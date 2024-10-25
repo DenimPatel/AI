@@ -18,7 +18,9 @@ Welcome to the history of artificial intelligence! Explore key milestones in the
 - **2016**: Google DeepMind's AlphaGo defeats world Go champion Lee Sedol, an achievement due to the complexity of the game and the use of reinforcement learning.
 - **2020**: OpenAI’s GPT-3, a language model with 175 billion parameters, demonstrates state-of-the-art performance in various natural language processing tasks.
 - **2022**: DeepMind’s AlphaFold predicts the 3D structures of almost all known proteins, solving a 50-year-old challenge in biology.
-  
+
+[product timeline](product_timeline.md)
+
 ## Contribute
 
-Feel free to contribute to this timeline by submitting a pull request!
+Feel free to contribute to this repo by submitting a pull request!
