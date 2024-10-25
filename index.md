@@ -20,6 +20,7 @@ Welcome to the history of artificial intelligence! Explore key milestones in the
 - **2022**: DeepMind’s AlphaFold predicts the 3D structures of almost all known proteins, solving a 50-year-old challenge in biology.
 
 [product timeline](product_timeline.md)
+[quotes](AI-quotes.md)
 
 ## Contribute
 
