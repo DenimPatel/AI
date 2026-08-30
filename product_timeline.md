@@ -48,6 +48,7 @@ A chronological timeline of significant AI product releases and milestones that 
 - **2024 Mar**: Mistral releases Mixtral 8x22B 🔓 and the closed Mistral Large 🔒
 - **2024 Mar**: OpenAI releases Sora 🔒
 - **2024 Mar**: Anthropic releases the Claude 3 family (Haiku, Sonnet, Opus) 🔒
+- **2024 Mar**: Cognition Labs launches Devin, marketed as the "first AI software engineer" — an early sign coding agents, not just chat models, were becoming the next battleground 🔒
 - **2024 Apr**: Meta releases Llama 3 (8B, 70B) 🔓
 - **2024 May**: OpenAI releases GPT-4o 🔒
 - **2024 Jun**: Anthropic releases Claude 3.5 Sonnet 🔒
@@ -63,27 +64,42 @@ A chronological timeline of significant AI product releases and milestones that 
 ## The Open-Weight Shock & Reasoning Race (2025)
 - **2025 Jan**: DeepSeek releases R1 🔓 — matches OpenAI's o1 on reasoning benchmarks at a small fraction of the training/inference cost, triggering a major AI/chip stock selloff (the "DeepSeek moment") and proving open models could match closed reasoning models
 - **2025 Jan**: OpenAI releases o3-mini 🔒
+- **2025 Feb**: Anthropic launches **Claude Code** as a research preview — an agentic command-line tool that lets Claude read, edit, run, and commit code directly in a developer's terminal 🔒
 - **2025 Feb**: Anthropic releases Claude 3.7 Sonnet 🔒 — a hybrid model with switchable "extended thinking"
 - **2025 Feb**: xAI releases Grok-3 🔒
-- **2025 Mar**: Google releases Gemma 3 🔓 and Gemini 2.5 Pro 🔒
+- **2025 Mar**: Google releases Gemma 3 🔓 and Gemini 2.5 Pro 🔒; OpenAI ships Codex CLI/agent tooling to compete with Claude Code 🔒
 - **2025 Apr**: Meta releases Llama 4 (Scout, Maverick) 🔓; OpenAI releases o3 and o4-mini 🔒
-- **2025 May**: Anthropic releases the Claude 4 family (Opus 4, Sonnet 4) 🔒
+- **2025 May**: Anthropic releases the Claude 4 family (Opus 4, Sonnet 4) alongside the **general availability of Claude Code** 🔒 — Claude Code goes on to grow more than 10x in usage within three months
 - **2025 Jul**: xAI releases Grok 4 🔒
 - **2025 Aug**: OpenAI releases GPT-5 🔒 — unifies the reasoning and non-reasoning model lines into a single system for the first time
 - **2025 Sep**: DeepSeek releases V3.1 Terminus and V3.2 🔓
-- **2025**: Alibaba releases the Qwen3 family 🔓, alongside continued open releases from Mistral and Z.ai's GLM
+- **2025**: Alibaba releases the Qwen3 family 🔓, alongside continued open releases from Mistral and Z.ai's GLM; Cursor's AI-native IDE becomes the fastest-growing SaaS product ever recorded, reaching roughly $2B ARR in about 28 months 🔒
 - **2025 Nov**: Google releases Gemini 3 🔒; xAI releases Grok 4.1 🔒
+- **2025 Nov**: An open-source personal AI agent launches under the name Clawdbot (soon renamed Moltbot, then **OpenClaw**) — an MIT-licensed, local-first agent that lives in chat apps like WhatsApp, Slack, and Telegram and can browse the web, manage files, and run commands on its own schedule 🔓
 - **2025 Nov–Dec**: OpenAI ships fast follow-ups GPT-5.1 and GPT-5.2 🔒
 
 ## Frontier Consolidation (2026)
+- **2026 Jan**: OpenClaw crosses 100,000 GitHub stars within its first week under its new name — one of the fastest-growing open-source projects ever, outpacing the early growth of Docker, Kubernetes, and React
+- **2026 Feb**: OpenClaw surpasses 214,000 GitHub stars; Anthropic reports Claude Code's run-rate revenue has climbed past $2.5 billion 🔒
 - **2026**: New Qwen generations (Qwen 3.5, 3.6) ship under the permissive Apache 2.0 license 🔓; Google shifts Gemma 4 to Apache 2.0 as well 🔓
+- **2026 Jun**: Anthropic publicly releases **Claude Fable 5** 🔒 — the first public model from its more powerful "Mythos" family, state-of-the-art on most capability benchmarks, shipped with safety classifiers that block high-risk cyber/bio/chem requests
+- **2026 Jun**: Days after Fable 5's release, the US government briefly restricts its export over cybersecurity jailbreak concerns; Anthropic redeploys it globally days later with strengthened safeguards
 - **2026 Jul**: DeepSeek releases V4 🔓 — MIT-licensed, with ultra-long context as a default
-- **2026 Jul**: Anthropic releases Claude Opus 5 🔒
+- **2026 Jul**: Anthropic releases Claude Opus 5 🔒, topping both the Intelligence and Agentic indexes on Artificial Analysis
 - **2026 Jul–Aug**: OpenAI's GPT-5.6 reaches general availability 🔒
 - **2026 Aug**: Google releases Gemini 3.7 Flash 🔒; Z.ai releases GLM-5.3 🔓
 - **2026 Aug**: xAI ships Grok 4.6 🔒
+- **2026 Aug**: Independent surveys put Claude Code at 39% adoption among professional developers worldwide (47% in the US), up from 18% in January — the fastest-growing of the major coding agents, ahead of OpenAI's Codex
 
 *(2026 entries are drawn from AI-news aggregators rather than primary announcements, since they fall after most models' training cutoffs — treat exact dates/version numbers as approximate.)*
+
+## Anthropic's Growth & the Rise of Agents
+- **Anthropic's revenue exploded.** From roughly $1 billion in annualized revenue in December 2024, Anthropic grew to $9B by end of 2025, $14B in February 2026, $30B in April 2026, $47B in May 2026, and $65B by July 2026 — CEO Dario Amodei described it as 80x annualized growth in a single quarter.
+- **Its valuation followed.** $4.1B (Mar 2023) → $61.5B (Mar 2025) → $380B (Feb 2026) → $965B after a $65B Series H (May 2026), briefly making Anthropic the world's most valuable private AI company, ahead of OpenAI.
+- **Claude Code became a business on its own.** Launched as a research preview in February 2025 and reaching general availability in May 2025, Claude Code grew more than 10x in usage within three months, crossed a $2.5B revenue run-rate by February 2026, and helped double Anthropic's $1M+ enterprise customers to over 1,000.
+- **Agentic coding tools became the main battleground.** Devin (2024), Claude Code, OpenAI's Codex CLI, Cursor, and GitHub Copilot all raced to move beyond autocomplete into autonomously writing features, fixing bugs, running tests, and opening pull requests — by mid-2026 roughly 90% of developers used at least one AI coding tool at work.
+- **Personal, always-on agents went mainstream outside coding too.** OpenClaw (born as Clawdbot/Moltbot in late 2025) showed the same agentic pattern — an LLM given tools, memory, and a persistent loop — could run entirely on personal hardware and act inside everyday chat apps, not just in a dev terminal.
+- **Anthropic pushed a more capable, more restricted tier.** The "Mythos" family and its public release, Claude Fable 5 (June 2026), showed frontier labs beginning to ship models powerful enough to trigger their own safety classifiers and, briefly, government export scrutiny — a preview of how the next capability jump may be gated differently than prior ones.
 
 ## Open vs. Closed: The State of the Race
 - **The gap has shrunk.** Open-weight models trailed closed frontier models by roughly two years in the GPT-3 era; by 2025–2026 that gap had narrowed to a matter of months, with DeepSeek-R1 and Llama 4 landing within striking distance of the latest o-series and Claude/Gemini releases on many benchmarks.
