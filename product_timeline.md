@@ -1,6 +1,8 @@
 # AI Product Timeline 📅
 
-A chronological timeline of significant AI product releases and milestones that have shaped the field of artificial intelligence.
+A chronological timeline of significant AI product releases and milestones that have shaped the field of artificial intelligence — including the race between **closed, API-only frontier models** and the **open-weight models** chasing (and sometimes matching) them.
+
+**Legend:** 🔓 open-weight (downloadable) &nbsp;|&nbsp; 🔒 closed / API-only
 
 ## Early Foundations (2010-2015)
 - **2011**: IBM Watson wins Jeopardy!
@@ -32,17 +34,62 @@ A chronological timeline of significant AI product releases and milestones that 
 ## AI Goes Mainstream (2023)
 - **2023 Jan**: Microsoft invests heavily in OpenAI
 - **2023 Feb**: Google announces Bard
-- **2023 Mar**: OpenAI releases GPT-4
-- **2023 Mar**: Anthropic releases Claude
-- **2023 Jul**: Meta releases Llama 2
-- **2023 Aug**: Stability AI releases SDXL
-- **2023 Nov**: OpenAI releases GPT-4 Turbo
-- **2023 Dec**: Google releases Gemini
+- **2023 Mar**: OpenAI releases GPT-4 🔒
+- **2023 Mar**: Anthropic releases Claude 🔒
+- **2023 Jul**: Meta releases Llama 2 🔓 — first widely-licensed open-weight model to seriously rival a closed frontier model
+- **2023 Aug**: Stability AI releases SDXL 🔓
+- **2023 Nov**: OpenAI releases GPT-4 Turbo 🔒
+- **2023 Dec**: Google releases Gemini 🔒
 
-## Latest Developments (2024)
-- **2024 Jan**: Anthropic releases Claude 3 family (Haiku, Sonnet, Opus)
-- **2024 Jan**: Google releases Gemini Ultra
-- **2024 Mar**: OpenAI releases Sora
+## Open Models Enter the Frontier Race (2024)
+- **2024 Jan**: Google releases Gemini Ultra 🔒
+- **2024 Feb**: Google releases Gemma (2B, 7B) 🔓 — lightweight open models distilled from Gemini research
+- **2024 Mar**: xAI open-sources the Grok-1 weights 🔓
+- **2024 Mar**: Mistral releases Mixtral 8x22B 🔓 and the closed Mistral Large 🔒
+- **2024 Mar**: OpenAI releases Sora 🔒
+- **2024 Mar**: Anthropic releases the Claude 3 family (Haiku, Sonnet, Opus) 🔒
+- **2024 Apr**: Meta releases Llama 3 (8B, 70B) 🔓
+- **2024 May**: OpenAI releases GPT-4o 🔒
+- **2024 Jun**: Anthropic releases Claude 3.5 Sonnet 🔒
+- **2024 Jul**: Meta releases Llama 3.1 405B 🔓 — the first open-weight model to benchmark competitively against GPT-4o and Claude 3.5 Sonnet
+- **2024 Aug**: xAI releases Grok-2 🔒
+- **2024 Sep**: Alibaba releases Qwen2.5 🔓
+- **2024 Sep**: OpenAI releases o1-preview / o1-mini 🔒 — the first mainstream "reasoning" model, trading extra inference-time compute for accuracy
+- **2024 Oct**: Anthropic releases an upgraded Claude 3.5 Sonnet and Claude 3.5 Haiku, with computer-use capability 🔒
+- **2024 Dec**: DeepSeek releases DeepSeek-V3 🔓 — a frontier-class model trained for a small fraction of the cost of comparable Western models
+- **2024 Dec**: OpenAI releases the full o1 🔒; Google releases Gemini 2.0 Flash 🔒
+- **2024 Dec**: Meta releases Llama 3.3 70B 🔓
+
+## The Open-Weight Shock & Reasoning Race (2025)
+- **2025 Jan**: DeepSeek releases R1 🔓 — matches OpenAI's o1 on reasoning benchmarks at a small fraction of the training/inference cost, triggering a major AI/chip stock selloff (the "DeepSeek moment") and proving open models could match closed reasoning models
+- **2025 Jan**: OpenAI releases o3-mini 🔒
+- **2025 Feb**: Anthropic releases Claude 3.7 Sonnet 🔒 — a hybrid model with switchable "extended thinking"
+- **2025 Feb**: xAI releases Grok-3 🔒
+- **2025 Mar**: Google releases Gemma 3 🔓 and Gemini 2.5 Pro 🔒
+- **2025 Apr**: Meta releases Llama 4 (Scout, Maverick) 🔓; OpenAI releases o3 and o4-mini 🔒
+- **2025 May**: Anthropic releases the Claude 4 family (Opus 4, Sonnet 4) 🔒
+- **2025 Jul**: xAI releases Grok 4 🔒
+- **2025 Aug**: OpenAI releases GPT-5 🔒 — unifies the reasoning and non-reasoning model lines into a single system for the first time
+- **2025 Sep**: DeepSeek releases V3.1 Terminus and V3.2 🔓
+- **2025**: Alibaba releases the Qwen3 family 🔓, alongside continued open releases from Mistral and Z.ai's GLM
+- **2025 Nov**: Google releases Gemini 3 🔒; xAI releases Grok 4.1 🔒
+- **2025 Nov–Dec**: OpenAI ships fast follow-ups GPT-5.1 and GPT-5.2 🔒
+
+## Frontier Consolidation (2026)
+- **2026**: New Qwen generations (Qwen 3.5, 3.6) ship under the permissive Apache 2.0 license 🔓; Google shifts Gemma 4 to Apache 2.0 as well 🔓
+- **2026 Jul**: DeepSeek releases V4 🔓 — MIT-licensed, with ultra-long context as a default
+- **2026 Jul**: Anthropic releases Claude Opus 5 🔒
+- **2026 Jul–Aug**: OpenAI's GPT-5.6 reaches general availability 🔒
+- **2026 Aug**: Google releases Gemini 3.7 Flash 🔒; Z.ai releases GLM-5.3 🔓
+- **2026 Aug**: xAI ships Grok 4.6 🔒
+
+*(2026 entries are drawn from AI-news aggregators rather than primary announcements, since they fall after most models' training cutoffs — treat exact dates/version numbers as approximate.)*
+
+## Open vs. Closed: The State of the Race
+- **The gap has shrunk.** Open-weight models trailed closed frontier models by roughly two years in the GPT-3 era; by 2025–2026 that gap had narrowed to a matter of months, with DeepSeek-R1 and Llama 4 landing within striking distance of the latest o-series and Claude/Gemini releases on many benchmarks.
+- **Training costs collapsed.** DeepSeek's efficiency-focused training (V3, R1) showed frontier-class results were achievable for a fraction of the compute cost previously assumed necessary, reshaping assumptions across the industry.
+- **Licensing is trending more open.** Newer open releases (DeepSeek V4, Gemma 4, the open Qwen line) have moved toward permissive licenses like Apache 2.0 and MIT, rather than the more restrictive custom licenses used by early Llama releases.
+- **It's increasingly a geographic race too.** US labs (OpenAI, Anthropic, Google, xAI) still lead most closed frontier benchmarks, while Chinese labs (DeepSeek, Alibaba's Qwen, Z.ai's GLM) have become the dominant force in high-quality open-weight releases — making "open vs. closed" partly a proxy for a broader US–China AI competition.
 
 ---
-*Last event in April 2024*
+*Last updated August 2026*
