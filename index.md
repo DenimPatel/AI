@@ -22,6 +22,12 @@ Welcome to the history of artificial intelligence! Explore key milestones in the
 [product timeline](product_timeline.md)
 [quotes](AI-quotes.md)
 
+## Robotics
+
+Tutorials and notes on ROS, navigation, computer vision, and the math behind robotics, migrated from the [Robotics At Once](https://roboticswithdenim.wordpress.com/) blog.
+
+[Explore the Robotics section](robotics/index.md)
+
 ## Contribute
 
 Feel free to contribute to this repo by submitting a pull request!
