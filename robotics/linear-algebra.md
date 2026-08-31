@@ -1,7 +1,8 @@
-# Linear Algebra
-
-*April 21, 2019 · Linear Algebra*
-
+---
+layout: robotics-article
+title: "Linear Algebra"
+date_label: "April 21, 2019"
+category: "Linear Algebra"
 ---
 
 Linear Algebra is always the must have tool for any engineers into the bucket. Because whenever we implement on a system of multi dimensions these concepts comes very handy and helps to understand or frame the problem and answer it in a more generalized and concise way possible.
@@ -46,7 +47,3 @@ If you have a good understanding of the above mentioned topics then you are good
 Cheers,
 Denim Patel
 
-
----
-
-[← Back to Robotics](index.md)

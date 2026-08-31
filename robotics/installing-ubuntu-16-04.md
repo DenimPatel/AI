@@ -1,7 +1,8 @@
-# Installing Ubuntu 16.04
-
-*March 24, 2017 · Uncategorized*
-
+---
+layout: robotics-article
+title: "Installing Ubuntu 16.04"
+date_label: "March 24, 2017"
+category: "Uncategorized"
 ---
 
 First of all, before installing Ubuntu as a dual boot here is the minimum specs required in your laptop for working with ROS.
@@ -48,7 +49,3 @@ Follow the **[step wise process](https://www.ubuntu.com/download/desktop/create-
 
 Congratulations!! Now You are good to go to the next page for installing ROS.
 
-
----
-
-[← Back to Robotics](index.md)

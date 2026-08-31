@@ -1,7 +1,8 @@
-# Introduction to ROS (Robot operating System)
-
-*March 23, 2017 · ROS*
-
+---
+layout: robotics-article
+title: "Introduction to ROS (Robot operating System)"
+date_label: "March 23, 2017"
+category: "ROS"
 ---
 
 > If you haven't heard a word about this extraordinary thing then, welcome to the world of real robotics.
@@ -76,7 +77,3 @@ Next page Contains the detailed instruction to install Ubuntu( 16.04) as dual-bo
 
 If you have the laptop installed with Ubuntu then you can simply skip the next page.
 
-
----
-
-[← Back to Robotics](index.md)

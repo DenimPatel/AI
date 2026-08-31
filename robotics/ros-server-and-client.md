@@ -1,7 +1,8 @@
-# ROS: Server and Client
-
-*April 14, 2017 · ROS*
-
+---
+layout: robotics-article
+title: "ROS: Server and Client"
+date_label: "April 14, 2017"
+category: "ROS"
 ---
 
 We learnt Publisher and subscriber in the previous post.
@@ -138,7 +139,3 @@ $  rosrun beginner_tutorials add_two_ints_client 5 10
 ```
 Now just observe the output of these two terminals.
 
-
----
-
-[← Back to Robotics](index.md)

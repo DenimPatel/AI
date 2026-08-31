@@ -1,7 +1,8 @@
-# Computer Vision 101: Best Resources
-
-*April 21, 2019 · Computer Vision*
-
+---
+layout: robotics-article
+title: "Computer Vision 101: Best Resources"
+date_label: "April 21, 2019"
+category: "Computer Vision"
 ---
 
 Hey folks,
@@ -40,7 +41,3 @@ Please find the list of courses offered in computer vision that contains the lec
 
 This way you will have a different flavor of the same topics and will broaden you understanding.
 
-
----
-
-[← Back to Robotics](index.md)

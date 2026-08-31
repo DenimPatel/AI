@@ -1,7 +1,8 @@
-# ROS: Creating a Workspace
-
-*March 28, 2017 · ROS*
-
+---
+layout: robotics-article
+title: "ROS: Creating a Workspace"
+date_label: "March 28, 2017"
+category: "ROS"
 ---
 
 before starting with the example,
@@ -98,7 +99,3 @@ We have some additional commands from ROS as well. You can have a very good summ
 
 In next post, we will learn about creating a package inside this newly created workspace.
 
-
----
-
-[← Back to Robotics](index.md)

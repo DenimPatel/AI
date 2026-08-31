@@ -1,7 +1,8 @@
-# Basic Operations: Image read and write and convert color
-
-*March 11, 2019 · Computer Vision*
-
+---
+layout: robotics-article
+title: "Basic Operations: Image read and write and convert color"
+date_label: "March 11, 2019"
+category: "Computer Vision"
 ---
 
 This blog aims to provide some basic operations on any image to make it ready to use it in your project as you want it.
@@ -95,7 +96,3 @@ cv2.imwrite("gray_mona.jpg", image_gray)
 
 Above line will save grayscaled image into the same folder with the name "gray\_mona"
 
-
----
-
-[← Back to Robotics](index.md)

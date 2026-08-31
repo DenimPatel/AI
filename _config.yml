@@ -1,6 +1,5 @@
 title: AI
 description: Informational website for all of AI
-theme: minima
 markdown: kramdown
 kramdown:
   input: GFM

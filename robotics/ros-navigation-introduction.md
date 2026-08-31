@@ -1,7 +1,8 @@
-# ROS: Navigation: Introduction
-
-*April 15, 2017 · Navigation, ROS*
-
+---
+layout: robotics-article
+title: "ROS: Navigation: Introduction"
+date_label: "April 15, 2017"
+category: "Navigation, ROS"
 ---
 
 hey buddy,
@@ -22,7 +23,3 @@ At the end you will be having the robot ready something like shown in the video 
 <https://www.youtube.com/watch?v=GYsj2UGhgdE>
 From the next post we will start with the Odometry.
 
-
----
-
-[← Back to Robotics](index.md)

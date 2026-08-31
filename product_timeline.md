@@ -1,8 +1,13 @@
-# AI Product Timeline 📅
-
-A chronological timeline of significant AI product releases and milestones that have shaped the field of artificial intelligence — including the race between **closed, API-only frontier models** and the **open-weight models** chasing (and sometimes matching) them.
+---
+layout: page
+title: Product Timeline
+kicker: Ship log
+subtitle: A chronological timeline of significant AI product releases and milestones — including the race between closed, API-only frontier models and the open-weight models chasing (and sometimes matching) them.
+---
 
 **Legend:** 🔓 open-weight (downloadable) &nbsp;|&nbsp; 🔒 closed / API-only
+
+[← Back to home]({{ '/' | relative_url }})
 
 ## Early Foundations (2010-2015)
 - **2011**: IBM Watson wins Jeopardy!

@@ -1,7 +1,8 @@
-# Introduction to My blog of Robotics
-
-*March 23, 2017 · Uncategorized*
-
+---
+layout: robotics-article
+title: "Introduction to My blog of Robotics"
+date_label: "March 23, 2017"
+category: "Uncategorized"
 ---
 
 > Are you a robotics enthusiast?
@@ -38,7 +39,3 @@ Cheers,
 
 Denim.
 
-
----
-
-[← Back to Robotics](index.md)

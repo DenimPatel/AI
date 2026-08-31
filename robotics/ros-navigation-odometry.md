@@ -1,7 +1,8 @@
-# ROS: Navigation: Odometry
-
-*April 15, 2017 · Navigation, ROS*
-
+---
+layout: robotics-article
+title: "ROS: Navigation: Odometry"
+date_label: "April 15, 2017"
+category: "Navigation, ROS"
 ---
 
 In this post we will discuss everything about odometry.
@@ -90,7 +91,3 @@ By combining these two results we can have the kinematic model of the Differenti
 That's all for this post.
 The kinematic model of this robot and the code for calculating odometry we will discuss in the next post.
 
-
----
-
-[← Back to Robotics](index.md)
