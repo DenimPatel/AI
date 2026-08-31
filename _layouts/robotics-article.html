@@ -1,0 +1,16 @@
+---
+layout: default
+---
+<div class="wrap wrap--article">
+  <article class="article-header" style="padding: clamp(32px, 6vw, 56px) 0 0;">
+    <p class="back-link"><a href="{{ '/robotics/' | relative_url }}">&larr; Back to Robotics</a></p>
+    {% if page.category %}<span class="article-kicker">{{ page.category }}</span>{% endif %}
+    <h1>{{ page.title }}</h1>
+    {% if page.date_label %}<p class="article-date">{{ page.date_label }}</p>{% endif %}
+    <div class="article-body">
+    {{ content }}
+    </div>
+    <div class="stats-rule" style="border-top-color: var(--color-divider); margin: var(--space-4) 0 var(--space-3);"></div>
+    <p class="back-link"><a href="{{ '/robotics/' | relative_url }}">&larr; Back to Robotics</a></p>
+  </article>
+</div>

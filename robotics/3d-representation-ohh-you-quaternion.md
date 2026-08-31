@@ -1,7 +1,8 @@
-# 3D representation? Ohh, YOU QUATERNION!!
-
-*April 14, 2020 · Quaternions*
-
+---
+layout: robotics-article
+title: "3D representation? Ohh, YOU QUATERNION!!"
+date_label: "April 14, 2020"
+category: "Quaternions"
 ---
 
 Here I am going to provide a short summary of How/ Why quaternion helps in 3D rotation representation. Here I tried to provide bits that are necessary and required when you are using them as a tool. I hope you find it useful.
@@ -133,7 +134,3 @@ Vector3d V\_rotated = q \* v; // it's overloaded operator
 
 I hope you like the short summary writing on 3D representation using quaternion. Let me know if you find any mistakes/errors.
 
-
----
-
-[← Back to Robotics](index.md)

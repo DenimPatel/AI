@@ -1,7 +1,8 @@
-# ROS: First Node
-
-*April 11, 2017 · ROS*
-
+---
+layout: robotics-article
+title: "ROS: First Node"
+date_label: "April 11, 2017"
+category: "ROS"
 ---
 
 let's start making the "hello world" example.
@@ -129,7 +130,3 @@ $ rosnode list
 
 That's all. From Next post we will do message passing using Publisher and subscriber.
 
-
----
-
-[← Back to Robotics](index.md)

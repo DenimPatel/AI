@@ -1,7 +1,8 @@
-# Installing ROS Kinetic Kame LTS
-
-*March 25, 2017 · ROS*
-
+---
+layout: robotics-article
+title: "Installing ROS Kinetic Kame LTS"
+date_label: "March 25, 2017"
+category: "ROS"
 ---
 
 For Downloading ROS on your laptop you have 3 choices of installation
@@ -24,7 +25,3 @@ Just following it is a wise option.
 
 When your are done with the ROS Installation, you are now ready to learn the basics of ROS.
 
-
----
-
-[← Back to Robotics](index.md)

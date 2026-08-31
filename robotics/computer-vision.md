@@ -1,7 +1,8 @@
-# Computer Vision
-
-*March 11, 2019 · Computer Vision*
-
+---
+layout: robotics-article
+title: "Computer Vision"
+date_label: "March 11, 2019"
+category: "Computer Vision"
 ---
 
 Hello folks,
@@ -18,7 +19,3 @@ This series of blog can be used to understand the pipeline for computer vision i
 
 Stay tuned for more interesting stuffs...
 
-
----
-
-[← Back to Robotics](index.md)

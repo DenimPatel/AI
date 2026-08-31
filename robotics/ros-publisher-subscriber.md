@@ -1,7 +1,8 @@
-# ROS: Publisher & Subscriber
-
-*April 14, 2017 · ROS*
-
+---
+layout: robotics-article
+title: "ROS: Publisher & Subscriber"
+date_label: "April 14, 2017"
+category: "ROS"
 ---
 
 This post is very crucial as far as learning of ROS is concerned. You will be doing this thing a lot while developing the Robotic system on ROS.
@@ -173,7 +174,3 @@ $ rxgraph
 more commands you can learn from [ROS Cheat Sheet](http://www.tedusar.eu/files/summerschool2013/ROScheatsheet.pdf).
 In next post we will learn about services.
 
-
----
-
-[← Back to Robotics](index.md)

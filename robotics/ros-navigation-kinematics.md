@@ -1,7 +1,8 @@
-# ROS: Navigation: Kinematics
-
-*April 15, 2017 · Navigation, ROS*
-
+---
+layout: robotics-article
+title: "ROS: Navigation: Kinematics"
+date_label: "April 15, 2017"
+category: "Navigation, ROS"
 ---
 
 In today's post we will discuss the kinematic model of the differential wheel mobile robot in greater detail.
@@ -44,7 +45,3 @@ It should send the same velocity with opposite direction.
 By implementing this algorithm we can have the code that can send the lower level velocity command to the motors to reach to the desired position.
 here the "Velocity Motion Model"  is described and in robotics generally this is used. You can make the "Displacement Motion Model" too with the same algorithm by feeding the displacement data instead of velocity.
 
-
----
-
-[← Back to Robotics](index.md)

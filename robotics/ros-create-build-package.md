@@ -1,7 +1,8 @@
-# ROS: Create & Build Package
-
-*March 28, 2017 · ROS*
-
+---
+layout: robotics-article
+title: "ROS: Create & Build Package"
+date_label: "March 28, 2017"
+category: "ROS"
 ---
 
 As you know that Package is the main building block for any Project you do in ROS.
@@ -93,7 +94,3 @@ $ catkin_make
 
 Congratulations! Now you have the fundamental knowledge of the package and also you have your own package to place your codes in.
 
-
----
-
-[← Back to Robotics](index.md)

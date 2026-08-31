@@ -1,7 +1,8 @@
-# ROS: Overview
-
-*March 27, 2017 · ROS*
-
+---
+layout: robotics-article
+title: "ROS: Overview"
+date_label: "March 27, 2017"
+category: "ROS"
 ---
 
 On internet probably you will find the statement that **"ROS has steep learning rate"**.
@@ -118,7 +119,3 @@ This  knowledge is enough for starting.In first go, you won't be able to unders
 If you want to learn this concepts in greater detail than you can go to this [ROS Wiki page](http://wiki.ros.org/ROS/Concepts).
 Now we have the basic knowledge of ROS. From next post, we will dive into ROS with greater detail.
 
-
----
-
-[← Back to Robotics](index.md)
