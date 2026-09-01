@@ -197,8 +197,7 @@ title: Home
     <div class="card"><div class="card-kicker">Navigation</div><div class="card-title">Odometry &amp; kinematics</div><p class="card-body">3 notes on how a robot tracks and plans its motion.</p></div>
     <div class="card"><div class="card-kicker">Computer vision</div><div class="card-title">Seeing the world</div><p class="card-body">3 notes on image basics and where to learn more.</p></div>
     <div class="card"><div class="card-kicker">Math</div><div class="card-title">Linear algebra &amp; quaternions</div><p class="card-body">2 notes on the math underneath it all.</p></div>
-    <div class="card"><div class="card-kicker">Interactive · part 1</div><div class="card-title">Nonlinear optimization</div><p class="card-body">Gradient descent, Newton, Gauss-Newton &amp; Levenberg-Marquardt, built step by step around robot localization.</p></div>
-    <div class="card"><div class="card-kicker">Interactive · part 2</div><div class="card-title">Optimization with rotations</div><p class="card-body">Extends part 1 with heading, bearing measurements, and angle-wrapping — solving for a robot's full 2D pose.</p></div>
+    <div class="card"><div class="card-kicker">Interactive · 5 parts</div><div class="card-title">Nonlinear optimization</div><p class="card-body">Gradient descent, Newton, Gauss-Newton &amp; Levenberg-Marquardt, built step by step from robot position through pose, unknown landmarks, trajectories, and 3D rotation.</p></div>
   </div>
   <a href="{{ '/robotics/' | relative_url }}" class="btn btn-secondary">View all robotics notes</a>
   <a href="{{ '/nonlinear-optimization.html' | relative_url }}" class="btn btn-ghost">Try the optimization guide →</a>
