@@ -82,6 +82,10 @@ permalink: /nonlinear-optimization.html
   .nlo-cheat th, .nlo-cheat td { padding: 10px 12px; border-bottom: 1px solid var(--color-divider); vertical-align: top; text-align: left; }
   .nlo-cheat th { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.6; }
   .nlo-cheat code { white-space: nowrap; }
+  .nlo-next {
+    display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;
+    margin-top: 24px; padding: 18px; background: var(--color-surface); border-radius: var(--radius-md);
+  }
   @media (max-width: 640px) {
     .nlo-eyebrow { margin-left: 0; }
     .nlo-step-head { flex-wrap: wrap; }
@@ -94,7 +98,11 @@ permalink: /nonlinear-optimization.html
   <a class="nav-brand" href="{{ '/' | relative_url }}">AI /</a>
   <a href="{{ '/' | relative_url }}">Home</a>
   <a href="{{ '/robotics/' | relative_url }}">Robotics</a>
-  <a href="{{ '/robotics/linear-algebra.html' | relative_url }}">Linear algebra notes</a>
+  <a href="{{ '/nonlinear-optimization.html' | relative_url }}">Part 1</a>
+  <a href="{{ '/nonlinear-optimization-rotations.html' | relative_url }}">Part 2</a>
+  <a href="{{ '/nonlinear-optimization-slam.html' | relative_url }}">Part 3</a>
+  <a href="{{ '/nonlinear-optimization-pose-graph.html' | relative_url }}">Part 4</a>
+  <a href="{{ '/nonlinear-optimization-3d-rotations.html' | relative_url }}">Part 5</a>
 </nav>
 
 <main>
@@ -316,6 +324,11 @@ permalink: /nonlinear-optimization.html
     <p style="margin-top:20px;">All four methods answer the same question — <em>which direction, and how far?</em> — using progressively more information about the shape of the cost function. Gradient descent only asks "which way is down." Newton asks "down, and how curved is it here?" Gauss-Newton gets a cheap answer to the same question by exploiting the sum-of-squares structure. Levenberg-Marquardt hedges between the two automatically, which is why it's the one you'll actually find inside most robotics and computer-vision libraries (it's the workhorse under <code>g2o</code>, <code>Ceres Solver</code>, and most bundle-adjustment and SLAM back-ends).</p>
   </section>
 {% endraw %}
+
+  <div class="nlo-next">
+    <span>Real robots also have a heading, not just a position — and that brings rotations into the optimization.</span>
+    <a class="btn btn-secondary" href="{{ '/nonlinear-optimization-rotations.html' | relative_url }}">Continue: optimization with rotations →</a>
+  </div>
 </div>
 </main>
 
