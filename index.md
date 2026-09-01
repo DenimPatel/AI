@@ -26,6 +26,8 @@ title: Home
     <p class="stat"><span>Product releases tracked</span><span class="stat-fill"></span><span class="stat-value">85</span></p>
     <p class="stat"><span>Voices quoted</span><span class="stat-fill"></span><span class="stat-value">26</span></p>
     <p class="stat"><span>Robotics field notes</span><span class="stat-fill"></span><span class="stat-value">18</span></p>
+    <p class="stat"><span>Benchmarks tracked</span><span class="stat-fill"></span><span class="stat-value">4</span></p>
+    <p class="stat"><span>Labs profiled</span><span class="stat-fill"></span><span class="stat-value">10</span></p>
   </div>
   <div class="stats-rule"></div>
 </section>
@@ -103,6 +105,38 @@ title: Home
   <div class="release-row"><span class="release-date">Aug 2026</span><p>Independent surveys put <strong>Claude Code</strong> at 39% adoption among professional developers worldwide.</p><span class="tag tag-neutral">Closed</span></div>
 
   <p style="margin-top: 20px;"><a href="{{ '/product_timeline.html' | relative_url }}" class="btn btn-secondary">View the full product timeline</a></p>
+</section>
+
+<section id="benchmarks" class="section">
+  <span class="section-kicker">Scoreboard</span>
+  <h2 class="section-title">Benchmarks</h2>
+  <p class="section-lede">How the frontier has moved on the evals that matter — general knowledge, graduate-level reasoning, real-world coding, and abstract generalization. Full tables, with sourcing notes, on the <a href="{{ '/benchmarks.html' | relative_url }}">benchmarks page</a>.</p>
+  <div class="card-grid card-grid--tight" style="margin-bottom: 24px;">
+    <div class="card"><div class="card-kicker">MMLU</div><div class="card-title">General knowledge</div><p class="card-body">~44% (GPT-3, 2020) → ~90% (Gemini Ultra, 2023) — the field hit the human-expert ceiling by 2024.</p></div>
+    <div class="card"><div class="card-kicker">GPQA Diamond</div><div class="card-title">Graduate-level reasoning</div><p class="card-body">~35% (GPT-4, 2023) → ~85%+ (GPT-5, 2025) on PhD-level science questions.</p></div>
+    <div class="card"><div class="card-kicker">SWE-bench Verified</div><div class="card-title">Real-world coding</div><p class="card-body">~49% (Claude 3.5 Sonnet, 2024) → ~80%+ (2026) resolving genuine GitHub issues.</p></div>
+    <div class="card"><div class="card-kicker">ARC-AGI</div><div class="card-title">Abstract generalization</div><p class="card-body">~5% (GPT-4, 2023) → ~76–88% (o3, 2024) on puzzles designed to resist pattern-matching.</p></div>
+  </div>
+  <a href="{{ '/benchmarks.html' | relative_url }}" class="btn btn-secondary">View all benchmarks</a>
+</section>
+
+<section id="labs" class="section">
+  <span class="section-kicker">Who's building it</span>
+  <h2 class="section-title">Labs &amp; Companies</h2>
+  <p class="section-lede">A who's-who of the organizations shipping frontier and open-weight models. All 10, with focus areas and defining releases, on the <a href="{{ '/labs.html' | relative_url }}">labs page</a>.</p>
+  <div class="tag-legend">
+    <span class="tag tag-neutral">Frontier</span>
+    <span class="tag tag-accent">Open-weight</span>
+  </div>
+  <div class="card-grid card-grid--tight" style="margin-bottom: 24px;">
+    <div class="card"><div class="card-kicker">San Francisco · 2015</div><div class="card-title">OpenAI</div><p class="card-body">GPT series, ChatGPT, o-series reasoning models.</p></div>
+    <div class="card"><div class="card-kicker">San Francisco · 2021</div><div class="card-title">Anthropic</div><p class="card-body">Claude family, Claude Code, Constitutional AI.</p></div>
+    <div class="card"><div class="card-kicker">London &amp; Mountain View</div><div class="card-title">Google DeepMind</div><p class="card-body">Gemini, AlphaGo, AlphaFold.</p></div>
+    <div class="card"><div class="card-kicker">Menlo Park</div><div class="card-title">Meta AI</div><p class="card-body">Llama family, PyTorch, open-weight frontier models.</p></div>
+    <div class="card"><div class="card-kicker">Hangzhou · 2023</div><div class="card-title">DeepSeek</div><p class="card-body">Frontier-class reasoning at a fraction of the cost.</p></div>
+    <div class="card"><div class="card-kicker">Paris · 2023</div><div class="card-title">Mistral AI</div><p class="card-body">Europe's leading open-weight lab.</p></div>
+  </div>
+  <a href="{{ '/labs.html' | relative_url }}" class="btn btn-secondary">View all labs</a>
 </section>
 
 <section id="voices" class="section">
