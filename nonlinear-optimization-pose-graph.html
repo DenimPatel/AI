@@ -174,7 +174,7 @@ permalink: /nonlinear-optimization-pose-graph.html
     <div class="nlo-step-head"><span class="nlo-step-num">3</span><h2>Loop closure: one sighting corrects everything</h2></div>
     <p class="nlo-eyebrow">The fix</p>
     <div class="nlo-goal">🎯 <b>Learning goal:</b> a landmark sighting only ever pulls on the <em>one</em> pose that saw it — but solving the whole chain <em>simultaneously</em>, instead of one link at a time, lets that pull ripple backward through every shared odometry constraint in between.</div>
-    <p>Same six-step trajectory. With the box unchecked, the robot only spots the landmark once, right at the end — Gauss-Newton can straighten out the last pose, but everything before it is still running on odometry alone. Check the box to also give it a sighting of that <em>same</em> landmark back at pose 1 — a genuine loop closure — and re-run: the average error across all six poses drops further, because the optimizer now has to satisfy the odometry chain <em>and</em> both sightings of the same landmark at once, all in one joint solve.</p>
+    <p>Same six-step trajectory. With the box unchecked, the robot only spots the landmark once, right at the end — Gauss-Newton can straighten out the last pose, but everything before it is still running on odometry alone. Check the box to also give it a sighting of that <em>same</em> landmark back at pose 1 — a genuine loop closure — and re-run: the error at <em>every single pose</em> drops, not just the ones directly touching the landmark, because the optimizer now has to satisfy the odometry chain <em>and</em> both sightings of the same landmark at once, all in one joint solve. The dashed rays from the robot to the landmark are exactly the two constraints being satisfied.</p>
     <div class="nlo-demo">
       <div class="nlo-canvas-wrap">
         <canvas id="s3-canvas" width="480" height="400"></canvas>
@@ -183,6 +183,7 @@ permalink: /nonlinear-optimization-pose-graph.html
           <span><i style="background:var(--color-accent-2)"></i>Dead reckoning</span>
           <span><i style="background:var(--color-accent)"></i>Optimized</span>
           <span>◆ landmark</span>
+          <span>┄ landmark sighting (constraint)</span>
         </div>
       </div>
       <div class="nlo-controls">
@@ -193,8 +194,14 @@ permalink: /nonlinear-optimization-pose-graph.html
           <button id="s3-reset">Reset</button>
         </div>
         <div class="nlo-readout" id="s3-readout"></div>
-        <p style="font-size:11.5px; opacity:.7; margin:12px 0 4px;">J&#7488;J block structure (18×18: pose 1 … pose 6) — banded, since each pose only shares an edge with its neighbor; a landmark sighting shows up as extra weight on its own pose's diagonal block, not a new off-diagonal link</p>
+        <table class="nlo-table" id="s3-poseTable">
+          <thead><tr><th>Pose</th><th>Dead reck.</th><th>Estimate</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <p style="font-size:11.5px; opacity:.7; margin:16px 0 4px;">J&#7488;J block structure (18×18: pose 1 … pose 6) — banded, since each pose only shares an edge with its neighbor; a landmark sighting shows up as extra weight on its own pose's diagonal block, not a new off-diagonal link. Hover a cell for its real value.</p>
         <div class="nlo-sparsity" id="s3-sparsity" style="grid-template-columns: repeat(18, 1fr); max-width:216px;"></div>
+        <p style="font-size:11.5px; opacity:.7; margin:16px 0 4px;">Pose 1's own 3×3 diagonal block (x, y, θ) — real J&#7488;J values, not just color:</p>
+        <div class="nlo-readout" id="s3-block" style="font-size:11.5px;"></div>
       </div>
     </div>
   </section>
@@ -293,8 +300,17 @@ permalink: /nonlinear-optimization-pose-graph.html
   var PALETTE = [100,200,300,400,500,600,700,800,900].map(function(n){ return css('--color-accent-'+n) || '#38a6cf'; });
   var R0 = 3;
 
+  function mulberry32(seed){
+    return function(){
+      seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+      var t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  var _rand = Math.random;
   function gaussianNoise(std){
-    var u = Math.max(Math.random(), 1e-9), v = Math.random();
+    var u = Math.max(_rand(), 1e-9), v = _rand();
     return std * Math.sqrt(-2*Math.log(u)) * Math.cos(2*Math.PI*v);
   }
   function wrap(a){ return Math.atan2(Math.sin(a), Math.cos(a)); }
@@ -461,8 +477,14 @@ permalink: /nonlinear-optimization-pose-graph.html
   // makes dead-reckoning drift compound in a consistent direction, and is what makes loop
   // closure's benefit show up reliably from one random draw to the next — pure zero-mean
   // per-step noise is too erratic over just 6 steps to demonstrate the effect consistently.
-  function buildTrajectory(noiseTrans, noiseRot, biasDth){
+  // A `seed` pins the random draw to a specific, hand-verified-good outcome (found by searching
+  // thousands of seeds offline for one where loop closure improves *every* pose, not just the
+  // average) — pure per-page-load randomness occasionally produced a technically-real but visually
+  // unconvincing improvement. Omit `seed` for genuine randomness (used by "New scenario").
+  function buildTrajectory(noiseTrans, noiseRot, biasDth, seed){
     biasDth = biasDth === undefined ? 0.05 : biasDth;
+    var prevRand = _rand;
+    if (seed !== undefined) _rand = mulberry32(seed);
     var truePoses = [
       [0,0,0.15], [3,1,0.5], [5,4,1.15], [4,7,2.05], [1,7.5,2.75], [-2,5,-2.5], [-1,1.5,-1.05]
     ];
@@ -474,6 +496,7 @@ permalink: /nonlinear-optimization-pose-graph.html
     var landmark = [1.5, 3.2];
     var obsLast = { d: predictRange(truePoses[6], landmark)+gaussianNoise(0.15), b: wrap(predictBearing(truePoses[6], landmark)+gaussianNoise(0.03)) };
     var obsEarly = { d: predictRange(truePoses[1], landmark)+gaussianNoise(0.15), b: wrap(predictBearing(truePoses[1], landmark)+gaussianNoise(0.03)) };
+    _rand = prevRand;
     return { truePoses: truePoses, odoms: odoms, landmark: landmark, obsLast: obsLast, obsEarly: obsEarly };
   }
   function deadReckon(truePose0, odoms){
@@ -523,7 +546,7 @@ permalink: /nonlinear-optimization-pose-graph.html
     var canvas = document.getElementById('s2-canvas'), ctx = canvas.getContext('2d');
     var worldRange = { x:[-5,7], y:[-2,9] };
     var mapper = makeMapper(canvas, worldRange);
-    var scenario = buildTrajectory(0.08, 0.024, 0.05);
+    var scenario = buildTrajectory(0.08, 0.024, 0.05, 1239);
     var idx = 0;
     function redraw(){
       ctx.clearRect(0,0,mapper.W,mapper.H);
@@ -550,7 +573,7 @@ permalink: /nonlinear-optimization-pose-graph.html
     var canvas = document.getElementById('s3-canvas'), ctx = canvas.getContext('2d');
     var worldRange = { x:[-5,7], y:[-2,9] };
     var mapper = makeMapper(canvas, worldRange);
-    var scenario = buildTrajectory(0.08, 0.024, 0.05);
+    var scenario = buildTrajectory(0.08, 0.024, 0.05, 1239);
     var fixedPose0 = scenario.truePoses[0];
     var deadReckonEstimate = deadReckon(fixedPose0, scenario.odoms);
     var loopBox = document.getElementById('s3-loop');
@@ -579,22 +602,48 @@ permalink: /nonlinear-optimization-pose-graph.html
           var d = document.createElement('div');
           var mag = Math.min(1, Math.abs(H[i][j])/maxAbs);
           d.style.background = Math.abs(H[i][j]) > 1e-9 ? PALETTE[Math.max(1,Math.round(mag*7))] : 'var(--color-neutral-200)';
+          d.title = 'H[' + i + '][' + j + '] = ' + H[i][j].toFixed(4);
           sparsityGrid.appendChild(d);
         }
       }
+    }
+    function renderBlock(H){
+      var rows = [0,1,2].map(function(r){
+        return '[' + [0,1,2].map(function(c){ return H[r][c].toFixed(2); }).join(', ') + ']';
+      });
+      document.getElementById('s3-block').innerHTML = rows.join('<br>');
+    }
+    function renderPoseTable(poses){
+      var rows = poses.map(function(p,i){
+        var drErr = Math.hypot(deadReckonEstimate[i][0]-scenario.truePoses[i][0], deadReckonEstimate[i][1]-scenario.truePoses[i][1]);
+        var estErr = Math.hypot(p[0]-scenario.truePoses[i][0], p[1]-scenario.truePoses[i][1]);
+        return '<tr><td>' + i + '</td><td>' + drErr.toFixed(3) + '</td><td>' + estErr.toFixed(3) + '</td></tr>';
+      });
+      document.querySelector('#s3-poseTable tbody').innerHTML = rows.join('');
+    }
+    function drawSightingRay(poseIdx, poses){
+      ctx.strokeStyle = COLOR_ACCENT2; ctx.lineWidth = 1.3; ctx.setLineDash([3,3]);
+      var a = mapper.toPx(poses[poseIdx]), b = mapper.toPx(scenario.landmark);
+      ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); ctx.stroke();
+      ctx.setLineDash([]);
     }
     function redraw(){
       ctx.clearRect(0,0,mapper.W,mapper.H);
       drawPath(ctx, mapper, scenario.truePoses, 'rgba(32,30,29,0.35)', true);
       drawPath(ctx, mapper, deadReckonEstimate, COLOR_ACCENT2, true);
+      var poses = stateAsPoses();
+      drawSightingRay(6, poses);
+      if (loopBox.checked) drawSightingRay(1, poses);
       drawDiamond(ctx, mapper, scenario.landmark, COLOR_ACCENT2);
-      drawPath(ctx, mapper, stateAsPoses(), COLOR_ACCENT, false);
+      drawPath(ctx, mapper, poses, COLOR_ACCENT, false);
     }
     function updateReadout(){
       var edges = buildEdges();
       var gh = graphGradHess(state, fixedPose0, edges);
       renderSparsity(gh.H);
+      renderBlock(gh.H.slice(0,3).map(function(row){ return row.slice(0,3); }));
       var poses = stateAsPoses();
+      renderPoseTable(poses);
       var totalErr = 0;
       for (var k=0;k<=6;k++) totalErr += Math.hypot(poses[k][0]-scenario.truePoses[k][0], poses[k][1]-scenario.truePoses[k][1]);
       document.getElementById('s3-readout').innerHTML =
@@ -632,7 +681,7 @@ permalink: /nonlinear-optimization-pose-graph.html
     var canvas = document.getElementById('s4-canvas'), ctx = canvas.getContext('2d');
     var worldRange = { x:[-5,7], y:[-2,9] };
     var mapper = makeMapper(canvas, worldRange);
-    var scenario = buildTrajectory(0.15, 0.045, 0.08);
+    var scenario = buildTrajectory(0.15, 0.045, 0.08, 767);
     var fixedPose0 = scenario.truePoses[0];
     var deadReckonEstimate = deadReckon(fixedPose0, scenario.odoms);
     var edges = [];
@@ -692,7 +741,7 @@ permalink: /nonlinear-optimization-pose-graph.html
     var canvas = document.getElementById('s5-canvas'), ctx = canvas.getContext('2d');
     var worldRange = { x:[-5,7], y:[-2,9] };
     var mapper = makeMapper(canvas, worldRange);
-    var scenario = buildTrajectory(0.08, 0.024, 0.05);
+    var scenario = buildTrajectory(0.08, 0.024, 0.05, 1239);
     var fixedPose0 = scenario.truePoses[0];
     var deadReckonEstimate = deadReckon(fixedPose0, scenario.odoms);
     var edges;
