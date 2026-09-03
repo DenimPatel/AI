@@ -1,0 +1,522 @@
+---
+title: "LLM Training, Interactively — Part 1: What Even Is a Language Model?"
+description: An interactive, step-by-step guide to how large language models are trained — starting from the basics of tokenization, embeddings, and next-token prediction, using the fully-open OLMo model family as a running example.
+permalink: /llm-training.html
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ page.title }} · {{ site.title }}</title>
+<meta name="description" content="{{ page.description }}">
+<link rel="stylesheet" href="{{ '/assets/css/styles.css' | relative_url }}">
+<style>
+  .llmt { max-width: 1180px; }
+  .llmt .page-header { padding-top: clamp(32px, 6vw, 56px); }
+  .llmt-step { padding: 48px 0; border-top: 1px solid var(--color-divider); }
+  .llmt-step:first-of-type { border-top: none; }
+  .llmt-step-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 30px; height: 30px; border-radius: 50%; background: var(--color-text); color: var(--color-bg);
+    font-family: var(--font-heading); font-weight: 600; font-size: 14px; flex: 0 0 auto;
+  }
+  .llmt-step-head { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+  .llmt-step-head h2 { margin: 0; font-size: clamp(22px, 3vw, 28px); }
+  .llmt-eyebrow {
+    font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--color-accent-700); margin: 0 0 4px 42px;
+  }
+  .llmt-goal {
+    display: flex; gap: 10px; margin: 16px 0 20px; padding: 12px 14px;
+    background: var(--color-accent-100); border-left: 3px solid var(--color-accent);
+    border-radius: var(--radius-sm); font-size: 14px; line-height: 1.55;
+  }
+  .llmt-goal b { color: var(--color-accent-800); }
+  .llmt-warn {
+    display: flex; gap: 10px; margin: 16px 0 20px; padding: 12px 14px;
+    background: var(--color-accent-2-100); border-left: 3px solid var(--color-accent-2);
+    border-radius: var(--radius-sm); font-size: 14px; line-height: 1.55;
+  }
+  .llmt-warn b { color: var(--color-accent-2-800); }
+  .llmt-math {
+    font-family: var(--font-mono); font-size: 13.5px; background: var(--color-surface);
+    padding: 12px 14px; border-radius: var(--radius-sm); overflow-x: auto; margin: 0 0 16px;
+    line-height: 1.7;
+  }
+  .llmt-demo {
+    display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;
+    background: var(--color-surface); border-radius: var(--radius-md); padding: 18px;
+    margin-top: 8px;
+  }
+  .llmt-canvas-wrap { flex: 1 1 380px; min-width: 280px; }
+  .llmt-canvas-wrap canvas { width: 100%; height: auto; display: block; background: var(--color-neutral-100); border-radius: var(--radius-sm); }
+  .llmt-canvas-hint { font-size: 11px; opacity: 0.6; margin-top: 6px; }
+  .llmt-controls { flex: 1 1 260px; min-width: 240px; font-size: 13.5px; }
+  .llmt-field { margin-bottom: 14px; }
+  .llmt-field label { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 12.5px; color: color-mix(in srgb, var(--color-text) 70%, transparent); }
+  .llmt-field label span.val { font-family: var(--font-mono); color: var(--color-text); }
+  .llmt-field input[type=range] { width: 100%; accent-color: var(--color-accent); }
+  .llmt-field input[type=text] {
+    width: 100%; font-family: var(--font-mono); font-size: 13.5px; padding: 8px 10px;
+    border-radius: var(--radius-sm); border: 1px solid var(--color-divider); background: var(--color-bg); color: var(--color-text);
+  }
+  .llmt-btnrow { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 14px; }
+  .llmt-btnrow button {
+    font-family: var(--font-heading); font-weight: 600; font-size: 13px; cursor: pointer;
+    border: 1px solid var(--color-divider); background: var(--color-bg); color: var(--color-text);
+    padding: 7px 13px; border-radius: var(--radius-md);
+  }
+  .llmt-btnrow button:hover { background: color-mix(in srgb, var(--color-text) 6%, transparent); }
+  .llmt-btnrow button.llmt-primary { background: var(--color-accent); color: #fff; border-color: var(--color-accent); }
+  .llmt-btnrow button.llmt-primary:hover { background: var(--color-accent-600); }
+  .llmt-btnrow button:disabled { opacity: 0.45; cursor: default; }
+  .llmt-readout { font-family: var(--font-mono); font-size: 12.5px; line-height: 1.85; background: var(--color-bg); border-radius: var(--radius-sm); padding: 10px 12px; }
+  .llmt-readout .k { opacity: 0.6; }
+  .llmt-readout .hi { color: var(--color-accent-700); font-weight: 600; }
+  .llmt-tokens { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .llmt-tok {
+    font-family: var(--font-mono); font-size: 12.5px; padding: 4px 8px; border-radius: var(--radius-sm);
+    background: var(--color-accent-100); color: var(--color-accent-800); border: 1px solid var(--color-accent-200);
+    position: relative;
+  }
+  .llmt-tok .id { display: block; font-size: 9.5px; opacity: 0.6; margin-top: 1px; }
+  .llmt-cheat { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .llmt-cheat th, .llmt-cheat td { padding: 10px 12px; border-bottom: 1px solid var(--color-divider); vertical-align: top; text-align: left; }
+  .llmt-cheat th { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.6; }
+  .llmt-cheat code { white-space: nowrap; }
+  .llmt-refs { font-size: 13.5px; line-height: 1.9; }
+  .llmt-refs li { margin-bottom: 2px; }
+  .llmt-next {
+    display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;
+    margin-top: 24px; padding: 18px; background: var(--color-surface); border-radius: var(--radius-md);
+  }
+  @media (max-width: 640px) {
+    .llmt-eyebrow { margin-left: 0; }
+    .llmt-step-head { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-brand" href="{{ '/' | relative_url }}">AI /</a>
+  <a href="{{ '/' | relative_url }}">Home</a>
+  <a href="{{ '/robotics/' | relative_url }}">Robotics</a>
+  <a href="{{ '/llm-training.html' | relative_url }}">Part 1</a>
+  <a href="{{ '/llm-training-data.html' | relative_url }}">Part 2</a>
+  <a href="{{ '/llm-training-pretraining.html' | relative_url }}">Part 3</a>
+  <a href="{{ '/llm-training-finetuning.html' | relative_url }}">Part 4</a>
+  <a href="{{ '/llm-training-rlhf.html' | relative_url }}">Part 5</a>
+  <a href="{{ '/llm-training-guardrails.html' | relative_url }}">Part 6</a>
+</nav>
+
+<main>
+<div class="wrap llmt">
+  <section class="page-header">
+    <span class="section-kicker">Interactive guide · Part 1 of 6</span>
+    <h1>LLM Training, Interactively</h1>
+    <p>Every chat assistant you've used — Claude, GPT, Gemini, Llama — went through the same broad pipeline: a base model learns language by predicting text, then it's shaped into an assistant, then it's aligned to be helpful and safe. Most labs won't show you the middle of that pipeline. This guide will, using <strong>OLMo</strong>, the model family from the Allen Institute for AI (Ai2) that publishes its dataset, its code, and hundreds of checkpoints from an actual training run — so every claim here points at something you can go inspect yourself.</p>
+  </section>
+  <div class="stats-rule" style="border-top-color: var(--color-divider); margin-bottom: 8px;"></div>
+
+{% raw %}
+  <section class="llmt-step" id="setup">
+    <div class="llmt-step-head"><span class="llmt-step-num">0</span><h2>Why OLMo, and what this series covers</h2></div>
+    <p class="llmt-eyebrow">Setup</p>
+    <p>Most "open" models today are really only <strong>open-weight</strong>: you get the final numbers, not how they got there. The exact web-crawl recipe, the filtering thresholds, the preference data, the reward model — those stay inside the lab. That's a problem if you actually want to understand training, not just call an API.</p>
+    <p><strong>OLMo</strong> (Ai2) is built differently. Ai2 releases the pretraining corpus (<strong>Dolma</strong>, a multi-trillion-token corpus, along with the exact curation code), checkpoints saved roughly every 1,000 training steps, full loss curves and hardware logs, and a tool called <strong>OlmoTrace</strong> that lets you trace a specific generated response back to the pretraining documents that most likely shaped it. We'll lean on OLMo throughout this series as the concrete, verifiable example behind each abstract idea.</p>
+    <div class="llmt-goal">💡 <span><b>The shape of the series:</b> Part 1 (this page) covers what a language model even is — tokens, embeddings, next-token prediction. Part 2 covers the pretraining <em>dataset</em>. Part 3 covers <em>pretraining</em> itself — the training loop that turns data into a base model. Part 4 covers <em>supervised fine-tuning</em>, which turns a base model into something that follows instructions. Part 5 covers <em>alignment</em> — RLHF and DPO. Part 6 covers <em>guardrails</em> — safety, evaluation, and deployment.</span></div>
+    <p>Prerequisites: comfort with vectors, matrices, probability, and basic calculus — the level of a first-year graduate course. We'll define every model-specific term as it comes up.</p>
+  </section>
+
+  <section class="llmt-step" id="what-is-lm">
+    <div class="llmt-step-head"><span class="llmt-step-num">1</span><h2>A language model is a probability distribution over the next word</h2></div>
+    <p class="llmt-eyebrow">Foundations</p>
+    <p>Strip away the transformer architecture, the GPUs, the trillions of tokens, and a language model is answering one narrow question, over and over: <em>given the text so far, what word (or token) is likely to come next?</em> Formally, it defines a conditional probability distribution</p>
+    <div class="llmt-math">P(x&#8348; | x&#8321;, x&#8322;, …, x&#8348;&#8331;&#8321;)</div>
+    <p>over its vocabulary, where <var>x&#8348;</var> is the next token and <var>x&#8321;…x&#8348;&#8331;&#8321;</var> is everything said before it. Chain that one-step prediction together — predict a token, append it, predict the next one — and you get a model that can generate whole passages. This is called <strong>autoregressive</strong> generation, and it's the objective every GPT-style model, including OLMo, is pretrained on.</p>
+    <p>Below is a genuine (if tiny) example: a bigram model — it predicts the next word using only the <em>previous</em> word — trained on a 110-word toy passage. Type a prompt ending in one of the passage's words (try <code>the</code>, <code>robot</code>, or <code>window</code>) and watch the actual learned distribution.</p>
+    <div class="llmt-demo">
+      <div class="llmt-canvas-wrap">
+        <canvas id="s1-canvas" width="560" height="260"></canvas>
+        <p class="llmt-canvas-hint">Bars show P(next word | last word), estimated by counting the toy passage below.</p>
+      </div>
+      <div class="llmt-controls">
+        <div class="llmt-field">
+          <label>Prompt</label>
+          <input type="text" id="s1-prompt" value="the robot read the">
+        </div>
+        <div class="llmt-readout" id="s1-readout"></div>
+        <p style="font-size:12px; opacity:0.65; margin-top:10px;">Toy passage: <em id="s1-corpus"></em></p>
+      </div>
+    </div>
+    <div class="llmt-goal">🎯 <b>Learning goal:</b> a language model doesn't "know" the next word — it estimates <em>how likely</em> each candidate is, given everything it's seen. A bigram model estimates this from one previous word; OLMo estimates it from up to thousands of previous tokens, using a transformer instead of a counting table — but the object being predicted is exactly the same shape.</div>
+  </section>
+
+  <section class="llmt-step" id="tokenization">
+    <div class="llmt-step-head"><span class="llmt-step-num">2</span><h2>Before prediction: turning text into tokens</h2></div>
+    <p class="llmt-eyebrow">Foundations</p>
+    <p>Models don't operate on characters or whole words directly — they operate on <strong>tokens</strong>, chunks of text drawn from a fixed vocabulary (OLMo 2 uses a vocabulary of roughly 100K tokens). The dominant scheme is <strong>byte-pair encoding (BPE)</strong>: start with individual characters, then repeatedly merge the most frequent adjacent pair into a single new token, building up from characters to common subwords to common whole words. Frequent words like <code>the</code> end up as one token; rare or unfamiliar words get split into several subword pieces.</p>
+    <div class="llmt-math">Start: "the" → t, h, e<br>Merge frequent pair (t, h) → "th"<br>Merge frequent pair (th, e) → "the"<br>Repeat for thousands of merges, most-frequent pair first, until the vocabulary is full</div>
+    <p>Below is a small illustrative BPE tokenizer — trained on the same toy passage, with far fewer merges than a real one — so you can see the mechanism, not a production vocabulary. Type anything and watch it split.</p>
+    <div class="llmt-demo">
+      <div class="llmt-canvas-wrap" style="flex-basis: 100%;">
+        <div class="llmt-field">
+          <label>Text to tokenize</label>
+          <input type="text" id="s2-input" value="the robot returned to the workbench">
+        </div>
+        <div class="llmt-tokens" id="s2-tokens"></div>
+        <p class="llmt-canvas-hint" id="s2-count"></p>
+      </div>
+    </div>
+    <div class="llmt-warn">⚠️ <span><b>Watch for:</b> type a word that never appeared in the toy passage (try <code>tokenization</code> itself) and it falls back to individual characters — there's no merge rule for it. A real tokenizer trained on trillions of tokens rarely falls back this far, but the same principle holds: unfamiliar strings cost <em>more</em> tokens, which is part of why token counts (and API pricing) vary by language and domain.</span></div>
+  </section>
+
+  <section class="llmt-step" id="embeddings">
+    <div class="llmt-step-head"><span class="llmt-step-num">3</span><h2>Tokens become vectors</h2></div>
+    <p class="llmt-eyebrow">Foundations</p>
+    <p>Once text is tokens, each token ID is looked up in an <strong>embedding table</strong> — a big matrix, one learned row-vector per vocabulary entry — turning a sequence of integers into a sequence of vectors in, say, ℝ<sup>4096</sup> (OLMo 2 32B uses a 5,120-dimensional hidden size). These vectors start out essentially random and are updated by training just like every other weight in the model. What makes them useful is that training pulls tokens used in similar contexts toward similar vectors — not because anyone hand-labels "cat is similar to dog," but because predicting the next token correctly requires it.</p>
+    <p>Below is a toy 2D embedding space (real ones have thousands of dimensions; this is compressed for the picture) for a handful of words from our passage. Click a word to see its nearest neighbors by cosine similarity.</p>
+    <div class="llmt-demo">
+      <div class="llmt-canvas-wrap">
+        <canvas id="s3-canvas" width="560" height="300"></canvas>
+        <p class="llmt-canvas-hint">Click a point to select it and see its nearest neighbors.</p>
+      </div>
+      <div class="llmt-controls">
+        <div class="llmt-readout" id="s3-readout">Click a word to begin.</div>
+      </div>
+    </div>
+    <div class="llmt-goal">💡 <span>This is also why "embedding space" turns up outside chat models — the same idea (learn a vector per item such that similar items end up close together) underlies recommendation systems, image search, and retrieval-augmented generation.</span></div>
+  </section>
+
+  <section class="llmt-step" id="generation">
+    <div class="llmt-step-head"><span class="llmt-step-num">4</span><h2>Putting it together: autoregressive generation</h2></div>
+    <p class="llmt-eyebrow">Foundations</p>
+    <p>Tokenize the prompt, look up embeddings, run them through the network to get a probability distribution over the next token, pick one (more on <em>how</em> to pick in Part 3), append it, and repeat. That loop — one forward pass per new token — is exactly how every response you've ever gotten from a chat model was produced. Use the same bigram model from Step 1 to generate a few tokens yourself:</p>
+    <div class="llmt-demo">
+      <div class="llmt-canvas-wrap" style="flex-basis:100%;">
+        <div class="llmt-field">
+          <label>Seed text</label>
+          <input type="text" id="s4-seed" value="the robot">
+        </div>
+        <div class="llmt-btnrow">
+          <button id="s4-step" class="llmt-primary">Generate next token ▸</button>
+          <button id="s4-reset">Reset</button>
+        </div>
+        <div class="llmt-readout" id="s4-readout"></div>
+      </div>
+    </div>
+    <div class="llmt-warn">⚠️ <span><b>Notice:</b> a bigram model only remembers one word back, so it wanders and repeats quickly. Real transformer models condition on the <em>entire</em> preceding context (OLMo 2 supports contexts of several thousand tokens), which is most of why they stay coherent — not a fundamentally different objective, just vastly more context and a vastly better function approximator (the transformer) doing the predicting.</span></div>
+  </section>
+
+  <section class="llmt-step" id="cheatsheet">
+    <div class="llmt-step-head"><span class="llmt-step-num">✓</span><h2>Cheat sheet</h2></div>
+    <p class="llmt-eyebrow">Recap</p>
+    <div style="overflow-x:auto;">
+    <table class="llmt-cheat">
+      <thead><tr><th>Concept</th><th>What it is</th><th>Where it fits</th></tr></thead>
+      <tbody>
+        <tr><td>Token</td><td>A chunk of text (often a subword) from a fixed vocabulary, produced by BPE or similar</td><td>The atomic unit the model reads and writes</td></tr>
+        <tr><td>Embedding</td><td>A learned vector per token ID</td><td>Turns discrete tokens into continuous inputs the network can compute over</td></tr>
+        <tr><td>Next-token distribution</td><td><code>P(x&#8348; | x&lt;&#8348;)</code>, a probability over the whole vocabulary</td><td>What the model outputs at every position</td></tr>
+        <tr><td>Autoregressive generation</td><td>Predict → sample → append → repeat</td><td>How a distribution over one token becomes a whole response</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <section class="llmt-step" id="refs">
+    <div class="llmt-step-head"><span class="llmt-step-num">📚</span><h2>Further reading</h2></div>
+    <p class="llmt-eyebrow">References</p>
+    <ul class="llmt-refs">
+      <li>Vaswani et al., <a href="https://arxiv.org/abs/1706.03762">"Attention Is All You Need"</a> (2017) — the transformer architecture.</li>
+      <li>Sennrich, Haddow &amp; Birch, <a href="https://arxiv.org/abs/1508.07909">"Neural Machine Translation of Rare Words with Subword Units"</a> (2015) — BPE for NLP.</li>
+      <li>OLMo 2 Team (Ai2), <a href="https://arxiv.org/abs/2501.00656">"2 OLMo 2 Furious"</a> (2024) — the OLMo 2 model report.</li>
+      <li><a href="https://allenai.org/olmo">Ai2's OLMo project page</a> — models, data, and code.</li>
+    </ul>
+  </section>
+{% endraw %}
+
+  <div class="llmt-next">
+    <span>Before any of this can be trained, someone has to build the dataset it learns from — and that's a bigger, messier problem than it sounds.</span>
+    <a class="btn btn-secondary" href="{{ '/llm-training-data.html' | relative_url }}">Continue: building the pretraining dataset →</a>
+  </div>
+</div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="stats-rule"></div>
+    <p style="margin:0;">Have a milestone to add? <a href="https://github.com/DenimPatel/AI">Contribute on GitHub</a>.</p>
+  </div>
+</footer>
+
+{% raw %}
+<script>
+(function(){
+  "use strict";
+
+  function css(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+  var COLOR_ACCENT = css('--color-accent') || '#0088b0';
+  var COLOR_TEXT = css('--color-text') || '#201e1d';
+  var COLOR_DIV = css('--color-divider') || '#ccc';
+
+  var CORPUS = "the small robot rolled across the quiet lab and stopped by the window the window was open and the cold air moved the curtain the robot raised its arm and closed the window then the robot returned to the workbench where a dataset of text waited to be read the robot read the text one token at a time and learned to guess the next token after every word the small model inside the robot updated its numbers a little the more text it read the better its guesses became until one day the robot could finish a sentence someone else had started";
+
+  document.getElementById('s1-corpus').textContent = '"' + CORPUS + '"';
+
+  var words = CORPUS.split(/\s+/);
+  var bigram = {};
+  for (var i=0; i<words.length-1; i++){
+    var a = words[i], b = words[i+1];
+    if (!bigram[a]) bigram[a] = {};
+    bigram[a][b] = (bigram[a][b]||0) + 1;
+  }
+
+  function nextDist(lastWord){
+    var d = bigram[lastWord];
+    if (!d) return null;
+    var total = 0; for (var k in d) total += d[k];
+    var arr = Object.keys(d).map(function(w){ return {w:w, p:d[w]/total, c:d[w]}; });
+    arr.sort(function(x,y){ return y.p - x.p; });
+    return arr;
+  }
+
+  function sampleFrom(dist, temperature){
+    temperature = temperature || 1.0;
+    var weights = dist.map(function(d){ return Math.pow(d.c, 1/temperature); });
+    var total = weights.reduce(function(a,b){return a+b;},0);
+    var r = Math.random()*total, acc = 0;
+    for (var i=0;i<dist.length;i++){ acc += weights[i]; if (r <= acc) return dist[i].w; }
+    return dist[dist.length-1].w;
+  }
+
+  // ---- Step 1: next-word distribution bar chart ----
+  (function(){
+    var canvas = document.getElementById('s1-canvas'), ctx = canvas.getContext('2d');
+    var W = canvas.width, H = canvas.height;
+    var input = document.getElementById('s1-prompt');
+    var readout = document.getElementById('s1-readout');
+
+    function draw(){
+      ctx.clearRect(0,0,W,H);
+      var text = input.value.trim();
+      var toks = text.length ? text.split(/\s+/) : [];
+      var last = toks.length ? toks[toks.length-1] : null;
+      var dist = last ? nextDist(last) : null;
+
+      ctx.font = '12px ' + (css('--font-body') || 'sans-serif');
+      if (!dist){
+        ctx.fillStyle = COLOR_TEXT;
+        ctx.fillText('No data for "' + (last||'') + '" — try a word from the toy passage (e.g. "the", "robot", "window").', 14, H/2);
+        readout.innerHTML = '<span class="k">last word:</span> ' + (last ? '"'+last+'"' : '(empty)') + ' — not seen in passage';
+        return;
+      }
+      dist = dist.slice(0, 8);
+      var padL = 90, padR = 20, padT = 16, padB = 10;
+      var barH = (H - padT - padB) / dist.length - 8;
+      var maxP = dist[0].p;
+      dist.forEach(function(d, i){
+        var y = padT + i*(barH+8);
+        var w = (W - padL - padR) * (d.p / maxP);
+        ctx.fillStyle = i===0 ? COLOR_ACCENT : (css('--color-accent-400')||'#62c5ee');
+        ctx.fillRect(padL, y, w, barH);
+        ctx.fillStyle = COLOR_TEXT;
+        ctx.textAlign = 'right';
+        ctx.fillText(d.w, padL-8, y+barH*0.7);
+        ctx.textAlign = 'left';
+        ctx.fillText((d.p*100).toFixed(0)+'%', padL+w+6, y+barH*0.7);
+      });
+
+      var readoutHtml = '<span class="k">last word:</span> "' + last + '"<br>';
+      readoutHtml += '<span class="k">top prediction:</span> <span class="hi">' + dist[0].w + '</span> (' + (dist[0].p*100).toFixed(0) + '%)<br>';
+      readoutHtml += '<span class="k">candidates seen after "' + last + '":</span> ' + dist.length;
+      readout.innerHTML = readoutHtml;
+    }
+    input.addEventListener('input', draw);
+    draw();
+  })();
+
+  // ---- Step 2: toy BPE tokenizer ----
+  (function(){
+    var input = document.getElementById('s2-input');
+    var tokensEl = document.getElementById('s2-tokens');
+    var countEl = document.getElementById('s2-count');
+
+    // Train a tiny BPE on the corpus at load time: start from characters (word-boundary marked),
+    // repeatedly merge the most frequent adjacent symbol pair.
+    var vocabWords = CORPUS.split(/\s+/);
+    var wordFreq = {};
+    vocabWords.forEach(function(w){ wordFreq[w] = (wordFreq[w]||0) + 1; });
+
+    // represent each unique word as an array of symbols, starting from characters
+    var symbolSeqs = {};
+    Object.keys(wordFreq).forEach(function(w){ symbolSeqs[w] = w.split(''); });
+
+    var merges = []; // ordered list of [a,b] pairs, most important (learned earliest) first
+    for (var m = 0; m < 60; m++){
+      var pairCounts = {};
+      Object.keys(symbolSeqs).forEach(function(w){
+        var seq = symbolSeqs[w], freq = wordFreq[w];
+        for (var i=0; i<seq.length-1; i++){
+          var key = seq[i] + '' + seq[i+1];
+          pairCounts[key] = (pairCounts[key]||0) + freq;
+        }
+      });
+      var bestKey = null, bestCount = 0;
+      for (var k in pairCounts){ if (pairCounts[k] > bestCount){ bestCount = pairCounts[k]; bestKey = k; } }
+      if (!bestKey || bestCount < 2) break;
+      var parts = bestKey.split('');
+      merges.push(parts);
+      Object.keys(symbolSeqs).forEach(function(w){
+        var seq = symbolSeqs[w], out = [], i = 0;
+        while (i < seq.length){
+          if (i < seq.length-1 && seq[i]===parts[0] && seq[i+1]===parts[1]){
+            out.push(parts[0]+parts[1]); i += 2;
+          } else { out.push(seq[i]); i += 1; }
+        }
+        symbolSeqs[w] = out;
+      });
+    }
+
+    function bpeTokenize(word){
+      var seq = word.split('');
+      var changed = true;
+      while (changed){
+        changed = false;
+        for (var m=0; m<merges.length; m++){
+          var a = merges[m][0], b = merges[m][1];
+          for (var i=0; i<seq.length-1; i++){
+            if (seq[i]===a && seq[i+1]===b){
+              seq = seq.slice(0,i).concat([a+b]).concat(seq.slice(i+2));
+              changed = true;
+              break;
+            }
+          }
+          if (changed) break;
+        }
+      }
+      return seq;
+    }
+
+    function vocabId(tok){
+      // stable-ish hash for a demo "token id"
+      var h = 0;
+      for (var i=0;i<tok.length;i++){ h = (h*31 + tok.charCodeAt(i)) >>> 0; }
+      return h % 50257;
+    }
+
+    function render(){
+      var text = input.value;
+      var words = text.split(/(\s+)/).filter(function(w){ return w.length; });
+      tokensEl.innerHTML = '';
+      var total = 0;
+      words.forEach(function(w){
+        if (/^\s+$/.test(w)) return;
+        var toks = bpeTokenize(w.toLowerCase());
+        toks.forEach(function(t){
+          total++;
+          var span = document.createElement('span');
+          span.className = 'llmt-tok';
+          span.innerHTML = t + '<span class="id">#' + vocabId(t) + '</span>';
+          tokensEl.appendChild(span);
+        });
+      });
+      countEl.textContent = total + ' token' + (total===1?'':'s') + ' for ' + words.length + ' word' + (words.length===1?'':'s') + ' (this toy tokenizer, not OLMo\'s real ~100K-token vocabulary)';
+    }
+    input.addEventListener('input', render);
+    render();
+  })();
+
+  // ---- Step 3: toy embedding space ----
+  (function(){
+    var canvas = document.getElementById('s3-canvas'), ctx = canvas.getContext('2d');
+    var W = canvas.width, H = canvas.height;
+    var readout = document.getElementById('s3-readout');
+    // hand-placed toy 2D embeddings so that related words cluster (illustrative, not learned)
+    var pts = [
+      {w:'robot', x:0.62, y:0.30}, {w:'model', x:0.68, y:0.22},
+      {w:'window', x:0.20, y:0.70}, {w:'curtain', x:0.15, y:0.60},
+      {w:'text', x:0.55, y:0.62}, {w:'token', x:0.60, y:0.70},
+      {w:'workbench', x:0.35, y:0.35}, {w:'lab', x:0.30, y:0.25},
+      {w:'read', x:0.50, y:0.50}, {w:'learned', x:0.58, y:0.55},
+      {w:'small', x:0.75, y:0.55}, {w:'quiet', x:0.25, y:0.15}
+    ];
+    var selected = null;
+
+    function toPx(p){ return { x: 40 + p.x*(W-80), y: 30 + p.y*(H-60) }; }
+    function cosine(a,b){
+      var dot = a.x*b.x + a.y*b.y;
+      var na = Math.hypot(a.x,a.y), nb = Math.hypot(b.x,b.y);
+      return dot/(na*nb || 1);
+    }
+
+    function draw(){
+      ctx.clearRect(0,0,W,H);
+      pts.forEach(function(p){
+        var px = toPx(p);
+        ctx.beginPath();
+        ctx.arc(px.x, px.y, selected===p ? 7 : 5, 0, 2*Math.PI);
+        ctx.fillStyle = selected===p ? COLOR_ACCENT : (css('--color-accent-500')||'#38a6cf');
+        ctx.fill();
+        ctx.fillStyle = COLOR_TEXT;
+        ctx.font = '12px ' + (css('--font-body')||'sans-serif');
+        ctx.fillText(p.w, px.x+9, px.y+4);
+      });
+      if (selected){
+        var ranked = pts.filter(function(p){return p!==selected;})
+          .map(function(p){ return {w:p.w, sim: cosine(selected, p)}; })
+          .sort(function(a,b){ return b.sim - a.sim; }).slice(0,3);
+        readout.innerHTML = '<span class="k">selected:</span> <span class="hi">' + selected.w + '</span><br>' +
+          '<span class="k">nearest neighbors:</span><br>' +
+          ranked.map(function(r){ return '&nbsp;&nbsp;' + r.w + ' (cos = ' + r.sim.toFixed(2) + ')'; }).join('<br>');
+      }
+    }
+    canvas.addEventListener('click', function(e){
+      var rect = canvas.getBoundingClientRect();
+      var mx = (e.clientX-rect.left) * (W/rect.width), my = (e.clientY-rect.top) * (H/rect.height);
+      var best = null, bestD = 1e9;
+      pts.forEach(function(p){
+        var px = toPx(p), d = Math.hypot(px.x-mx, px.y-my);
+        if (d < bestD){ bestD = d; best = p; }
+      });
+      if (bestD < 20) selected = best;
+      draw();
+    });
+    draw();
+  })();
+
+  // ---- Step 4: generation loop ----
+  (function(){
+    var seedInput = document.getElementById('s4-seed');
+    var stepBtn = document.getElementById('s4-step');
+    var resetBtn = document.getElementById('s4-reset');
+    var readout = document.getElementById('s4-readout');
+    var current = seedInput.value;
+
+    function render(){
+      var toks = current.split(/\s+/);
+      var last = toks[toks.length-1];
+      var dist = nextDist(last);
+      readout.innerHTML = '<span class="k">generated so far:</span> <span class="hi">' + current + '</span><br>' +
+        (dist ? '<span class="k">next-token options:</span> ' + dist.slice(0,4).map(function(d){return d.w+' ('+(d.p*100).toFixed(0)+'%)';}).join(', ') : '<span class="k">no continuation known for "'+last+'"</span>');
+    }
+    stepBtn.addEventListener('click', function(){
+      var toks = current.split(/\s+/);
+      var last = toks[toks.length-1];
+      var dist = nextDist(last);
+      if (dist){ current += ' ' + sampleFrom(dist, 0.7); }
+      render();
+    });
+    resetBtn.addEventListener('click', function(){ current = seedInput.value; render(); });
+    seedInput.addEventListener('change', function(){ current = seedInput.value; render(); });
+    render();
+  })();
+
+})();
+</script>
+{% endraw %}
+
+</body>
+</html>

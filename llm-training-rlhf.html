@@ -1,0 +1,327 @@
+---
+title: "LLM Training, Interactively — Part 5: Alignment — RLHF, Reward Models, and DPO"
+description: How preference data trains a model to prefer better responses over worse ones — reward modeling, PPO-based RLHF, and DPO as a simpler alternative, illustrated with OLMo's Tulu 3 post-training recipe.
+permalink: /llm-training-rlhf.html
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ page.title }} · {{ site.title }}</title>
+<meta name="description" content="{{ page.description }}">
+<link rel="stylesheet" href="{{ '/assets/css/styles.css' | relative_url }}">
+<style>
+  .llmt { max-width: 1180px; }
+  .llmt .page-header { padding-top: clamp(32px, 6vw, 56px); }
+  .llmt-step { padding: 48px 0; border-top: 1px solid var(--color-divider); }
+  .llmt-step:first-of-type { border-top: none; }
+  .llmt-step-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 30px; height: 30px; border-radius: 50%; background: var(--color-text); color: var(--color-bg);
+    font-family: var(--font-heading); font-weight: 600; font-size: 14px; flex: 0 0 auto;
+  }
+  .llmt-step-head { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+  .llmt-step-head h2 { margin: 0; font-size: clamp(22px, 3vw, 28px); }
+  .llmt-eyebrow {
+    font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--color-accent-700); margin: 0 0 4px 42px;
+  }
+  .llmt-goal {
+    display: flex; gap: 10px; margin: 16px 0 20px; padding: 12px 14px;
+    background: var(--color-accent-100); border-left: 3px solid var(--color-accent);
+    border-radius: var(--radius-sm); font-size: 14px; line-height: 1.55;
+  }
+  .llmt-goal b { color: var(--color-accent-800); }
+  .llmt-warn {
+    display: flex; gap: 10px; margin: 16px 0 20px; padding: 12px 14px;
+    background: var(--color-accent-2-100); border-left: 3px solid var(--color-accent-2);
+    border-radius: var(--radius-sm); font-size: 14px; line-height: 1.55;
+  }
+  .llmt-warn b { color: var(--color-accent-2-800); }
+  .llmt-math {
+    font-family: var(--font-mono); font-size: 13.5px; background: var(--color-surface);
+    padding: 12px 14px; border-radius: var(--radius-sm); overflow-x: auto; margin: 0 0 16px;
+    line-height: 1.7;
+  }
+  .llmt-demo {
+    display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;
+    background: var(--color-surface); border-radius: var(--radius-md); padding: 18px;
+    margin-top: 8px;
+  }
+  .llmt-canvas-wrap { flex: 1 1 380px; min-width: 280px; }
+  .llmt-canvas-wrap canvas { width: 100%; height: auto; display: block; background: var(--color-neutral-100); border-radius: var(--radius-sm); }
+  .llmt-canvas-hint { font-size: 11px; opacity: 0.6; margin-top: 6px; }
+  .llmt-controls { flex: 1 1 260px; min-width: 240px; font-size: 13.5px; }
+  .llmt-field { margin-bottom: 14px; }
+  .llmt-field label { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 12.5px; color: color-mix(in srgb, var(--color-text) 70%, transparent); }
+  .llmt-field input[type=range] { width: 100%; accent-color: var(--color-accent); }
+  .llmt-btnrow { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 14px; }
+  .llmt-btnrow button {
+    font-family: var(--font-heading); font-weight: 600; font-size: 13px; cursor: pointer;
+    border: 1px solid var(--color-divider); background: var(--color-bg); color: var(--color-text);
+    padding: 7px 13px; border-radius: var(--radius-md);
+  }
+  .llmt-btnrow button:hover { background: color-mix(in srgb, var(--color-text) 6%, transparent); }
+  .llmt-btnrow button.llmt-primary { background: var(--color-accent); color: #fff; border-color: var(--color-accent); }
+  .llmt-btnrow button.llmt-chosen { outline: 2px solid var(--color-accent); }
+  .llmt-readout { font-family: var(--font-mono); font-size: 12.5px; line-height: 1.85; background: var(--color-bg); border-radius: var(--radius-sm); padding: 10px 12px; }
+  .llmt-readout .k { opacity: 0.6; }
+  .llmt-readout .hi { color: var(--color-accent-700); font-weight: 600; }
+  .llmt-pair { display: flex; gap: 14px; flex-wrap: wrap; flex-basis: 100%; }
+  .llmt-card { flex: 1 1 260px; background: var(--color-bg); border-radius: var(--radius-sm); padding: 12px 14px; border: 1px solid var(--color-divider); }
+  .llmt-card p { margin: 6px 0 0; font-size: 13.5px; }
+  .llmt-card .label { font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.6; }
+  .llmt-pipeline { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: 12.5px; }
+  .llmt-pipeline .pbox { background: var(--color-bg); border: 1px solid var(--color-divider); border-radius: var(--radius-sm); padding: 8px 10px; }
+  .llmt-pipeline .arrow { opacity: 0.5; }
+  .llmt-cheat { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .llmt-cheat th, .llmt-cheat td { padding: 10px 12px; border-bottom: 1px solid var(--color-divider); vertical-align: top; text-align: left; }
+  .llmt-cheat th { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.6; }
+  .llmt-refs { font-size: 13.5px; line-height: 1.9; }
+  .llmt-refs li { margin-bottom: 2px; }
+  .llmt-next {
+    display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;
+    margin-top: 24px; padding: 18px; background: var(--color-surface); border-radius: var(--radius-md);
+  }
+  @media (max-width: 640px) {
+    .llmt-eyebrow { margin-left: 0; }
+    .llmt-step-head { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-brand" href="{{ '/' | relative_url }}">AI /</a>
+  <a href="{{ '/' | relative_url }}">Home</a>
+  <a href="{{ '/robotics/' | relative_url }}">Robotics</a>
+  <a href="{{ '/llm-training.html' | relative_url }}">Part 1</a>
+  <a href="{{ '/llm-training-data.html' | relative_url }}">Part 2</a>
+  <a href="{{ '/llm-training-pretraining.html' | relative_url }}">Part 3</a>
+  <a href="{{ '/llm-training-finetuning.html' | relative_url }}">Part 4</a>
+  <a href="{{ '/llm-training-rlhf.html' | relative_url }}">Part 5</a>
+  <a href="{{ '/llm-training-guardrails.html' | relative_url }}">Part 6</a>
+</nav>
+
+<main>
+<div class="wrap llmt">
+  <section class="page-header">
+    <span class="section-kicker">Interactive guide · Part 5 of 6</span>
+    <h1>Alignment: RLHF, reward models, and DPO</h1>
+    <p>SFT teaches a model to produce <em>a</em> plausible response in the right format. It has no mechanism for the much more common real situation: two responses are both reasonable, but one is clearly better — more helpful, more honest, better organized, less likely to be misused. That comparative judgment is what this stage, broadly called <strong>alignment</strong>, is built to train on, using human (or model) preferences rather than single correct answers.</p>
+  </section>
+  <div class="stats-rule" style="border-top-color: var(--color-divider); margin-bottom: 8px;"></div>
+
+{% raw %}
+  <section class="llmt-step" id="prefdata">
+    <div class="llmt-step-head"><span class="llmt-step-num">1</span><h2>Preference data: comparisons, not corrections</h2></div>
+    <p class="llmt-eyebrow">Where alignment data comes from</p>
+    <p>Instead of writing "the correct answer," labelers (human annotators, or sometimes another model acting as a judge) are shown a prompt with two or more candidate responses and asked which is better — a much easier and more reliable judgment to make than authoring an ideal response from scratch. Each such judgment becomes one training example: a <strong>chosen</strong> response and a <strong>rejected</strong> response for the same prompt.</p>
+    <div class="llmt-demo">
+      <div class="llmt-pair">
+        <div class="llmt-card"><span class="label">Response A</span><p id="s1-a"></p></div>
+        <div class="llmt-card"><span class="label">Response B</span><p id="s1-b"></p></div>
+      </div>
+      <div class="llmt-controls" style="flex-basis:100%;">
+        <div class="llmt-btnrow">
+          <button id="s1-pick-a">Prefer A</button>
+          <button id="s1-pick-b">Prefer B</button>
+          <button id="s1-next">New pair</button>
+        </div>
+        <div class="llmt-readout" id="s1-readout">Pick the response you think a labeler would prefer, then compare with the intended answer.</div>
+      </div>
+    </div>
+    <div class="llmt-goal">💡 <span><b>This is the raw material for everything else in this part:</b> a reward model and DPO both consume exactly this (prompt, chosen, rejected) shape — they just use it differently.</span></div>
+  </section>
+
+  <section class="llmt-step" id="rewardmodel">
+    <div class="llmt-step-head"><span class="llmt-step-num">2</span><h2>Training a reward model</h2></div>
+    <p class="llmt-eyebrow">Method 1 of 2 — the RLHF route</p>
+    <p>The classic RLHF recipe first trains a separate <strong>reward model</strong>: a copy of the language model with its output head replaced by a single scalar score, trained so that it scores the chosen response higher than the rejected one for the same prompt. The standard loss (from the Bradley-Terry model of pairwise comparison) is:</p>
+    <div class="llmt-math">L = − log σ( r&#952;(x, y&#8340;) − r&#952;(x, y&#8347;) )&nbsp;&nbsp;&nbsp;y&#8340; = chosen response, y&#8347; = rejected response</div>
+    <p>Drag the margin below (how much higher the chosen response scores than the rejected one) and watch how the loss responds — this is the same sigmoid-based loss shape used by DPO later on this page, which isn't a coincidence.</p>
+    <div class="llmt-demo">
+      <div class="llmt-canvas-wrap" style="flex-basis:100%;">
+        <canvas id="s2-canvas" width="700" height="220"></canvas>
+      </div>
+      <div class="llmt-controls" style="flex-basis:100%;">
+        <div class="llmt-field"><label>Reward margin r(chosen) − r(rejected) <span class="val" id="s2-mval"></span></label><input type="range" id="s2-margin" min="-4" max="4" step="0.1" value="0.5"></div>
+        <div class="llmt-readout" id="s2-readout"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="llmt-step" id="ppo">
+    <div class="llmt-step-head"><span class="llmt-step-num">3</span><h2>RLHF: using the reward model to update the policy</h2></div>
+    <p class="llmt-eyebrow">Method 1 of 2, continued</p>
+    <p>With a trained reward model in hand, the SFT model (now called the <strong>policy</strong>) is optimized with reinforcement learning — typically <strong>PPO</strong> (Proximal Policy Optimization) — to generate responses that score higher under the reward model. Crucially, a <strong>KL-divergence penalty</strong> against the original SFT model is added to the objective, discouraging the policy from drifting too far from sensible language just to farm reward-model score:</p>
+    <div class="llmt-math">maximize&nbsp; E[ r&#952;(x, y) ] − β · KL( π&#8342;&#8341;&#8331;&#8348;&#8348;&#8331; ‖ π&#8340;&#8342;&#8340; )</div>
+    <div class="llmt-pipeline">
+      <span class="pbox">SFT model (policy)</span><span class="arrow">→</span>
+      <span class="pbox">generate response</span><span class="arrow">→</span>
+      <span class="pbox">score with reward model</span><span class="arrow">→</span>
+      <span class="pbox">PPO update, penalized by KL to SFT reference</span><span class="arrow">→</span>
+      <span class="pbox">repeat</span>
+    </div>
+    <div class="llmt-warn">⚠️ <span><b>Why this is hard in practice:</b> RLHF via PPO involves keeping multiple models in memory at once (policy, reward model, and a frozen reference copy for the KL term), is sensitive to hyperparameters, and can suffer from <strong>reward hacking</strong> — the policy finding ways to score well on the reward model that don't reflect genuine quality (e.g. padding responses, because the reward model happens to associate length with thoroughness).</span></div>
+  </section>
+
+  <section class="llmt-step" id="dpo">
+    <div class="llmt-step-head"><span class="llmt-step-num">4</span><h2>DPO: skipping the reward model entirely</h2></div>
+    <p class="llmt-eyebrow">Method 2 of 2 — the simpler route</p>
+    <p><strong>Direct Preference Optimization (DPO)</strong> makes an important observation: for the KL-regularized reward-maximization objective above, the optimal policy has a closed form in terms of the reward function — which means you can algebraically substitute that relationship back into the reward-model loss and get an objective that trains the <em>policy directly</em> on preference pairs, with no separate reward model and no reinforcement learning loop at all:</p>
+    <div class="llmt-math">L = − log σ( β · [ log(π&#952;(y&#8340;|x)/π&#8348;&#8331;&#8347;(y&#8340;|x)) − log(π&#952;(y&#8347;|x)/π&#8348;&#8331;&#8347;(y&#8347;|x)) ] )</div>
+    <div class="llmt-pipeline">
+      <span class="pbox">SFT model (reference, frozen)</span><span class="arrow">→</span>
+      <span class="pbox">SFT model (policy, trainable)</span><span class="arrow">→</span>
+      <span class="pbox">compute DPO loss directly on (chosen, rejected) pairs</span><span class="arrow">→</span>
+      <span class="pbox">standard gradient update</span>
+    </div>
+    <p>No reward model to train, no PPO rollouts, no separate reward-hacking failure mode against a proxy model — just supervised-style training on preference pairs, which is far closer in engineering complexity to the SFT stage from Part 4 than to a full RL pipeline. This simplicity is a large part of why DPO (and its variants) has become widely adopted since its introduction.</p>
+    <div class="llmt-goal">💡 <span><b>OLMo's actual recipe:</b> Ai2's Tulu 3 post-training pipeline for OLMo combines SFT, then DPO on preference data, then a further RL stage using <strong>verifiable rewards</strong> (RLVR) — rewarding correctness directly for tasks like math and precise instruction-following, where "correct" can be checked programmatically rather than judged by a trained reward model. It's a concrete, published example of mixing these techniques rather than treating them as mutually exclusive.</span></div>
+  </section>
+
+  <section class="llmt-step" id="cheatsheet">
+    <div class="llmt-step-head"><span class="llmt-step-num">✓</span><h2>Cheat sheet</h2></div>
+    <p class="llmt-eyebrow">Recap</p>
+    <div style="overflow-x:auto;">
+    <table class="llmt-cheat">
+      <thead><tr><th></th><th>RLHF (PPO)</th><th>DPO</th></tr></thead>
+      <tbody>
+        <tr><td>Needs a separate reward model?</td><td>Yes</td><td>No</td></tr>
+        <tr><td>Needs an RL loop?</td><td>Yes (PPO)</td><td>No — direct supervised-style loss</td></tr>
+        <tr><td>Models held in memory</td><td>Policy + reward model + frozen reference</td><td>Policy + frozen reference</td></tr>
+        <tr><td>Main risk</td><td>Reward hacking against the reward model</td><td>Less flexible for reward signals beyond static preference pairs (e.g. verifiable/programmatic rewards)</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <section class="llmt-step" id="refs">
+    <div class="llmt-step-head"><span class="llmt-step-num">📚</span><h2>Further reading</h2></div>
+    <p class="llmt-eyebrow">References</p>
+    <ul class="llmt-refs">
+      <li>Ouyang et al., <a href="https://arxiv.org/abs/2203.02155">"Training Language Models to Follow Instructions with Human Feedback"</a> (InstructGPT / RLHF, 2022).</li>
+      <li>Schulman et al., <a href="https://arxiv.org/abs/1707.06347">"Proximal Policy Optimization Algorithms"</a> (2017).</li>
+      <li>Rafailov et al., <a href="https://arxiv.org/abs/2305.18290">"Direct Preference Optimization: Your Language Model is Secretly a Reward Model"</a> (2023).</li>
+      <li>Lambert et al., <a href="https://arxiv.org/abs/2411.15124">"Tulu 3: Pushing Frontiers in Open Language Model Post-Training"</a> (Ai2, 2024) — SFT + DPO + RLVR recipe used for OLMo.</li>
+    </ul>
+  </section>
+{% endraw %}
+
+  <div class="llmt-next">
+    <span>A well-aligned model still needs an explicit safety layer, evaluation against misuse, and testing before anyone ships it.</span>
+    <a class="btn btn-secondary" href="{{ '/llm-training-guardrails.html' | relative_url }}">Continue: guardrails, evaluation, and deployment →</a>
+  </div>
+</div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="stats-rule"></div>
+    <p style="margin:0;">Have a milestone to add? <a href="https://github.com/DenimPatel/AI">Contribute on GitHub</a>.</p>
+  </div>
+</footer>
+
+{% raw %}
+<script>
+(function(){
+  "use strict";
+  function css(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+  var COLOR_ACCENT = css('--color-accent') || '#0088b0';
+  var COLOR_TEXT = css('--color-text') || '#201e1d';
+
+  // ---- Step 1: preference picker ----
+  (function(){
+    var pairs = [
+      {
+        prompt: 'How do I safely jump-start a car battery?',
+        a: 'Connect any two cables to any terminals — polarity doesn\'t really matter for a quick jump.',
+        b: 'Connect red to both positive terminals first, then black to the working battery\'s negative terminal, then black to an unpainted metal surface on the dead car (not its negative terminal) — this order reduces spark risk near the battery.',
+        better: 'b'
+      },
+      {
+        prompt: 'Summarize the plot of a mystery novel in one sentence.',
+        a: 'A detective investigates a series of clues to uncover who committed a crime, and the story resolves with the culprit\'s identity revealed.',
+        b: 'A detective investigates a series of clues to uncover who committed a crime, and the story resolves with the culprit\'s identity revealed, and then there is a trial, and then an appeal, and then a television adaptation, and then a sequel, and then...',
+        better: 'a'
+      },
+      {
+        prompt: 'What\'s a good first step for someone learning to code?',
+        a: 'Just start; you\'ll figure it out.',
+        b: 'Pick one beginner-friendly language (Python is a common choice), work through a short structured tutorial, and build one small project you\'re personally motivated to finish — momentum matters more than picking the "perfect" first language.',
+        better: 'b'
+      }
+    ];
+    var idx = 0;
+    var aEl = document.getElementById('s1-a'), bEl = document.getElementById('s1-b');
+    var readout = document.getElementById('s1-readout');
+    var pickA = document.getElementById('s1-pick-a'), pickB = document.getElementById('s1-pick-b');
+
+    function render(){
+      var p = pairs[idx];
+      aEl.textContent = p.a;
+      bEl.textContent = p.b;
+      readout.textContent = 'Prompt: "' + p.prompt + '" — pick the response you think a labeler would prefer.';
+      pickA.classList.remove('llmt-chosen'); pickB.classList.remove('llmt-chosen');
+    }
+    function pick(choice){
+      var p = pairs[idx];
+      var correct = choice === p.better;
+      readout.innerHTML = '<span class="k">you picked:</span> Response ' + choice.toUpperCase() +
+        '<br><span class="k">labeler preference used for this example:</span> <span class="hi">Response ' + p.better.toUpperCase() + '</span>' +
+        (correct ? ' — matches what you picked.' : ' — this pair records B as chosen, A as rejected (or vice versa) for training, regardless of which felt more natural to pick.');
+      (choice==='a'?pickA:pickB).classList.add('llmt-chosen');
+    }
+    pickA.addEventListener('click', function(){ pick('a'); });
+    pickB.addEventListener('click', function(){ pick('b'); });
+    document.getElementById('s1-next').addEventListener('click', function(){ idx = (idx+1) % pairs.length; render(); });
+    render();
+  })();
+
+  // ---- Step 2: reward margin / sigmoid loss ----
+  (function(){
+    var canvas = document.getElementById('s2-canvas'), ctx = canvas.getContext('2d');
+    var W = canvas.width, H = canvas.height;
+    var marginEl = document.getElementById('s2-margin'), mval = document.getElementById('s2-mval');
+    var readout = document.getElementById('s2-readout');
+
+    function sigmoid(x){ return 1/(1+Math.exp(-x)); }
+    function loss(margin){ return -Math.log(sigmoid(margin) + 1e-9); }
+
+    function draw(){
+      var m = parseFloat(marginEl.value);
+      mval.textContent = m.toFixed(1);
+      ctx.clearRect(0,0,W,H);
+      var padL=50, padR=20, padT=16, padB=30;
+      ctx.beginPath();
+      for (var x=-4; x<=4; x+=0.05){
+        var px = padL + (W-padL-padR)*((x+4)/8);
+        var py = padT + (H-padT-padB)*(1 - Math.min(loss(x),4)/4);
+        if (x===-4) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+      }
+      ctx.strokeStyle = COLOR_ACCENT; ctx.lineWidth=2; ctx.stroke();
+      var mx = padL + (W-padL-padR)*((m+4)/8);
+      var my = padT + (H-padT-padB)*(1 - Math.min(loss(m),4)/4);
+      ctx.beginPath(); ctx.arc(mx,my,5,0,2*Math.PI); ctx.fillStyle = css('--color-accent-2')||'#d6006c'; ctx.fill();
+      ctx.strokeStyle = css('--color-divider')||'#ccc';
+      ctx.beginPath(); ctx.moveTo(padL,padT); ctx.lineTo(padL,H-padB); ctx.lineTo(W-padR,H-padB); ctx.stroke();
+      ctx.fillStyle = COLOR_TEXT; ctx.font='11px '+(css('--font-body')||'sans-serif');
+      ctx.fillText('loss →', 6, padT+10);
+      ctx.fillText('margin (chosen − rejected) →', W-padR-160, H-8);
+
+      readout.innerHTML = '<span class="k">margin:</span> ' + m.toFixed(1) +
+        '&nbsp;&nbsp;<span class="k">loss:</span> <span class="hi">' + loss(m).toFixed(3) + '</span><br>' +
+        '<span class="k">reading it:</span> ' + (m > 1.5 ? 'chosen response scores clearly higher — loss is small, little gradient pressure left.' : (m > -0.2 ? 'reward model is still uncertain which is better — meaningful gradient pushes the chosen score up.' : 'reward model currently scores the rejected response higher — large loss, strong correction.'));
+    }
+    marginEl.addEventListener('input', draw);
+    draw();
+  })();
+
+})();
+</script>
+{% endraw %}
+
+</body>
+</html>
