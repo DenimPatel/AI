@@ -51,6 +51,9 @@ permalink: /nonlinear-optimization.html
   }
   .nlo-canvas-wrap { flex: 1 1 380px; min-width: 280px; }
   .nlo-canvas-wrap canvas { width: 100%; height: auto; display: block; background: var(--color-neutral-100); border-radius: var(--radius-sm); cursor: crosshair; }
+  .nlo-plot3d { width: 100%; height: 420px; background: var(--color-neutral-100); border-radius: var(--radius-sm); cursor: grab; }
+  .nlo-plot3d:active { cursor: grabbing; }
+  .nlo-plot3d.nlo-plot3d-tall { height: 440px; }
   .nlo-canvas-hint { font-size: 11px; opacity: 0.6; margin-top: 6px; }
   .nlo-controls { flex: 1 1 260px; min-width: 240px; font-size: 13.5px; }
   .nlo-field { margin-bottom: 14px; }
@@ -199,11 +202,11 @@ permalink: /nonlinear-optimization.html
     <p class="nlo-eyebrow">Method 2, generalized</p>
     <div class="nlo-goal">🎯 <b>Learning goal:</b> in 2D (or higher), "slope" becomes a <b>gradient vector</b> and "curvature" becomes a <b>Hessian matrix</b>. The update rule is the same idea, just with linear algebra doing the work.</div>
     <div class="nlo-math">∇C(p) = gradient (2×1 vector)&nbsp;&nbsp;&nbsp;H(p) = Hessian (2×2 matrix)<br>p&#8341;&#8330;&#8321; = p&#8341; − H(p&#8341;)&#8315;&sup1; ∇C(p&#8341;)</div>
-    <p>Below is the cost surface <code>C(x, y)</code> for the robot, seen from above — darker means lower cost. This scenario deliberately uses only <b>two landmarks</b>, so there isn't one clean bowl: two positions can produce almost the same pair of distances, mirrored across the line through the landmarks. Click to place a starting guess, then step. Watch what happens if you start on the "wrong" side.</p>
+    <p>Below is the cost surface <code>C(x, y)</code> for the robot, plotted as a 3D bowl — height and color both track cost, so you can rotate it to see the shape directly instead of squinting at a flat heatmap. This scenario deliberately uses only <b>two landmarks</b>, so there isn't one clean bowl: two positions can produce almost the same pair of distances, mirrored across the line through the landmarks. Drag to orbit, scroll to zoom, and click the surface to place a starting guess, then step. Watch what happens if you start on the "wrong" side.</p>
     <div class="nlo-demo">
       <div class="nlo-canvas-wrap">
-        <canvas id="s4-canvas" width="480" height="420"></canvas>
-        <p class="nlo-canvas-hint">Click the map to set the robot's starting guess (blue). ★ marks the true position (hidden from the algorithm — it only sees noisy distances).</p>
+        <div id="s4-plot3d" class="nlo-plot3d"></div>
+        <p class="nlo-canvas-hint">Drag to orbit, scroll to zoom. Click the surface to set the robot's starting guess (blue). ★ marks the true position (hidden from the algorithm — it only sees noisy distances).</p>
         <div class="nlo-legend">
           <span><i style="background:var(--color-accent)"></i>Newton path</span>
           <span>★ true position</span>
@@ -233,8 +236,8 @@ permalink: /nonlinear-optimization.html
     <p>That's a good approximation whenever the residuals themselves are small or nearly linear near the answer — true for most well-posed localization problems close to the solution. This scenario adds a <b>third landmark</b>, which removes the mirror-image ambiguity from the last step. Toggle the checkbox to overlay Newton's path for comparison — near the minimum they behave almost identically, but Gauss-Newton got there without ever touching a second derivative.</p>
     <div class="nlo-demo">
       <div class="nlo-canvas-wrap">
-        <canvas id="s5-canvas" width="480" height="420"></canvas>
-        <p class="nlo-canvas-hint">Click the map to set the robot's starting guess.</p>
+        <div id="s5-plot3d" class="nlo-plot3d"></div>
+        <p class="nlo-canvas-hint">Drag to orbit, scroll to zoom. Click the surface to set the robot's starting guess.</p>
         <div class="nlo-legend">
           <span><i style="background:var(--color-accent-2)"></i>Gauss-Newton path</span>
           <span><i style="background:var(--color-accent);opacity:.55"></i>Newton path (for comparison)</span>
@@ -261,8 +264,8 @@ permalink: /nonlinear-optimization.html
     <p>When <code>λ = 0</code> this is exactly Gauss-Newton. As <code>λ → ∞</code> the step shrinks and turns into a plain (small) gradient-descent step. Levenberg-Marquardt adjusts <var>λ</var> after every step: <strong>if the step reduced the cost, accept it and lower λ</strong> (be bolder, trust the local model more); <strong>if the step made things worse, reject it and raise λ</strong> (be more cautious, fall back toward gradient descent). Same 3-landmark scenario as before — try a starting guess far from the landmarks, where plain Gauss-Newton struggled, and watch adaptive λ tame it.</p>
     <div class="nlo-demo">
       <div class="nlo-canvas-wrap">
-        <canvas id="s6-canvas" width="480" height="420"></canvas>
-        <p class="nlo-canvas-hint">Click the map to set the robot's starting guess.</p>
+        <div id="s6-plot3d" class="nlo-plot3d"></div>
+        <p class="nlo-canvas-hint">Drag to orbit, scroll to zoom. Click the surface to set the robot's starting guess.</p>
       </div>
       <div class="nlo-controls">
         <label class="nlo-toggle"><input type="checkbox" id="s6-adaptive" checked> Adapt λ automatically</label>
@@ -284,8 +287,8 @@ permalink: /nonlinear-optimization.html
     <p>One scenario, four landmarks, one starting guess — every method runs from the same spot at once. Watch the paths diverge and see the table fill in as each one converges (or doesn't).</p>
     <div class="nlo-demo">
       <div class="nlo-canvas-wrap">
-        <canvas id="s7-canvas" width="520" height="440"></canvas>
-        <p class="nlo-canvas-hint">Click the map to set the shared starting guess.</p>
+        <div id="s7-plot3d" class="nlo-plot3d nlo-plot3d-tall"></div>
+        <p class="nlo-canvas-hint">Drag to orbit, scroll to zoom. Click the surface to set the shared starting guess.</p>
         <div class="nlo-legend">
           <span><i style="background:#9b9797"></i>Gradient descent</span>
           <span><i style="background:var(--color-accent)"></i>Newton</span>
@@ -340,6 +343,7 @@ permalink: /nonlinear-optimization.html
 </footer>
 
 {% raw %}
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
 <script>
 (function(){
   "use strict";
@@ -585,69 +589,112 @@ permalink: /nonlinear-optimization.html
   make1DDemo({ method:'newton', canvasId:'s3-canvas', stepId:'s3-step', runId:'s3-run', resetId:'s3-reset',
     readoutId:'s3-readout', initialX:-6 });
 
-  // ---------- Shared 2D engine ----------
-  function make2DMapper(canvas, worldRange){
-    var W = canvas.width, H = canvas.height;
+  // ---------- Shared 3D cost-surface engine (Plotly) ----------
+  var SURFACE_COLORSCALE = PALETTE.slice().reverse().map(function(c,i){ return [i/(PALETTE.length-1), c]; });
+  var COLOR_DIVIDER = css('--color-divider') || 'rgba(32,30,29,0.16)';
+
+  function computeCostGrid(landmarks, meas, worldRange, gridN){
+    gridN = gridN || 44;
+    var xs = new Array(gridN), ys = new Array(gridN);
+    for (var i=0;i<gridN;i++){
+      xs[i] = worldRange.x[0] + i/(gridN-1)*(worldRange.x[1]-worldRange.x[0]);
+      ys[i] = worldRange.y[0] + i/(gridN-1)*(worldRange.y[1]-worldRange.y[0]);
+    }
+    var z = new Array(gridN), zMin = Infinity, zMax = -Infinity;
+    for (var gy=0; gy<gridN; gy++){
+      var row = new Array(gridN);
+      for (var gx=0; gx<gridN; gx++){
+        var c = NLO.cost([xs[gx], ys[gy]], landmarks, meas);
+        row[gx] = c;
+        if (c<zMin) zMin=c; if (c>zMax) zMax=c;
+      }
+      z[gy] = row;
+    }
+    return { x: xs, y: ys, z: z, zMin: zMin, zMax: zMax };
+  }
+
+  function sceneLayout(worldRange, zMin, zMax){
+    var zPad = (zMax-zMin) * 0.06 || 1;
     return {
-      toPx: function(p){ return [ (p[0]-worldRange.x[0])/(worldRange.x[1]-worldRange.x[0]) * W,
-                                   H - (p[1]-worldRange.y[0])/(worldRange.y[1]-worldRange.y[0]) * H ]; },
-      toWorld: function(px,py){ return [ worldRange.x[0] + px/W*(worldRange.x[1]-worldRange.x[0]),
-                                          worldRange.y[0] + (H-py)/H*(worldRange.y[1]-worldRange.y[0]) ]; },
-      W:W, H:H
+      xaxis: { title:'x', range: worldRange.x, backgroundcolor:'transparent', gridcolor: COLOR_DIVIDER, zerolinecolor: COLOR_DIVIDER, color: COLOR_TEXT },
+      yaxis: { title:'y', range: worldRange.y, backgroundcolor:'transparent', gridcolor: COLOR_DIVIDER, zerolinecolor: COLOR_DIVIDER, color: COLOR_TEXT },
+      zaxis: { title:'cost', range: [zMin-zPad, zMax+zPad], backgroundcolor:'transparent', gridcolor: COLOR_DIVIDER, zerolinecolor: COLOR_DIVIDER, color: COLOR_TEXT },
+      aspectmode: 'manual',
+      aspectratio: { x:1, y: (worldRange.y[1]-worldRange.y[0])/(worldRange.x[1]-worldRange.x[0]), z:0.65 },
+      camera: { eye: { x:1.5, y:-1.5, z:1.05 } }
     };
   }
 
-  function drawHeatmap(canvas, mapper, landmarks, meas, worldRange){
-    var ctx = canvas.getContext('2d');
-    var grid = 56;
-    var costs = new Array(grid*grid);
-    var min = Infinity, max = -Infinity;
-    for (var gy=0; gy<grid; gy++){
-      for (var gx=0; gx<grid; gx++){
-        var wx = worldRange.x[0] + (gx+0.5)/grid*(worldRange.x[1]-worldRange.x[0]);
-        var wy = worldRange.y[0] + (gy+0.5)/grid*(worldRange.y[1]-worldRange.y[0]);
-        var c = NLO.cost([wx,wy], landmarks, meas);
-        costs[gy*grid+gx] = c;
-        if (c<min) min=c; if (c>max) max=c;
-      }
-    }
-    var cellW = mapper.W/grid, cellH = mapper.H/grid;
-    for (gy=0; gy<grid; gy++){
-      for (gx=0; gx<grid; gx++){
-        var c2 = costs[gy*grid+gx];
-        var t = max>min ? Math.sqrt((c2-min)/(max-min)) : 0;
-        var idx = Math.max(0, Math.min(8, Math.round((1-t)*8)));
-        ctx.fillStyle = PALETTE[idx];
-        var px = gx*cellW, py = mapper.H - (gy+1)*cellH;
-        ctx.fillRect(px-0.5, py-0.5, cellW+1, cellH+1);
-      }
-    }
+  // Builds a Plotly 3D cost-surface figure with a floor for landmark/truth pins
+  // and one or more path traces on top. Returns a controller with trace indices.
+  function make3DSurfaceFigure(divId, landmarks, meas, trueP, worldRange, pathSpecs){
+    var grid = computeCostGrid(landmarks, meas, worldRange);
+    var floorZ = grid.zMin - (grid.zMax-grid.zMin)*0.08 - 1e-6;
+
+    var surfaceTrace = {
+      type:'surface', x: grid.x, y: grid.y, z: grid.z,
+      colorscale: SURFACE_COLORSCALE, showscale:false, opacity:0.96,
+      contours: { z: { show:true, usecolormap:true, project:{z:true}, highlightwidth:1 } },
+      lighting: { ambient:0.7, diffuse:0.55, specular:0.12, roughness:0.9 },
+      hovertemplate: 'x=%{x:.2f}<br>y=%{y:.2f}<br>cost=%{z:.3f}<extra></extra>'
+    };
+    var landmarkTrace = {
+      type:'scatter3d', mode:'markers', name:'landmark',
+      x: landmarks.map(function(L){ return L[0]; }),
+      y: landmarks.map(function(L){ return L[1]; }),
+      z: landmarks.map(function(){ return floorZ; }),
+      marker:{ size:6, color: COLOR_ACCENT2, symbol:'diamond' },
+      hovertemplate:'landmark<extra></extra>'
+    };
+    var truthTrace = {
+      type:'scatter3d', mode:'markers', name:'true position',
+      x:[trueP[0]], y:[trueP[1]], z:[floorZ],
+      marker:{ size:7, color: COLOR_TEXT, symbol:'diamond-open', line:{width:2,color:COLOR_TEXT} },
+      hovertemplate:'true position<extra></extra>'
+    };
+    var data = [surfaceTrace, landmarkTrace, truthTrace];
+    var pathTraceIndex = {};
+    pathSpecs.forEach(function(spec){
+      pathTraceIndex[spec.key] = data.length;
+      data.push({
+        type:'scatter3d', mode:'lines+markers', name: spec.name,
+        x:[], y:[], z:[],
+        line:{ color: spec.color, width:4 },
+        marker:{ size:3.5, color: spec.color },
+        visible: spec.visible === false ? false : true,
+        hovertemplate: spec.name + '<br>cost=%{z:.3f}<extra></extra>'
+      });
+    });
+
+    var layout = {
+      autosize:true, margin:{l:0,r:0,t:0,b:0}, showlegend:false,
+      paper_bgcolor:'transparent', scene: sceneLayout(worldRange, grid.zMin, grid.zMax)
+    };
+    var div = document.getElementById(divId);
+    Plotly.newPlot(div, data, layout, { displayModeBar:false, responsive:true });
+
+    return { div: div, pathTraceIndex: pathTraceIndex, floorZ: floorZ };
   }
 
-  function drawLandmarksAndTruth(ctx, mapper, landmarks, trueP){
-    ctx.fillStyle = COLOR_ACCENT2;
-    landmarks.forEach(function(L){
-      var p = mapper.toPx(L);
-      ctx.beginPath();
-      ctx.moveTo(p[0], p[1]-7); ctx.lineTo(p[0]+7,p[1]); ctx.lineTo(p[0],p[1]+7); ctx.lineTo(p[0]-7,p[1]); ctx.closePath();
-      ctx.fill();
-    });
-    var tp = mapper.toPx(trueP);
-    ctx.fillStyle = COLOR_TEXT;
-    ctx.save(); ctx.translate(tp[0],tp[1]); ctx.font = '16px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText('★', 0, 1); ctx.restore();
+  // Recomputes the surface (used when landmarks/measurements change) and rebuilds the figure in place.
+  function rebuild3DSurfaceFigure(fig, divId, landmarks, meas, trueP, worldRange, pathSpecs){
+    var rebuilt = make3DSurfaceFigure(divId, landmarks, meas, trueP, worldRange, pathSpecs);
+    fig.div = rebuilt.div; fig.pathTraceIndex = rebuilt.pathTraceIndex; fig.floorZ = rebuilt.floorZ;
   }
 
-  function drawPath(ctx, mapper, path, color){
-    if (path.length < 1) return;
-    ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.beginPath();
-    path.forEach(function(p,i){ var px = mapper.toPx(p); if (i===0) ctx.moveTo(px[0],px[1]); else ctx.lineTo(px[0],px[1]); });
-    ctx.stroke();
-    path.forEach(function(p,i){
-      var px = mapper.toPx(p);
-      ctx.fillStyle = color;
-      ctx.beginPath(); ctx.arc(px[0],px[1], i===path.length-1?5:2.5, 0, 7); ctx.fill();
-    });
+  function updatePathTrace(fig, key, path, landmarks, meas){
+    var idx = fig.pathTraceIndex[key];
+    if (idx === undefined) return;
+    var xs = path.map(function(p){ return p[0]; });
+    var ys = path.map(function(p){ return p[1]; });
+    var zs = path.map(function(p){ return NLO.cost(p, landmarks, meas); });
+    Plotly.restyle(fig.div, { x:[xs], y:[ys], z:[zs] }, [idx]);
+  }
+
+  function setPathVisible(fig, key, visible){
+    var idx = fig.pathTraceIndex[key];
+    if (idx === undefined) return;
+    Plotly.restyle(fig.div, { visible: visible }, [idx]);
   }
 
   function makeScenario(landmarkCount, trueP, noiseStd, worldRange){
@@ -688,12 +735,13 @@ permalink: /nonlinear-optimization.html
     return { p: candidate, delta: delta, grad: g };
   }
 
-  function make2DDemo(opts){
-    var canvas = document.getElementById(opts.canvasId);
-    var ctx = canvas.getContext('2d');
+  function make3DDemo(opts){
     var worldRange = opts.scenario.worldRange;
-    var mapper = make2DMapper(canvas, worldRange);
     var landmarks = opts.scenario.landmarks, meas = opts.scenario.meas, trueP = opts.scenario.trueP;
+
+    var pathSpecs = [{ key:'main', name: opts.methodLabel || opts.method, color: opts.pathColor || COLOR_ACCENT }];
+    if (opts.compareMethod) pathSpecs.push({ key:'compare', name: opts.compareLabel || opts.compareMethod, color: COLOR_ACCENT, visible: opts.getCompareOn ? opts.getCompareOn() : true });
+    var fig = make3DSurfaceFigure(opts.divId, landmarks, meas, trueP, worldRange, pathSpecs);
 
     var p = opts.initial.slice();
     var path = [p.slice()];
@@ -702,12 +750,12 @@ permalink: /nonlinear-optimization.html
     var compareState = { lambda: 1 };
     var running = false, timer = null;
 
-    function redrawBase(){ drawHeatmap(canvas, mapper, landmarks, meas, worldRange); }
     function redraw(){
-      redrawBase();
-      drawLandmarksAndTruth(ctx, mapper, landmarks, trueP);
-      if (comparePath && opts.getCompareOn && opts.getCompareOn()) drawPath(ctx, mapper, comparePath, COLOR_ACCENT + '90');
-      drawPath(ctx, mapper, path, opts.pathColor || COLOR_ACCENT);
+      updatePathTrace(fig, 'main', path, landmarks, meas);
+      if (comparePath && opts.compareMethod){
+        updatePathTrace(fig, 'compare', comparePath, landmarks, meas);
+        if (opts.getCompareOn) setPathVisible(fig, 'compare', opts.getCompareOn());
+      }
     }
     function currentLambda(){ return opts.getLambda ? opts.getLambda(state) : state.lambda; }
 
@@ -769,11 +817,10 @@ permalink: /nonlinear-optimization.html
         if (done || count > 50) stopRun();
       }, 300);
     });
-    canvas.addEventListener('click', function(e){
-      var rect = canvas.getBoundingClientRect();
-      var px = (e.clientX-rect.left)/rect.width*mapper.W;
-      var py = (e.clientY-rect.top)/rect.height*mapper.H;
-      reset(mapper.toWorld(px,py));
+    fig.div.on('plotly_click', function(evt){
+      var pt = evt.points && evt.points[0];
+      if (!pt || pt.data.type !== 'surface') return;
+      reset([pt.x, pt.y]);
     });
 
     reset(opts.initial);
@@ -781,14 +828,14 @@ permalink: /nonlinear-optimization.html
   }
 
   var scenario2 = makeScenario(2, [1,-2], 0.15, { x:[-8,8], y:[-6,6] });
-  make2DDemo({ method:'newton', canvasId:'s4-canvas', stepId:'s4-step', runId:'s4-run', resetId:'s4-reset',
-    readoutId:'s4-readout', scenario: scenario2, initial:[6,5], pathColor: COLOR_ACCENT });
+  make3DDemo({ method:'newton', divId:'s4-plot3d', stepId:'s4-step', runId:'s4-run', resetId:'s4-reset',
+    readoutId:'s4-readout', scenario: scenario2, initial:[6,5], pathColor: COLOR_ACCENT, methodLabel:'Newton' });
 
   var scenario3 = makeScenario(3, [1,-2], 0.15, { x:[-8,8], y:[-6,6] });
   var s5compareBox = document.getElementById('s5-compare');
-  make2DDemo({ method:'gauss-newton', canvasId:'s5-canvas', stepId:'s5-step', runId:'s5-run', resetId:'s5-reset',
-    readoutId:'s5-readout', scenario: scenario3, initial:[6,5], pathColor: COLOR_ACCENT2,
-    compareMethod:'newton', getCompareOn: function(){ return s5compareBox.checked; } });
+  make3DDemo({ method:'gauss-newton', divId:'s5-plot3d', stepId:'s5-step', runId:'s5-run', resetId:'s5-reset',
+    readoutId:'s5-readout', scenario: scenario3, initial:[6,5], pathColor: COLOR_ACCENT2, methodLabel:'Gauss-Newton',
+    compareMethod:'newton', compareLabel:'Newton (comparison)', getCompareOn: function(){ return s5compareBox.checked; } });
   s5compareBox.addEventListener('change', function(){ /* redraw triggered on next step/reset; force one now */
     var evt = new Event('click'); document.getElementById('s5-reset').dispatchEvent(evt);
   });
@@ -803,9 +850,9 @@ permalink: /nonlinear-optimization.html
   function toggleLambdaField(){ s6lambdaField.style.opacity = s6adaptive.checked ? 0.35 : 1; s6lambdaSlider.disabled = s6adaptive.checked; }
   toggleLambdaField();
   s6adaptive.addEventListener('change', toggleLambdaField);
-  make2DDemo({
-    method:'lm', canvasId:'s6-canvas', stepId:'s6-step', runId:'s6-run', resetId:'s6-reset',
-    readoutId:'s6-readout', scenario: scenario4, initial:[7,-5.5], pathColor: '#1a7a3a', lambda0: 1,
+  make3DDemo({
+    method:'lm', divId:'s6-plot3d', stepId:'s6-step', runId:'s6-run', resetId:'s6-reset',
+    readoutId:'s6-readout', scenario: scenario4, initial:[7,-5.5], pathColor: '#1a7a3a', lambda0: 1, methodLabel:'Levenberg-Marquardt',
     getLambda: function(state){
       if (s6adaptive.checked) return state.lambda;
       return Math.pow(10, parseFloat(s6lambdaSlider.value));
@@ -814,9 +861,7 @@ permalink: /nonlinear-optimization.html
 
   // ---------- Step 7: playground race ----------
   (function(){
-    var canvas = document.getElementById('s7-canvas'), ctx = canvas.getContext('2d');
     var worldRange = { x:[-8,8], y:[-6,6] };
-    var mapper = make2DMapper(canvas, worldRange);
     var scenario = makeScenario(4, [1,-2], 0.15, worldRange);
     var initial = [6.5,5];
     var methods = [
@@ -825,7 +870,18 @@ permalink: /nonlinear-optimization.html
       { key:'gauss-newton', label:'Gauss-Newton', color: COLOR_ACCENT2 },
       { key:'lm', label:'Levenberg-Marquardt', color: '#1a7a3a' }
     ];
+    var pathSpecs = methods.map(function(m){ return { key:m.key, name:m.label, color:m.color }; });
+    var fig = make3DSurfaceFigure('s7-plot3d', scenario.landmarks, scenario.meas, scenario.trueP, worldRange, pathSpecs);
     var paths, states, done, running=false, timer=null;
+
+    function bindClick(){
+      fig.div.on('plotly_click', function(evt){
+        var pt = evt.points && evt.points[0];
+        if (!pt || pt.data.type !== 'surface') return;
+        reset([pt.x, pt.y]);
+      });
+    }
+    bindClick();
 
     function tbody(){ return document.querySelector('#s7-table tbody'); }
     function renderTable(){
@@ -837,14 +893,16 @@ permalink: /nonlinear-optimization.html
       tbody().innerHTML = rows.join('');
     }
     function redraw(){
-      drawHeatmap(canvas, mapper, scenario.landmarks, scenario.meas, worldRange);
-      drawLandmarksAndTruth(ctx, mapper, scenario.landmarks, scenario.trueP);
-      methods.forEach(function(m,i){ drawPath(ctx, mapper, paths[i], m.color); });
+      methods.forEach(function(m,i){ updatePathTrace(fig, m.key, paths[i], scenario.landmarks, scenario.meas); });
     }
     function reset(newInitial, newScenario){
       stopRun();
       if (newScenario) scenario = newScenario;
       if (newInitial) initial = newInitial;
+      if (newScenario){
+        rebuild3DSurfaceFigure(fig, 's7-plot3d', scenario.landmarks, scenario.meas, scenario.trueP, worldRange, pathSpecs);
+        bindClick();
+      }
       paths = methods.map(function(){ return [initial.slice()]; });
       states = methods.map(function(){ return { lambda: 1 }; });
       done = methods.map(function(){ return null; });
@@ -885,12 +943,6 @@ permalink: /nonlinear-optimization.html
       var angle = Math.random()*Math.PI*2, r = 3+Math.random()*2;
       var trueP = [Math.cos(angle)*r, Math.sin(angle)*r];
       reset(initial, makeScenario(4, trueP, 0.15, worldRange));
-    });
-    canvas.addEventListener('click', function(e){
-      var rect = canvas.getBoundingClientRect();
-      var px = (e.clientX-rect.left)/rect.width*mapper.W;
-      var py = (e.clientY-rect.top)/rect.height*mapper.H;
-      reset(mapper.toWorld(px,py));
     });
     reset(initial);
   })();
