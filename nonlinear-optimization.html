@@ -677,7 +677,9 @@ permalink: /nonlinear-optimization.html
   }
 
   // Recomputes the surface (used when landmarks/measurements change) and rebuilds the figure in place.
+  // Purges first so the old WebGL context and any event listeners (e.g. plotly_click) don't leak.
   function rebuild3DSurfaceFigure(fig, divId, landmarks, meas, trueP, worldRange, pathSpecs){
+    Plotly.purge(divId);
     var rebuilt = make3DSurfaceFigure(divId, landmarks, meas, trueP, worldRange, pathSpecs);
     fig.div = rebuilt.div; fig.pathTraceIndex = rebuilt.pathTraceIndex; fig.floorZ = rebuilt.floorZ;
   }
@@ -817,10 +819,16 @@ permalink: /nonlinear-optimization.html
         if (done || count > 50) stopRun();
       }, 300);
     });
+    var clickPending = false;
     fig.div.on('plotly_click', function(evt){
+      if (clickPending) return;
       var pt = evt.points && evt.points[0];
       if (!pt || pt.data.type !== 'surface') return;
-      reset([pt.x, pt.y]);
+      clickPending = true;
+      // Defer: mutating traces (via reset -> Plotly.restyle) synchronously inside a
+      // gl3d plotly_click handler re-enters Plotly's WebGL render/pick loop and can
+      // hang the tab. Running it on the next tick lets that loop finish first.
+      setTimeout(function(){ clickPending = false; reset([pt.x, pt.y]); }, 0);
     });
 
     reset(opts.initial);
@@ -874,11 +882,17 @@ permalink: /nonlinear-optimization.html
     var fig = make3DSurfaceFigure('s7-plot3d', scenario.landmarks, scenario.meas, scenario.trueP, worldRange, pathSpecs);
     var paths, states, done, running=false, timer=null;
 
+    var clickPending = false;
     function bindClick(){
       fig.div.on('plotly_click', function(evt){
+        if (clickPending) return;
         var pt = evt.points && evt.points[0];
         if (!pt || pt.data.type !== 'surface') return;
-        reset([pt.x, pt.y]);
+        clickPending = true;
+        // Defer: mutating traces (via reset -> Plotly.restyle) synchronously inside a
+        // gl3d plotly_click handler re-enters Plotly's WebGL render/pick loop and can
+        // hang the tab. Running it on the next tick lets that loop finish first.
+        setTimeout(function(){ clickPending = false; reset([pt.x, pt.y]); }, 0);
       });
     }
     bindClick();
