@@ -1,0 +1,158 @@
+---
+title: "LLM Training, Interactively — Series Hub"
+description: The full map of the 12-part interactive LLM training guide — a clickable pipeline from raw web text to a deployed, guarded assistant, plus a routing table for jumping in wherever you already know the basics.
+permalink: /llm-training-index.html
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ page.title }} · {{ site.title }}</title>
+<meta name="description" content="{{ page.description }}">
+<link rel="stylesheet" href="{{ '/assets/css/styles.css' | relative_url }}">
+<link rel="stylesheet" href="{{ '/assets/css/llm-guide.css' | relative_url }}">
+<style>
+  .hub-pipeline { width: 100%; height: auto; }
+  .hub-pipeline .stage { cursor: pointer; }
+  .hub-pipeline .stage rect { fill: var(--color-surface); stroke: var(--color-divider); transition: fill 0.15s; }
+  .hub-pipeline .stage:hover rect { fill: var(--color-accent-100); stroke: var(--color-accent); }
+  .hub-pipeline .stage text { fill: var(--color-text); font-family: var(--font-body); }
+  .hub-pipeline .stage .stage-title { font-weight: 600; font-size: 12.5px; }
+  .hub-pipeline .stage .stage-meta { font-size: 9.5px; opacity: 0.65; }
+  .hub-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; margin-top: 16px; }
+  .hub-card {
+    background: var(--color-surface); border-radius: var(--radius-md); padding: 16px;
+    text-decoration: none; color: var(--color-text); display: block; transition: box-shadow 0.15s;
+  }
+  .hub-card:hover { box-shadow: var(--shadow-md); }
+  .hub-card .num { font-family: var(--font-mono); font-size: 11px; opacity: 0.55; }
+  .hub-card h3 { margin: 4px 0 6px; font-size: 16px; }
+  .hub-card p { margin: 0; font-size: 13px; opacity: 0.8; line-height: 1.5; }
+  .route-table { width: 100%; border-collapse: collapse; font-size: 13.5px; margin-top: 10px; }
+  .route-table th, .route-table td { padding: 10px 12px; border-bottom: 1px solid var(--color-divider); text-align: left; vertical-align: top; }
+  .route-table th { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.6; }
+</style>
+</head>
+<body>
+
+{% include llm-nav.html %}
+
+<main>
+<div class="wrap llmt">
+  <section class="page-header">
+    <span class="section-kicker">Interactive guide · Series hub</span>
+    <h1>LLM Training, Interactively</h1>
+    <p>Twelve parts, one pipeline: raw web text becomes a corpus, a corpus trains a base model, a base model becomes an assistant, an assistant is aligned and hardened, and the result is served to actual users. Every stage below is a real, interactive part of the series — not a static description.</p>
+  </section>
+  <div class="stats-rule" style="border-top-color: var(--color-divider); margin-bottom: 24px;"></div>
+
+  <section class="llmt-step" style="border-top:none; padding-top:0;">
+    <h2 style="margin-top:0;">The pipeline</h2>
+    <p>Click any stage to jump to its part.</p>
+    <svg class="hub-pipeline" viewBox="0 0 1160 260" role="img" aria-label="LLM training pipeline diagram">
+      <!-- connecting line -->
+      <line x1="60" y1="130" x2="1100" y2="130" stroke="var(--color-divider)" stroke-width="2"/>
+      <!-- stages -->
+      <a href="{{ '/llm-training-data.html' | relative_url }}"><g class="stage" transform="translate(20,80)">
+        <rect width="150" height="100" rx="4"/>
+        <text x="75" y="30" text-anchor="middle" class="stage-title">Raw web →</text>
+        <text x="75" y="46" text-anchor="middle" class="stage-title">corpus</text>
+        <text x="75" y="66" text-anchor="middle" class="stage-meta">Part 4</text>
+        <text x="75" y="80" text-anchor="middle" class="stage-meta">~200TB → 3T tokens</text>
+      </g></a>
+      <a href="{{ '/llm-training-pretraining.html' | relative_url }}"><g class="stage" transform="translate(190,80)">
+        <rect width="150" height="100" rx="4"/>
+        <text x="75" y="30" text-anchor="middle" class="stage-title">Pretraining</text>
+        <text x="75" y="46" text-anchor="middle" class="stage-title">(base model)</text>
+        <text x="75" y="66" text-anchor="middle" class="stage-meta">Parts 3, 5, 6</text>
+        <text x="75" y="80" text-anchor="middle" class="stage-meta">Weeks–months, 1000s of GPUs</text>
+      </g></a>
+      <a href="{{ '/llm-training-pretraining.html' | relative_url }}#anneal"><g class="stage" transform="translate(360,80)">
+        <rect width="150" height="100" rx="4"/>
+        <text x="75" y="30" text-anchor="middle" class="stage-title">Mid-training</text>
+        <text x="75" y="46" text-anchor="middle" class="stage-title">(anneal)</text>
+        <text x="75" y="66" text-anchor="middle" class="stage-meta">Part 5</text>
+        <text x="75" y="80" text-anchor="middle" class="stage-meta">Hours–days</text>
+      </g></a>
+      <a href="{{ '/llm-training-finetuning.html' | relative_url }}"><g class="stage" transform="translate(530,80)">
+        <rect width="150" height="100" rx="4"/>
+        <text x="75" y="30" text-anchor="middle" class="stage-title">SFT</text>
+        <text x="75" y="46" text-anchor="middle" class="stage-title">(instruction tuning)</text>
+        <text x="75" y="66" text-anchor="middle" class="stage-meta">Part 7</text>
+        <text x="75" y="80" text-anchor="middle" class="stage-meta">Thousands–millions of examples</text>
+      </g></a>
+      <a href="{{ '/llm-training-rlhf.html' | relative_url }}"><g class="stage" transform="translate(700,80)">
+        <rect width="150" height="100" rx="4"/>
+        <text x="75" y="30" text-anchor="middle" class="stage-title">Alignment</text>
+        <text x="75" y="46" text-anchor="middle" class="stage-title">+ RL (Parts 8–9)</text>
+        <text x="75" y="66" text-anchor="middle" class="stage-meta">DPO / PPO / GRPO</text>
+        <text x="75" y="80" text-anchor="middle" class="stage-meta">Preference + verifiable data</text>
+      </g></a>
+      <a href="{{ '/llm-training-evaluation.html' | relative_url }}"><g class="stage" transform="translate(870,80)">
+        <rect width="150" height="100" rx="4"/>
+        <text x="75" y="30" text-anchor="middle" class="stage-title">Evaluation</text>
+        <text x="75" y="46" text-anchor="middle" class="stage-title">+ guardrails</text>
+        <text x="75" y="66" text-anchor="middle" class="stage-meta">Parts 10, 12</text>
+        <text x="75" y="80" text-anchor="middle" class="stage-meta">Ongoing, incl. post-release</text>
+      </g></a>
+      <a href="{{ '/llm-training-inference.html' | relative_url }}"><g class="stage" transform="translate(1040,80)">
+        <rect width="110" height="100" rx="4"/>
+        <text x="55" y="30" text-anchor="middle" class="stage-title">Serving</text>
+        <text x="55" y="46" text-anchor="middle" class="stage-title">(inference)</text>
+        <text x="55" y="66" text-anchor="middle" class="stage-meta">Part 11</text>
+        <text x="55" y="80" text-anchor="middle" class="stage-meta">Milliseconds/token</text>
+      </g></a>
+    </svg>
+  </section>
+
+  <section class="llmt-step">
+    <h2 style="margin-top:0;">All 12 parts</h2>
+    <div class="hub-grid">
+      {% for part in site.data.llm_series %}
+      <a class="hub-card" href="{{ part.permalink | relative_url }}">
+        <span class="num">Part {{ part.num }} of 12</span>
+        <h3>{{ part.title }}</h3>
+        <p>{{ part.blurb }}</p>
+      </a>
+      {% endfor %}
+      <a class="hub-card" href="{{ '/llm-training-glossary.html' | relative_url }}">
+        <span class="num">Reference</span>
+        <h3>Glossary &amp; numbers to know</h3>
+        <p>Every bolded term across the series, linked back to where it's introduced, plus a quick-reference numbers card.</p>
+      </a>
+    </div>
+  </section>
+
+  <section class="llmt-step">
+    <h2 style="margin-top:0;">Already know some of this? Start here</h2>
+    <table class="route-table">
+      <thead><tr><th>If you...</th><th>Start at</th></tr></thead>
+      <tbody>
+        <tr><td>Have never touched an ML paper</td><td><a href="{{ '/llm-training.html' | relative_url }}">Part 1 — What is a language model</a></td></tr>
+        <tr><td>Know tokenization/embeddings, want the architecture</td><td><a href="{{ '/llm-training-architecture.html' | relative_url }}">Part 3 — The transformer, block by block</a></td></tr>
+        <tr><td>Know transformers, want the data/training-systems side</td><td><a href="{{ '/llm-training-data.html' | relative_url }}">Part 4 — Building the pretraining dataset</a></td></tr>
+        <tr><td>Have a base model, want to fine-tune it yourself</td><td><a href="{{ '/llm-training-finetuning.html' | relative_url }}">Part 7 — SFT &amp; PEFT (LoRA)</a></td></tr>
+        <tr><td>Know SFT/RLHF, want reasoning-model RL specifically</td><td><a href="{{ '/llm-training-reasoning.html' | relative_url }}">Part 9 — Reasoning &amp; RLVR</a></td></tr>
+        <tr><td>Just want to know how to read a benchmark number</td><td><a href="{{ '/llm-training-evaluation.html' | relative_url }}">Part 10 — Evaluation</a></td></tr>
+        <tr><td>Care about running models cheaply, not training them</td><td><a href="{{ '/llm-training-inference.html' | relative_url }}">Part 11 — Inference, serving &amp; efficiency</a></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <div class="llmt-next">
+    <span>Start from the beginning, or jump straight into whichever part you need.</span>
+    <a class="btn btn-secondary" href="{{ '/llm-training.html' | relative_url }}">Start with Part 1 →</a>
+  </div>
+</div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="stats-rule"></div>
+    <p style="margin:0;">Have a milestone to add? <a href="https://github.com/DenimPatel/AI">Contribute on GitHub</a>.</p>
+  </div>
+</footer>
+
+</body>
+</html>
