@@ -118,7 +118,7 @@ permalink: /multi-view-geometry-sfm-pipelines.html
   <section class="page-header">
     <span class="section-kicker">Interactive guide &middot; Part 11 of 13</span>
     <h1>Structure-from-Motion Pipelines</h1>
-    <p>PLACEHOLDER-INTRO-PARAGRAPH</p>
+    <p>Every earlier part of this series built one piece of machinery in isolation — a fundamental or essential matrix between a pair (Part 3), a homography (Part 6), a triangulated point (Part 7), a resectioned camera (Part 8), a bundle-adjustment cost that cleans everything up at once (Part 10). A real system like <strong>COLMAP</strong> is the wiring diagram that turns those pieces into a pipeline: feed it an unordered folder of photos, and it has to decide which pairs overlap, where to start, how to grow one image at a time without drifting apart, and when to stop and re-optimize. This page is that wiring diagram, its "grow everything at once" alternative, and the honest fine print on what an <em>uncalibrated</em> reconstruction actually hands you before a further step called self-calibration is applied.</p>
   </section>
   <div class="stats-rule" style="border-top-color: var(--color-divider); margin-bottom: 8px;"></div>
 

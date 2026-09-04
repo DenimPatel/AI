@@ -118,7 +118,7 @@ permalink: /multi-view-geometry-beyond.html
   <section class="page-header">
     <span class="section-kicker">Interactive guide &middot; Part 12 of 13</span>
     <h1>Beyond: SLAM, MVS &amp; Learned Geometry</h1>
-    <p>PLACEHOLDER-INTRO-PARAGRAPH</p>
+    <p>Every part of this series so far — from Part 1's projection equation through Part 11's full structure-from-motion pipeline — ends at the same kind of answer: a <em>sparse</em> point cloud, with 3D coordinates only for the handful of pixels that got matched as features. This closing part is a survey of what the field builds on top of that. First, <strong>dense multi-view stereo</strong>, which pushes from "a few thousand matched points" to "a depth estimate at nearly every pixel," and fuses many such depth maps into one solid surface. Then the newest shift: <strong>neural and feed-forward methods</strong> (NeRF, 3D Gaussian Splatting, DUSt3R-style models) that replace pieces of this classical pipeline with learned components — while, in every case that has actually stuck, still leaning on the same projection equation, known or estimated camera poses, and multi-view consistency this guide spent eleven parts deriving. Finally, <strong>SLAM</strong>, the real-time sibling of everything covered so far — the same tracking-and-mapping problem, but online, frame by frame, under a latency budget. The goal here is to place these on the map you've already built, not to rebuild any of them from scratch.</p>
   </section>
   <div class="stats-rule" style="border-top-color: var(--color-divider); margin-bottom: 8px;"></div>
 

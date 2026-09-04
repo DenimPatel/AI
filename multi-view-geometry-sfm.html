@@ -146,6 +146,10 @@ permalink: /multi-view-geometry-sfm.html
       </div>
       <div class="mvg-controls">
         <div class="mvg-field"><label>Pixel noise σ <span class="val" id="s2-noiseval"></span></label><input type="range" id="s2-noise" min="0" max="10" step="0.2" value="5"></div>
+        <div class="mvg-field" style="display:flex; align-items:center; gap:8px; justify-content:flex-start;">
+          <input type="checkbox" id="s2-optposes" style="width:auto; accent-color:var(--color-accent);">
+          <label for="s2-optposes" style="margin:0; display:inline; font-size:13px;">also optimize camera poses (δ on SO(3), see below)</label>
+        </div>
         <div class="mvg-btnrow">
           <button id="s2-step" class="mvg-primary">Step ▸</button>
           <button id="s2-run">Run</button>
@@ -154,7 +158,109 @@ permalink: /multi-view-geometry-sfm.html
         <div class="mvg-readout" id="s2-readout"></div>
       </div>
     </div>
-    <p>This demo only refines the <em>points</em>, holding the 5 camera poses fixed — full bundle adjustment also refines every camera's pose simultaneously, which couples every point and every camera together into one much larger (but structurally identical) least-squares problem.</p>
+    <p>With the checkbox off, this demo only refines the <em>points</em>, holding the 5 camera poses fixed, exactly as before. Check it and every camera's pose is <em>also</em> perturbed away from truth at scene start (simulating imperfect initial calibration) and refined every step — jointly with the points, using the block-coordinate version of the same Gauss-Newton loop above (points refined with poses held fixed, then poses refined with points held fixed, repeated). Camera 0 is always left untouched — that pins the gauge freedom explained below.</p>
+    <div class="mvg-demo" style="margin-top:14px;">
+      <div class="mvg-canvas-wrap">
+        <canvas id="s2-sparsity" class="mvg-costchart" style="height:230px;"></canvas>
+        <p class="mvg-canvas-hint">Jacobian sparsity: one row per observation, columns are the 5×6 camera-pose block <span style="color:var(--color-accent)">■</span> followed by the 8×3 point block <span style="color:var(--color-accent-2)">■</span>. Each row only touches <em>one</em> camera-column-group and <em>one</em> point-column-group.</p>
+      </div>
+      <div class="mvg-canvas-wrap">
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <div><canvas id="s2-Ucc"></canvas><p class="mvg-canvas-hint" style="text-align:center;">U<sub>cc</sub> (30×30)</p></div>
+          <div><canvas id="s2-W"></canvas><p class="mvg-canvas-hint" style="text-align:center;">W (30×24)</p></div>
+          <div><canvas id="s2-Vpp"></canvas><p class="mvg-canvas-hint" style="text-align:center;">V<sub>pp</sub> (24×24)</p></div>
+        </div>
+        <p class="mvg-canvas-hint">|J&#7488;J| for this exact toy problem, split into camera-camera, camera-point, and point-point blocks. Only the block-diagonal structure of U<sub>cc</sub> and V<sub>pp</sub> is exploited by the Schur complement below — W is left dense.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="mvg-step" id="sparsity">
+    <div class="mvg-step-head"><span class="mvg-step-num">3</span><h2>The Jacobian is almost all zeros</h2></div>
+    <p class="mvg-eyebrow">Why naive bundle adjustment doesn't scale</p>
+    <p>Stack every camera's 6 pose unknowns and every point's 3 position unknowns into one long vector, and stack every residual (one observation, camera <var>i</var> seeing point <var>j</var>) into one long vector <var>r</var>. Gauss-Newton needs the Jacobian <var>J = &part;r/&part;(cameras, points)</var> of that whole residual vector. Here's the fact that makes bundle adjustment special: the residual for observation <var>(i,j)</var> is <var>r&#8261;&#8352; = &#960;(camera&#8261;, point&#8352;) − x&#8261;&#8352;</var> — it is a function of <em>exactly two</em> blocks of unknowns, camera <var>i</var>'s 6 params and point <var>j</var>'s 3 params, and literally nothing else. Its derivative with respect to every other camera's params and every other point's params is exactly, structurally zero — not small, zero.</p>
+    <p>So each row-pair of <var>J</var> (one observation, 2 rows for <var>u,v</var>) has nonzero entries in only 9 of the (6·#cameras + 3·#points) columns. Grouping columns as "all camera blocks" then "all point blocks", <var>J</var> splits cleanly:</p>
+    <div class="mvg-math">J = [ J<sub>c</sub> &nbsp;|&nbsp; J<sub>p</sub> ]&nbsp;&nbsp;&nbsp;&nbsp;— one row-block per observation (i,j):<br>&nbsp;&nbsp;row (i,j):&nbsp; zeros … &nbsp;&#8593;&nbsp;&nbsp; &#8202;&part;r&#8261;&#8352;/&part;camera&#8261;&#8202;&nbsp;&nbsp; &#8593;&nbsp; … zeros&nbsp;&nbsp;|&nbsp;&nbsp; zeros … &nbsp;&#8593;&nbsp;&nbsp; &#8202;&part;r&#8261;&#8352;/&part;point&#8352;&#8202;&nbsp;&nbsp; &#8593;&nbsp; … zeros</div>
+    <p>Rendered as a grid (rows = observations, columns = parameters), the camera half of <var>J</var> looks block-diagonal-ish — each row lights up exactly one 6-wide camera stripe — and the point half looks the same with 3-wide point stripes. The demo above renders this pattern for the toy 5-camera, 8-point cube directly: <a href="#demo">scroll up</a> and toggle "optimize camera poses" to see it change shape live as visibility changes.</p>
+    <div class="mvg-warn">&#9888; <span><b>Why this matters:</b> real reconstructions have thousands of cameras and hundreds of thousands to millions of points. <var>J&#7488;J</var> — the matrix Gauss-Newton actually needs to invert — is <var>(6m+3n)×(6m+3n)</var>. For 2,000 cameras and 500,000 points that's a <var>1,512,000 × 1,512,000</var> matrix. Forming it densely, let alone inverting it, is completely out of the question — but well over 99.9% of its entries are exact zeros, because most cameras don't see most points. Exploiting that sparsity, rather than fighting it, is the entire subject of the next section.</span></div>
+  </section>
+
+  <section class="mvg-step" id="schur">
+    <div class="mvg-step-head"><span class="mvg-step-num">4</span><h2>Eliminate the points first: the Schur complement</h2></div>
+    <p class="mvg-eyebrow">The one trick that makes BA practical</p>
+    <p>The Gauss-Newton normal equations are <var>J&#7488;J&#183;&Delta; = −J&#7488;r</var>. Split the unknown update <var>&Delta;</var> into a camera part <var>&Delta;c</var> and a point part <var>&Delta;p</var>, and — because <var>J = [J<sub>c</sub>|J<sub>p</sub>]</var> — the normal equations split into a matching 2×2 block system:</p>
+    <div class="mvg-math">&#9121; U<sub>cc</sub> &nbsp;&nbsp;W &#9124; &#9121;&Delta;c&#9124;&nbsp; &nbsp;&#9121;e<sub>c</sub>&#9124;<br>&#9125;W&#7488;&nbsp; V<sub>pp</sub>&#9128; &#9125;&Delta;p&#9128;&nbsp;=&nbsp;&#9125;e<sub>p</sub>&#9128;<br>&#9126;&#9129; &#9126;&#9129;&nbsp;&nbsp; &#9126;&#9129;</div>
+    <p>where <var>U<sub>cc</sub> = J<sub>c</sub>&#7488;J<sub>c</sub></var>, <var>V<sub>pp</sub> = J<sub>p</sub>&#7488;J<sub>p</sub></var>, <var>W = J<sub>c</sub>&#7488;J<sub>p</sub></var>, and <var>e<sub>c</sub>, e<sub>p</sub></var> are the matching pieces of <var>−J&#7488;r</var>. The sparsity from the last section says something very precise about these three blocks: an entry of <var>U<sub>cc</sub></var> connecting camera <var>i</var> to camera <var>i&prime;</var> (<var>i≠i&prime;</var>) sums over residuals that depend on <em>both</em> cameras' params at once — but no residual ever does, since one observation only ever involves one camera. So <var>U<sub>cc</sub></var> is exactly block-diagonal (one 6×6 block per camera), and by the identical argument so is <var>V<sub>pp</sub></var> (one 3×3 block per point). Only <var>W</var>, whose <var>(i,j)</var> block sums over the single residual that <em>does</em> involve both camera <var>i</var> and point <var>j</var>, is nonzero off the block-diagonal — dense-ish, patterned by whichever cameras actually see whichever points.</p>
+    <p>A block-diagonal matrix inverts block-by-block, for free (invert each tiny 3×3 point block independently — trivial compared to inverting the whole thing). That's the opening <var>V<sub>pp</sub></var> gives you. Take the bottom block row of the system, <var>W&#7488;&Delta;c + V<sub>pp</sub>&Delta;p = e<sub>p</sub></var>, and solve it for <var>&Delta;p</var>:</p>
+    <div class="mvg-math">&Delta;p = V<sub>pp</sub>&#8315;&#185;(e<sub>p</sub> − W&#7488;&Delta;c)</div>
+    <p>Substitute that into the top block row, <var>U<sub>cc</sub>&Delta;c + W&Delta;p = e<sub>c</sub></var>, and the <var>&Delta;p</var> terms rearrange into a system purely in <var>&Delta;c</var> — the <strong>Schur complement</strong>, a.k.a. the <strong>reduced camera system</strong>:</p>
+    <div class="mvg-math">(U<sub>cc</sub> − W V<sub>pp</sub>&#8315;&#185;W&#7488;) &Delta;c = e<sub>c</sub> − W V<sub>pp</sub>&#8315;&#185;e<sub>p</sub></div>
+    <div class="mvg-goal">💡 <span><b>Why this is the trick:</b> the reduced system is dense in general (points couple cameras that share them), but it's only <var>6m×6m</var> in the camera params alone — no points anywhere in it. Real scenes have far more points than cameras (millions of points, thousands of cameras), so this is a dramatically smaller dense solve than the full <var>(6m+3n)×(6m+3n)</var> system. Solve it for <var>&Delta;c</var> first, then back-substitute into the <var>&Delta;p</var> equation above using the already-computed, already-cheap <var>V<sub>pp</sub>&#8315;&#185;</var> — no additional dense linear algebra required. This one identity — eliminate the (numerous, cheaply-invertible) points, solve a much smaller dense system for the (few, expensive) cameras, back-substitute — is exactly what Ceres, g2o, GTSAM, and COLMAP's bundle adjuster all do under the hood. Without it, large-scale bundle adjustment simply would not run.</span></div>
+    <p>How dense the reduced system actually is depends on the <strong>visibility graph</strong>: the bipartite graph with cameras on one side, points on the other, and an edge for every observation. <var>W</var>'s nonzero pattern <em>is</var> this graph, and <var>W V<sub>pp</sub>&#8315;&#185;W&#7488;</var> fills in a camera-camera entry exactly when two cameras share at least one point — so a well-connected scene (lots of shared points between many camera pairs) gives a denser but still far smaller reduced system, while a weakly-connected scene (long chains of cameras with thin overlap, or loops that barely close) gives a sparser reduced system that's <em>harder to solve well</em> — the same weak connectivity that lets small errors accumulate and drift, the failure mode that motivates <a href="{{ '/multi-view-geometry-sfm-pipelines.html' | relative_url }}">incremental SfM's loop-closure problem</a> later in this series.</p>
+  </section>
+
+  <section class="mvg-step" id="robust">
+    <div class="mvg-step-head"><span class="mvg-step-num">5</span><h2>Robust losses: the outlier problem lives inside the optimizer too</h2></div>
+    <p class="mvg-eyebrow">IRLS: same machinery, one extra step</p>
+    <p><a href="{{ '/multi-view-geometry-ransac.html' | relative_url }}">RANSAC</a> filters out most bad correspondences before bundle adjustment ever runs — but "most" isn't "all." A handful of bad matches always survive: a repeated texture, a moving object, a mismatch just inside the inlier threshold. Plain squared loss <var>&rho;(r) = r&#178;</var> gives every residual influence proportional to <var>2r</var> — so one leftover outlier residual, ten times larger than the rest, pulls on the solution ten times harder than any good one, and can visibly drag a converged reconstruction off course. This is the exact same failure mode that motivated RANSAC in the first place, just relocated: now it's happening <em>inside</em> the optimizer, on data RANSAC already mostly cleaned.</p>
+    <p>The fix is the same idea as RANSAC's inlier threshold, made smooth and differentiable: a <strong>robust loss</strong> <var>&rho;(r)</var> that grows like <var>r&#178;</var> for small residuals (so it still behaves like ordinary least squares near the optimum) but grows much more slowly — or not at all — for large ones.</p>
+    <div class="mvg-math">Huber: &nbsp; &rho;(r) = &#189;r&#178; &nbsp;&nbsp;if |r| &le; &delta;,&nbsp;&nbsp;&nbsp; &delta;(|r| − &#189;&delta;) &nbsp;&nbsp;if |r| &gt; &delta;<br>&nbsp;&nbsp;— quadratic near zero, linear beyond &delta;: caps an outlier's influence at a constant rather than letting it grow with r.</div>
+    <div class="mvg-math">Cauchy / Lorentzian: &nbsp; &rho;(r) = (c&#178;/2)&#183;log(1 + r&#178;/c&#178;)<br>&nbsp;&nbsp;— grows only logarithmically for large r: even more aggressive down-weighting than Huber, but non-convex, so it can (rarely) trap Gauss-Newton in a bad local minimum.</div>
+    <div class="mvg-math">Tukey's biweight: &nbsp; &rho;(r) = (c&#178;/6)&#183;[1 − (1 − (r/c)&#178;)&#179;] &nbsp;&nbsp;if |r| &le; c,&nbsp;&nbsp;&nbsp; c&#178;/6 &nbsp;&nbsp;if |r| &gt; c<br>&nbsp;&nbsp;— fully <em>saturates</em>: past the cutoff c the loss is flat, its gradient is exactly zero, and the residual is hard-rejected — it stops influencing the solve at all.</div>
+    <p>None of these need a new solver. Each robust loss can be implemented as plain <em>weighted</em> least squares, where the weight is recomputed from the current residual at every iteration — <strong>Iteratively Reweighted Least Squares (IRLS)</strong>:</p>
+    <div class="mvg-math">w(r) = &rho;&prime;(r) / r &nbsp;&nbsp;&nbsp;&nbsp;(recomputed every iteration from the current r)<br>normal equations become:&nbsp; J&#7488;WJ&#183;&Delta; = −J&#7488;Wr,&nbsp; W = diag(w(r&#8321;), w(r&#8322;), …)</div>
+    <p>At the current estimate, compute every residual, turn it into a weight <var>w(r)</var> (1 for a small residual, shrinking toward 0 for a large one), solve the ordinary weighted Gauss-Newton step — the exact same <var>J&#7488;J</var>, same block-sparse structure, same Schur complement from the last section, just with each observation's contribution to <var>U<sub>cc</sub></var>, <var>V<sub>pp</sub></var>, <var>W</var>, <var>e<sub>c</sub></var>, <var>e<sub>p</sub></var> scaled by its current weight — then repeat. Robust bundle adjustment isn't a different algorithm; it's this exact same machinery with one extra reweighting pass bolted onto the top of every iteration.</p>
+    <div class="mvg-goal">🎯 <b>Learning goal:</b> watch a single gross outlier observation visibly break an L2 solve while Huber and Cauchy solves barely notice it, live, as you drag the outlier further from where it should be.</div>
+    <p>One 3D point is observed by 4 fixed cameras. Camera 0's observation can be dragged arbitrarily far from its true pixel (simulating one bad correspondence that survived RANSAC); the other three stay clean. Each checked loss is solved to convergence via IRLS from the same initial triangulation, and its result is plotted against ground truth.</p>
+    <div class="mvg-demo">
+      <div class="mvg-canvas-wrap">
+        <div id="s3-plot3d" class="mvg-plot3d" style="height:340px;"></div>
+        <p class="mvg-canvas-hint">Black = ground truth, diamonds = cameras (camera 0 is the one with the draggable outlier).</p>
+        <div class="mvg-legend" id="s3-legend"></div>
+      </div>
+      <div class="mvg-controls">
+        <div class="mvg-field"><label>Outlier magnitude (px off) <span class="val" id="s3-outlierval"></span></label><input type="range" id="s3-outlier" min="0" max="250" step="2" value="0"></div>
+        <div class="mvg-field" style="display:flex; flex-direction:column; gap:6px;">
+          <label style="display:flex; align-items:center; gap:6px; margin:0;"><input type="checkbox" id="s3-l2" checked style="width:auto;"> L2 (plain squared loss)</label>
+          <label style="display:flex; align-items:center; gap:6px; margin:0;"><input type="checkbox" id="s3-huber" checked style="width:auto;"> Huber (&delta; = 3px)</label>
+          <label style="display:flex; align-items:center; gap:6px; margin:0;"><input type="checkbox" id="s3-cauchy" checked style="width:auto;"> Cauchy (c = 3px)</label>
+        </div>
+        <div class="mvg-readout" id="s3-readout"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mvg-step" id="gauge">
+    <div class="mvg-step-head"><span class="mvg-step-num">6</span><h2>Gauge freedom: the whole reconstruction can float</h2></div>
+    <p class="mvg-eyebrow">A hidden rank deficiency</p>
+    <p>Reprojection error depends only on the geometry <em>between</em> cameras and points — how each camera's ray relates to each point, not where the whole configuration happens to sit in an abstract world frame. Concretely: take every camera pose and every 3D point and apply the exact same rigid transform (a rotation and translation — or, since scale is separately unobservable from monocular two-view geometry too, as Part 4's four-candidate-pose decomposition of <var>E</var> only fixes <var>t</var> up to scale, a full similarity transform including a uniform scale factor) to <em>all of them at once</em>. Every camera-to-point ray is exactly preserved — same direction, same relative depth ratios — so every reprojected pixel is bit-for-bit unchanged and the cost <var>C</var> doesn't move by a single floating-point unit.</p>
+    <p>A direction that changes every unknown but leaves the cost function exactly flat is, by definition, a direction of zero curvature — a null vector of the Hessian <var>J&#7488;J</var>. So <var>J&#7488;J</var> is exactly rank-deficient by the dimension of that invariance group: <strong>6</strong> if only a rigid transform is free (3 rotation + 3 translation), <strong>7</strong> if scale is unconstrained too (the monocular case, by default — see Part 4). A rank-deficient Hessian can't be inverted; naive Gauss-Newton on an un-anchored bundle-adjustment problem is solving a system with infinitely many equally-good solutions differing only by where the whole reconstruction sits, and the linear solve either fails outright or wanders arbitrarily along that flat direction.</p>
+    <div class="mvg-goal">💡 <span><b>The fix: fix the datum.</b> Remove exactly as many degrees of freedom as the invariance group has, by hand, before optimizing: pin one camera's pose outright (camera 0 = identity rotation, origin — 6 DOF gone), and, if scale is also free, additionally fix one distance (e.g. force the baseline between cameras 0 and 1 to be exactly 1 — the 7th DOF gone). With those pinned, the remaining Hessian is full rank and invertible, and the solver converges to one specific reconstruction instead of drifting along the flat valley.</span></div>
+    <div class="mvg-demo">
+      <div class="mvg-canvas-wrap">
+        <div id="s4-plot3d" class="mvg-plot3d" style="height:340px;"></div>
+        <p class="mvg-canvas-hint">Drag the sliders — with the datum free, the cube and cameras visibly move but the cost stays ≈0. Pin camera 0 and moving them stops being free.</p>
+      </div>
+      <div class="mvg-controls">
+        <div class="mvg-field"><label>Rotation about y (°) <span class="val" id="s4-rot-val"></span></label><input type="range" id="s4-rot" min="-180" max="180" step="1" value="0"></div>
+        <div class="mvg-field"><label>Translation <span class="val" id="s4-trans-val"></span></label><input type="range" id="s4-trans" min="-3" max="3" step="0.05" value="0"></div>
+        <div class="mvg-field"><label>Scale <span class="val" id="s4-scale-val"></span></label><input type="range" id="s4-scale" min="0.4" max="2.5" step="0.02" value="1"></div>
+        <div class="mvg-field" style="display:flex; align-items:center; gap:8px;">
+          <input type="checkbox" id="s4-pin" style="width:auto;"><label for="s4-pin" style="margin:0; display:inline;">pin camera 0 (fix the datum)</label>
+        </div>
+        <div class="mvg-readout" id="s4-readout"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mvg-step" id="lie">
+    <div class="mvg-step-head"><span class="mvg-step-num">7</span><h2>Updating rotations without breaking them</h2></div>
+    <p class="mvg-eyebrow">SO(3), SE(3), and why the demo above froze poses in the first place</p>
+    <p>A rotation matrix <var>R</var> has 9 numbers but only 3 real degrees of freedom — the other 6 are eaten by the orthogonality constraint <var>R&#7488;R = I</var>. An ordinary Gauss-Newton step treats every unknown as free: <var>R + &Delta;R</var> for some 3×3 <var>&Delta;R</var> straight out of the normal equations. Do that even once and <var>R + &Delta;R</var> is, generically, no longer orthogonal — not a rotation at all anymore, and every camera that "drifts off SO(3)" this way corrupts the whole reconstruction it feeds into.</p>
+    <p>The fix reuses the skew-symmetric matrix <var>[·]&#215;</var> from the <a href="{{ '/multi-view-geometry-epipolar.html' | relative_url }}">essential-matrix derivation</a> (<var>E = [t]&#215;R</var>), where <var>[v]&#215;</var> is the matrix with <var>[v]&#215;w = v&#215;w</var>. Instead of updating <var>R</var> additively, update it <em>multiplicatively</em> by a small rotation built from a free 3-vector <var>&delta;</var> via the matrix exponential:</p>
+    <div class="mvg-math">R<sub>new</sub> = R<sub>old</sub>&#183;exp([&delta;]&#215;) &nbsp;&approx;&nbsp; R<sub>old</sub>&#183;(I + [&delta;]&#215;) &nbsp;&nbsp;for small &delta; &#8712; &#8477;&#179;</div>
+    <p>Because <var>exp([&delta;]&#215;)</var> is a genuine rotation matrix for <em>any</em> <var>&delta;</var> (it's the Rodrigues formula — the same exponential map that turns an axis-angle vector into a rotation), <var>R<sub>new</sub></var> is automatically, exactly orthogonal again — no re-normalization hack required. Gauss-Newton's actual unknown for the rotation part is the free 3-vector <var>&delta;</var>, not the 9 entries of <var>R</var> itself; the Jacobian column for "camera <var>i</var>'s rotation" is <var>&part;r/&part;&delta;</var>, evaluated at <var>&delta;=0</var>. Paired with 3 more unknowns for translation, that's exactly the 6 pose DOF per camera claimed all the way back at the start of this section.</p>
+    <p>This is precisely the missing piece the toy demo skipped by freezing camera poses: naively perturbing <var>R</var>'s 9 numbers and adding the result back is exactly the trap described above. The "optimize camera poses" toggle in the demo implements the rule on this page — every pose update is <var>R &larr; R&#183;exp([&delta;]&#215;)</var>, computed by finite-differencing the reprojection residual with respect to <var>&delta;</var> at <var>&delta;=0</var>, never by touching <var>R</var>'s entries directly.</p>
   </section>
 
   <section class="mvg-step" id="cheatsheet">
@@ -170,6 +276,11 @@ permalink: /multi-view-geometry-sfm.html
         <tr><td>4 · Triangulation &amp; pose</td><td>Given two views, where exactly is the 3D point?</td></tr>
         <tr><td>5 · Trifocal tensor</td><td>What does a third view add?</td></tr>
         <tr><td>6 · Bundle adjustment</td><td>How do all cameras and all points agree at once?</td></tr>
+        <tr><td>Schur complement</td><td><code>(U<sub>cc</sub> − WV<sub>pp</sub>&#8315;&#185;W&#7488;)&Delta;c = e<sub>c</sub> − WV<sub>pp</sub>&#8315;&#185;e<sub>p</sub></code> — eliminate the (many, cheap) points, solve the much smaller (few, dense) camera-only system, back-substitute</td></tr>
+        <tr><td>Robust losses</td><td>Huber: quadratic/linear split at <var>&delta;</var>; Cauchy: <code>(c&#178;/2)log(1+r&#178;/c&#178;)</code>; Tukey: saturates to zero gradient past <var>c</var></td></tr>
+        <tr><td>IRLS weight</td><td><code>w(r) = &rho;&prime;(r)/r</code>, recomputed from the current residual every iteration — robust BA is ordinary BA plus this one reweighting step</td></tr>
+        <tr><td>Gauge freedom</td><td>rigid transform of the whole reconstruction is invisible to cost &rArr; <var>J&#7488;J</var> is rank-deficient by 6 (rigid) or 7 (+scale); fix by pinning camera 0 (and one baseline length)</td></tr>
+        <tr><td>SE(3) pose update</td><td><code>R<sub>new</sub> = R<sub>old</sub>&#183;exp([&delta;]&#215;)</code> — update via the exponential map, never additively on <var>R</var>'s 9 entries</td></tr>
       </tbody>
     </table>
     </div>

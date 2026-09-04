@@ -480,6 +480,239 @@ permalink: /multi-view-geometry-triangulation.html
     resample();
   })();
 
+  // ---------- shared: 3x3 matrix helpers + Jacobi symmetric-eigen SVD ----------
+  function mat3T(A){ return [[A[0][0],A[1][0],A[2][0]],[A[0][1],A[1][1],A[2][1]],[A[0][2],A[1][2],A[2][2]]]; }
+  function mat3Mul(A,B){
+    var R=[[0,0,0],[0,0,0],[0,0,0]];
+    for (var i=0;i<3;i++) for (var j=0;j<3;j++){ var s=0; for (var k=0;k<3;k++) s+=A[i][k]*B[k][j]; R[i][j]=s; }
+    return R;
+  }
+  function mat3Det(A){
+    return A[0][0]*(A[1][1]*A[2][2]-A[1][2]*A[2][1]) - A[0][1]*(A[1][0]*A[2][2]-A[1][2]*A[2][0]) + A[0][2]*(A[1][0]*A[2][1]-A[1][1]*A[2][0]);
+  }
+  // Cyclic Jacobi eigenvalue algorithm for a symmetric 3x3 matrix: repeatedly
+  // zero the largest off-diagonal entry with a plane rotation until it converges.
+  function symEig3(Ain){
+    var a = [Ain[0].slice(), Ain[1].slice(), Ain[2].slice()];
+    var V = [[1,0,0],[0,1,0],[0,0,1]];
+    for (var sweep=0; sweep<60; sweep++){
+      var p=0,q=1,maxv=Math.abs(a[0][1]);
+      if (Math.abs(a[0][2])>maxv){ maxv=Math.abs(a[0][2]); p=0; q=2; }
+      if (Math.abs(a[1][2])>maxv){ maxv=Math.abs(a[1][2]); p=1; q=2; }
+      if (maxv < 1e-12) break;
+      var app=a[p][p], aqq=a[q][q], apq=a[p][q];
+      var phi = 0.5*Math.atan2(2*apq, aqq-app);
+      var c=Math.cos(phi), s=Math.sin(phi), k;
+      for (k=0;k<3;k++){ var akp=a[k][p], akq=a[k][q]; a[k][p]=c*akp-s*akq; a[k][q]=s*akp+c*akq; }
+      for (k=0;k<3;k++){ var apk=a[p][k], aqk=a[q][k]; a[p][k]=c*apk-s*aqk; a[q][k]=s*apk+c*aqk; }
+      for (k=0;k<3;k++){ var vkp=V[k][p], vkq=V[k][q]; V[k][p]=c*vkp-s*vkq; V[k][q]=s*vkp+c*vkq; }
+    }
+    var vals=[a[0][0],a[1][1],a[2][2]];
+    var idx=[0,1,2].sort(function(i,j){ return vals[j]-vals[i]; });
+    var Vs=[[0,0,0],[0,0,0],[0,0,0]], valsS=[0,0,0];
+    for (var c2=0;c2<3;c2++){ valsS[c2]=vals[idx[c2]]; for (var r=0;r<3;r++) Vs[r][c2]=V[r][idx[c2]]; }
+    return { V: Vs, vals: valsS };
+  }
+  // SVD of a 3x3 matrix via eigendecomposition of E^T E (gives V and the
+  // singular values), then U = E V / sigma for the two nonzero singular
+  // values, with the third column filled in by cross product to keep U a
+  // proper rotation. The two nonzero singular values are forced to 1 (E is
+  // rank-2 with equal nonzero singular values by construction).
+  function svd3(E){
+    var Et = mat3T(E);
+    var EtE = mat3Mul(Et, E);
+    var eig = symEig3(EtE);
+    var V = eig.V;
+    var sigma = eig.vals.map(function(v){ return Math.sqrt(Math.max(v,0)); });
+    var U = [[0,0,0],[0,0,0],[0,0,0]];
+    for (var i=0;i<2;i++){
+      var vcol=[V[0][i],V[1][i],V[2][i]];
+      var Ev = MVG.matVec(E, vcol);
+      var s = sigma[i] > 1e-9 ? sigma[i] : 1;
+      for (var r=0;r<3;r++) U[r][i]=Ev[r]/s;
+    }
+    var u0=[U[0][0],U[1][0],U[2][0]], u1=[U[0][1],U[1][1],U[2][1]];
+    var u2 = MVG.cross(u0,u1);
+    for (var r=0;r<3;r++) U[r][2]=u2[r];
+    if (mat3Det(V) < 0){ for (var r2=0;r2<3;r2++) V[r2][2] = -V[r2][2]; } // fix handedness (sign of the null-space column is free)
+    return { U:U, V:V };
+  }
+  var W3 = [[0,-1,0],[1,0,0],[0,0,1]];
+  var W3t = mat3T(W3);
+  function skew(t){ return [[0,-t[2],t[1]],[t[2],0,-t[0]],[-t[1],t[0],0]]; }
+  // The four-candidate SVD recipe from Section 4.
+  function decomposeE(E){
+    var svd = svd3(E);
+    var U=svd.U, V=svd.V, Vt=mat3T(V);
+    var R1 = mat3Mul(mat3Mul(U,W3), Vt);
+    var R2 = mat3Mul(mat3Mul(U,W3t), Vt);
+    var u3 = [U[0][2],U[1][2],U[2][2]];
+    return [
+      { R:R1, t:u3.slice() },
+      { R:R1, t:MVG.scale(u3,-1) },
+      { R:R2, t:u3.slice() },
+      { R:R2, t:MVG.scale(u3,-1) }
+    ];
+  }
+  function projectionMatrixRt(K,R,t){
+    var Kmat=[[K.fx,0,K.cx],[0,K.fy,K.cy],[0,0,1]];
+    var Rt34=[R[0].concat([t[0]]), R[1].concat([t[1]]), R[2].concat([t[2]])];
+    var P=[[0,0,0,0],[0,0,0,0],[0,0,0,0]];
+    for (var i=0;i<3;i++) for (var j=0;j<4;j++){ var s=0; for (var k=0;k<3;k++) s+=Kmat[i][k]*Rt34[k][j]; P[i][j]=s; }
+    return P;
+  }
+
+  // ---------- Step 5: cheirality demo ----------
+  (function(){
+    var div = document.getElementById('s4-plot3d');
+    if (!div) return;
+    var K = { fx: 480, fy: 480, cx: 0, cy: 0 };
+    var rotEl = document.getElementById('s4-rot'), xEl = document.getElementById('s4-px'), zEl = document.getElementById('s4-pz');
+    var GREEN = '#2a9d3f', RED = '#c23b3b';
+
+    function groundTruth(){
+      var ang = parseFloat(rotEl.value) * Math.PI/180;
+      var R2 = [[Math.cos(ang),0,Math.sin(ang)],[0,1,0],[-Math.sin(ang),0,Math.cos(ang)]];
+      var C2 = [2.2, 0.3, -0.4];
+      var t2 = MVG.scale(MVG.matVec(R2, C2), -1); // t = -R*C, matching the P=[R|t] convention
+      return { R: R2, t: t2, C: C2 };
+    }
+
+    function layout(){
+      return {
+        autosize:true, margin:{l:0,r:0,t:0,b:0}, showlegend:false, paper_bgcolor:'transparent',
+        scene: {
+          xaxis:{ range:[-2,4], backgroundcolor:'transparent', gridcolor:COLOR_DIVIDER, zerolinecolor:COLOR_DIVIDER, color:COLOR_TEXT, title:'x' },
+          yaxis:{ range:[-3,3], backgroundcolor:'transparent', gridcolor:COLOR_DIVIDER, zerolinecolor:COLOR_DIVIDER, color:COLOR_TEXT, title:'y' },
+          zaxis:{ range:[-4,6], backgroundcolor:'transparent', gridcolor:COLOR_DIVIDER, zerolinecolor:COLOR_DIVIDER, color:COLOR_TEXT, title:'z (depth)' },
+          aspectmode:'cube', camera:{ eye:{x:1.5,y:-1.7,z:0.9} }
+        }
+      };
+    }
+
+    function render(){
+      var gt = groundTruth();
+      var cam1 = { R:[[1,0,0],[0,1,0],[0,0,1]], C:[0,0,0] };
+      var cam2 = { R:gt.R, C:gt.C };
+      var X = [parseFloat(xEl.value), 0.2, parseFloat(zEl.value)];
+
+      var p1 = MVG.project(K, cam1, X);
+      var p2 = MVG.project(K, cam2, X);
+
+      document.getElementById('s4-rotval').textContent = rotEl.value + '°';
+      document.getElementById('s4-pxval').textContent = parseFloat(xEl.value).toFixed(2);
+      document.getElementById('s4-pzval').textContent = parseFloat(zEl.value).toFixed(1);
+
+      if (!p1 || !p2){
+        document.getElementById('s4-readout').innerHTML = '<div class="hi">Test point is behind the true camera setup for these sliders — pick a point in front of both first.</div>';
+        Plotly.react(div, [], layout(), { displayModeBar:false, responsive:true });
+        return;
+      }
+
+      var baseline = MVG.norm(gt.t);
+      var E = mat3Mul(skew(gt.t), gt.R);
+      var candidates = decomposeE(E);
+      var P1 = projectionMatrixRt(K, cam1.R, [0,0,0]);
+
+      var traces = [
+        { type:'scatter3d', mode:'markers', x:[0], y:[0], z:[0], marker:{ size:7, color:COLOR_TEXT, symbol:'diamond' }, hoverinfo:'skip' }
+      ];
+      var rows = [];
+      var trueCandIdx = -1, bestScore = -1;
+
+      candidates.forEach(function(cand, i){
+        var tScaled = MVG.scale(cand.t, baseline); // rescale the unit SVD translation to the true baseline, purely for a legible picture (see warning below the demo)
+        var P2 = projectionMatrixRt(K, cand.R, tScaled);
+        var Xc = triangulateLinear(P1, [p1.u,p1.v], P2, [p2.u,p2.v]);
+        var depth1 = Xc[2];
+        var depth2 = (MVG.matVec(cand.R, Xc)[2] + tScaled[2]);
+        var valid = depth1 > 0 && depth2 > 0;
+        var Ccand = MVG.scale(MVG.matVec(mat3T(cand.R), tScaled), -1); // C = -R^T t
+        var color = valid ? GREEN : RED;
+        traces.push({ type:'scatter3d', mode:'markers', x:[Ccand[0]], y:[Ccand[1]], z:[Ccand[2]], marker:{ size:6, color:color, symbol:'diamond' }, hoverinfo:'skip' });
+        traces.push({ type:'scatter3d', mode:'markers', x:[Xc[0]], y:[Xc[1]], z:[Xc[2]], marker:{ size:6, color:color, symbol:'circle' }, hoverinfo:'skip' });
+        traces.push({ type:'scatter3d', mode:'lines', x:[Ccand[0],Xc[0]], y:[Ccand[1],Xc[1]], z:[Ccand[2],Xc[2]], line:{ color:color, width:2, dash:'dot' }, hoverinfo:'skip' });
+        if (valid){ trueCandIdx = i; }
+        rows.push('<div><span class="k">candidate ' + (i+1) + '</span> depth&#8321;=' + depth1.toFixed(2) + ', depth&#8322;=' + depth2.toFixed(2) + ' &mdash; ' + (valid ? '<span class="hi">in front of both (valid)</span>' : 'behind a camera (impossible)') + '</div>');
+      });
+
+      Plotly.react(div, traces, layout(), { displayModeBar:false, responsive:true });
+      document.getElementById('s4-readout').innerHTML = rows.join('') +
+        '<div style="margin-top:6px;">' + (trueCandIdx >= 0 ? '<span class="hi">exactly 1 of 4 passes cheirality — that one is (R,t)</span>' : 'no candidate passed — try a point in front of both true cameras') + '</div>';
+    }
+
+    [rotEl, xEl, zEl].forEach(function(el){ el.addEventListener('input', render); });
+    render();
+  })();
+
+  // ---------- Step 8: depth-error / ray-intersection-angle uncertainty demo ----------
+  (function(){
+    var canvas = document.getElementById('s5-canvas');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var W = canvas.width, H = canvas.height;
+    var f = 800; // fixed pixel focal length for this demo
+
+    var baseEl = document.getElementById('s5-base'), depthEl = document.getElementById('s5-depth'), noiseEl = document.getElementById('s5-noise');
+
+    function update(){
+      var B = parseFloat(baseEl.value), Z = parseFloat(depthEl.value), sigma = parseFloat(noiseEl.value);
+      document.getElementById('s5-baseval').textContent = B.toFixed(2) + ' m';
+      document.getElementById('s5-depthval').textContent = Z.toFixed(1) + ' m';
+      document.getElementById('s5-noiseval').textContent = sigma.toFixed(1) + ' px';
+
+      var dZ = sigma * Z*Z / (f*B);          // depth-uncertainty formula, Section 7
+      var dX = sigma * Z / f;                 // lateral uncertainty, no baseline term
+
+      // ray-intersection angle at the point, cameras at (-B/2,0) and (B/2,0), point at (0,Z)
+      var half = Math.atan2(B/2, Z);
+      var angleDeg = (2*half) * 180/Math.PI;
+
+      // world-to-pixel scale: fit both cameras and the point comfortably on the canvas
+      var worldHalfExtent = Math.max(Z*1.15, B*1.2, 1);
+      var scale = Math.min(W,H)*0.42 / worldHalfExtent;
+      var cx = W/2, cy = H - 30;
+      function toPx(x,y){ return [cx + x*scale, cy - y*scale]; }
+
+      ctx.clearRect(0,0,W,H);
+      ctx.fillStyle = 'rgba(0,0,0,0.04)'; ctx.fillRect(0,0,W,H);
+
+      var c1 = toPx(-B/2, 0), c2 = toPx(B/2, 0), pt = toPx(0, Z);
+
+      // rays
+      ctx.strokeStyle = COLOR_DIVIDER; ctx.lineWidth = 1.5; ctx.setLineDash([4,3]);
+      ctx.beginPath(); ctx.moveTo(c1[0],c1[1]); ctx.lineTo(pt[0],pt[1]); ctx.moveTo(c2[0],c2[1]); ctx.lineTo(pt[0],pt[1]); ctx.stroke();
+      ctx.setLineDash([]);
+
+      // camera markers
+      [c1,c2].forEach(function(p){
+        ctx.fillStyle = COLOR_ACCENT;
+        ctx.beginPath(); ctx.arc(p[0],p[1],5,0,7); ctx.fill();
+      });
+
+      // uncertainty ellipse, exaggerated 20x for visibility, axis-aligned since the point
+      // sits on the perpendicular bisector (depth = vertical, lateral = horizontal here)
+      var EXAG = 20;
+      var rx = Math.max(dX*scale*EXAG, 2);
+      var ry = Math.max(dZ*scale*EXAG, 2);
+      ctx.strokeStyle = COLOR_ACCENT2; ctx.fillStyle = 'rgba(214,0,108,0.15)'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.ellipse(pt[0], pt[1], rx, ry, 0, 0, 2*Math.PI); ctx.fill(); ctx.stroke();
+
+      // point marker
+      ctx.fillStyle = COLOR_TEXT;
+      ctx.beginPath(); ctx.arc(pt[0], pt[1], 4, 0, 7); ctx.fill();
+
+      document.getElementById('s5-readout').innerHTML =
+        '<div><span class="k">ray intersection angle</span> = <span class="hi">' + angleDeg.toFixed(1) + '&#176;</span></div>' +
+        '<div><span class="k">&#916;Z &#8776; &#963;&#183;Z&#178;/(fB)</span> = <span class="hi">' + dZ.toFixed(4) + ' m</span></div>' +
+        '<div><span class="k">&#916;X &#8776; &#963;&#183;Z/f</span> = ' + dX.toFixed(4) + ' m</div>' +
+        '<div><span class="k">depth / lateral ratio</span> = ' + (dZ/dX).toFixed(2) + '&#215;</div>';
+    }
+
+    [baseEl, depthEl, noiseEl].forEach(function(el){ el.addEventListener('input', update); });
+    update();
+  })();
+
 })();
 </script>
 {% endraw %}

@@ -119,14 +119,14 @@ permalink: /multi-view-geometry-trifocal.html
     <p class="mvg-eyebrow">Foundations</p>
     <p>The trifocal tensor <var>T</var> is a 3×3×3 array of numbers (27 entries, 18 of them independent) built from the three cameras' projection matrices. It plays the same role for three views that the fundamental matrix plays for two — except instead of one constraint per correspondence, it directly <strong>transfers</strong> geometry between views: given a point in views 1 and 2, <var>T</var> predicts its exact location in view 3 (and, more generally, can transfer lines too — hence "point-line-line" and "line-line-line" relationships in the fuller treatment). Because it's linear in the unknowns, it can be estimated from as few as 6-7 point correspondences seen in all three views, with no calibration required — a three-view generalization of the eight-point algorithm from Part 2.</p>
     <p>The full index-notation formula for point transfer is dense multilinear algebra and won't add much intuition at this level — what matters is the shape of the idea: <strong>redundancy across views is information.</strong> The more cameras that see a point, the more its location elsewhere is constrained (and eventually over-determined), which is exactly the leverage that structure-from-motion pipelines exploit with dozens or hundreds of views at once.</p>
-    <div class="mvg-warn">⚠️ <span>The demo below shows the effect of point transfer — predicting view 3 from views 1 &amp; 2 — using the triangulate-then-project shortcut from Part 4, which needs known camera poses. The real trifocal tensor achieves the same prediction directly from pixel correspondences, without ever calibrating the cameras or triangulating a 3D point. Both describe the same underlying geometric fact.</span></div>
+    <div class="mvg-warn">⚠️ <span>The demo directly below still shows the effect of point transfer — predicting view 3 from views 1 &amp; 2 — using the triangulate-then-project shortcut from Part 4, which needs known camera poses, purely as a warm-up/sanity check. The trifocal tensor <var>T</var> is built and used for real — for both point <em>and</em> line transfer, with no 3D triangulation anywhere in the transfer step — further down: <a href="#realT">jump to the real thing</a>.</span></div>
   </section>
 
   <section class="mvg-step" id="demo">
     <div class="mvg-step-head"><span class="mvg-step-num">2</span><h2>Play with it: predict the third view</h2></div>
     <p class="mvg-eyebrow">Interactive</p>
     <div class="mvg-goal">🎯 <b>Learning goal:</b> a correspondence in views 1 &amp; 2 fully determines where it must appear in view 3 — click and watch the prediction land almost exactly on the true projection, until you add noise.</div>
-    <p>Click a pixel in image 1 to choose a point (depth slider sets where it actually sits in 3D — a stand-in for having already matched it in image 2 too). Image 3's prediction (hollow circle) comes purely from combining the noisy observations in images 1 &amp; 2; the true projection (filled dot) is the answer key.</p>
+    <p>Click a pixel in image 1 to choose a point (depth slider sets where it actually sits in 3D — a stand-in for having already matched it in image 2 too). Image 3's prediction (hollow circle) comes purely from combining the noisy observations in images 1 &amp; 2; the true projection (filled dot) is the answer key. <strong>This particular demo still fakes the transfer</strong> (triangulate + reproject) — <a href="#realT">the next one below builds and uses <var>T</var> for real</a>.</p>
     <div class="mvg-demo">
       <div class="mvg-canvas-wrap" style="flex-basis:100%;">
         <div id="s2-plot3d" class="mvg-plot3d"></div>
@@ -158,6 +158,71 @@ permalink: /multi-view-geometry-trifocal.html
     </div>
   </section>
 
+  <section class="mvg-step" id="realT">
+    <div class="mvg-step-head"><span class="mvg-step-num">3</span><h2>Building <var>T</var> for real</h2></div>
+    <p class="mvg-eyebrow">The actual tensor</p>
+    <p>Put camera 1 in canonical form, <var>P</var>=[I|0] (always possible by choosing world coordinates to coincide with camera 1's frame — exactly what the demo below does). Write the other two cameras as <var>P&#8242;</var>=[A|a&#8324;] and <var>P&#8243;</var>=[B|b&#8324;], where <var>A</var>,<var>B</var> are their leading 3×3 blocks and a&#8324;,b&#8324; their last columns. Let a&#7522; be the <var>i</var>-th <strong>column</strong> of <var>A</var>, and b&#7522; the <var>i</var>-th column of <var>B</var>. The trifocal tensor is the set of three 3×3 matrices</p>
+    <div class="mvg-math">T&#7522; = a&#7522;b&#8324;&#7488; &#8722; a&#8324;b&#7522;&#7488;&nbsp;&nbsp;&nbsp;&nbsp;(i = 1, 2, 3)</div>
+    <p>Each T&#7522; is an outer product of two 3-vectors minus another outer product — nothing more exotic than that; no SVD, no iteration, just six outer products and three subtractions. That's 27 numbers total (three 3×3 matrices), but they aren't all free: scale is arbitrary (as always in projective geometry) and the 27 entries satisfy internal algebraic constraints, leaving <strong>18 genuine degrees of freedom</strong> — the same count you'd get adding up two calibration-free camera pairs' worth of relative-pose information, which is exactly what <var>T</var> encodes.</p>
+    <p>Why this particular formula? It falls straight out of eliminating the 3D point <var>X</var> from the three projection equations x&#771;&#8321;≅[I|0]X&#771;, x&#771;&#8322;≅[A|a&#8324;]X&#771;, x&#771;&#8323;≅[B|b&#8324;]X&#771; algebraically — <var>T</var> is what's left of "the third view" once the unknown depth and 3D position have been algebraically eliminated, which is exactly why it can predict view 3 without either.</p>
+    <p>The payoff is a single incidence relation that generalizes two-view epipolar coplanarity (Part 2's x&#8322;&#7488;Fx&#8321;=0) to three views. Take a point x&#771;&#8321; in view 1, and <strong>any</strong> two lines l&#8322;, l&#8323; that happen to pass through the true corresponding points x&#771;&#8322;, x&#771;&#8323; in views 2 and 3 (the simplest choice: a horizontal or vertical image-axis line through each). Then, writing x&#8321;&#8305; for the three homogeneous components of x&#771;&#8321;:</p>
+    <div class="mvg-math">l&#8322;&#7488; &middot; ( &#8721;&#7522; x&#8321;&#8305; T&#7522; ) &middot; l&#8323; = 0&nbsp;&nbsp;&nbsp;&nbsp;for every l&#8322;&#8715;x&#771;&#8322;, l&#8323;&#8715;x&#771;&#8323;</div>
+    <p>Geometrically: back-project x&#771;&#8321; from camera 1 into a 3D ray, back-project l&#8322; from camera 2 into a 3D plane, and back-project l&#8323; from camera 3 into a 3D plane. If x&#771;&#8321;, l&#8322;, l&#8323; are truly images/silhouettes of the same 3D point, that ray and those two planes all meet at one common point in space — which is a strictly more rigid, more three-view-specific condition than any pairwise epipolar constraint, and it's exactly what the left-hand side above vanishing says algebraically.</p>
+  </section>
+
+  <section class="mvg-step" id="transferdemo">
+    <div class="mvg-step-head"><span class="mvg-step-num">4</span><h2>True trifocal transfer: points <em>and</em> lines</h2></div>
+    <p class="mvg-eyebrow">The real demo</p>
+    <div class="mvg-goal">🎯 <b>Learning goal:</b> <var>T</var>, built once from the camera matrices, transfers a point exactly (matching the fake triangulate-then-project method to within numerical noise) and transfers an entire <strong>line</strong> exactly — something no pair of two-view fundamental matrices can ever do, because <var>F</var> alone only ever hands you a line-shaped constraint, never a full second-order transfer.</p>
+    <p><strong>Point transfer, derived from the incidence relation above.</strong> Fix x&#771;&#8321; and define the 3×3 matrix M(x&#771;&#8321;) = &#8721;&#7522; x&#8321;&#8305; T&#7522; (linear in x&#771;&#8321;, nothing else). The incidence relation says l&#8322;&#7488;M(x&#771;&#8321;)l&#8323;=0 for <strong>every</strong> line l&#8322; through x&#771;&#8322; and <strong>every</strong> line l&#8323; through x&#771;&#8323;. Hold l&#8322; fixed at any one line through x&#771;&#8322; and let l&#8323; range over every line through x&#771;&#8323;: the only vector that's orthogonal to an entire pencil of lines through a point is that point itself. So:</p>
+    <div class="mvg-math">x&#771;&#8323; &#8773; M(x&#771;&#8321;)&#7488; l&#8322;&nbsp;&nbsp;&nbsp;&nbsp;for <em>any single</em> line l&#8322; through x&#771;&#8322; (e.g. the vertical image line x=x&#8322; through it)</div>
+    <p>No triangulation, no camera centers, no depth — just one matrix built from x&#771;&#8321; and T, applied to one line through x&#771;&#8322;. The demo below computes this and compares it, pixel for pixel, against the old triangulate-then-project shortcut.</p>
+    <p><strong>Line transfer — the genuinely three-view-only trick.</strong> Given a line l&#8321; in view 1 (say, a cube edge) and its corresponding line l&#8322; in view 2, transfer <em>two distinct points</em> x&#771;&#8321;&#7491;, x&#771;&#8321;&#7495; that both lie on l&#8321; (any two points with l&#8321;&#7488;x=0 will do) using the exact point-transfer formula above, reusing the <strong>same whole line</strong> l&#8322; both times:</p>
+    <div class="mvg-math">x&#771;&#8323;&#7491; &#8773; M(x&#771;&#8321;&#7491;)&#7488; l&#8322;,&nbsp;&nbsp; x&#771;&#8323;&#7495; &#8773; M(x&#771;&#8321;&#7495;)&#7488; l&#8322;&nbsp;&nbsp;&nbsp;&nbsp;&#8658;&nbsp;&nbsp;&nbsp;&nbsp; l&#8323; &#8773; x&#771;&#8323;&#7491; &times; x&#771;&#8323;&#7495;</div>
+    <p>This works because x&#771;&#8321;&#8614;x&#771;&#8323; (for l&#8322; held fixed as the whole line, not a point-specific one) is <em>linear</em> in x&#771;&#8321; — a linear map sends the line l&#8321; to a line, and that image line has to be l&#8323;, since every true correspondence on l&#8321; must land on the true l&#8323; by the incidence relation itself. Two-view geometry has no equivalent of this: from <var>F</var> alone, a point in view 1 only ever gives you a <em>line</em> constraint in view 2 — never a point, and never a whole transferred line in a third view. Three-view <var>T</var> categorically outruns any pair of two-view relations.</p>
+    <p>Click a pixel in image 1 below to pick a point (as before); its transfer to image 3 is now computed <strong>two independent ways</strong> — the old triangulate-then-project shortcut, and the real formula above — and the readout reports how far apart they land (it should be effectively zero, up to floating-point roundoff). A highlighted cube edge is also transferred as a <em>line</em> from views 1 &amp; 2 into view 3 and drawn directly on top of that edge's ordinary projection, to show they coincide exactly.</p>
+    <div class="mvg-demo">
+      <div class="mvg-canvas-wrap" style="flex-basis:100%;">
+        <div class="mvg-imgrow">
+          <div class="mvg-imgcol">
+            <h4>Image 1 (click to pick a point)</h4>
+            <canvas id="s5-canvas1" width="320" height="240"></canvas>
+          </div>
+          <div class="mvg-imgcol">
+            <h4>Image 2</h4>
+            <canvas id="s5-canvas2" width="320" height="240"></canvas>
+          </div>
+          <div class="mvg-imgcol">
+            <h4>Image 3: transferred point &amp; line vs. actual</h4>
+            <canvas id="s5-canvas3" width="320" height="240"></canvas>
+          </div>
+        </div>
+        <div class="mvg-legend">
+          <span><i style="background:var(--color-text)"></i>actual projection</span>
+          <span><i style="background:var(--color-accent-2);border:2px solid var(--color-accent-2)"></i>fake transfer (triangulate + reproject)</span>
+          <span><i style="background:var(--color-accent);border:2px solid var(--color-accent)"></i>real transfer (T, point &amp; line)</span>
+        </div>
+      </div>
+      <div class="mvg-controls">
+        <div class="mvg-field"><label>Depth along ray from camera 1 <span class="val" id="s5-depthval"></span></label><input type="range" id="s5-depth" min="2" max="12" step="0.05" value="6"></div>
+        <div class="mvg-btnrow"><button id="s5-cycle">Cycle transferred edge</button></div>
+        <div class="mvg-readout" id="s5-readout"></div>
+      </div>
+    </div>
+    <div class="mvg-warn">⚠️ <span>Still one simplification here: <var>T</var> is assembled from known camera poses (via P&#8242;,P&#8243;), the way this whole series has done for every earlier tensor/matrix. Real trifocal-tensor estimation in an uncalibrated setting instead solves for <var>T</var>'s 27 numbers directly from ≈7 point correspondences seen in all three images — no poses required — the same spirit as the eight-point algorithm for <var>F</var> in Part 2. Once <var>T</var> exists, though, every formula above is used exactly as stated — the transfer step itself is fully real, not faked.</span></div>
+  </section>
+
+  <section class="mvg-step" id="beyondT">
+    <div class="mvg-step-head"><span class="mvg-step-num">5</span><h2><var>F</var> and epipoles, straight out of <var>T</var> — and where the hierarchy stops</h2></div>
+    <p class="mvg-eyebrow">What T contains</p>
+    <p><var>T</var> doesn't just generalize the two view-pairs (1,2) and (1,3) — it <em>contains</em> both of their fundamental matrices and epipoles as extractable byproducts, with no extra data needed. Each T&#7522; is (generically) rank 2. Let u&#7522; be its left null vector (u&#7522;&#7488;T&#7522;=0) and v&#7522; its right null vector (T&#7522;v&#7522;=0). Stacking all three u&#7522; (or v&#7522;) must agree on a single common direction — and that direction is an epipole:</p>
+    <div class="mvg-math">e&#8322; &#8773; u&#8321; &times; u&#8322;&nbsp;&nbsp;(&#8773; u&#8321;&times;u&#8323; &#8773; u&#8322;&times;u&#8323;)&nbsp;&nbsp;&nbsp;&nbsp;e&#8323; &#8773; v&#8321; &times; v&#8322;&nbsp;&nbsp;(&#8773; v&#8321;&times;v&#8323; &#8773; v&#8322;&times;v&#8323;)</div>
+    <p>and the fundamental matrix between views 1 and 2 follows directly from e&#8322; and e&#8323;:</p>
+    <div class="mvg-math">F&#8322;&#8321; &#8773; [e&#8322;]&times; &middot; [ T&#8321;e&#8323; &nbsp;|&nbsp; T&#8322;e&#8323; &nbsp;|&nbsp; T&#8323;e&#8323; ]&nbsp;&nbsp;&nbsp;&nbsp;(three columns, each T&#7522;e&#8323;, stacked into a 3×3 matrix)</div>
+    <p>F&#8323;&#8321; (views 1,3) is built the same way with the roles of views 2 and 3 swapped. The upshot: <var>T</var> strictly contains more information than the pair {F&#8322;&#8321;, F&#8323;&#8321;} — it also fixes F&#8323;&#8322; (views 2,3), which the two pairwise fundamental matrices alone leave underdetermined, plus the full point- and line-transfer maps this page has been building.</p>
+    <p>Add a fourth view and the same elimination trick produces a <strong>quadrifocal tensor</strong> Q — 3<sup>4</sup>=81 components, encoding a four-view point-line-line-line incidence relation the same way <var>T</var> encodes point-line-line. But the hierarchy stops there: any geometric relation among five or more views reduces to combinations of the two-, three-, and four-view tensors (F, T, Q) applied to overlapping subsets — no fundamentally new type of constraint appears past four views. That's why real structure-from-motion systems (Part 6) never build a literal N-focal tensor for N&gt;4; instead they work with pairwise and triplet relations plus bundle adjustment across however many views they have.</p>
+  </section>
+
   <section class="mvg-step" id="cheatsheet">
     <div class="mvg-step-head"><span class="mvg-step-num">✓</span><h2>Cheat sheet</h2></div>
     <p class="mvg-eyebrow">Recap</p>
@@ -168,6 +233,12 @@ permalink: /multi-view-geometry-trifocal.html
         <tr><td>2 (calibrated)</td><td><code>x&#8322;&#7488;Ex&#8321;=0</code></td><td>A line in view 2 (the epipolar line)</td></tr>
         <tr><td>2 (uncalibrated)</td><td><code>x&#8322;&#7488;Fx&#8321;=0</code></td><td>Same, without knowing intrinsics</td></tr>
         <tr><td>3</td><td>Trifocal tensor <code>T</code></td><td>An exact point (or line) in view 3 — full transfer, not just a constraint</td></tr>
+        <tr><td>3</td><td><code>T&#7522; = a&#7522;b&#8324;&#7488;&#8722;a&#8324;b&#7522;&#7488;</code> (i=1,2,3)</td><td>T itself, built from P&#8242;=[A|a&#8324;], P&#8243;=[B|b&#8324;] — 27 numbers, 18 DOF</td></tr>
+        <tr><td>3</td><td><code>l&#8322;&#7488;(&#8721;&#7522;x&#8321;&#8305;T&#7522;)l&#8323;=0</code></td><td>Point-line-line incidence — three back-projected rays/planes meet at one 3D point</td></tr>
+        <tr><td>3</td><td><code>x&#771;&#8323;&#8773;M(x&#771;&#8321;)&#7488;l&#8322;</code>, M=&#8721;&#7522;x&#8321;&#8305;T&#7522;</td><td>Point transfer: view 3's point from x&#771;&#8321;, x&#771;&#8322; and T — no 3D point ever built</td></tr>
+        <tr><td>3</td><td><code>l&#8323;&#8773;M(x&#8321;&#7491;)&#7488;l&#8322; &times; M(x&#8321;&#7495;)&#7488;l&#8322;</code></td><td>Line transfer: an entire line handed to view 3 exactly — impossible from any pair of F's</td></tr>
+        <tr><td>3</td><td><code>e&#8322;&#8773;u&#8321;&times;u&#8322;</code>, <code>F&#8322;&#8321;&#8773;[e&#8322;]&times;[T&#8321;e&#8323;|T&#8322;e&#8323;|T&#8323;e&#8323;]</code></td><td>Epipoles and both pairwise F's, read directly out of T's null vectors</td></tr>
+        <tr><td>4</td><td>Quadrifocal tensor <code>Q</code> (81 numbers)</td><td>Point-line-line-line incidence; hierarchy of fundamental multi-view objects stops here (F, T, Q)</td></tr>
       </tbody>
     </table>
     </div>
