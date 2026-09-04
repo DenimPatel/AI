@@ -658,6 +658,241 @@ permalink: /multi-view-geometry-epipolar.html
     update();
   })();
 
+  // shared small draw helper: line a*u+b*v+c=0 clipped to a W×H canvas
+  function drawClippedLine(ctx, W, H, line, color, dashed){
+    var a=line[0], b=line[1], c=line[2];
+    var pts = [];
+    function addIfInRange(pt){ if (pt[0]>=-1 && pt[0]<=W+1 && pt[1]>=-1 && pt[1]<=H+1) pts.push(pt); }
+    if (Math.abs(b) > 1e-9){ addIfInRange([0, -c/b]); addIfInRange([W, -(c+a*W)/b]); }
+    if (Math.abs(a) > 1e-9){ addIfInRange([-c/a, 0]); addIfInRange([-(c+b*H)/a, H]); }
+    if (pts.length < 2) return;
+    ctx.strokeStyle = color; ctx.lineWidth = 2.2;
+    if (dashed) ctx.setLineDash([6,4]); else ctx.setLineDash([]);
+    ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]); ctx.lineTo(pts[1][0], pts[1][1]); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  function gaussianNoise(){
+    var u = Math.random() || 1e-9, v = Math.random();
+    return Math.sqrt(-2*Math.log(u)) * Math.cos(2*Math.PI*v);
+  }
+  // ---------- Step 5: eight-point algorithm walkthrough ----------
+  (function(){
+    var canvas1 = document.getElementById('s3-canvas1'), ctx1 = canvas1.getContext('2d');
+    var canvas2 = document.getElementById('s3-canvas2'), ctx2 = canvas2.getContext('2d');
+    var W1=canvas1.width, H1=canvas1.height, W2=canvas2.width, H2=canvas2.height;
+
+    var cam1 = MVG.orbitCamera(0.7, 0.25, 7, [0,0,0]);
+    var K1 = { fx: 420, fy: 420, cx: W1/2, cy: H1/2 };
+    var K2 = { fx: 420, fy: 420, cx: W2/2, cy: H2/2 };
+
+    var azEl = document.getElementById('s3-az'), elEl = document.getElementById('s3-el'), noiseEl = document.getElementById('s3-noise');
+    var resampleBtn = document.getElementById('s3-resample');
+    var amatDiv = document.getElementById('s3-amatrix');
+
+    var noiseVec = [];
+    function regenerateNoise(){
+      var s = parseFloat(noiseEl.value);
+      noiseVec = CUBE_VERTS.map(function(){ return [gaussianNoise()*s, gaussianNoise()*s, gaussianNoise()*s, gaussianNoise()*s]; });
+    }
+    regenerateNoise();
+
+    function buildAMatrixHTML(A){
+      var headers = ['x&#8321;x&#8322;','y&#8321;x&#8322;','x&#8322;','x&#8321;y&#8322;','y&#8321;y&#8322;','y&#8322;','x&#8321;','y&#8321;','1'];
+      var html = '<table class="mvg-cheat" style="font-size:11.5px;"><thead><tr><th>#</th>' +
+        headers.map(function(h){ return '<th>'+h+'</th>'; }).join('') + '</tr></thead><tbody>';
+      A.forEach(function(row,i){
+        html += '<tr><td>'+(i+1)+'</td>' + row.map(function(v){ return '<td>'+v.toFixed(1)+'</td>'; }).join('') + '</tr>';
+      });
+      html += '</tbody></table>';
+      return html;
+    }
+
+    function update(){
+      var cam2 = MVG.orbitCamera(parseFloat(azEl.value), parseFloat(elEl.value), 7, [0,0,0]);
+      var pts1clean = [], pts2clean = [], pts1 = [], pts2 = [];
+      CUBE_VERTS.forEach(function(X, i){
+        var p1 = MVG.project(K1, cam1, X), p2 = MVG.project(K2, cam2, X);
+        if (!p1 || !p2) return;
+        pts1clean.push([p1.u, p1.v]); pts2clean.push([p2.u, p2.v]);
+        pts1.push([p1.u + noiseVec[i][0], p1.v + noiseVec[i][1]]);
+        pts2.push([p2.u + noiseVec[i][2], p2.v + noiseVec[i][3]]);
+      });
+
+      var corrsRawClean = pts1clean.map(function(p,i){ return [p[0],p[1],pts2clean[i][0],pts2clean[i][1]]; });
+      var corrsRaw = pts1.map(function(p,i){ return [p[0],p[1],pts2[i][0],pts2[i][1]]; });
+
+      // unnormalized solve
+      var Araw = MVG.buildAMatrix(corrsRaw);
+      var nvRaw = MVG.nullVector9(Araw);
+      var Fraw = MVG.enforceRank2(MVG.reshape9to3x3(nvRaw.f));
+
+      // Hartley-normalized solve
+      var norm1 = MVG.hartleyNormalize(pts1), norm2 = MVG.hartleyNormalize(pts2);
+      var corrsNorm = norm1.pts.map(function(p,i){ return [p[0],p[1],norm2.pts[i][0],norm2.pts[i][1]]; });
+      var Anorm = MVG.buildAMatrix(corrsNorm);
+      var nvNorm = MVG.nullVector9(Anorm);
+      var Fhat = MVG.enforceRank2(MVG.reshape9to3x3(nvNorm.f));
+      var Fnorm = MVG.matMul(MVG.matMul(MVG.transpose(norm2.T), Fhat), norm1.T);
+
+      // ground truth
+      var Egt = MVG.essentialMatrix(cam1, cam2);
+      var Fgt = MVG.fundamentalMatrix(MVG.K3(K1), MVG.K3(K2), Egt);
+
+      var errRaw = MVG.compareF(Fraw, Fgt);
+      var errNorm = MVG.compareF(Fnorm, Fgt);
+      var residRaw = MVG.meanEpipolarResidual(Fraw, corrsRawClean);
+      var residNorm = MVG.meanEpipolarResidual(Fnorm, corrsRawClean);
+
+      // draw image 1: cube + correspondence dots
+      ctx1.clearRect(0,0,W1,H1); ctx1.fillStyle='rgba(0,0,0,0.06)'; ctx1.fillRect(0,0,W1,H1);
+      ctx1.strokeStyle = COLOR_TEXT; ctx1.lineWidth=1.2; ctx1.globalAlpha=0.3;
+      var cpts1 = CUBE_VERTS.map(function(X){ return MVG.project(K1, cam1, X); });
+      CUBE_EDGES.forEach(function(e){ var a=cpts1[e[0]], b=cpts1[e[1]]; if(!a||!b) return; ctx1.beginPath(); ctx1.moveTo(a.u,a.v); ctx1.lineTo(b.u,b.v); ctx1.stroke(); });
+      ctx1.globalAlpha=1;
+      pts1.forEach(function(p){ ctx1.fillStyle=COLOR_ACCENT; ctx1.beginPath(); ctx1.arc(p[0],p[1],4,0,7); ctx1.fill(); });
+
+      // draw image 2: cube + correspondence dots + 3 epipolar lines for the first point
+      ctx2.clearRect(0,0,W2,H2); ctx2.fillStyle='rgba(0,0,0,0.06)'; ctx2.fillRect(0,0,W2,H2);
+      ctx2.strokeStyle = COLOR_TEXT; ctx2.lineWidth=1.2; ctx2.globalAlpha=0.3;
+      var cpts2 = CUBE_VERTS.map(function(X){ return MVG.project(K2, cam2, X); });
+      CUBE_EDGES.forEach(function(e){ var a=cpts2[e[0]], b=cpts2[e[1]]; if(!a||!b) return; ctx2.beginPath(); ctx2.moveTo(a.u,a.v); ctx2.lineTo(b.u,b.v); ctx2.stroke(); });
+      ctx2.globalAlpha=1;
+      pts2.forEach(function(p){ ctx2.fillStyle=COLOR_ACCENT; ctx2.beginPath(); ctx2.arc(p[0],p[1],4,0,7); ctx2.fill(); });
+
+      var testX1 = [pts1clean[0][0], pts1clean[0][1], 1];
+      drawClippedLine(ctx2, W2, H2, MVG.matVecGeneric(Fgt, testX1), COLOR_DIVIDER, true);
+      drawClippedLine(ctx2, W2, H2, MVG.matVecGeneric(Fnorm, testX1), '#2a9d5c', false);
+      drawClippedLine(ctx2, W2, H2, MVG.matVecGeneric(Fraw, testX1), COLOR_ACCENT2, false);
+      ctx2.fillStyle = COLOR_TEXT;
+      ctx2.beginPath(); ctx2.arc(pts2clean[0][0], pts2clean[0][1], 5, 0, 7); ctx2.fill();
+
+      amatDiv.innerHTML = buildAMatrixHTML(Araw);
+
+      document.getElementById('s3-azval').textContent = parseFloat(azEl.value).toFixed(2);
+      document.getElementById('s3-elval').textContent = parseFloat(elEl.value).toFixed(2);
+      document.getElementById('s3-noiseval').textContent = parseFloat(noiseEl.value).toFixed(2);
+      document.getElementById('s3-readout').innerHTML =
+        '<div><span class="k">smallest 2 eigenvalues of A&#7488;A (raw)</span> = ' + nvRaw.sortedValues.slice(0,2).map(function(v){return v.toExponential(2);}).join(', ') + '</div>' +
+        '<div><span class="k">&#8214;F&#8722;F_truth&#8214; &mdash; without normalization</span> = <span class="hi" style="color:' + COLOR_ACCENT2 + '">' + errRaw.toFixed(3) + '</span></div>' +
+        '<div><span class="k">&#8214;F&#8722;F_truth&#8214; &mdash; with Hartley normalization</span> = <span class="hi" style="color:#2a9d5c">' + errNorm.toFixed(3) + '</span></div>' +
+        '<div><span class="k">mean epipolar residual (clean pts, px), unnorm.</span> = ' + residRaw.toFixed(1) + '</div>' +
+        '<div><span class="k">mean epipolar residual (clean pts, px), norm.</span> = ' + residNorm.toFixed(2) + '</div>';
+    }
+
+    azEl.addEventListener('input', update);
+    elEl.addEventListener('input', update);
+    noiseEl.addEventListener('input', function(){ regenerateNoise(); update(); });
+    resampleBtn.addEventListener('click', function(){ regenerateNoise(); update(); });
+    update();
+  })();
+
+  // ---------- Step 7: degeneracy demo ----------
+  (function(){
+    var canvas1 = document.getElementById('s4e-canvas1'), ctx1 = canvas1.getContext('2d');
+    var canvas2 = document.getElementById('s4e-canvas2'), ctx2 = canvas2.getContext('2d');
+    var W1=canvas1.width, H1=canvas1.height, W2=canvas2.width, H2=canvas2.height;
+
+    var cam1 = MVG.orbitCamera(0.7, 0.25, 7, [0,0,0]);
+    var K1 = { fx: 420, fy: 420, cx: W1/2, cy: H1/2 };
+    var K2 = { fx: 420, fy: 420, cx: W2/2, cy: H2/2 };
+
+    var PLANE_PTS = [
+      [-0.9,0,-0.9],[-0.9,0,0.9],[0.9,0,-0.9],[0.9,0,0.9],
+      [-0.4,0,-0.3],[0.4,0,-0.3],[-0.4,0,0.35],[0.4,0,0.35]
+    ];
+
+    var azEl = document.getElementById('s4e-az'), elEl = document.getElementById('s4e-el'), noiseEl = document.getElementById('s4e-noise');
+    var resampleBtn = document.getElementById('s4e-resample');
+    var btnGeneral = document.getElementById('s4e-general'), btnPlanar = document.getElementById('s4e-planar'), btnRotation = document.getElementById('s4e-rotation');
+    var preset = 'general';
+    var prevF = null;
+
+    function rotationOnlyR(az, el){
+      var forward = MVG.normalize([Math.sin(az)*Math.cos(el), Math.sin(el), Math.cos(az)*Math.cos(el)]);
+      var right = MVG.normalize(MVG.cross(forward, [0,1,0]));
+      var down = MVG.cross(forward, right);
+      return [right, down, forward];
+    }
+
+    var noiseVec = [];
+    function scenePoints(){ return preset === 'planar' ? PLANE_PTS : CUBE_VERTS; }
+    function regenerateNoise(){
+      var s = parseFloat(noiseEl.value);
+      noiseVec = scenePoints().map(function(){ return [gaussianNoise()*s, gaussianNoise()*s, gaussianNoise()*s, gaussianNoise()*s]; });
+    }
+    regenerateNoise();
+
+    function setPreset(p){
+      preset = p; prevF = null; regenerateNoise();
+      [btnGeneral, btnPlanar, btnRotation].forEach(function(b){ b.classList.remove('mvg-primary'); });
+      (p==='general'?btnGeneral:p==='planar'?btnPlanar:btnRotation).classList.add('mvg-primary');
+      update();
+    }
+
+    function update(){
+      var az = parseFloat(azEl.value), el = parseFloat(elEl.value);
+      var cam2 = preset === 'rotation'
+        ? { C: cam1.C.slice(), R: rotationOnlyR(az, el) }
+        : MVG.orbitCamera(az, el, 7, [0,0,0]);
+
+      var pts = scenePoints();
+      var pts1clean=[], pts2clean=[], pts1=[], pts2=[];
+      pts.forEach(function(X,i){
+        var p1 = MVG.project(K1, cam1, X), p2 = MVG.project(K2, cam2, X);
+        if (!p1 || !p2) return;
+        pts1clean.push([p1.u,p1.v]); pts2clean.push([p2.u,p2.v]);
+        pts1.push([p1.u+noiseVec[i][0], p1.v+noiseVec[i][1]]);
+        pts2.push([p2.u+noiseVec[i][2], p2.v+noiseVec[i][3]]);
+      });
+      if (pts1.length < 8){ return; } // degenerate projection (behind camera); skip this frame
+
+      var norm1 = MVG.hartleyNormalize(pts1), norm2 = MVG.hartleyNormalize(pts2);
+      var corrsNorm = norm1.pts.map(function(p,i){ return [p[0],p[1],norm2.pts[i][0],norm2.pts[i][1]]; });
+      var Anorm = MVG.buildAMatrix(corrsNorm);
+      var nv = MVG.nullVector9(Anorm);
+      var Fhat = MVG.enforceRank2(MVG.reshape9to3x3(nv.f));
+      var F = MVG.matMul(MVG.matMul(MVG.transpose(norm2.T), Fhat), norm1.T);
+
+      var gapRatio = nv.sortedValues[0] / (nv.sortedValues[1] || 1e-12);
+
+      var Egt = MVG.essentialMatrix(cam1, cam2);
+      var Fgt = MVG.fundamentalMatrix(MVG.K3(K1), MVG.K3(K2), Egt);
+      var isRotation = preset === 'rotation';
+      var errTruth = isRotation ? null : MVG.compareF(F, Fgt);
+      var deltaResample = prevF ? MVG.compareF(F, prevF) : null;
+      prevF = F;
+
+      // draw
+      ctx1.clearRect(0,0,W1,H1); ctx1.fillStyle='rgba(0,0,0,0.06)'; ctx1.fillRect(0,0,W1,H1);
+      pts1.forEach(function(p){ ctx1.fillStyle=COLOR_ACCENT; ctx1.beginPath(); ctx1.arc(p[0],p[1],4,0,7); ctx1.fill(); });
+      ctx2.clearRect(0,0,W2,H2); ctx2.fillStyle='rgba(0,0,0,0.06)'; ctx2.fillRect(0,0,W2,H2);
+      pts2.forEach(function(p){ ctx2.fillStyle=COLOR_ACCENT; ctx2.beginPath(); ctx2.arc(p[0],p[1],4,0,7); ctx2.fill(); });
+      var testX1 = [pts1clean[0][0], pts1clean[0][1], 1];
+      if (!isRotation) drawClippedLine(ctx2, W2, H2, MVG.matVecGeneric(Fgt, testX1), COLOR_DIVIDER, true);
+      drawClippedLine(ctx2, W2, H2, MVG.matVecGeneric(F, testX1), isRotation ? COLOR_ACCENT2 : '#2a9d5c', false);
+      ctx2.fillStyle = COLOR_TEXT; ctx2.beginPath(); ctx2.arc(pts2clean[0][0], pts2clean[0][1], 5, 0, 7); ctx2.fill();
+
+      document.getElementById('s4e-azval').textContent = az.toFixed(2);
+      document.getElementById('s4e-elval').textContent = el.toFixed(2);
+      document.getElementById('s4e-noiseval').textContent = parseFloat(noiseEl.value).toFixed(2);
+      var interp = gapRatio > 0.15 ? '<span class="hi" style="color:'+COLOR_ACCENT2+'">degenerate &mdash; null space poorly separated</span>' : '<span class="hi" style="color:#2a9d5c">well-posed</span>';
+      document.getElementById('s4e-readout').innerHTML =
+        '<div><span class="k">preset</span> = ' + preset + '</div>' +
+        '<div><span class="k">smallest / 2nd-smallest eigenvalue of A&#7488;A</span> = ' + gapRatio.toExponential(2) + ' &mdash; ' + interp + '</div>' +
+        '<div><span class="k">&#8214;F&#8722;F_truth&#8214;</span> = ' + (errTruth===null ? 'undefined (E&#8801;0, no baseline)' : errTruth.toFixed(3)) + '</div>' +
+        '<div><span class="k">&#8214;F&#8722;F_previous&#8214; (resample stability)</span> = ' + (deltaResample===null ? '&mdash; (resample to check)' : deltaResample.toFixed(3)) + '</div>';
+    }
+
+    azEl.addEventListener('input', update);
+    elEl.addEventListener('input', update);
+    noiseEl.addEventListener('input', function(){ regenerateNoise(); update(); });
+    resampleBtn.addEventListener('click', function(){ regenerateNoise(); update(); });
+    btnGeneral.addEventListener('click', function(){ setPreset('general'); });
+    btnPlanar.addEventListener('click', function(){ setPreset('planar'); });
+    btnRotation.addEventListener('click', function(){ setPreset('rotation'); });
+    setPreset('general');
+  })();
+
 })();
 </script>
 {% endraw %}

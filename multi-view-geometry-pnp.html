@@ -123,7 +123,124 @@ permalink: /multi-view-geometry-pnp.html
   <div class="stats-rule" style="border-top-color: var(--color-divider); margin-bottom: 8px;"></div>
 
 {% raw %}
-  <!-- TODO(subagent): fill in mvg-step sections here, see spec -->
+  <section class="mvg-step" id="setup">
+    <div class="mvg-step-head"><span class="mvg-step-num">0</span><h2>The problem, stated precisely</h2></div>
+    <p class="mvg-eyebrow">Setup</p>
+    <p>You have <var>N</var> 3D points <var>X&#8321;, &hellip;, X&#8345;</var> whose world coordinates are already known — they came from a prior triangulation, a scan, or an earlier reconstruction. You have one new image, and for at least some of those points you know which pixel <var>x&#8321;, &hellip;, x&#8345;</var> each one landed on — the matching itself isn't this page's job, only what to do once it's done. You also know the camera's calibration <var>K</var> (<a href="{{ '/multi-view-geometry-calibration.html' | relative_url }}">Part 2</a>). What you don't know is the camera's pose: the rotation <var>R</var> and position it was sitting at when it took this photo. <strong>PnP</strong> is the problem of finding the <var>(R, t)</var> that makes all of these consistent at once:</p>
+    <div class="mvg-math">x&#771;&#8339; &#8773; K [R | t] X&#771;&#8339;&nbsp;&nbsp;&nbsp;for every correspondence i</div>
+    <div class="mvg-goal">&#128161; <span><b>Contrast with Parts 3 and 7:</b> there, both cameras' positions were unknown and you had only 2D&ndash;2D pixel correspondences between them — you had to solve for <em>relative</em> pose via <var>E</var>/<var>F</var>, and the reconstructed 3D structure only existed up to an unknown overall scale (and, for <var>F</var> alone, an unknown projective distortion). Here the 3D structure is already fixed and metric, and you're solving for <em>one</em> camera against it. That's a fundamentally easier, better-conditioned problem — with enough points, PnP has a closed-form linear solution and no scale ambiguity at all, since the known <var>X&#8339;</var> already fix the scale.</span></div>
+  </section>
+
+  <section class="mvg-step" id="dlt">
+    <div class="mvg-step-head"><span class="mvg-step-num">1</span><h2>DLT resection: the same trick, a third time</h2></div>
+    <p class="mvg-eyebrow">Foundations</p>
+    <p>The unknown here is the 3&times;4 camera matrix <var>P = K[R | t]</var> &mdash; 12 numbers, but only 11 independent (it's defined up to an overall scale). Exactly the same cross-product idea used for homography DLT (<a href="{{ '/multi-view-geometry-homography.html' | relative_url }}">Part 3</a>) and the 8-point algorithm (<a href="{{ '/multi-view-geometry-epipolar.html' | relative_url }}">Part 3, epipolar</a>) applies directly: since <var>x&#771;&#8339;</var> and <var>PX&#771;&#8339;</var> point the same direction, their cross product vanishes.</p>
+    <div class="mvg-math">x&#771;&#8339; &times; (P X&#771;&#8339;) = 0</div>
+    <p>Writing <var>P</var>'s three rows as 4-vectors <var>p&#8321;&#7488;, p&#8322;&#7488;, p&#8323;&#7488;</var> stacked into one 12-vector <var>p</var>, and <var>x&#8339; = (x&#8339;, y&#8339;)</var> for the observed pixel, two of the three cross-product components are independent and linear in <var>p</var>:</p>
+    <div class="mvg-math">[ &minus;X&#771;&#8339;&#7488;&nbsp; 0&#7488;&nbsp;&nbsp; x&#8339;X&#771;&#8339;&#7488; ] p = 0<br>[ 0&#7488;&nbsp;&nbsp; &minus;X&#771;&#8339;&#7488;&nbsp; y&#8339;X&#771;&#8339;&#7488; ] p = 0</div>
+    <p>Two rows per correspondence, 12 unknowns up to scale (11 DOF) &mdash; so <strong>6 correspondences</strong> (12 equations) pin it down exactly; more than 6 gives an overdetermined, noise-averaging system. Stack every correspondence's row pair into one matrix <var>A</var> and the whole problem collapses to the same homogeneous least-squares shape this series keeps returning to &mdash; the 8-point algorithm's <var>Af = 0</var>, the homography DLT's <var>Ah = 0</var>, and now:</p>
+    <div class="mvg-math">A p = 0&nbsp;&nbsp;&mdash;&nbsp;&nbsp;solve by SVD: p = the right-singular vector of the smallest singular value of A</div>
+    <p>Reshape the resulting <var>p</var> back into the 3&times;4 matrix <var>P</var>. Because <var>K</var> is already known here (unlike Part 1's calibration problem, where <var>K</var> is what RQ-decomposition extracts from <var>P</var>'s leading 3&times;3 block), the same decomposition runs in reverse: use <var>K</var> to strip the calibration out of <var>P</var> instead of reading it off. In practice it's simplest to normalize the pixels first &mdash; multiply every observation by <var>K&#8315;&#185;</var> to get calibrated rays &mdash; so the DLT solves directly for <var>[R | t]</var> (up to scale), and only <var>R</var> needs cleaning up:</p>
+    <div class="mvg-math">M = leading 3&times;3 block of the recovered [R | t]&nbsp;&nbsp;(&#8776; s&middot;R for some scale s, but not exactly orthogonal &mdash; noise)<br>R = polar(M) = M (M&#7488;M)&#8315;&#185;&#8260;&#178;&nbsp;&nbsp;&mdash;&nbsp;&nbsp;the nearest proper rotation to M, by SVD/polar decomposition<br>t = p&#8324; / s&nbsp;&nbsp;&nbsp;&nbsp;s = mean singular value of M</div>
+    <div class="mvg-warn">&#9888;&#65039; <span><b>Why polar decomposition, not RQ:</b> Part 1's RQ-decomposition of <var>P</var>'s leading block gives <em>both</em> an upper-triangular <var>K</var> and an orthogonal <var>R</var>, because that block is <var>KR</var> with <var>K</var> unknown. Here <var>K</var> was already divided out before the DLT ran, so the leading block <em>should</em> be exactly <var>s&middot;R</var> for a pure rotation <var>R</var> &mdash; it just isn't, exactly, because of pixel noise. Polar decomposition finds the closest orthogonal matrix in the least-squares sense, which is the right tool once <var>K</var> is no longer part of the unknown.</span></div>
+  </section>
+
+  <section class="mvg-step" id="demo-dlt">
+    <div class="mvg-step-head"><span class="mvg-step-num">2</span><h2>Play: resect a camera from noisy 2D&ndash;3D correspondences</h2></div>
+    <p class="mvg-eyebrow">Interactive</p>
+    <div class="mvg-goal">&#127919; <b>Learning goal:</b> the black camera is the (hidden, ground-truth) pose that generated the observations; the colored one is recovered from nothing but the 3D points and their noisy pixels, live, by the DLT + polar-decomposition code above. Crank up the noise or outlier fraction and watch it drift &mdash; then switch on Gauss&ndash;Newton refinement and watch it snap back.</div>
+    <p>14 known 3D points (think: a small patch of an existing reconstruction) are observed by one new camera. Pixel noise and a few injected outliers (mismatches) are added to the observations before the solver ever sees them &mdash; exactly the situation a real resection step is in.</p>
+    <div class="mvg-demo">
+      <div class="mvg-canvas-wrap">
+        <div id="s2-plot3d" class="mvg-plot3d"></div>
+        <p class="mvg-canvas-hint">Drag to orbit, scroll to zoom.</p>
+        <div class="mvg-imgplane">
+          <canvas id="s2-canvas" width="480" height="360"></canvas>
+        </div>
+        <p class="mvg-canvas-hint">Observed pixels fed to the solver (orange = outlier draws).</p>
+        <div class="mvg-legend">
+          <span><i style="background:var(--color-text)"></i>true camera</span>
+          <span><i style="background:#9b9797"></i>DLT-recovered (raw)</span>
+          <span><i style="background:var(--color-accent-2)"></i>after Gauss&ndash;Newton refinement</span>
+        </div>
+      </div>
+      <div class="mvg-controls">
+        <div class="mvg-field"><label>Pixel noise &sigma; <span class="val" id="s2-noiseval"></span></label><input type="range" id="s2-noise" min="0" max="10" step="0.1" value="1.5"></div>
+        <div class="mvg-field"><label>Outlier fraction <span class="val" id="s2-outval"></span></label><input type="range" id="s2-out" min="0" max="0.4" step="0.02" value="0"></div>
+        <div class="mvg-btnrow">
+          <button id="s2-resample" class="mvg-primary">New observations</button>
+        </div>
+        <div class="mvg-readout" id="s2-readout"></div>
+      </div>
+    </div>
+    <p>With zero noise the raw DLT solve is already essentially exact &mdash; there's nothing to refine. Push noise up and the raw estimate drifts measurably; refinement (a handful of Gauss&ndash;Newton steps minimizing true reprojection error, the same machinery as Part 7's nonlinear triangulation) pulls it most of the way back. Add outliers, though, and refinement stops helping &mdash; a few wildly wrong correspondences drag the least-squares solve off no matter how well you polish it afterward. That's the motivation for the RANSAC demo below.</p>
+  </section>
+
+  <section class="mvg-step" id="p3p">
+    <div class="mvg-step-head"><span class="mvg-step-num">3</span><h2>P3P: the minimal solver, and a third instance of a familiar pattern</h2></div>
+    <p class="mvg-eyebrow">Foundations</p>
+    <p>DLT needs 6 points. But given <var>K</var>, the true minimum is <strong>3</strong> &mdash; and getting there means leaving linear algebra behind for plain geometry. Three known 3D points <var>X&#8321;, X&#8322;, X&#8323;</var> and the (unknown) camera center <var>C</var> form a tetrahedron. The three known inter-point distances <var>d&#8339;&#7488;</var> (from the 3D points themselves) are fixed; the three angles <var>&theta;&#8339;&#7488;</var> between the viewing rays <var>C&rarr;X&#8339;</var> and <var>C&rarr;X&#7488;</var> are also known &mdash; they come straight out of <var>K</var> and the observed pixels, with no camera pose needed at all, since an angle between two rays through the same center doesn't depend on where that center is. What's unknown are the three distances from the camera to each point, <var>d&#8321; = |CX&#8321;|</var>, <var>d&#8322;</var>, <var>d&#8323;</var>. The law of cosines in the triangle <var>C, X&#8321;, X&#8322;</var> ties them together:</p>
+    <div class="mvg-math">d&#8321;&#178; + d&#8322;&#178; &minus; 2 d&#8321;d&#8322; cos&thinsp;&theta;&#8321;&#8322; = d&#8321;&#8322;&#178;</div>
+    <p>The same relation holds for the <var>(1,3)</var> and <var>(2,3)</var> pairs, giving three simultaneous quadratics in <var>d&#8321;, d&#8322;, d&#8323;</var> &mdash; known coefficients (<var>&theta;&#8339;&#7488;</var>, <var>d&#8339;&#7488;</var>), three unknowns. Eliminating variables between the three equations produces a single <strong>quartic</strong> polynomial in one of them, which has <strong>up to 4 real roots</strong> &mdash; so P3P alone hands back up to 4 algebraically valid camera poses, all consistent with the same three rays and three distances.</p>
+    <div class="mvg-warn">&#9888;&#65039; <span><b>A pattern you've now seen three times.</b> Part 6's homography decomposition gave 2 candidate poses off a flat scene; Part 7's essential-matrix decomposition gave 4 candidates for relative pose. P3P's quartic is the same story a third time: a minimal solver, working from too little information to be unambiguous by itself, algebraically returns several equally valid answers &mdash; and one extra piece of information (a cheirality check, a positive-depth check, or here a <strong>4th point</strong>) is what picks the physical one. With a 4th correspondence in hand, whichever of the &le;4 candidates reprojects it with the least error wins.</span></div>
+  </section>
+
+  <section class="mvg-step" id="epnp">
+    <div class="mvg-step-head"><span class="mvg-step-num">4</span><h2>EPnP: linear again, and fast for any N</h2></div>
+    <p class="mvg-eyebrow">Foundations</p>
+    <p>P3P is minimal but ambiguous; DLT is unambiguous but its cost grows with <var>N</var> unknowns tied one-to-one to the points. <strong>EPnP</strong> is the standard middle path used by real systems (it's what OpenCV's <code>solvePnP</code> reaches for by default, and what runs inside <code>solvePnPRansac</code>'s minimal-sample loop for larger samples). The key idea: instead of treating each of the <var>N</var> 3D points as its own unknown, pick just <strong>4 virtual control points</strong> once, and express every real 3D point as a fixed weighted combination of those 4 (barycentric-style coordinates, computed once from the known <var>X&#8339;</var> and frozen for the rest of the solve). The problem of "where is every one of these <var>N</var> points, really, in the camera's frame" becomes "where are these <em>4</em> control points" &mdash; <strong>12 unknowns total, regardless of how large N is.</strong> That turns what would otherwise be an <var>N</var>-scaling problem into a small, fixed-size linear system solved once per image, which is exactly why EPnP is the fast, accurate default for <var>N &ge; 4</var> points in production structure-from-motion and SLAM pipelines.</p>
+  </section>
+
+  <section class="mvg-step" id="ransac">
+    <div class="mvg-step-head"><span class="mvg-step-num">5</span><h2>PnP + RANSAC: how a camera actually gets registered</h2></div>
+    <p class="mvg-eyebrow">Foundations</p>
+    <p>Real correspondences come from feature matching, and feature matching produces outliers &mdash; wrong matches that no amount of least-squares polishing will fix, exactly as the demo above showed. The fix is the same one <a href="{{ '/multi-view-geometry-ransac.html' | relative_url }}">Part 4</a> used for the 8-point and homography DLT: wrap the minimal solver in <strong>RANSAC</strong>. Draw a minimal sample (3 points for P3P, plus a 4th to disambiguate its candidates &mdash; or, as this page's demo does, 6 points for a minimal DLT solve, which needs no disambiguation step but is otherwise the identical loop), solve for a candidate pose, count how many of the <em>other</em> correspondences it reprojects within a small pixel threshold, and repeat. Whichever candidate wins the most inliers gets refined &mdash; typically with EPnP or a nonlinear reprojection-error minimization like the Gauss&ndash;Newton step above &mdash; on its full inlier set, and that refined pose is the camera's registered position.</p>
+    <div class="mvg-goal">&#128161; <span><b>This is the actual registration step.</b> Every time an incremental structure-from-motion pipeline (<a href="{{ '/multi-view-geometry-sfm-pipelines.html' | relative_url }}">Part 11</a>) adds one more photo to a growing reconstruction, this loop &mdash; match 2D features against the existing 3D point cloud, run PnP+RANSAC, refine &mdash; is how that new camera's pose gets found.</span></div>
+  </section>
+
+  <section class="mvg-step" id="demo-ransac">
+    <div class="mvg-step-head"><span class="mvg-step-num">6</span><h2>Play: PnP + RANSAC against contaminated correspondences</h2></div>
+    <p class="mvg-eyebrow">Interactive</p>
+    <div class="mvg-goal">&#127919; <b>Learning goal:</b> resect naively on every correspondence (outliers included) and compare it to a RANSAC loop that discovers which correspondences are trustworthy on its own.</div>
+    <div class="mvg-warn">&#9888;&#65039; <span><b>Simplification, stated plainly:</b> this demo's RANSAC loop draws minimal samples of <strong>6</strong> points and solves them with the DLT resection above, not a true 3-point P3P solver with its quartic. The RANSAC logic &mdash; sample, solve, count inliers, keep the best, refine &mdash; is identical either way; only the algebra inside "solve" differs, and P3P's is a further layer this page describes but doesn't implement from scratch.</span></div>
+    <p>Same 14-point cloud and true camera as above, plus a controllable outlier fraction. "Naive DLT" resects on every correspondence at once. "PnP + RANSAC" repeatedly resects on random 6-point samples, scores each by reprojection inliers, and refines the winner on its inlier set.</p>
+    <div class="mvg-demo">
+      <div class="mvg-canvas-wrap">
+        <div id="s6-plot3d" class="mvg-plot3d"></div>
+        <p class="mvg-canvas-hint">Drag to orbit. Point color: green = RANSAC inlier, red = outlier.</p>
+        <div class="mvg-legend">
+          <span><i style="background:var(--color-text)"></i>true camera</span>
+          <span><i style="background:#9b9797"></i>naive DLT (all points)</span>
+          <span><i style="background:var(--color-accent-2)"></i>PnP + RANSAC (refined)</span>
+        </div>
+      </div>
+      <div class="mvg-controls">
+        <div class="mvg-field"><label>Outlier fraction <span class="val" id="s6-outval"></span></label><input type="range" id="s6-out" min="0" max="0.5" step="0.02" value="0.25"></div>
+        <div class="mvg-field"><label>Pixel noise &sigma; <span class="val" id="s6-noiseval"></span></label><input type="range" id="s6-noise" min="0" max="4" step="0.1" value="1"></div>
+        <div class="mvg-btnrow">
+          <button id="s6-resample" class="mvg-primary">New correspondences</button>
+          <button id="s6-run">Run RANSAC</button>
+        </div>
+        <div class="mvg-readout" id="s6-readout"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mvg-step" id="cheatsheet">
+    <div class="mvg-step-head"><span class="mvg-step-num">&#10003;</span><h2>Cheat sheet</h2></div>
+    <p class="mvg-eyebrow">Recap</p>
+    <div style="overflow-x:auto;">
+    <table class="mvg-cheat">
+      <thead><tr><th>Method</th><th>Core idea</th><th>Min. points</th><th>Ambiguity / notes</th></tr></thead>
+      <tbody>
+        <tr><td>DLT resection</td><td><code>x&#771;&#8339;&times;(PX&#771;&#8339;)=0</code> &rarr; 2 linear rows per point in <var>P</var>'s 12 entries, solved by SVD null vector</td><td>6</td><td>Unique (up to noise); decompose with <var>K</var> known via polar decomposition, not RQ</td></tr>
+        <tr><td>P3P</td><td>Law of cosines on the 3-point&ndash;camera tetrahedron: <code>d&#8321;&#178;+d&#8322;&#178;&minus;2d&#8321;d&#8322;cos&theta;&#8321;&#8322;=d&#8321;&#8322;&#178;</code>, ×3, eliminated to one quartic</td><td>3 (+1 to disambiguate)</td><td>Up to 4 algebraic solutions &mdash; same pattern as H's 2 and E's 4 candidates</td></tr>
+        <tr><td>EPnP</td><td>Express all N points via 4 virtual control points &rarr; 12 unknowns regardless of N &rarr; linear, O(N)</td><td>4</td><td>Standard fast/accurate default (e.g. OpenCV's <code>solvePnP</code>)</td></tr>
+        <tr><td>PnP + RANSAC</td><td>Minimal solver (P3P, or DLT with a larger sample) inside a RANSAC loop; refine the inlier-set winner</td><td>3&ndash;6 per sample</td><td>How every new camera gets registered into a growing SfM reconstruction (Part 11)</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
 {% endraw %}
 
   <div class="mvg-next">
