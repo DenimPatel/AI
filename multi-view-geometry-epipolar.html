@@ -167,6 +167,110 @@ permalink: /multi-view-geometry-epipolar.html
     <p>Now move <b>camera 2's</b> sliders instead: the epipole and every epipolar line move with it. Notice that whatever pixel you clicked in image 1, its epipolar line in image 2 always passes through the same epipole — try clicking several different points and watch all their lines fan out from one spot.</p>
   </section>
 
+  <section class="mvg-step" id="derivation">
+    <div class="mvg-step-head"><span class="mvg-step-num">3</span><h2>Where E = [t]&#215;R actually comes from</h2></div>
+    <p class="mvg-eyebrow">Derivation</p>
+    <p>Step 1 handed you <var>E = [t]&#215;R</var> as a fact. Here's where it comes from. Put camera 1 at the origin with identity orientation, and camera 2 at pose <var>(R, t)</var> relative to it (t is the direction from camera 1 to camera 2, expressed in camera 1's frame). A 3D point <var>X</var> gives a ray direction <var>x&#771;&#8321;</var> in camera 1 and, once rotated into camera 2's frame, direction <var>Rx&#771;&#8321;</var>; its actual observed direction in camera 2 is <var>x&#771;&#8322;</var>.</p>
+    <p>Camera 1's center, camera 2's center, and <var>X</var> all sit in one plane &mdash; the epipolar plane from Step 1. Equivalently: the baseline vector <var>t</var>, the ray direction <var>Rx&#771;&#8321;</var> (camera 1's ray, expressed in camera 2's frame), and the ray direction <var>x&#771;&#8322;</var> are three vectors lying in that same plane, so they're <strong>coplanar</strong>. Three vectors <var>a, b, c</var> are coplanar exactly when their scalar triple product vanishes: <var>a&middot;(b&#215;c) = 0</var>. Applied here:</p>
+    <div class="mvg-math">x&#771;&#8322; &middot; (t &#215; Rx&#771;&#8321;) = 0</div>
+    <p>The cross product <var>t &#215; (&middot;)</var> is a linear map &mdash; it can be written as a matrix multiply. For <var>t = (t&#8321;, t&#8322;, t&#8323;)</var>, define the <strong>skew-symmetric matrix</strong> <var>[t]&#215;</var> so that <var>[t]&#215; v = t &#215; v</var> for any <var>v</var>:</p>
+    <div class="mvg-math">[t]&#215; = &#9121; 0&nbsp;&nbsp; −t&#8323;&nbsp;&nbsp; t&#8322; &#9124;<br>&#9125; t&#8323;&nbsp;&nbsp; 0&nbsp;&nbsp; −t&#8321; &#9128;<br>&#9126;−t&#8322;&nbsp;&nbsp; t&#8321;&nbsp;&nbsp; 0&nbsp;&#9129;</div>
+    <p>Substituting turns the triple product into a pure matrix expression, and <em>that's</em> the whole derivation:</p>
+    <div class="mvg-math">x&#771;&#8322;&#7488; [t]&#215; R x&#771;&#8321; = 0&nbsp;&nbsp;&nbsp;&nbsp;&mdash;&nbsp; define&nbsp; E := [t]&#215;R&nbsp; &mdash;&nbsp;&nbsp;&nbsp;&nbsp; x&#771;&#8322;&#7488; E x&#771;&#8321; = 0</div>
+    <p>Nothing more went into it than "three vectors in one plane have zero triple product." <var>E</var> is just the matrix form of "cross with <var>t</var>, then rotate by <var>R</var>."</p>
+    <div class="mvg-goal">💡 <span><b>This is Part 0's incidence relation again:</b> <var>Ex&#771;&#8321;</var> is a 3-vector of the exact shape <var>(a, b, c)</var> that Part 0 used for a 2D line <var>au + bv + c = 0</var>. It <em>is</em> the epipolar line in image 2: <var>l&#8322; = Ex&#771;&#8321;</var>. And <var>x&#771;&#8322;&#7488;Ex&#771;&#8321; = 0</var> is nothing but Part 0's point-on-line incidence <var>x&#771;&#8322;&middot;l&#8322; = 0</var>, applied to this specific line. The epipolar constraint isn't a new piece of machinery &mdash; it's ordinary point-line incidence, with the line built by <var>E</var> instead of by two points.</span></div>
+  </section>
+
+  <section class="mvg-step" id="fproperties">
+    <div class="mvg-step-head"><span class="mvg-step-num">4</span><h2>What F's structure tells you</h2></div>
+    <p class="mvg-eyebrow">Properties</p>
+    <p>Everything below is about the uncalibrated <var>F = K&#8322;&#8315;&#7488;EK&#8321;&#8315;&#185;</var>, since that's what you actually estimate from pixel correspondences with no calibration in hand.</p>
+    <p><b>Rank 2, always.</b> <var>[t]&#215;</var> has rank 2, not 3: its null space is <var>t</var> itself, since <var>t &#215; t = 0</var>. Multiplying by the full-rank rotation <var>R</var> doesn't change rank, so <var>E = [t]&#215;R</var> also has rank exactly 2. Multiplying by the invertible calibration matrices <var>K&#8322;&#8315;&#7488;</var> and <var>K&#8321;&#8315;&#185;</var> preserves rank too, so <var>F</var> is rank 2 as well &mdash; <var>det(F) = 0</var>, always, for any real stereo pair.</p>
+    <p><b>7 degrees of freedom.</b> A 3×3 matrix has 9 entries. <var>F</var> is only defined up to an overall scale (the constraint <var>x&#771;&#8322;&#7488;Fx&#771;&#8321;=0</var> is homogeneous in <var>F</var>) &mdash; that's 1 DOF gone. The rank-2 constraint <var>det(F)=0</var> removes 1 more. <var>9 − 1 − 1 = 7</var>. This is exactly why the minimal correspondence count for uncalibrated <var>F</var> is 7, not 9 &mdash; see the seven-point algorithm below.</p>
+    <p><b>Epipoles are F's null vectors.</b> The epipolar line in image 1 corresponding to a point <var>x&#771;&#8322;</var> is <var>l&#8321; = F&#7488;x&#771;&#8322;</var>, and every such line passes through <var>e&#8321;</var> &mdash; by definition, the epipole is where the baseline itself lands in image 1, and every epipolar plane contains the baseline, so every epipolar line contains its image. So <var>e&#8321;&#7488;l&#8321; = 0</var> for <em>every</em> <var>x&#771;&#8322;</var>, i.e. <var>e&#8321;&#7488;F&#7488;x&#771;&#8322; = 0</var> for all <var>x&#771;&#8322;</var>, which forces <var>e&#8321;&#7488;F&#7488; = 0</var>, i.e.:</p>
+    <div class="mvg-math">F e&#8321; = 0&nbsp;&nbsp;&nbsp;&nbsp;e&#8322;&#7488; F = 0</div>
+    <p>The epipoles are the right and left null vectors of <var>F</var> &mdash; exactly the kind of "smallest singular vector" object the eight-point algorithm below computes anyway, so once you have <var>F</var> the epipoles are almost free.</p>
+    <p><b>Order matters, transposed.</b> <var>F&#8321;&#8322;</var> (image 1 &#8594; image 2 convention, <var>x&#771;&#8322;&#7488;F&#8321;&#8322;x&#771;&#8321;=0</var>) and <var>F&#8322;&#8321;</var> (the same pair, roles swapped, <var>x&#771;&#8321;&#7488;F&#8322;&#8321;x&#771;&#8322;=0</var>) are related by a plain transpose: <var>F&#8322;&#8321; = F&#8321;&#8322;&#7488;</var>. Transposing the scalar equation <var>x&#771;&#8322;&#7488;F&#8321;&#8322;x&#771;&#8321;=0</var> (a 1×1 matrix, equal to its own transpose) gives <var>x&#771;&#8321;&#7488;F&#8321;&#8322;&#7488;x&#771;&#8322;=0</var>, which is exactly the swapped-order constraint with <var>F&#8322;&#8321;=F&#8321;&#8322;&#7488;</var>.</p>
+  </section>
+
+  <section class="mvg-step" id="eightpoint">
+    <div class="mvg-step-head"><span class="mvg-step-num">5</span><h2>The eight-point algorithm, one row at a time</h2></div>
+    <p class="mvg-eyebrow">Interactive derivation</p>
+    <p>Every correspondence <var>(x&#771;&#8321;, x&#771;&#8322;)</var> gives one <em>linear</em> equation in the 9 unknown entries of <var>F</var>. Writing <var>x&#771;&#8321;=(x&#8321;,y&#8321;,1)</var>, <var>x&#771;&#8322;=(x&#8322;,y&#8322;,1)</var> and expanding <var>x&#771;&#8322;&#7488;Fx&#771;&#8321;=0</var> term by term:</p>
+    <div class="mvg-math">x&#8321;x&#8322;f&#8321;&#8321; + y&#8321;x&#8322;f&#8321;&#8322; + x&#8322;f&#8321;&#8323; + x&#8321;y&#8322;f&#8322;&#8321; + y&#8321;y&#8322;f&#8322;&#8322; + y&#8322;f&#8322;&#8323; + x&#8321;f&#8323;&#8321; + y&#8321;f&#8323;&#8322; + f&#8323;&#8323; = 0</div>
+    <p>That's just <var>a&middot;f = 0</var> for the 9-vector <var>f = (f&#8321;&#8321;,f&#8321;&#8322;,...,f&#8323;&#8323;)</var> and the row <var>a = (x&#8321;x&#8322;, y&#8321;x&#8322;, x&#8322;, x&#8321;y&#8322;, y&#8321;y&#8322;, y&#8322;, x&#8321;, y&#8321;, 1)</var> &mdash; the outer product of <var>x&#771;&#8321;</var> and <var>x&#771;&#8322;</var>, flattened. Stack one such row per correspondence into a matrix <var>A</var>: <var>N</var> correspondences give an <var>N×9</var> system <var>Af = 0</var>. With exactly 8 correspondences in general position, the null space of <var>A</var> is (generically) one-dimensional &mdash; that's the "eight" in eight-point. With more than 8 (and real pixel noise), there's usually no exact solution, so instead you solve the <strong>homogeneous least-squares</strong> problem: minimize <var>&#8214;Af&#8214;</var> subject to <var>&#8214;f&#8214;=1</var>. That minimizer is the right singular vector of <var>A</var> belonging to its smallest singular value &mdash; equivalently, the eigenvector of <var>A&#7488;A</var> (a 9×9 matrix you can actually build by hand) with the smallest eigenvalue. Reshape that 9-vector back into a 3×3 matrix and you have a candidate <var>F</var>.</p>
+    <div class="mvg-warn">&#9888; <span><b>The gotcha that bites everyone once:</b> solved directly on raw pixel coordinates, eight-point is numerically garbage. Pixel values run into the hundreds, so a row like <var>a</var> mixes terms around <var>10&#8309;</var> (<var>x&#8321;x&#8322;</var>) with a term of exactly <var>1</var>. <var>A&#7488;A</var> ends up wildly ill-conditioned, and the "smallest eigenvalue" direction the solver finds is dominated by rounding noise, not geometry. The fix (Hartley, 1997) is <strong>normalization</strong>: for each image separately, translate its points so their centroid is the origin, then uniformly scale so the <em>average</em> point distance from the origin is <var>&#8730;2</var> (so a typical normalized point is around <var>(1,1)</var>). Solve for a normalized <var>F&#770;</var> using the well-scaled coordinates, then undo the normalization: <var>F = T&#8322;&#7488;F&#770;T&#8321;</var>, where <var>T&#8321;, T&#8322;</var> are the two similarity transforms. The demo below makes the difference impossible to miss.</span></div>
+    <p>One more wrinkle: the SVD solution for <var>F</var> generically comes out full rank (3), because real measurement noise pulls it off the rank-2 manifold that a true fundamental matrix must live on. The fix is to take the SVD of the resulting <var>F = U&#183;diag(&sigma;&#8321;,&sigma;&#8322;,&sigma;&#8323;)&#183;V&#7488;</var> and zero out the smallest singular value: <var>F&#8322; = U&#183;diag(&sigma;&#8321;,&sigma;&#8322;,0)&#183;V&#7488;</var>. By the Eckart&ndash;Young theorem, this <var>F&#8322;</var> is provably the <em>closest</em> rank-2 matrix to the noisy <var>F</var> in Frobenius norm &mdash; the cheapest possible way to snap an almost-valid matrix back onto the constraint surface it's supposed to satisfy.</p>
+    <div class="mvg-goal">🎯 <span><b>Learning goal:</b> watch the eight-point pipeline run on real (synthetic) correspondences, end to end &mdash; the <var>A</var> matrix, the null-space solve, rank-2 cleanup &mdash; and watch normalization turn "unusable" into "nearly exact."</span></div>
+    <div class="mvg-demo">
+      <div class="mvg-canvas-wrap" style="flex-basis:100%;">
+        <div class="mvg-imgrow">
+          <div class="mvg-imgcol">
+            <h4>Image 1 (8 correspondences)</h4>
+            <canvas id="s3-canvas1" width="420" height="300"></canvas>
+          </div>
+          <div class="mvg-imgcol">
+            <h4>Image 2 &mdash; truth vs. recovered epipolar line</h4>
+            <canvas id="s3-canvas2" width="420" height="300"></canvas>
+          </div>
+        </div>
+        <p class="mvg-canvas-hint" id="s3-legend">Gray dashed = ground truth. Green = recovered with Hartley normalization. Red = recovered without it.</p>
+        <p class="mvg-canvas-hint">The 8×9 matrix <var>A</var>, built live from the unnormalized pixel coordinates on the left (this is exactly the matrix whose ill-conditioning the warning above is about):</p>
+        <div id="s3-amatrix" style="overflow-x:auto;"></div>
+      </div>
+      <div class="mvg-controls">
+        <div class="mvg-field"><label>Camera 2 azimuth <span class="val" id="s3-azval"></span></label><input type="range" id="s3-az" min="-3.14" max="3.14" step="0.01" value="-1.0"></div>
+        <div class="mvg-field"><label>Camera 2 elevation <span class="val" id="s3-elval"></span></label><input type="range" id="s3-el" min="-1.2" max="1.2" step="0.01" value="0.3"></div>
+        <div class="mvg-field"><label>Pixel noise (std, px) <span class="val" id="s3-noiseval"></span></label><input type="range" id="s3-noise" min="0" max="3" step="0.05" value="1.2"></div>
+        <div class="mvg-btnrow"><button id="s3-resample" class="mvg-primary">Resample noise</button></div>
+        <div class="mvg-readout" id="s3-readout"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mvg-step" id="beyond8">
+    <div class="mvg-step-head"><span class="mvg-step-num">6</span><h2>Beyond eight points</h2></div>
+    <p class="mvg-eyebrow">Minimal solvers</p>
+    <p><b>Seven-point algorithm.</b> With only 7 correspondences, <var>A</var> is 7×9 and its null space is generically <em>two</em>-dimensional, spanned by matrices <var>F&#8320;</var> and <var>F&#8321;</var> (found the same way &mdash; the two smallest-eigenvalue eigenvectors of <var>A&#7488;A</var>). Every rank-2 <var>F</var> consistent with the 7 points has the form <var>F = F&#8320; + &lambda;F&#8321;</var> for some scalar <var>&lambda;</var>, so the rank-2 constraint <var>det(F&#8320;+&lambda;F&#8321;) = 0</var> becomes a <em>cubic</em> polynomial in <var>&lambda;</var>. A cubic has 1 or 3 real roots, so seven-point produces 1 to 3 candidate matrices; an 8th correspondence (or a cheirality/reprojection check) picks the right one. It exists purely because 7 points aren't enough to pin down the 2 DOF a 9-entry, scale-free, rank-2 matrix has left over &mdash; you get a 1-parameter family instead of a point.</p>
+    <p><b>Five-point algorithm (calibrated).</b> If the cameras <em>are</em> calibrated, you're solving for <var>E</var>, not <var>F</var>, and <var>E</var> carries one more constraint than "rank 2": its two nonzero singular values must be <em>equal</em>. That's 2 extra constraints beyond what <var>F</var> has, dropping the minimal correspondence count from 7 to 5. Nist&eacute;r's five-point algorithm (2004) solves this minimal, more constrained problem directly &mdash; it's algebraically more involved (a polynomial system solved via Gr&ouml;bner bases or resultants) and this page won't derive it, but it's worth knowing it exists: it's what nearly every modern visual-odometry and structure-from-motion pipeline actually calls, because the extra constraint makes it far less prone to the planar-scene degeneracy that eight-point suffers from below, and using fewer points means fewer that need to be outlier-free inside a RANSAC loop.</p>
+  </section>
+
+  <section class="mvg-step" id="degeneracies">
+    <div class="mvg-step-head"><span class="mvg-step-num">7</span><h2>Three ways epipolar estimation breaks</h2></div>
+    <p class="mvg-eyebrow">Degeneracies</p>
+    <p><b>Planar scenes.</b> If every 3D point lies on one plane, the correspondences are secretly related by a single homography (Part 3), and there's more than one rank-2 <var>F</var> consistent with them &mdash; the eight-point system becomes ill-posed, with a poorly separated null space instead of one clean answer. In practice, this is exactly why real pipelines don't commit to <var>F</var> blindly: they fit <em>both</em> a homography <var>H</var> and a fundamental matrix <var>F</var> to the same correspondences, then use a model-selection criterion (GRIC is the classic one) that scores each fit while penalizing <var>H</var>'s much smaller degree of freedom count, and keep whichever model actually explains the data &mdash; a near-planar scene should win on <var>H</var>, a general scene on <var>F</var>.</p>
+    <p><b>Pure rotation.</b> If the camera only rotates in place (<var>t = 0</var>) &mdash; think of standing still and turning your phone &mdash; then <var>E = [t]&#215;R</var> with <var>[0]&#215; = 0</var>, so <var>E</var> is identically the zero matrix, not merely rank-2. There's no baseline, hence no epipolar plane, hence literally zero triangulation information in the geometry: <em>any</em> correspondence satisfies <var>x&#771;&#8322;&#7488;·0·x&#771;&#8321;=0</var> trivially, so the constraint carries no information at all. This is why "just rotate the phone in place" never works for stereo or SfM, no matter how many frames you capture.</p>
+    <p><b>Points on the baseline.</b> A 3D point sitting exactly on the line through both camera centers projects to the epipole itself in both images &mdash; its epipolar plane degenerates to a pencil (any plane through the baseline satisfies the coplanarity condition), so its epipolar line is undefined. In practice this shows up as instability for points near the epipole, not just exactly on it: the closer a correspondence is to the epipole, the less its epipolar line constrains anything.</p>
+    <div class="mvg-warn">&#9888; <span><b>Simplification here:</b> a degenerate configuration still fits the <em>training</em> correspondences with near-zero residual &mdash; least squares is very good at explaining the points you gave it, even when the underlying geometry is meaningless. The tell isn't residual, it's <em>instability</em>: resample the noise and solve again, and a well-posed <var>F</var> barely moves while a degenerate one jumps around. That's what the demo below checks.</span></div>
+    <div class="mvg-demo">
+      <div class="mvg-canvas-wrap" style="flex-basis:100%;">
+        <div class="mvg-imgrow">
+          <div class="mvg-imgcol">
+            <h4>Image 1</h4>
+            <canvas id="s4e-canvas1" width="420" height="300"></canvas>
+          </div>
+          <div class="mvg-imgcol">
+            <h4>Image 2 &mdash; recovered epipolar line</h4>
+            <canvas id="s4e-canvas2" width="420" height="300"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="mvg-controls">
+        <div class="mvg-btnrow">
+          <button id="s4e-general" class="mvg-primary">General scene</button>
+          <button id="s4e-planar">Planar scene</button>
+          <button id="s4e-rotation">Pure rotation</button>
+        </div>
+        <div class="mvg-field"><label>Camera 2 azimuth <span class="val" id="s4e-azval"></span></label><input type="range" id="s4e-az" min="-3.14" max="3.14" step="0.01" value="-1.0"></div>
+        <div class="mvg-field"><label>Camera 2 elevation <span class="val" id="s4e-elval"></span></label><input type="range" id="s4e-el" min="-1.2" max="1.2" step="0.01" value="0.3"></div>
+        <div class="mvg-field"><label>Pixel noise (std, px) <span class="val" id="s4e-noiseval"></span></label><input type="range" id="s4e-noise" min="0" max="3" step="0.05" value="0.8"></div>
+        <div class="mvg-btnrow"><button id="s4e-resample" class="mvg-primary">Resample noise</button></div>
+        <div class="mvg-readout" id="s4e-readout"></div>
+      </div>
+    </div>
+    <p>Epipolar geometry constrains <em>where</em> a match can be, but the payoff &mdash; dense, pixel-by-pixel stereo matching &mdash; needs the epipolar lines turned into simple horizontal scanlines first. That rectification-and-disparity pipeline gets its own page: <a href="{{ '/multi-view-geometry-stereo.html' | relative_url }}">Part 5</a>.</p>
+  </section>
+
   <section class="mvg-step" id="cheatsheet">
     <div class="mvg-step-head"><span class="mvg-step-num">✓</span><h2>Cheat sheet</h2></div>
     <p class="mvg-eyebrow">Recap</p>
@@ -178,6 +282,11 @@ permalink: /multi-view-geometry-epipolar.html
         <tr><td>Epipole</td><td>Projection of one camera's center into the other's image</td><td>Every epipolar line in an image passes through that image's epipole</td></tr>
         <tr><td>Essential matrix <code>E</code></td><td><code>[t]&#215;R</code>, calibrated (normalized) coordinates</td><td><code>x&#8322;&#7488;Ex&#8321; = 0</code></td></tr>
         <tr><td>Fundamental matrix <code>F</code></td><td><code>K&#8322;&#8315;&#7488;EK&#8321;&#8315;&#185;</code>, raw pixel coordinates</td><td><code>x&#8322;&#7488;Fx&#8321; = 0</code>; <code>Fx&#8321;</code> is the epipolar line in image 2</td></tr>
+        <tr><td>E derivation</td><td>Coplanarity of <code>t</code>, <code>Rx&#8321;</code>, <code>x&#8322;</code> &#8658; triple product <code>x&#8322;&middot;(t&#215;Rx&#8321;)=0</code> &#8658; <code>t&#215;(&middot;) = [t]&#215;</code></td><td><code>Ex&#8321; = l&#8322;</code> is exactly Part 0's <code>l</code>; <code>x&#8322;&#7488;l&#8322;=0</code> is point-on-line incidence</td></tr>
+        <tr><td>Properties of F</td><td>Rank 2 (from <code>[t]&#215;</code>'s rank 2, preserved by <code>K</code> multiplies); 7 DOF (9 &minus; 1 scale &minus; 1 <code>det=0</code>)</td><td>Epipoles = null vectors: <code>Fe&#8321;=0</code>, <code>e&#8322;&#7488;F=0</code>; <code>F&#8322;&#8321; = F&#8321;&#8322;&#7488;</code></td></tr>
+        <tr><td>Normalized eight-point</td><td>Per image: translate to centroid 0, scale so mean point distance = <code>&#8730;2</code> &#8594; <var>T</var></td><td>Solve <code>Af&#770;=0</code> (SVD, smallest singular vector) on normalized coords &#8594; rank-2 project &#8594; <code>F = T&#8322;&#7488;F&#770;T&#8321;</code></td></tr>
+        <tr><td>Seven-point / five-point</td><td>7-pt (uncalibrated): 2D null space, <code>det(F&#8320;+&lambda;F&#8321;)=0</code> cubic in <var>&lambda;</var>, 1&ndash;3 candidates</td><td>5-pt (calibrated, Nist&eacute;r): adds "equal nonzero singular values" of <var>E</var>; minimal, avoids planar degeneracy</td></tr>
+        <tr><td>Degeneracies</td><td>Planar scene (H/F ambiguity, use GRIC); pure rotation (<code>t=0 &#8658; E&#8801;0</code>, zero information); points on the baseline (epipole ill-defined)</td><td>Symptom: low fit residual but <var>F</var> unstable across resamples</td></tr>
       </tbody>
     </table>
     </div>
@@ -263,6 +372,135 @@ permalink: /multi-view-geometry-epipolar.html
     var K2invT = MVG.transpose(MVG.inverse3(K2));
     var K1inv = MVG.inverse3(K1);
     return MVG.matMul(MVG.matMul(K2invT, E), K1inv);
+  };
+  MVG.matSub3 = function(A,B){ return A.map(function(row,i){ return row.map(function(v,j){ return v-B[i][j]; }); }); };
+  MVG.matAdd3 = function(A,B){ return A.map(function(row,i){ return row.map(function(v,j){ return v+B[i][j]; }); }); };
+  MVG.scaleMat3 = function(A,s){ return A.map(function(row){ return row.map(function(v){ return v*s; }); }); };
+  MVG.frobNorm3 = function(A){ var s=0; A.forEach(function(row){ row.forEach(function(v){ s+=v*v; }); }); return Math.sqrt(s); };
+
+  // ---------- generic small-matrix linear algebra (for the eight-point solver) ----------
+  MVG.matMulGeneric = function(A,B){
+    var m=A.length, k=A[0].length, n=B[0].length;
+    var C=[];
+    for (var i=0;i<m;i++){ C.push([]); for (var j=0;j<n;j++){ var s=0; for (var p=0;p<k;p++) s+=A[i][p]*B[p][j]; C[i].push(s); } }
+    return C;
+  };
+  MVG.transposeGeneric = function(A){
+    var m=A.length, n=A[0].length, T=[];
+    for (var j=0;j<n;j++){ T.push([]); for (var i=0;i<m;i++) T[j].push(A[i][j]); }
+    return T;
+  };
+  // Classic cyclic Jacobi eigenvalue algorithm for a symmetric n×n matrix.
+  // Returns { values: [n eigenvalues], vectors: n×n matrix whose COLUMNS are the eigenvectors }.
+  MVG.jacobiEigenSymmetric = function(Ain, n){
+    var A = Ain.map(function(row){ return row.slice(); });
+    var V = [];
+    for (var i=0;i<n;i++){ V.push([]); for (var j=0;j<n;j++) V[i].push(i===j?1:0); }
+    for (var sweep=0; sweep<60; sweep++){
+      for (var p=0;p<n-1;p++){
+        for (var q=p+1;q<n;q++){
+          if (Math.abs(A[p][q]) < 1e-13) continue;
+          var theta = (A[q][q]-A[p][p]) / (2*A[p][q]);
+          var sgn = theta >= 0 ? 1 : -1;
+          var t = sgn / (Math.abs(theta) + Math.sqrt(theta*theta+1));
+          var c = 1/Math.sqrt(t*t+1), s = t*c;
+          var app=A[p][p], aqq=A[q][q], apq=A[p][q];
+          A[p][p] = c*c*app - 2*s*c*apq + s*s*aqq;
+          A[q][q] = s*s*app + 2*s*c*apq + c*c*aqq;
+          A[p][q] = 0; A[q][p] = 0;
+          for (var i2=0;i2<n;i2++){
+            if (i2!==p && i2!==q){
+              var aip=A[i2][p], aiq=A[i2][q];
+              A[i2][p] = c*aip - s*aiq; A[p][i2] = A[i2][p];
+              A[i2][q] = s*aip + c*aiq; A[q][i2] = A[i2][q];
+            }
+          }
+          for (i2=0;i2<n;i2++){
+            var vip=V[i2][p], viq=V[i2][q];
+            V[i2][p] = c*vip - s*viq;
+            V[i2][q] = s*vip + c*viq;
+          }
+        }
+      }
+    }
+    var values = []; for (var d=0; d<n; d++) values.push(A[d][d]);
+    return { values: values, vectors: V };
+  };
+  // Unit vector f minimizing ||Af|| subject to ||f||=1, for an N×9 matrix A (the eight-point null-space solve).
+  // Also returns the sorted (ascending) eigenvalues of AᵀA, useful as a conditioning diagnostic.
+  MVG.nullVector9 = function(A){
+    var AtA = MVG.matMulGeneric(MVG.transposeGeneric(A), A);
+    var eig = MVG.jacobiEigenSymmetric(AtA, 9);
+    var order = [0,1,2,3,4,5,6,7,8].slice().sort(function(a,b){ return eig.values[a]-eig.values[b]; });
+    var best = order[0];
+    var f = []; for (var i=0;i<9;i++) f.push(eig.vectors[i][best]);
+    var sortedValues = order.map(function(i){ return eig.values[i]; });
+    return { f: f, sortedValues: sortedValues };
+  };
+  MVG.reshape9to3x3 = function(f){ return [[f[0],f[1],f[2]],[f[3],f[4],f[5]],[f[6],f[7],f[8]]]; };
+  // SVD of a 3×3 matrix via the eigendecomposition of MᵀM (small enough that this is numerically fine).
+  // Returns { U:[u1,u2,u3], S:[s1,s2,s3] desc, V:[v1,v2,v3] }, each u_k/v_k a 3-array (singular vector "columns").
+  MVG.svd3x3 = function(M){
+    var MtM = MVG.matMul(MVG.transpose(M), M);
+    var eig = MVG.jacobiEigenSymmetric(MtM, 3);
+    var order = [0,1,2].slice().sort(function(a,b){ return eig.values[b]-eig.values[a]; });
+    var S = order.map(function(i){ return Math.sqrt(Math.max(eig.values[i],0)); });
+    var V = order.map(function(i){ return [eig.vectors[0][i], eig.vectors[1][i], eig.vectors[2][i]]; });
+    var U = [null,null,null];
+    for (var k=0;k<3;k++){
+      if (S[k] > 1e-9) U[k] = MVG.scale(MVG.matVec(M, V[k]), 1/S[k]);
+    }
+    if (!U[2]) U[2] = MVG.normalize(MVG.cross(U[0]||[1,0,0], U[1]||[0,1,0]));
+    if (!U[1]) U[1] = MVG.normalize(MVG.cross(U[2], U[0]||[1,0,0]));
+    if (!U[0]) U[0] = MVG.normalize(MVG.cross(U[1], U[2]));
+    return { U:U, S:S, V:V };
+  };
+  // Project a 3×3 matrix onto the closest rank-2 matrix (Frobenius norm) by zeroing its smallest singular value.
+  MVG.enforceRank2 = function(M){
+    var svd = MVG.svd3x3(M);
+    var R = [[0,0,0],[0,0,0],[0,0,0]];
+    for (var k=0;k<2;k++){
+      for (var i=0;i<3;i++) for (var j=0;j<3;j++) R[i][j] += svd.S[k]*svd.U[k][i]*svd.V[k][j];
+    }
+    return R;
+  };
+  // Hartley normalization: translate to centroid 0, scale so mean distance from origin is √2.
+  MVG.hartleyNormalize = function(pts){
+    var n = pts.length, cx=0, cy=0;
+    pts.forEach(function(p){ cx+=p[0]; cy+=p[1]; }); cx/=n; cy/=n;
+    var meanDist = 0;
+    pts.forEach(function(p){ meanDist += Math.hypot(p[0]-cx, p[1]-cy); }); meanDist/=n;
+    var s = meanDist > 1e-9 ? Math.SQRT2/meanDist : 1;
+    var T = [[s,0,-s*cx],[0,s,-s*cy],[0,0,1]];
+    var normed = pts.map(function(p){ return [s*(p[0]-cx), s*(p[1]-cy)]; });
+    return { T: T, pts: normed };
+  };
+  // One row of the eight-point A matrix for a correspondence [x1,y1,x2,y2].
+  MVG.eightPointRow = function(c){
+    var x1=c[0], y1=c[1], x2=c[2], y2=c[3];
+    return [x1*x2, y1*x2, x2, x1*y2, y1*y2, y2, x1, y1, 1];
+  };
+  MVG.buildAMatrix = function(corrs){ return corrs.map(MVG.eightPointRow); };
+  // Frobenius-norm distance between two F's after normalizing each to unit norm and aligning sign (F ~ -F).
+  MVG.compareF = function(F, G){
+    var nf = MVG.frobNorm3(F) || 1, ng = MVG.frobNorm3(G) || 1;
+    var Fn = MVG.scaleMat3(F, 1/nf), Gn = MVG.scaleMat3(G, 1/ng);
+    var d1 = MVG.frobNorm3(MVG.matSub3(Fn, Gn));
+    var d2 = MVG.frobNorm3(MVG.matAdd3(Fn, Gn));
+    return Math.min(d1, d2);
+  };
+  // Mean symmetric-ish epipolar distance (pixels) of F on a set of correspondences [x1,y1,x2,y2].
+  MVG.meanEpipolarResidual = function(F, corrs){
+    var total = 0;
+    corrs.forEach(function(c){
+      var x1=[c[0],c[1],1], x2=[c[2],c[3],1];
+      var l2 = MVG.matVecGeneric(F, x1);
+      var d2 = Math.abs(MVG.dot(x2, l2)) / (Math.hypot(l2[0], l2[1]) || 1);
+      var l1 = MVG.matVecGeneric(MVG.transpose(F), x2);
+      var d1 = Math.abs(MVG.dot(x1, l1)) / (Math.hypot(l1[0], l1[1]) || 1);
+      total += 0.5*(d1+d2);
+    });
+    return total / corrs.length;
   };
 
   // ---------- shared scene: a cube (drawn faintly for spatial context) ----------

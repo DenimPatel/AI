@@ -1,0 +1,302 @@
+---
+title: Stereo Rectification &amp; Disparity
+description: Part 5 of the multi-view geometry series — rectifying an image pair so epipolar lines become horizontal scanlines, block matching and SGBM, disparity maps, and Z = fB/d.
+permalink: /multi-view-geometry-stereo.html
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ page.title }} · {{ site.title }}</title>
+<meta name="description" content="{{ page.description }}">
+<link rel="stylesheet" href="{{ '/assets/css/styles.css' | relative_url }}">
+<style>
+  .mvg { max-width: 1180px; }
+  .mvg .page-header { padding-top: clamp(32px, 6vw, 56px); }
+  .mvg-step { padding: 48px 0; border-top: 1px solid var(--color-divider); }
+  .mvg-step:first-of-type { border-top: none; }
+  .mvg-step-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 30px; height: 30px; border-radius: 50%; background: var(--color-text); color: var(--color-bg);
+    font-family: var(--font-heading); font-weight: 600; font-size: 14px; flex: 0 0 auto;
+  }
+  .mvg-step-head { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+  .mvg-step-head h2 { margin: 0; font-size: clamp(22px, 3vw, 28px); }
+  .mvg-eyebrow {
+    font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--color-accent-700); margin: 0 0 4px 42px;
+  }
+  .mvg-goal {
+    display: flex; gap: 10px; margin: 16px 0 20px; padding: 12px 14px;
+    background: var(--color-accent-100); border-left: 3px solid var(--color-accent);
+    border-radius: var(--radius-sm); font-size: 14px; line-height: 1.55;
+  }
+  .mvg-goal b { color: var(--color-accent-800); }
+  .mvg-warn {
+    display: flex; gap: 10px; margin: 16px 0 20px; padding: 12px 14px;
+    background: var(--color-accent-2-100); border-left: 3px solid var(--color-accent-2);
+    border-radius: var(--radius-sm); font-size: 14px; line-height: 1.55;
+  }
+  .mvg-warn b { color: var(--color-accent-2-800); }
+  .mvg-math {
+    font-family: var(--font-mono); font-size: 13.5px; background: var(--color-surface);
+    padding: 12px 14px; border-radius: var(--radius-sm); overflow-x: auto; margin: 0 0 16px;
+    line-height: 1.7;
+  }
+  .mvg-demo {
+    display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;
+    background: var(--color-surface); border-radius: var(--radius-md); padding: 18px;
+    margin-top: 8px;
+  }
+  .mvg-canvas-wrap { flex: 1 1 380px; min-width: 280px; }
+  .mvg-canvas-wrap canvas { width: 100%; height: auto; display: block; background: var(--color-neutral-100); border-radius: var(--radius-sm); }
+  .mvg-plot3d { width: 100%; height: 380px; background: var(--color-neutral-100); border-radius: var(--radius-sm); cursor: grab; }
+  .mvg-plot3d:active { cursor: grabbing; }
+  .mvg-canvas-hint { font-size: 11px; opacity: 0.6; margin-top: 6px; }
+  .mvg-controls { flex: 1 1 260px; min-width: 240px; font-size: 13.5px; }
+  .mvg-field { margin-bottom: 14px; }
+  .mvg-field label { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 12.5px; color: color-mix(in srgb, var(--color-text) 70%, transparent); }
+  .mvg-field label span.val { font-family: var(--font-mono); color: var(--color-text); }
+  .mvg-field input[type=range] { width: 100%; accent-color: var(--color-accent); }
+  .mvg-btnrow { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 14px; }
+  .mvg-btnrow button {
+    font-family: var(--font-heading); font-weight: 600; font-size: 13px; cursor: pointer;
+    border: 1px solid var(--color-divider); background: var(--color-bg); color: var(--color-text);
+    padding: 7px 13px; border-radius: var(--radius-md);
+  }
+  .mvg-btnrow button:hover { background: color-mix(in srgb, var(--color-text) 6%, transparent); }
+  .mvg-btnrow button.mvg-primary { background: var(--color-accent); color: #fff; border-color: var(--color-accent); }
+  .mvg-btnrow button.mvg-primary:hover { background: var(--color-accent-600); }
+  .mvg-btnrow button:disabled { opacity: 0.45; cursor: default; }
+  .mvg-readout { font-family: var(--font-mono); font-size: 12.5px; line-height: 1.85; background: var(--color-bg); border-radius: var(--radius-sm); padding: 10px 12px; }
+  .mvg-readout .k { opacity: 0.6; }
+  .mvg-readout .hi { color: var(--color-accent-700); font-weight: 600; }
+  .mvg-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 11.5px; margin-top: 8px; opacity: 0.85; }
+  .mvg-legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .mvg-legend i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .mvg-toggle { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 13px; }
+  .mvg-cheat { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .mvg-cheat th, .mvg-cheat td { padding: 10px 12px; border-bottom: 1px solid var(--color-divider); vertical-align: top; text-align: left; }
+  .mvg-cheat th { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.6; }
+  .mvg-cheat code { white-space: nowrap; }
+  .mvg-next {
+    display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;
+    margin-top: 24px; padding: 18px; background: var(--color-surface); border-radius: var(--radius-md);
+  }
+  .mvg-imgplane { position: relative; }
+  .mvg-imgplane canvas { cursor: default; }
+  @media (max-width: 640px) {
+    .mvg-eyebrow { margin-left: 0; }
+    .mvg-step-head { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-brand" href="{{ '/' | relative_url }}">AI /</a>
+  <a href="{{ '/' | relative_url }}">Home</a>
+  <a href="{{ '/robotics/' | relative_url }}">Robotics</a>
+  <a href="{{ '/multi-view-geometry-projective.html' | relative_url }}">Part 0</a>
+  <a href="{{ '/multi-view-geometry.html' | relative_url }}">Part 1</a>
+  <a href="{{ '/multi-view-geometry-calibration.html' | relative_url }}">Part 2</a>
+  <a href="{{ '/multi-view-geometry-epipolar.html' | relative_url }}">Part 3</a>
+  <a href="{{ '/multi-view-geometry-ransac.html' | relative_url }}">Part 4</a>
+  <a href="{{ '/multi-view-geometry-stereo.html' | relative_url }}" aria-current="page">Part 5</a>
+  <a href="{{ '/multi-view-geometry-homography.html' | relative_url }}">Part 6</a>
+  <a href="{{ '/multi-view-geometry-triangulation.html' | relative_url }}">Part 7</a>
+  <a href="{{ '/multi-view-geometry-pnp.html' | relative_url }}">Part 8</a>
+  <a href="{{ '/multi-view-geometry-trifocal.html' | relative_url }}">Part 9</a>
+  <a href="{{ '/multi-view-geometry-sfm.html' | relative_url }}">Part 10</a>
+  <a href="{{ '/multi-view-geometry-sfm-pipelines.html' | relative_url }}">Part 11</a>
+  <a href="{{ '/multi-view-geometry-beyond.html' | relative_url }}">Part 12</a>
+</nav>
+
+<main>
+<div class="wrap mvg">
+  <section class="page-header">
+    <span class="section-kicker">Interactive guide &middot; Part 5 of 13</span>
+    <h1>Stereo: Rectification &amp; Disparity</h1>
+    <p><a href="{{ '/multi-view-geometry-epipolar.html' | relative_url }}">Part 3</a> showed that a point in one image constrains its match in the other to lie on an epipolar line — but that line can point in <em>any</em> direction, and searching a whole image along an arbitrary line, at every candidate depth, is still awkward to make fast. Real stereo systems sidestep the problem: warp both images so every pair of corresponding epipolar lines becomes the <em>same</em> horizontal row in both images, and the search collapses to sliding a small window along one scanline. That trick — rectification — is what turns epipolar geometry into an actual depth sensor, and it's the piece this guide was missing: stereo depth cameras, robot stereo rigs, and every real-time disparity map run on exactly this pipeline. This page derives the rectifying rotation, turns disparity into depth with <code>Z = fB/d</code>, and builds a live block-matching stereo pair so you can watch the whole thing run.</p>
+  </section>
+  <div class="stats-rule" style="border-top-color: var(--color-divider); margin-bottom: 8px;"></div>
+
+{% raw %}
+  <section class="mvg-step" id="why">
+    <div class="mvg-step-head"><span class="mvg-step-num">0</span><h2>From an arbitrary line to a single row</h2></div>
+    <p class="mvg-eyebrow">Motivation</p>
+    <p>The epipolar constraint from Part 3 says a match must lie somewhere on the line <code>l&#8322; = Fx&#8321;</code> — a real improvement over searching the whole image, but that line's slope depends on <var>F</var>, which depends on the two cameras' relative pose. In general it's tilted, so "search along it" means resampling pixels along a diagonal at every candidate position, for every pixel in the image, for every frame. That's expensive and fiddly to vectorize.</p>
+    <p>But there's nothing sacred about the <em>original</em> pixel grid. Camera rotation is free to choose, and Part 6 will show that rotating a calibrated camera about its own optical center — without moving it — is exactly a homography: a warp of the image that changes nothing about the physical rays it represents, only how they're indexed by pixel coordinates. So: choose new, virtual camera orientations for both cameras such that every epipolar line becomes <em>horizontal</em>, and lands on the <em>same row</em> in both images. Warp the two real images into those virtual cameras. Now the search for a match is one dimension: fix a row, slide a window along it, done.</p>
+    <div class="mvg-goal">💡 <span><b>Why it matters:</b> this is the difference between "epipolar geometry" as a nice constraint and stereo vision as a working depth sensor. Every stereo camera you can buy — from a robot's stereo rig to a laptop webcam pair to classic Kinect-style stereo depth — rectifies first and matches second. Almost nothing downstream (block matching, SGBM, real-time disparity) works without it.</span></div>
+  </section>
+
+  <section class="mvg-step" id="construction">
+    <div class="mvg-step-head"><span class="mvg-step-num">1</span><h2>Constructing the rectifying rotation</h2></div>
+    <p class="mvg-eyebrow">Derivation</p>
+    <p>Start from a calibrated stereo pair: two cameras with known rotations <var>R&#8321;, R&#8322;</var> (world → camera) and known relative pose between them, summarized by the baseline vector <var>t</var> pointing from camera 1's center to camera 2's center, expressed in world coordinates. The goal is a single new rotation <var>R</var><sub>rect</sub> that both virtual cameras will share — same orientation, so their image planes are parallel and their rows already line up — chosen so that direction also happens to send the epipole to infinity along the horizontal axis.</p>
+    <p>An epipole is the projection of one camera's center into the other camera's image, so all epipolar lines fan out from it; if it sits at infinity in a fixed horizontal direction, every epipolar line is parallel to that direction — i.e. horizontal. The standard construction picks <var>R</var><sub>rect</sub>'s three rows to be an orthonormal basis built directly from <var>t</var>:</p>
+    <div class="mvg-math">
+      new x&#8209;axis:  e&#8321; = t / &#8214;t&#8214;&nbsp;&nbsp;&nbsp;(points along the baseline itself)<br>
+      new y&#8209;axis:  e&#8322; = (0,0,1) &#215; e&#8321;, normalized&nbsp;&nbsp;&nbsp;(perpendicular to baseline, roughly &#8220;up&#8221; — assumes t isn&#8217;t vertical)<br>
+      new z&#8209;axis:  e&#8323; = e&#8321; &#215; e&#8322;&nbsp;&nbsp;&nbsp;(completes a right&#8209;handed frame, points &#8220;forward&#8221;)<br>
+      <br>
+      R<sub>rect</sub> = [ e&#8321;&#7488; ; e&#8322;&#7488; ; e&#8323;&#7488; ]&nbsp;&nbsp;&nbsp;(stack as rows)
+    </div>
+    <p>Here's why this specific choice sends the epipole to infinity. Camera 2's center, seen from camera 1's <em>new</em> orientation, is displaced by <var>t</var>; expressed in the new frame that displacement is <code>R</code><sub>rect</sub><code>&middot;t</code>. Because <code>e&#8321; = t/&#8214;t&#8214;</code> by construction, and <code>e&#8322;, e&#8323;</code> are both orthogonal to <var>t</var> by construction:</p>
+    <div class="mvg-math">
+      R<sub>rect</sub>&middot;t = ( e&#8321;&middot;t, &nbsp;e&#8322;&middot;t, &nbsp;e&#8323;&middot;t ) = ( &#8214;t&#8214;, &nbsp;0, &nbsp;0 )
+    </div>
+    <p>All of the displacement lands on the new x-axis; none of it on y or z. The epipole — the projection of that displaced center — sits infinitely far along x with zero vertical component, i.e. exactly at the ideal point in the horizontal direction (Part 0's <code>w = 0</code> points). A line through the epipole with zero vertical offset from any point is, by definition, horizontal. That's the whole derivation: the construction doesn't just happen to work, it's reverse-engineered so that <var>t</var> lands entirely on the axis that becomes "sideways" in the new image.</p>
+    <p>The rectifying rotation applied to each real camera is <code>R</code><sub>rect</sub><code>&middot;R&#8321;&#7488;</code> and <code>R</code><sub>rect</sub><code>&middot;R&#8322;&#7488;</code> (composing "undo the camera's own rotation" with "rotate into the shared rectified frame"). Since both new cameras get the identical <code>R</code><sub>rect</sub>, they end up row-aligned by construction — and since <var>t</var> is now purely along the shared x-axis, the two virtual cameras differ from each other by nothing but a pure horizontal translation of length <var>B = &#8214;t&#8214;</var>, the baseline.</p>
+    <div class="mvg-warn">⚠️ <span><b>What actually gets warped:</b> the cameras' centers never move — only their orientation (and, for a clean result, their intrinsics <var>K</var>, usually reconciled to a shared value for both images) — so per Part 6, this rotation-about-the-center is exactly a homography of the original pixel grid: <code>x&#8242; &#8773; K</code><sub>new</sub><code>&middot;R</code><sub>rect</sub><code>&middot;R</code><sub>i</sub><code>&#7488;&middot;K</code><sub>i</sub><code>&#8315;&#185;&middot;x</code>. Rectification in practice (e.g. OpenCV's <code>stereoRectify</code> + <code>remap</code>) is exactly this: two per-image homography warps, computed once from calibration, applied to every incoming frame.</span></div>
+  </section>
+
+  <section class="mvg-step" id="depth-math">
+    <div class="mvg-step-head"><span class="mvg-step-num">2</span><h2>Disparity, and why Z = fB / d</h2></div>
+    <p class="mvg-eyebrow">Derivation</p>
+    <p>After rectification, both virtual cameras share a focal length <var>f</var>, sit a baseline <var>B</var> apart along a shared x-axis, and share every row. A 3D point at depth <var>Z</var> and horizontal offset <var>X</var> from the left camera projects, in each camera, by the ordinary pinhole rule <code>u = f&middot;(horizontal coordinate)/Z</code> — the only difference between the two cameras is which point they call the horizontal origin, and that offset is exactly <var>B</var>:</p>
+    <div class="mvg-math">
+      u<sub>left</sub>  =  f&middot;X / Z<br>
+      u<sub>right</sub> =  f&middot;(X &#8722; B) / Z&nbsp;&nbsp;&nbsp;(the right camera's center sits B further along +x, so the point is B closer to its own origin)<br>
+      <br>
+      disparity&nbsp; d  &#8801;  u<sub>left</sub> &#8722; u<sub>right</sub>  =  f&middot;X/Z &#8722; f&middot;(X&#8722;B)/Z  =  fB / Z<br>
+      <br>
+      &#8658;&nbsp;&nbsp; <b>Z = fB / d</b>
+    </div>
+    <p>Every quantity on the right of <code>Z = fB/d</code> is either fixed by calibration (<var>f</var>, <var>B</var>) or directly measured from the two images (<var>d</var>, in pixels) — which is the whole appeal: once rectified, recovering depth is arithmetic on a single measured integer (or sub-pixel value) per pixel, no triangulation solve required.</p>
+    <p>That formula also says something uncomfortable about accuracy. Disparity is measured to some finite precision — call one pixel of disparity noise <code>&#916;d = 1</code>. How much does that same pixel of noise mean in meters, as a function of how far away the point already is? Differentiate <code>Z(d) = fB/d</code>:</p>
+    <div class="mvg-math">
+      dZ/dd  =  &#8722;fB / d&#178;<br>
+      substitute&nbsp; d = fB/Z&nbsp; (so&nbsp; d&#178; = f&#178;B&#178;/Z&#178;):<br>
+      dZ/dd  =  &#8722;fB &middot; Z&#178;/(f&#178;B&#178;)  =  &#8722;Z&#178; / (fB)<br>
+      <br>
+      &#8658;&nbsp;&nbsp; <b>&#916;Z &#8776; Z&#178; / (fB)</b>&nbsp;&nbsp;&nbsp; for one pixel of disparity error
+    </div>
+    <p>Depth error grows with the <em>square</em> of distance and shrinks only <em>linearly</em> with baseline. A stereo rig that's comfortably accurate at 2 m can be off by meters at 20 m — the same one pixel of disparity noise means 100&times; more depth error, because disparity itself has shrunk 10&times; and the derivative scales as its inverse square. This is precisely why LiDAR, not stereo, dominates long-range depth, and why wide-baseline rigs (further-apart cameras) trade a larger blind zone near the camera for meaningfully better depth at range.</p>
+  </section>
+
+  <section class="mvg-step" id="demo-rectify">
+    <div class="mvg-step-head"><span class="mvg-step-num">3</span><h2>Play: rectify a stereo pair, then match a pixel</h2></div>
+    <p class="mvg-eyebrow">Interactive</p>
+    <div class="mvg-goal">🎯 <b>Learning goal:</b> toggle between an "unrectified" (toed-in) rig and a rectified one and watch the epipolar line snap horizontal. Then, in the rectified pair, click a pixel and watch a real block match run along that single row.</div>
+    <div class="mvg-warn">⚠️ <span><b>Honest framing:</b> there's no real camera hardware here. Both images below are ray-traced from a small synthetic scene (a textured ground plane plus one sphere) through two virtual pinhole cameras, purely so there's real, live-computable stereo geometry to click on. Real rectification also has to correct lens distortion and reconcile two slightly different <var>K</var>'s; this demo skips both since the virtual cameras are already distortion-free and share <var>K</var> exactly.</span></div>
+    <p>The rig is two cameras <var>B</var> apart along a shared baseline, both pitched down slightly to see a checkered floor with one solid sphere floating above it. In <b>Unrectified</b> mode each camera additionally toes inward to fixate a point ahead — a common (bad) way to point two cameras at the same subject — which makes their relative rotation <var>R&#8322;R&#8321;&#7488; &ne; I</var> and tilts the epipolar line. In <b>Rectified</b> mode both cameras share the same orientation exactly as derived above, so <var>t</var> is purely horizontal and the epipolar line is exactly horizontal too.</p>
+    <div class="mvg-demo">
+      <div class="mvg-canvas-wrap" style="flex-basis:100%;">
+        <div class="mvg-btnrow">
+          <button id="s3-mode-rect" class="mvg-primary">Rectified</button>
+          <button id="s3-mode-unrect">Unrectified (toe-in)</button>
+        </div>
+        <div class="mvg-imgrow" style="display:flex; gap:14px; flex-wrap:wrap;">
+          <div style="flex:1 1 220px;">
+            <h4 style="margin:0 0 6px; font-size:12px; text-transform:uppercase; letter-spacing:.06em; opacity:.7;">Left image (click to pick a pixel)</h4>
+            <canvas id="s3-canvasL" width="200" height="140" style="width:100%; height:auto; display:block; background:var(--color-neutral-100); border-radius:var(--radius-sm); cursor:crosshair;"></canvas>
+          </div>
+          <div style="flex:1 1 220px;">
+            <h4 style="margin:0 0 6px; font-size:12px; text-transform:uppercase; letter-spacing:.06em; opacity:.7;">Right image (epipolar line + best match)</h4>
+            <canvas id="s3-canvasR" width="200" height="140" style="width:100%; height:auto; display:block; background:var(--color-neutral-100); border-radius:var(--radius-sm);"></canvas>
+          </div>
+        </div>
+        <p class="mvg-canvas-hint">Dashed line = epipolar line for the clicked pixel, computed from the live <var>F</var>. In rectified mode it's the search row; the filled dot marks the best SAD match found by sliding a 7&times;7 window along it.</p>
+      </div>
+      <div class="mvg-controls">
+        <div class="mvg-field"><label>Baseline B <span class="val" id="s3-bval"></span></label><input type="range" id="s3-b" min="0.3" max="3" step="0.02" value="1.2"></div>
+        <div class="mvg-field"><label>Camera pitch (down) <span class="val" id="s3-pval"></span></label><input type="range" id="s3-pitch" min="0" max="0.5" step="0.01" value="0.22"></div>
+        <div class="mvg-readout" id="s3-readout">Click a pixel in the left image.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mvg-step" id="matching">
+    <div class="mvg-step-head"><span class="mvg-step-num">4</span><h2>How disparity actually gets computed</h2></div>
+    <p class="mvg-eyebrow">Algorithms</p>
+    <p><strong>Block matching.</strong> For every pixel in the rectified left image, slide a small window (e.g. 7&times;7 or 9&times;9) along the <em>same row</em> in the right image and score how well it matches at each candidate column. Three common scores:</p>
+    <div class="mvg-math">
+      SAD (sum of absolute differences):&nbsp; &#8721; |I<sub>L</sub>(x,y) &#8722; I<sub>R</sub>(x&#8722;d,y)|&nbsp;&nbsp;&mdash;&nbsp; cheapest, sensitive to brightness offsets<br>
+      SSD (sum of squared differences):&nbsp; &#8721; (I<sub>L</sub>(x,y) &#8722; I<sub>R</sub>(x&#8722;d,y))&#178;&nbsp;&nbsp;&mdash;&nbsp; penalizes large errors harder<br>
+      NCC (normalized cross-correlation): &#8721;(I<sub>L</sub>&#8722;&#563;<sub>L</sub>)(I<sub>R</sub>&#8722;&#563;<sub>R</sub>) / (&#963;<sub>L</sub>&#963;<sub>R</sub>)&nbsp;&nbsp;&mdash;&nbsp; robust to brightness/contrast differences between the two cameras
+    </div>
+    <p>Whichever score is used, the disparity that minimizes cost is only known to the nearest integer pixel by default; fitting a parabola to the three cost values around the minimum (<code>d&#8722;1, d, d+1</code>) and solving for its vertex gives a cheap sub-pixel refinement, which is what the demo above does.</p>
+    <p><strong>The cost volume.</strong> Doing this for every pixel and every candidate disparity builds a 3D array — <code>cost[row][col][d]</code> — the object every stereo algorithm, however sophisticated, is ultimately searching over. Naive block matching just takes the per-pixel minimum along the <var>d</var> axis independently for each pixel, which is fast but noisy: textureless regions (a blank wall) have a flat, ambiguous cost curve, and the per-pixel minimum can jump around randomly from one pixel to its neighbor.</p>
+    <p><strong>SGBM (semi-global block matching).</strong> Instead of picking each pixel's minimum in isolation, SGBM aggregates cost along several 1D paths through the cost volume (typically 8 or 16 directions radiating from each pixel), adding a penalty whenever the disparity jumps between neighboring pixels along a path — a small penalty for a 1-pixel jump (edges are allowed to have small disparity steps), a much larger one for jumps of more than 1 (discourages spurious noise). Summing the aggregated cost from all directions and then taking the per-pixel minimum gives a result that's dramatically smoother than naive block matching while still respecting real depth discontinuities, at a fraction of the cost of solving the fully global (2D smoothness) version of the same optimization. This is exactly the algorithm behind OpenCV's <code>StereoSGBM</code>.</p>
+    <p><strong>Occlusion.</strong> Because the two cameras sit at different positions, some 3D surface visible to the left camera is hidden from the right one — most obviously at depth discontinuities (the strip of background right behind a foreground object's edge) and at the image borders (the baseline shift exposes a sliver of scene only one camera can see). Those pixels have no correct match at all, and forcing block matching to pick <em>something</em> anyway just injects noise. The standard fix is a <strong>left-right consistency check</strong>: match left&rarr;right independently of right&rarr;left; if pixel <var>x</var> in the left image matches <var>x&#8722;d</var> in the right image, but that pixel's own best right&rarr;left match doesn't land back within about a pixel of <var>x</var>, the two disagree — flag the disparity invalid rather than trust it.</p>
+  </section>
+
+  <section class="mvg-step" id="demo-deptherror">
+    <div class="mvg-step-head"><span class="mvg-step-num">5</span><h2>Play: how fast does stereo get bad at distance?</h2></div>
+    <p class="mvg-eyebrow">Interactive</p>
+    <div class="mvg-goal">🎯 <b>Learning goal:</b> watch &#916;Z = Z&#178;/(fB) explode quadratically as Z grows, and shrink only linearly when you double the baseline — directly from the formula, no simulated image involved this time.</div>
+    <p>This is the disparity-specific version of depth uncertainty — distinct from Part 7's general triangulation covariance ellipsoid, which applies to any two-view ray intersection regardless of whether the images are rectified. Here it's just <code>Z = fB/d</code> and its derivative, evaluated live as you move the sliders.</p>
+    <div class="mvg-demo">
+      <div class="mvg-canvas-wrap" style="flex-basis:100%;">
+        <canvas id="s5-canvas" width="640" height="300"></canvas>
+        <p class="mvg-canvas-hint">&#916;Z(Z) for the current baseline (solid) and 2&times; the baseline (dashed), log scale on the vertical axis. Marker = your current Z, B.</p>
+      </div>
+      <div class="mvg-controls">
+        <div class="mvg-field"><label>Focal length f (px) <span class="val" id="s5-fval"></span></label><input type="range" id="s5-f" min="200" max="1600" step="10" value="700"></div>
+        <div class="mvg-field"><label>Baseline B (m) <span class="val" id="s5-bval"></span></label><input type="range" id="s5-b" min="0.02" max="1.0" step="0.01" value="0.12"></div>
+        <div class="mvg-field"><label>Distance Z (m) <span class="val" id="s5-zval"></span></label><input type="range" id="s5-z" min="0.3" max="40" step="0.05" value="4"></div>
+        <div class="mvg-readout" id="s5-readout"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mvg-step" id="cheatsheet">
+    <div class="mvg-step-head"><span class="mvg-step-num">✓</span><h2>Cheat sheet</h2></div>
+    <p class="mvg-eyebrow">Recap</p>
+    <div style="overflow-x:auto;">
+    <table class="mvg-cheat">
+      <thead><tr><th>Object</th><th>Definition / formula</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Rectification, goal</td><td>Warp both images so corresponding epipolar lines become the same horizontal row</td><td>Turns 2D/line search into 1D row search</td></tr>
+        <tr><td>Rectifying frame</td><td><code>e&#8321;=t/&#8214;t&#8214;, e&#8322;=(0,0,1)&times;e&#8321;, e&#8323;=e&#8321;&times;e&#8322;, R</code><sub>rect</sub><code>=[e&#8321;&#7488;;e&#8322;&#7488;;e&#8323;&#7488;]</code></td><td>Forces <code>R</code><sub>rect</sub><code>&middot;t = (&#8214;t&#8214;,0,0)</code> &mdash; epipole to infinity along x</td></tr>
+        <tr><td>Rectifying warp</td><td><code>x&#8242; &#8773; K</code><sub>new</sub><code>&middot;R</code><sub>rect</sub><code>&middot;R</code><sub>i</sub><code>&#7488;&middot;K</code><sub>i</sub><code>&#8315;&#185;&middot;x</code></td><td>A homography per image (Part 6) &mdash; centers never move</td></tr>
+        <tr><td>Disparity &rarr; depth</td><td><code>Z = fB / d</code></td><td><var>d</var> in pixels, <var>f</var> shared focal length, <var>B</var> baseline</td></tr>
+        <tr><td>Depth uncertainty</td><td><code>&#916;Z &#8776; Z&#178; / (fB)</code> per pixel of disparity error</td><td>Quadratic in <var>Z</var>, linear improvement from <var>B</var></td></tr>
+        <tr><td>Block matching</td><td>Per-pixel minimum of SAD/SSD/NCC along the row</td><td>Fast; noisy on low-texture regions</td></tr>
+        <tr><td>SGBM</td><td>Aggregates cost along multiple 1D paths with a jump penalty, then takes the minimum</td><td>OpenCV <code>StereoSGBM</code>; smoother, still local-ish cost</td></tr>
+        <tr><td>Left-right consistency</td><td>Match L&rarr;R and R&rarr;L independently; disagreement &gt; ~1px &rArr; invalid</td><td>Flags occluded / unmatchable pixels</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+{% endraw %}
+
+  <div class="mvg-next">
+    <span>PLACEHOLDER-NEXT-BLURB</span>
+    <a class="btn btn-secondary" href="PLACEHOLDER-NEXT-HREF">PLACEHOLDER-NEXT-LABEL</a>
+  </div>
+</div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="stats-rule"></div>
+    <p style="margin:0;">Have a milestone to add? <a href="https://github.com/DenimPatel/AI">Contribute on GitHub</a>.</p>
+  </div>
+</footer>
+
+{% raw %}
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  function css(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+  var COLOR_TEXT = css('--color-text') || '#201e1d';
+  var COLOR_ACCENT = css('--color-accent') || '#0088b0';
+  var COLOR_ACCENT2 = css('--color-accent-2') || '#d6006c';
+  var COLOR_DIVIDER = css('--color-divider') || 'rgba(32,30,29,0.16)';
+
+  // TODO(subagent): add one IIFE-wrapped block per interactive demo below,
+  // following the pattern used in multi-view-geometry-projective.html and
+  // multi-view-geometry.html (Step 2 / Step 3 demos). Each demo owns its
+  // own canvas/Plotly setup, its own `update()` function wired to its
+  // input elements, and writes into its own #sN-readout div.
+
+})();
+</script>
+{% endraw %}
+</body>
+</html>

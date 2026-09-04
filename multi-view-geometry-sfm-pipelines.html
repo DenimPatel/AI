@@ -1,0 +1,165 @@
+---
+title: SfM Pipelines
+description: Part 11 of the multi-view geometry series — incremental structure-from-motion (COLMAP-style) versus global SfM, self-calibration, and the stratified projective &rarr; affine &rarr; metric upgrade.
+permalink: /multi-view-geometry-sfm-pipelines.html
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ page.title }} · {{ site.title }}</title>
+<meta name="description" content="{{ page.description }}">
+<link rel="stylesheet" href="{{ '/assets/css/styles.css' | relative_url }}">
+<style>
+  .mvg { max-width: 1180px; }
+  .mvg .page-header { padding-top: clamp(32px, 6vw, 56px); }
+  .mvg-step { padding: 48px 0; border-top: 1px solid var(--color-divider); }
+  .mvg-step:first-of-type { border-top: none; }
+  .mvg-step-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 30px; height: 30px; border-radius: 50%; background: var(--color-text); color: var(--color-bg);
+    font-family: var(--font-heading); font-weight: 600; font-size: 14px; flex: 0 0 auto;
+  }
+  .mvg-step-head { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+  .mvg-step-head h2 { margin: 0; font-size: clamp(22px, 3vw, 28px); }
+  .mvg-eyebrow {
+    font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--color-accent-700); margin: 0 0 4px 42px;
+  }
+  .mvg-goal {
+    display: flex; gap: 10px; margin: 16px 0 20px; padding: 12px 14px;
+    background: var(--color-accent-100); border-left: 3px solid var(--color-accent);
+    border-radius: var(--radius-sm); font-size: 14px; line-height: 1.55;
+  }
+  .mvg-goal b { color: var(--color-accent-800); }
+  .mvg-warn {
+    display: flex; gap: 10px; margin: 16px 0 20px; padding: 12px 14px;
+    background: var(--color-accent-2-100); border-left: 3px solid var(--color-accent-2);
+    border-radius: var(--radius-sm); font-size: 14px; line-height: 1.55;
+  }
+  .mvg-warn b { color: var(--color-accent-2-800); }
+  .mvg-math {
+    font-family: var(--font-mono); font-size: 13.5px; background: var(--color-surface);
+    padding: 12px 14px; border-radius: var(--radius-sm); overflow-x: auto; margin: 0 0 16px;
+    line-height: 1.7;
+  }
+  .mvg-demo {
+    display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;
+    background: var(--color-surface); border-radius: var(--radius-md); padding: 18px;
+    margin-top: 8px;
+  }
+  .mvg-canvas-wrap { flex: 1 1 380px; min-width: 280px; }
+  .mvg-canvas-wrap canvas { width: 100%; height: auto; display: block; background: var(--color-neutral-100); border-radius: var(--radius-sm); }
+  .mvg-plot3d { width: 100%; height: 380px; background: var(--color-neutral-100); border-radius: var(--radius-sm); cursor: grab; }
+  .mvg-plot3d:active { cursor: grabbing; }
+  .mvg-canvas-hint { font-size: 11px; opacity: 0.6; margin-top: 6px; }
+  .mvg-controls { flex: 1 1 260px; min-width: 240px; font-size: 13.5px; }
+  .mvg-field { margin-bottom: 14px; }
+  .mvg-field label { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 12.5px; color: color-mix(in srgb, var(--color-text) 70%, transparent); }
+  .mvg-field label span.val { font-family: var(--font-mono); color: var(--color-text); }
+  .mvg-field input[type=range] { width: 100%; accent-color: var(--color-accent); }
+  .mvg-btnrow { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 14px; }
+  .mvg-btnrow button {
+    font-family: var(--font-heading); font-weight: 600; font-size: 13px; cursor: pointer;
+    border: 1px solid var(--color-divider); background: var(--color-bg); color: var(--color-text);
+    padding: 7px 13px; border-radius: var(--radius-md);
+  }
+  .mvg-btnrow button:hover { background: color-mix(in srgb, var(--color-text) 6%, transparent); }
+  .mvg-btnrow button.mvg-primary { background: var(--color-accent); color: #fff; border-color: var(--color-accent); }
+  .mvg-btnrow button.mvg-primary:hover { background: var(--color-accent-600); }
+  .mvg-btnrow button:disabled { opacity: 0.45; cursor: default; }
+  .mvg-readout { font-family: var(--font-mono); font-size: 12.5px; line-height: 1.85; background: var(--color-bg); border-radius: var(--radius-sm); padding: 10px 12px; }
+  .mvg-readout .k { opacity: 0.6; }
+  .mvg-readout .hi { color: var(--color-accent-700); font-weight: 600; }
+  .mvg-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 11.5px; margin-top: 8px; opacity: 0.85; }
+  .mvg-legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .mvg-legend i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .mvg-toggle { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 13px; }
+  .mvg-cheat { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .mvg-cheat th, .mvg-cheat td { padding: 10px 12px; border-bottom: 1px solid var(--color-divider); vertical-align: top; text-align: left; }
+  .mvg-cheat th { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.6; }
+  .mvg-cheat code { white-space: nowrap; }
+  .mvg-next {
+    display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;
+    margin-top: 24px; padding: 18px; background: var(--color-surface); border-radius: var(--radius-md);
+  }
+  .mvg-imgplane { position: relative; }
+  .mvg-imgplane canvas { cursor: default; }
+  @media (max-width: 640px) {
+    .mvg-eyebrow { margin-left: 0; }
+    .mvg-step-head { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-brand" href="{{ '/' | relative_url }}">AI /</a>
+  <a href="{{ '/' | relative_url }}">Home</a>
+  <a href="{{ '/robotics/' | relative_url }}">Robotics</a>
+  <a href="{{ '/multi-view-geometry-projective.html' | relative_url }}">Part 0</a>
+  <a href="{{ '/multi-view-geometry.html' | relative_url }}">Part 1</a>
+  <a href="{{ '/multi-view-geometry-calibration.html' | relative_url }}">Part 2</a>
+  <a href="{{ '/multi-view-geometry-epipolar.html' | relative_url }}">Part 3</a>
+  <a href="{{ '/multi-view-geometry-ransac.html' | relative_url }}">Part 4</a>
+  <a href="{{ '/multi-view-geometry-stereo.html' | relative_url }}">Part 5</a>
+  <a href="{{ '/multi-view-geometry-homography.html' | relative_url }}">Part 6</a>
+  <a href="{{ '/multi-view-geometry-triangulation.html' | relative_url }}">Part 7</a>
+  <a href="{{ '/multi-view-geometry-pnp.html' | relative_url }}">Part 8</a>
+  <a href="{{ '/multi-view-geometry-trifocal.html' | relative_url }}">Part 9</a>
+  <a href="{{ '/multi-view-geometry-sfm.html' | relative_url }}">Part 10</a>
+  <a href="{{ '/multi-view-geometry-sfm-pipelines.html' | relative_url }}" aria-current="page">Part 11</a>
+  <a href="{{ '/multi-view-geometry-beyond.html' | relative_url }}">Part 12</a>
+</nav>
+
+<main>
+<div class="wrap mvg">
+  <section class="page-header">
+    <span class="section-kicker">Interactive guide &middot; Part 11 of 13</span>
+    <h1>Structure-from-Motion Pipelines</h1>
+    <p>PLACEHOLDER-INTRO-PARAGRAPH</p>
+  </section>
+  <div class="stats-rule" style="border-top-color: var(--color-divider); margin-bottom: 8px;"></div>
+
+{% raw %}
+  <!-- TODO(subagent): fill in mvg-step sections here, see spec -->
+{% endraw %}
+
+  <div class="mvg-next">
+    <span>PLACEHOLDER-NEXT-BLURB</span>
+    <a class="btn btn-secondary" href="PLACEHOLDER-NEXT-HREF">PLACEHOLDER-NEXT-LABEL</a>
+  </div>
+</div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="stats-rule"></div>
+    <p style="margin:0;">Have a milestone to add? <a href="https://github.com/DenimPatel/AI">Contribute on GitHub</a>.</p>
+  </div>
+</footer>
+
+{% raw %}
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  function css(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+  var COLOR_TEXT = css('--color-text') || '#201e1d';
+  var COLOR_ACCENT = css('--color-accent') || '#0088b0';
+  var COLOR_ACCENT2 = css('--color-accent-2') || '#d6006c';
+  var COLOR_DIVIDER = css('--color-divider') || 'rgba(32,30,29,0.16)';
+
+  // TODO(subagent): add one IIFE-wrapped block per interactive demo below,
+  // following the pattern used in multi-view-geometry-projective.html and
+  // multi-view-geometry.html (Step 2 / Step 3 demos). Each demo owns its
+  // own canvas/Plotly setup, its own `update()` function wired to its
+  // input elements, and writes into its own #sN-readout div.
+
+})();
+</script>
+{% endraw %}
+</body>
+</html>
