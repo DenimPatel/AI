@@ -1,0 +1,299 @@
+---
+title: "LLM Training, Interactively — Part 10: Evaluation"
+description: How MMLU is actually scored, few-shot prompting as a protocol, LLM-as-judge position bias, Elo/Bradley-Terry arena ratings, and pass@k for code.
+permalink: /llm-training-evaluation.html
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ page.title }} · {{ site.title }}</title>
+<meta name="description" content="{{ page.description }}">
+<link rel="stylesheet" href="{{ '/assets/css/styles.css' | relative_url }}">
+{% include llm-head.html %}
+</head>
+<body>
+
+{% include llm-nav.html %}
+
+<main>
+<div class="wrap llmt">
+  <section class="page-header">
+    <span class="section-kicker">Interactive guide · Part 10 of 12</span>
+    <h1>Evaluation</h1>
+    <p>"OLMo 2 scores 63.7 on MMLU" sounds like a simple fact. It hides several protocol choices — how each answer choice is scored, how many examples the model sees first, who or what is judging open-ended output — each of which can move the number by several points without changing the model at all. This part makes those choices visible.</p>
+  </section>
+  <div class="stats-rule" style="border-top-color: var(--color-divider); margin-bottom: 8px;"></div>
+
+{% raw %}
+  <section class="llmt-step" id="mmlu">
+    <div class="llmt-step-head"><span class="llmt-step-num">1</span><h2>How a multiple-choice benchmark is actually scored</h2></div>
+    <p class="llmt-eyebrow">MMLU-style scoring</p>
+    <p>A base model isn't given "A/B/C/D" as buttons to press — it's a next-token predictor. The standard trick: append each answer choice's <em>text</em> to the question and score the whole continuation's log-likelihood under the model; the highest-scoring choice wins. Two protocol details change results: whether you divide by the answer's token length (<strong>length normalization</strong> — without it, longer correct answers are unfairly penalized just for having more tokens to get exactly right), and whether you show the choices as text (<strong>cloze</strong>) or ask the model to output a letter (<strong>multiple-choice formulation</strong>) — models are often measurably better at one than the other.</p>
+    <div class="llmt-demo" style="flex-direction:column;">
+      <p><b>Q: The capital of Australia is:</b></p>
+      <div id="mmlu-choices"></div>
+      <div class="llmt-btnrow">
+        <button id="mmlu-lennorm" class="llmt-primary">Length normalization: ON</button>
+      </div>
+      <div class="llmt-readout" id="mmlu-readout"></div>
+    </div>
+    <div class="llmt-warn">⚠️ <span><b>Toggle length normalization above</b> and watch the ranked order change — "Canberra" (correct, 3 tokens) loses to "Sydney" (wrong, 1 token) under raw summed log-likelihood, simply because a shorter answer has fewer negative log-probabilities to add up; per-token averaging removes that length bias but isn't automatically "more correct" either — it's a different, also-defensible scoring convention, which is exactly why the same model gets different reported numbers from different eval harnesses.</span></div>
+  </section>
+
+  <section class="llmt-step" id="fewshot">
+    <div class="llmt-step-head"><span class="llmt-step-num">2</span><h2>Few-shot prompting as a protocol</h2></div>
+    <p class="llmt-eyebrow">In-context learning</p>
+    <p>Benchmarks are usually run "k-shot": k solved examples are prepended to the prompt before the real question, purely as context — no gradient update happens. More shots generally help (the model infers the expected answer format and task from the examples) but cost more prompt tokens per question and eventually plateau or even hurt if examples are unrepresentative.</p>
+    <div class="llmt-demo">
+      <div class="llmt-canvas-wrap">
+        <canvas id="fs-canvas" width="480" height="220"></canvas>
+      </div>
+      <div class="llmt-controls">
+        <div class="llmt-field"><label>Shots k <span class="val" id="fs-k-val">3</span></label>
+          <input type="range" id="fs-k" min="0" max="10" step="1" value="3"></div>
+        <div class="llmt-readout" id="fs-readout"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="llmt-step" id="judge">
+    <div class="llmt-step-head"><span class="llmt-step-num">3</span><h2>LLM-as-judge, and its position bias</h2></div>
+    <p class="llmt-eyebrow">Judging open-ended output</p>
+    <p>For tasks without a single correct string (chat quality, helpfulness), it's common to have a strong model judge a pair of responses and pick the better one. A well-documented failure mode: judges are measurably more likely to prefer whichever response is shown <strong>first</strong>, independent of content — <strong>position bias</strong>. Rigorous evals run every pairwise comparison in both orders and check whether the verdict flips.</p>
+    <div class="llmt-demo" style="flex-direction:column;">
+      <div class="llmt-btnrow">
+        <button id="judge-swap" class="llmt-primary">Swap response A/B order</button>
+      </div>
+      <div class="llmt-readout" id="judge-readout"></div>
+    </div>
+  </section>
+
+  <section class="llmt-step" id="arena">
+    <div class="llmt-step-head"><span class="llmt-step-num">4</span><h2>Arena ratings: Elo / Bradley-Terry</h2></div>
+    <p class="llmt-eyebrow">Reusing Part 8's math</p>
+    <p>Human-preference arenas (like Chatbot Arena) collect pairwise "which response was better" votes across many models and convert them into a single ranking with the same Bradley-Terry model from Part 8's reward modeling section: <code>P(A beats B) = σ(s<sub>A</sub> − s<sub>B</sub>)</code>. Feed in a batch of pairwise match results below and watch the fitted scores settle via simple gradient ascent on the same likelihood.</p>
+    <div class="llmt-demo">
+      <div class="llmt-canvas-wrap">
+        <canvas id="arena-canvas" width="440" height="220"></canvas>
+      </div>
+      <div class="llmt-controls">
+        <div class="llmt-btnrow"><button id="arena-more" class="llmt-primary">Simulate 20 more matches</button>
+        <button id="arena-reset">Reset ratings</button></div>
+        <div class="llmt-readout" id="arena-readout"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="llmt-step" id="passk">
+    <div class="llmt-step-head"><span class="llmt-step-num">5</span><h2>pass@k for code</h2></div>
+    <p class="llmt-eyebrow">Unbiased estimation</p>
+    <p>For code, "correct" is checkable by running unit tests, so accuracy is usually reported as pass@k: does at least one of k sampled completions pass? Naively generating exactly k samples and checking is a biased, high-variance estimator; the standard unbiased estimator instead samples <var>n</var> ≥ k completions, counts <var>c</var> correct ones, and computes:</p>
+    <div class="llmt-math llmt-katex">$$\text{pass@}k = 1 - \frac{\binom{n-c}{k}}{\binom{n}{k}}$$</div>
+    <div class="llmt-demo">
+      <div class="llmt-controls" style="flex-basis:100%;">
+        <div class="llmt-grid3">
+          <div class="llmt-field"><label>Samples generated n <span class="val" id="pk-n-val">20</span></label><input type="range" id="pk-n" min="1" max="200" step="1" value="20"></div>
+          <div class="llmt-field"><label>Correct count c <span class="val" id="pk-c-val">4</span></label><input type="range" id="pk-c" min="0" max="200" step="1" value="4"></div>
+          <div class="llmt-field"><label>k <span class="val" id="pk-k-val">1</span></label><input type="range" id="pk-k" min="1" max="50" step="1" value="1"></div>
+        </div>
+        <div class="llmt-readout" id="pk-readout"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="llmt-step" id="pitfalls">
+    <div class="llmt-step-head"><span class="llmt-step-num">6</span><h2>Other ways benchmark numbers mislead</h2></div>
+    <p class="llmt-eyebrow">Named, not demoed</p>
+    <div class="llmt-grid2">
+      <div class="llmt-card"><b>Contamination</b> — if a benchmark's questions (or close paraphrases) leaked into pretraining data, the model may have memorized answers rather than reasoned to them. N-gram overlap checks (Part 4) against known benchmark text are a standard mitigation.</div>
+      <div class="llmt-card"><b>Error bars and variance</b> — a benchmark score from a few hundred questions has real sampling noise; a 1-point difference between two models is often not statistically significant. Ai2 and others increasingly report confidence intervals, not just a point estimate.</div>
+      <div class="llmt-card"><b>Benchmark saturation</b> — once most frontier models score 90%+, a benchmark stops discriminating between them, and remaining errors may just be label noise in the benchmark itself.</div>
+      <div class="llmt-card"><b>OLMES</b> — Ai2's own standardized evaluation suite, built specifically to fix apples-to-oranges comparisons: fixed prompt formats, fixed few-shot counts, and documented scoring conventions per task, so numbers from different papers are actually comparable.</div>
+    </div>
+    <p>See the site's <a href="{{ '/benchmarks.html' | relative_url }}">benchmarks page</a> for how these numbers get tracked over time across the industry.</p>
+  </section>
+
+  <section class="llmt-step" id="refs">
+    <div class="llmt-step-head"><span class="llmt-step-num">📚</span><h2>Further reading</h2></div>
+    <p class="llmt-eyebrow">References</p>
+    <ul class="llmt-refs">
+      <li>Hendrycks et al., <a href="https://arxiv.org/abs/2009.03300">"Measuring Massive Multitask Language Understanding"</a> (2020) — MMLU.</li>
+      <li>Chen et al. (OpenAI), <a href="https://arxiv.org/abs/2107.03374">"Evaluating Large Language Models Trained on Code"</a> (2021) — pass@k's unbiased estimator, HumanEval.</li>
+      <li>Zheng et al., <a href="https://arxiv.org/abs/2306.05685">"Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena"</a> (2023) — position bias.</li>
+      <li>Gu et al. (Ai2), <a href="https://arxiv.org/abs/2406.08446">"OLMES: A Standard for Language Model Evaluations"</a> (2024).</li>
+    </ul>
+  </section>
+{% endraw %}
+
+  <div class="llmt-next">
+    <span>With training and evaluation both covered, the last piece is making sure the deployed model behaves — and fails — safely.</span>
+    <a class="btn btn-secondary" href="{{ '/llm-training-guardrails.html' | relative_url }}">Continue: guardrails, safety & deployment →</a>
+  </div>
+</div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="stats-rule"></div>
+    <p style="margin:0;">Have a milestone to add? <a href="https://github.com/DenimPatel/AI">Contribute on GitHub</a>.</p>
+  </div>
+</footer>
+
+<script src="{{ '/assets/js/llm-guide.js' | relative_url }}"></script>
+{% raw %}
+<script>
+(function(){
+  "use strict";
+  var G = window.LLMG, c = G.colors();
+
+  // ---- MMLU scoring ----
+  (function(){
+    var choices = [
+      {label:'A', text:'Canberra', correct:true, tokLogProbs:[-0.2,-0.15,-0.25]},
+      {label:'B', text:'Sydney', correct:false, tokLogProbs:[-0.5]},
+      {label:'C', text:'Melbourne, the former capital', correct:false, tokLogProbs:[-1.4,-1.6,-1.5,-1.5,-1.5]},
+      {label:'D', text:'Perth', correct:false, tokLogProbs:[-0.7]}
+    ];
+    var lenNorm = true;
+    var container = document.getElementById('mmlu-choices');
+    var readout = document.getElementById('mmlu-readout');
+    var toggle = document.getElementById('mmlu-lennorm');
+
+    function render(){
+      var scored = choices.map(function(ch){
+        var sum = ch.tokLogProbs.reduce(function(a,b){return a+b;},0);
+        var score = lenNorm ? sum/ch.tokLogProbs.length : sum;
+        return {label:ch.label, text:ch.text, correct:ch.correct, score:score};
+      }).sort(function(a,b){return b.score-a.score;});
+      container.innerHTML = '';
+      scored.forEach(function(s,i){
+        var div = document.createElement('div');
+        div.style.padding = '6px 10px'; div.style.marginBottom='4px'; div.style.borderRadius='2px';
+        div.style.background = i===0 ? (s.correct?'var(--color-accent-100)':'var(--color-accent-2-100)') : 'var(--color-bg)';
+        div.innerHTML = '<b>'+s.label+'.</b> '+s.text+' — log-score: '+s.score.toFixed(3) + (i===0?' <b>(top pick)</b>':'') + (s.correct?' ✓ correct answer':'');
+        container.appendChild(div);
+      });
+      readout.innerHTML = '<span class="k">model picks:</span> ' + scored[0].label + (scored[0].correct ? ' <span class="hi">— correct</span>' : ' <span class="bad">— WRONG, correct is A</span>');
+    }
+    toggle.addEventListener('click', function(){
+      lenNorm = !lenNorm;
+      toggle.textContent = 'Length normalization: ' + (lenNorm?'ON':'OFF');
+      render();
+    });
+    render();
+  })();
+
+  // ---- Few-shot ----
+  (function(){
+    var slider = document.getElementById('fs-k'), val = document.getElementById('fs-k-val');
+    var canvas = document.getElementById('fs-canvas'), ctx = canvas.getContext('2d');
+    var readout = document.getElementById('fs-readout');
+    var W = canvas.width, H = canvas.height;
+    function accAt(k){ return 0.35 + 0.5*(1-Math.exp(-k/2.5)) + (k>7? -0.01*(k-7): 0); }
+    function render(){
+      var k = parseInt(slider.value,10);
+      val.textContent = k;
+      var pts = []; for (var i=0;i<=10;i++) pts.push({x:i, y:accAt(i)});
+      var axes = G.drawLines(ctx, W, H, [{points:pts, color:c.accent}], [0,10], [0,1], {xLabel:'shots (k)', yLabel:'accuracy (illustrative curve)'});
+      var mx = axes.px(k), my = axes.py(accAt(k));
+      ctx.fillStyle = c.accent2; ctx.beginPath(); ctx.arc(mx,my,5,0,2*Math.PI); ctx.fill();
+      var promptTokens = 40*k + 20;
+      readout.innerHTML = '<span class="k">shots:</span> '+k+'  <span class="k">≈accuracy:</span> '+(accAt(k)*100).toFixed(0)+'%  <span class="k">prompt overhead:</span> ~'+promptTokens+' tokens/question';
+    }
+    slider.addEventListener('input', render);
+    render();
+  })();
+
+  // ---- Judge position bias ----
+  (function(){
+    var swapBtn = document.getElementById('judge-swap');
+    var readout = document.getElementById('judge-readout');
+    var swapped = false;
+    var responseA = "A thorough, well-organized answer covering the key trade-offs.";
+    var responseB = "A thorough, well-organized answer covering the key trade-offs."; // deliberately near-identical content
+    function render(){
+      var first = swapped ? 'B' : 'A';
+      readout.innerHTML = '<span class="k">shown first:</span> Response ' + first + ' (content of A and B is deliberately near-identical here)<br>' +
+        '<span class="k">judge verdict:</span> <span class="hi">Response ' + first + ' is better</span><br>' +
+        '<span style="opacity:0.6">the verdict tracks presentation order, not content — this is position bias, measured by running every comparison in both orders and checking for exactly this flip</span>';
+    }
+    swapBtn.addEventListener('click', function(){ swapped=!swapped; render(); });
+    render();
+  })();
+
+  // ---- Arena Bradley-Terry ----
+  (function(){
+    var models = ['Model α','Model β','Model γ','Model δ'];
+    var trueSkill = [1.5, 0.8, 0.2, -0.6];
+    var scores = [0,0,0,0];
+    var matchLog = [];
+    var canvas = document.getElementById('arena-canvas'), ctx = canvas.getContext('2d');
+    var readout = document.getElementById('arena-readout');
+    var W = canvas.width, H = canvas.height;
+
+    function sigmoid(x){ return 1/(1+Math.exp(-x)); }
+    function simulate(nMatches){
+      for (var m=0;m<nMatches;m++){
+        var i = Math.floor(Math.random()*4), j = Math.floor(Math.random()*4);
+        if (i===j) continue;
+        var pIwins = sigmoid(trueSkill[i]-trueSkill[j]);
+        var iWon = Math.random() < pIwins;
+        matchLog.push({i:i,j:j,iWon:iWon});
+      }
+    }
+    function fit(){
+      scores = [0,0,0,0];
+      var lr = 0.05;
+      for (var iter=0; iter<300; iter++){
+        var grad = [0,0,0,0];
+        matchLog.forEach(function(mm){
+          var p = sigmoid(scores[mm.i]-scores[mm.j]);
+          var err = (mm.iWon?1:0) - p;
+          grad[mm.i]+=err; grad[mm.j]-=err;
+        });
+        for (var k=0;k<4;k++) scores[k]+=lr*grad[k]/Math.max(1,matchLog.length);
+      }
+    }
+    function render(){
+      fit();
+      var data = models.map(function(name,i){ return {label:name, value: scores[i]+3, valueLabel: scores[i].toFixed(2)}; })
+        .sort(function(a,b){return b.value-a.value;});
+      G.drawBars(ctx, W, H, data, {maxV: Math.max.apply(null, data.map(function(d){return d.value;}))});
+      readout.innerHTML = '<span class="k">matches recorded:</span> '+matchLog.length+'<br><span style="opacity:0.6">fitted scores converge toward the true underlying skill gaps as more matches accumulate — the exact same Bradley-Terry likelihood as Part 8\'s reward model</span>';
+    }
+    document.getElementById('arena-more').addEventListener('click', function(){ simulate(20); render(); });
+    document.getElementById('arena-reset').addEventListener('click', function(){ matchLog=[]; render(); });
+    simulate(20); render();
+  })();
+
+  // ---- pass@k ----
+  (function(){
+    var nS=document.getElementById('pk-n'), cS=document.getElementById('pk-c'), kS=document.getElementById('pk-k');
+    var nV=document.getElementById('pk-n-val'), cV=document.getElementById('pk-c-val'), kV=document.getElementById('pk-k-val');
+    var readout = document.getElementById('pk-readout');
+    function logChoose(n,k){
+      if (k<0||k>n) return -Infinity;
+      var s=0; for (var i=0;i<k;i++) s += Math.log(n-i) - Math.log(i+1);
+      return s;
+    }
+    function render(){
+      var n=+nS.value, c=Math.min(+cS.value,n), k=Math.min(+kS.value,n);
+      cS.max = n;
+      nV.textContent=n; cV.textContent=c; kV.textContent=k;
+      var passK;
+      if (n-c < k) passK = 1;
+      else passK = 1 - Math.exp(logChoose(n-c,k) - logChoose(n,k));
+      readout.innerHTML = '<span class="k">n='+n+', c='+c+', k='+k+'</span><br><span class="k">pass@k:</span> <span class="hi">'+(passK*100).toFixed(1)+'%</span>';
+    }
+    [nS,cS,kS].forEach(function(el){el.addEventListener('input',render);});
+    render();
+  })();
+
+})();
+</script>
+{% endraw %}
+
+</body>
+</html>
