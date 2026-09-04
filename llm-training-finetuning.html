@@ -1,6 +1,6 @@
 ---
-title: "LLM Training, Interactively — Part 4: Supervised Fine-Tuning"
-description: How a base model that just completes text becomes an assistant that follows instructions — instruction-tuning datasets, chat templates, and the loss-masking trick behind supervised fine-tuning (SFT), illustrated with OLMo-Instruct and the Tulu mixture.
+title: "LLM Training, Interactively — Part 7: Supervised Fine-Tuning & PEFT"
+description: How a base model becomes an assistant — chat templates, multi-turn loss masking, LoRA/QLoRA parameter-efficient fine-tuning, and the full-FT vs. LoRA trade-off, illustrated with OLMo-Instruct and the Tulu mixture.
 permalink: /llm-training-finetuning.html
 ---
 <!DOCTYPE html>
@@ -11,105 +11,26 @@ permalink: /llm-training-finetuning.html
 <title>{{ page.title }} · {{ site.title }}</title>
 <meta name="description" content="{{ page.description }}">
 <link rel="stylesheet" href="{{ '/assets/css/styles.css' | relative_url }}">
+{% include llm-head.html %}
 <style>
-  .llmt { max-width: 1180px; }
-  .llmt .page-header { padding-top: clamp(32px, 6vw, 56px); }
-  .llmt-step { padding: 48px 0; border-top: 1px solid var(--color-divider); }
-  .llmt-step:first-of-type { border-top: none; }
-  .llmt-step-num {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 30px; height: 30px; border-radius: 50%; background: var(--color-text); color: var(--color-bg);
-    font-family: var(--font-heading); font-weight: 600; font-size: 14px; flex: 0 0 auto;
-  }
-  .llmt-step-head { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
-  .llmt-step-head h2 { margin: 0; font-size: clamp(22px, 3vw, 28px); }
-  .llmt-eyebrow {
-    font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
-    color: var(--color-accent-700); margin: 0 0 4px 42px;
-  }
-  .llmt-goal {
-    display: flex; gap: 10px; margin: 16px 0 20px; padding: 12px 14px;
-    background: var(--color-accent-100); border-left: 3px solid var(--color-accent);
-    border-radius: var(--radius-sm); font-size: 14px; line-height: 1.55;
-  }
-  .llmt-goal b { color: var(--color-accent-800); }
-  .llmt-warn {
-    display: flex; gap: 10px; margin: 16px 0 20px; padding: 12px 14px;
-    background: var(--color-accent-2-100); border-left: 3px solid var(--color-accent-2);
-    border-radius: var(--radius-sm); font-size: 14px; line-height: 1.55;
-  }
-  .llmt-warn b { color: var(--color-accent-2-800); }
-  .llmt-math {
-    font-family: var(--font-mono); font-size: 13.5px; background: var(--color-surface);
-    padding: 12px 14px; border-radius: var(--radius-sm); overflow-x: auto; margin: 0 0 16px;
-    line-height: 1.7;
-  }
-  .llmt-demo {
-    display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;
-    background: var(--color-surface); border-radius: var(--radius-md); padding: 18px;
-    margin-top: 8px;
-  }
-  .llmt-canvas-wrap { flex: 1 1 380px; min-width: 280px; }
-  .llmt-canvas-hint { font-size: 11px; opacity: 0.6; margin-top: 6px; }
-  .llmt-controls { flex: 1 1 260px; min-width: 240px; font-size: 13.5px; }
-  .llmt-field { margin-bottom: 14px; }
-  .llmt-field label { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 12.5px; color: color-mix(in srgb, var(--color-text) 70%, transparent); }
-  .llmt-field select, .llmt-field input[type=text] {
-    width: 100%; font-family: var(--font-body); font-size: 13.5px; padding: 8px 10px;
-    border-radius: var(--radius-sm); border: 1px solid var(--color-divider); background: var(--color-bg); color: var(--color-text);
-  }
-  .llmt-btnrow { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 14px; }
-  .llmt-btnrow button {
-    font-family: var(--font-heading); font-weight: 600; font-size: 13px; cursor: pointer;
-    border: 1px solid var(--color-divider); background: var(--color-bg); color: var(--color-text);
-    padding: 7px 13px; border-radius: var(--radius-md);
-  }
-  .llmt-btnrow button:hover { background: color-mix(in srgb, var(--color-text) 6%, transparent); }
-  .llmt-btnrow button.llmt-primary { background: var(--color-accent); color: #fff; border-color: var(--color-accent); }
-  .llmt-readout { font-family: var(--font-mono); font-size: 12.5px; line-height: 1.85; background: var(--color-bg); border-radius: var(--radius-sm); padding: 10px 12px; }
-  .llmt-readout .k { opacity: 0.6; }
-  .llmt-readout .hi { color: var(--color-accent-700); font-weight: 600; }
   .llmt-completion { font-family: var(--font-mono); font-size: 13px; background: var(--color-bg); border-radius: var(--radius-sm); padding: 12px 14px; line-height: 1.7; white-space: pre-wrap; }
   .llmt-completion .label { display:block; font-size:10.5px; letter-spacing:0.06em; text-transform:uppercase; opacity:0.6; margin-bottom:4px; }
   .llmt-tplbox { font-family: var(--font-mono); font-size: 12.5px; background: var(--color-bg); border-radius: var(--radius-sm); padding: 12px 14px; line-height: 2; white-space: pre-wrap; word-break: break-word; }
   .llmt-tok-masked { opacity: 0.35; }
   .llmt-tok-trained { background: var(--color-accent-100); color: var(--color-accent-800); border-radius: 3px; padding: 0 2px; }
   .llmt-special { color: var(--color-accent-2-700); font-weight: 600; }
-  .llmt-cheat { width: 100%; border-collapse: collapse; font-size: 13.5px; }
-  .llmt-cheat th, .llmt-cheat td { padding: 10px 12px; border-bottom: 1px solid var(--color-divider); vertical-align: top; text-align: left; }
-  .llmt-cheat th { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.6; }
-  .llmt-refs { font-size: 13.5px; line-height: 1.9; }
-  .llmt-refs li { margin-bottom: 2px; }
-  .llmt-next {
-    display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;
-    margin-top: 24px; padding: 18px; background: var(--color-surface); border-radius: var(--radius-md);
-  }
-  @media (max-width: 640px) {
-    .llmt-eyebrow { margin-left: 0; }
-    .llmt-step-head { flex-wrap: wrap; }
-  }
 </style>
 </head>
 <body>
 
-<nav class="nav">
-  <a class="nav-brand" href="{{ '/' | relative_url }}">AI /</a>
-  <a href="{{ '/' | relative_url }}">Home</a>
-  <a href="{{ '/robotics/' | relative_url }}">Robotics</a>
-  <a href="{{ '/llm-training.html' | relative_url }}">Part 1</a>
-  <a href="{{ '/llm-training-data.html' | relative_url }}">Part 2</a>
-  <a href="{{ '/llm-training-pretraining.html' | relative_url }}">Part 3</a>
-  <a href="{{ '/llm-training-finetuning.html' | relative_url }}">Part 4</a>
-  <a href="{{ '/llm-training-rlhf.html' | relative_url }}">Part 5</a>
-  <a href="{{ '/llm-training-guardrails.html' | relative_url }}">Part 6</a>
-</nav>
+{% include llm-nav.html %}
 
 <main>
 <div class="wrap llmt">
   <section class="page-header">
-    <span class="section-kicker">Interactive guide · Part 4 of 6</span>
-    <h1>Supervised fine-tuning: teaching it to be an assistant</h1>
-    <p>A base model straight out of pretraining is a very good <em>text completer</em>, not an assistant. Ask it a question and it may just continue the pattern — writing more questions, or drifting into unrelated text — because that's the most statistically plausible continuation of internet-style text. <strong>Supervised fine-tuning (SFT)</strong> is the (comparatively small, but behaviorally huge) second training stage that reshapes this into "answer directly, follow instructions, stop when done."</p>
+    <span class="section-kicker">Interactive guide · Part 7 of 12</span>
+    <h1>Supervised Fine-Tuning &amp; PEFT</h1>
+    <p>A base model straight out of pretraining is a very good <em>text completer</em>, not an assistant. Ask it a question and it may just continue the pattern — writing more questions, or drifting into unrelated text — because that's the most statistically plausible continuation of internet-style text. <strong>Supervised fine-tuning (SFT)</strong> is the (comparatively small, but behaviorally huge) second training stage that reshapes this into "answer directly, follow instructions, stop when done." This part also covers how to do that fine-tuning cheaply, with LoRA.</p>
   </section>
   <div class="stats-rule" style="border-top-color: var(--color-divider); margin-bottom: 8px;"></div>
 
@@ -117,7 +38,7 @@ permalink: /llm-training-finetuning.html
   <section class="llmt-step" id="behavior">
     <div class="llmt-step-head"><span class="llmt-step-num">1</span><h2>Base model vs. instruction-tuned model</h2></div>
     <p class="llmt-eyebrow">The behavior shift</p>
-    <p>Same prompt, same underlying knowledge from pretraining — very different behavior after SFT. These example completions are illustrative (written for this page, not sampled from a live model), but they show the qualitative shift accurately: a base model treats your prompt as the start of a document; an instruction-tuned model treats it as a request to fulfill.</p>
+    <p>Same prompt, same underlying knowledge from pretraining — very different behavior after SFT. These example completions are illustrative (written for this page, not sampled from a live model), but they show the qualitative shift accurately.</p>
     <div class="llmt-demo">
       <div class="llmt-controls" style="flex-basis:100%;">
         <div class="llmt-field"><label>Prompt</label>
@@ -139,46 +60,67 @@ permalink: /llm-training-finetuning.html
   </section>
 
   <section class="llmt-step" id="data">
-    <div class="llmt-step-head"><span class="llmt-step-num">2</span><h2>Instruction-tuning data</h2></div>
+    <div class="llmt-step-head"><span class="llmt-step-num">2</span><h2>Instruction-tuning data: curation, synthesis, and distillation</h2></div>
     <p class="llmt-eyebrow">What SFT trains on</p>
-    <p>SFT data is a curated set of (prompt, response) pairs — ideally covering a wide range of task types (question answering, summarization, code, creative writing, multi-turn conversation) and response styles (concise, detailed, step-by-step). For OLMo, Ai2 uses and publishes the <strong>Tulu</strong> mixture: a combination of human-written examples, carefully filtered existing instruction datasets, and synthetically generated examples, again released with the exact recipe rather than just a description of it.</p>
+    <p>SFT data is a curated set of (prompt, response) pairs — ideally covering a wide range of task types and response styles. For OLMo, Ai2 uses and publishes the <strong>Tulu</strong> mixture: a combination of human-written examples, carefully filtered existing instruction datasets, and synthetically generated examples — a real mix of curation and <strong>distillation</strong> (generating training examples from a stronger existing model's outputs, then filtering the results), rather than either alone.</p>
     <div class="llmt-warn">⚠️ <span><b>Quality over quantity:</b> unlike pretraining, SFT data is measured in thousands to low millions of examples, not trillions of tokens — and the field's own research (including Ai2's) has repeatedly found that a smaller, carefully curated instruction set often outperforms a much larger, noisier one. Bad SFT examples (wrong answers, inconsistent formatting, sycophantic tone) get imitated just as readily as good ones.</span></div>
+    <p>SFT hyperparameters reflect this: learning rates are typically <strong>~100× smaller</strong> than peak pretraining rates (the model is already good at language; SFT should nudge, not overwrite), and training usually runs only 2–3 epochs over the data, since with so few examples relative to pretraining, more epochs risks the overfitting-to-surface-patterns problem below.</p>
   </section>
 
   <section class="llmt-step" id="template">
-    <div class="llmt-step-head"><span class="llmt-step-num">3</span><h2>Chat templates: turning a conversation into one token sequence</h2></div>
+    <div class="llmt-step-head"><span class="llmt-step-num">3</span><h2>Chat templates and multi-turn masking</h2></div>
     <p class="llmt-eyebrow">Mechanics</p>
-    <p>A multi-turn conversation has to be serialized into a single flat token sequence the model can be trained on, using special tokens to mark role boundaries (exact tokens vary by model family — this shows a representative style). Build a tiny conversation below and see it formatted:</p>
+    <p>A multi-turn conversation has to be serialized into a single flat token sequence, using special tokens to mark role boundaries (exact tokens vary by model family). SFT reuses the exact cross-entropy loss from Part 5 — the only change is <strong>which tokens count toward it</strong>: loss is masked on the system prompt and every user turn, and computed only on assistant-response tokens, across however many turns the conversation has.</p>
+    <div class="llmt-math llmt-katex">$$L = -\frac{1}{|R|}\sum_{t \in R} \log P_\theta(x_t \mid x_{<t}), \qquad R = \text{response-token positions across all turns}$$</div>
+    <p>Build a small multi-turn conversation below and see it formatted, with the mask applied per turn:</p>
     <div class="llmt-demo">
       <div class="llmt-controls" style="flex-basis:100%; display:flex; gap:16px; flex-wrap:wrap;">
         <div class="llmt-field" style="flex:1 1 260px;"><label>System prompt</label><input type="text" id="s2-sys" value="You are a concise, helpful assistant."></div>
-        <div class="llmt-field" style="flex:1 1 260px;"><label>User message</label><input type="text" id="s2-user" value="What is the capital of France?"></div>
-        <div class="llmt-field" style="flex:1 1 260px;"><label>Assistant response</label><input type="text" id="s2-asst" value="The capital of France is Paris."></div>
+        <div class="llmt-field" style="flex:1 1 260px;"><label>User turn 1</label><input type="text" id="s2-user1" value="What is the capital of France?"></div>
+        <div class="llmt-field" style="flex:1 1 260px;"><label>Assistant turn 1</label><input type="text" id="s2-asst1" value="The capital of France is Paris."></div>
+        <div class="llmt-field" style="flex:1 1 260px;"><label>User turn 2</label><input type="text" id="s2-user2" value="What's its population?"></div>
+        <div class="llmt-field" style="flex:1 1 260px;"><label>Assistant turn 2</label><input type="text" id="s2-asst2" value="Roughly 2.1 million in the city proper."></div>
       </div>
       <div class="llmt-canvas-wrap" style="flex-basis:100%;">
-        <div class="llmt-tplbox" id="s2-out"></div>
+        <div class="llmt-tplbox" id="s3-out"></div>
+        <p class="llmt-canvas-hint"><span class="llmt-tok-trained">highlighted</span> = contributes to the SFT loss (response tokens, both turns). Faded = present in the sequence, masked out of the loss.</p>
       </div>
     </div>
   </section>
 
-  <section class="llmt-step" id="masking">
-    <div class="llmt-step-head"><span class="llmt-step-num">4</span><h2>The SFT loss: only score the response</h2></div>
-    <p class="llmt-eyebrow">Mechanics</p>
-    <p>SFT reuses the exact same cross-entropy loss from Part 3 — the only change is <strong>which tokens count toward it</strong>. Loss is masked (excluded) on the system prompt and user turn, and computed only on the assistant's response tokens, so the model is only ever penalized for generating a bad <em>response</em>, never for "failing to predict" the user's own message (which it isn't supposed to generate anyway).</p>
-    <div class="llmt-math">L = − (1/|R|) &sum;&#8348;&#8712;R log P&#952;(x&#8348; | x&lt;&#8348;)&nbsp;&nbsp;&nbsp;R = the set of response-token positions only</div>
-    <p>Toggle the mask below over the same conversation to see which tokens the loss actually touches:</p>
+  <section class="llmt-step" id="lora">
+    <div class="llmt-step-head"><span class="llmt-step-num">4</span><h2>LoRA: fine-tuning without touching most of the weights</h2></div>
+    <p class="llmt-eyebrow">Parameter-efficient fine-tuning</p>
+    <p>Full fine-tuning updates every one of a model's weight matrices, which for a 7B+ model means storing optimizer state for billions of parameters — expensive, and every fine-tune produces a full-size copy of the model. <strong>LoRA (Low-Rank Adaptation)</strong> instead freezes the original weight matrix <var>W</var> entirely and learns a small additive update as a product of two thin matrices, $\Delta W = BA$, where <var>B</var> is <var>d×r</var> and <var>A</var> is <var>r×d</var> for a small rank <var>r</var> (often 8–64) — far fewer trainable parameters than <var>d×d</var>.</p>
+    <div class="llmt-math llmt-katex">$$W' = W + BA, \qquad \text{trainable params} = r(d_{in}+d_{out}) \ll d_{in} d_{out}$$</div>
+    <p>Below, a toy 8×8 weight matrix has a "true" full-fine-tune update it would need to learn (a fixed, moderately complex target). Drag the rank slider and watch LoRA's <var>B·A</var> approximate it via real gradient descent — trainable-parameter count and reconstruction error both update live.</p>
     <div class="llmt-demo">
-      <div class="llmt-canvas-wrap" style="flex-basis:100%;">
-        <div class="llmt-tplbox" id="s3-out"></div>
-        <p class="llmt-canvas-hint"><span class="llmt-tok-trained">highlighted</span> = contributes to the SFT loss (response tokens). Faded = present in the sequence, but masked out of the loss.</p>
+      <div class="llmt-canvas-wrap">
+        <canvas id="lora-canvas" width="420" height="220"></canvas>
       </div>
+      <div class="llmt-controls">
+        <div class="llmt-field"><label>LoRA rank r <span class="val" id="lora-r-val">2</span></label><input type="range" id="lora-r" min="1" max="8" step="1" value="2"></div>
+        <div class="llmt-readout" id="lora-readout"></div>
+      </div>
+    </div>
+    <p><strong>QLoRA</strong> layers one more idea on top: keep the frozen base weights <var>W</var> quantized to 4 bits (Part 11 covers quantization) while the small LoRA matrices train in higher precision — cutting base-model memory further, at the cost of a little extra quantization error on top of LoRA's own approximation error.</p>
+    <div style="overflow-x:auto; margin-top:14px;">
+    <table class="llmt-cheat">
+      <thead><tr><th></th><th>Full fine-tuning</th><th>LoRA</th><th>QLoRA</th></tr></thead>
+      <tbody>
+        <tr><td>Trainable params (7B model, typical)</td><td>~7B (100%)</td><td>~0.1–1%</td><td>~0.1–1%</td></tr>
+        <tr><td>Base weights</td><td>Updated directly</td><td>Frozen, bf16</td><td>Frozen, 4-bit</td></tr>
+        <tr><td>Optimizer memory</td><td>Full AdamW state over all params</td><td>Only over LoRA matrices</td><td>Only over LoRA matrices</td></tr>
+        <tr><td>Output artifact</td><td>A new full-size model copy</td><td>A small adapter file (MBs) on top of the base</td><td>A small adapter file on top of the quantized base</td></tr>
+      </tbody>
+    </table>
     </div>
   </section>
 
   <section class="llmt-step" id="limits">
-    <div class="llmt-step-head"><span class="llmt-step-num">5</span><h2>What SFT changes — and what it doesn't</h2></div>
+    <div class="llmt-step-head"><span class="llmt-step-num">5</span><h2>What SFT changes, and the risk of forgetting</h2></div>
     <p class="llmt-eyebrow">Scope</p>
-    <p>SFT is comparatively cheap and fast next to pretraining, and its effect is mostly on <em>behavior and format</em>, not on the underlying knowledge the model has — that was set during pretraining, on vastly more data. Over-training on a narrow SFT set can cause the model to overfit to surface patterns in that set (a fixed response length, a signature phrase, refusing things the SFT data happened to refuse) rather than genuinely generalizing "be helpful." This is also why SFT alone isn't the last stage: it teaches format and directness, but it doesn't have a principled way to say "this response is better than that one" for cases with no single correct answer — which is exactly the gap the next stage, alignment, is built to close.</p>
+    <p>SFT's effect is mostly on <em>behavior and format</em>, not the underlying knowledge set during pretraining on vastly more data. Two related risks: over-training on a narrow SFT set can cause the model to overfit to surface patterns (a fixed response length, a signature phrase); and fine-tuning too aggressively on a narrow domain can cause <strong>catastrophic forgetting</strong>, where capabilities the base model had — general knowledge, other task types — measurably degrade, sometimes called the <strong>alignment tax</strong> when the specific capability lost is general-purpose quality traded for narrower instruction-following. LoRA's frozen base weights are one structural mitigation: since most of the network is literally untouched, broad pretrained knowledge is mechanically harder to overwrite than with full fine-tuning.</p>
   </section>
 
   <section class="llmt-step" id="cheatsheet">
@@ -190,8 +132,9 @@ permalink: /llm-training-finetuning.html
       <tbody>
         <tr><td>Objective</td><td>Predict next token, everywhere</td><td>Predict next token, only on response spans</td></tr>
         <tr><td>Data scale</td><td>Trillions of tokens</td><td>Thousands–millions of examples</td></tr>
-        <tr><td>Data shape</td><td>Raw / lightly filtered text</td><td>Curated (prompt, response) pairs</td></tr>
+        <tr><td>Learning rate</td><td>Peak ~1e-3 to 1e-4 scale</td><td>~100× smaller</td></tr>
         <tr><td>What it teaches</td><td>Language, facts, world knowledge</td><td>Format, directness, instruction-following behavior</td></tr>
+        <tr><td>LoRA</td><td>—</td><td>Freezes base weights, trains a low-rank BA update instead</td></tr>
       </tbody>
     </table>
     </div>
@@ -201,17 +144,17 @@ permalink: /llm-training-finetuning.html
     <div class="llmt-step-head"><span class="llmt-step-num">📚</span><h2>Further reading</h2></div>
     <p class="llmt-eyebrow">References</p>
     <ul class="llmt-refs">
-      <li>Ouyang et al., <a href="https://arxiv.org/abs/2203.02155">"Training Language Models to Follow Instructions with Human Feedback"</a> (InstructGPT, 2022) — SFT + RLHF pipeline.</li>
-      <li>Wang et al., <a href="https://arxiv.org/abs/2306.04751">"How Far Can Camels Go? Exploring the State of Instruction Tuning on Open Resources"</a> (Tulu, 2023).</li>
-      <li>Wei et al., <a href="https://arxiv.org/abs/2109.01652">"Finetuned Language Models Are Zero-Shot Learners"</a> (FLAN, 2021).</li>
-      <li><a href="https://allenai.org/olmo">Ai2's OLMo project page</a> — OLMo-Instruct models and the Tulu SFT mixture.</li>
+      <li>Ouyang et al., <a href="https://arxiv.org/abs/2203.02155">"Training Language Models to Follow Instructions with Human Feedback"</a> (InstructGPT, 2022).</li>
+      <li>Hu et al., <a href="https://arxiv.org/abs/2106.09685">"LoRA: Low-Rank Adaptation of Large Language Models"</a> (2021).</li>
+      <li>Dettmers et al., <a href="https://arxiv.org/abs/2305.14314">"QLoRA: Efficient Finetuning of Quantized LLMs"</a> (2023).</li>
+      <li>Lambert et al. (Ai2), <a href="https://arxiv.org/abs/2411.15124">"Tulu 3"</a> (2024) — SFT data mixture and recipe.</li>
     </ul>
   </section>
 {% endraw %}
 
   <div class="llmt-next">
     <span>SFT teaches format, but not which of two reasonable responses is actually better. That comparative judgment is what alignment — RLHF and DPO — is built to train on.</span>
-    <a class="btn btn-secondary" href="{{ '/llm-training-rlhf.html' | relative_url }}">Continue: RLHF and DPO →</a>
+    <a class="btn btn-secondary" href="{{ '/llm-training-rlhf.html' | relative_url }}">Continue: alignment, RLHF &amp; DPO →</a>
   </div>
 </div>
 </main>
@@ -223,28 +166,21 @@ permalink: /llm-training-finetuning.html
   </div>
 </footer>
 
+<script src="{{ '/assets/js/llm-guide.js' | relative_url }}"></script>
 {% raw %}
 <script>
 (function(){
   "use strict";
+  var G = window.LLMG, c = G.colors();
 
   // ---- Step 1: base vs SFT completions ----
   (function(){
     var sel = document.getElementById('s1-prompt');
     var baseEl = document.getElementById('s1-base'), sftEl = document.getElementById('s1-sft');
     var examples = [
-      {
-        base: 'What is the capital of France? What is the capital of Germany? What is the capital of Spain? These are common questions on middle-school geography worksheets, often paired with...',
-        sft: 'The capital of France is Paris.'
-      },
-      {
-        base: 'Write a one-sentence summary of photosynthesis. Write a one-paragraph summary of cellular respiration. Write a lab report outline for...',
-        sft: 'Photosynthesis is the process by which plants use sunlight, water, and carbon dioxide to produce glucose and oxygen.'
-      },
-      {
-        base: 'List three uses for a paperclip. List five uses for a rubber band. List ten household items that can be repurposed as tools, useful for a classroom brainstorming activity on...',
-        sft: '1. Holding papers together\n2. Straightening to pick a small lock or reset button\n3. Bending into a small hook or stand'
-      }
+      { base: 'What is the capital of France? What is the capital of Germany? What is the capital of Spain? These are common questions on middle-school geography worksheets, often paired with...', sft: 'The capital of France is Paris.' },
+      { base: 'Write a one-sentence summary of photosynthesis. Write a one-paragraph summary of cellular respiration. Write a lab report outline for...', sft: 'Photosynthesis is the process by which plants use sunlight, water, and carbon dioxide to produce glucose and oxygen.' },
+      { base: 'List three uses for a paperclip. List five uses for a rubber band. List ten household items that can be repurposed as tools, useful for a classroom brainstorming activity on...', sft: '1. Holding papers together\n2. Straightening to pick a small lock or reset button\n3. Bending into a small hook or stand' }
     ];
     function render(){
       var ex = examples[parseInt(sel.value,10)];
@@ -255,31 +191,90 @@ permalink: /llm-training-finetuning.html
     render();
   })();
 
-  // ---- Steps 2 & 3: chat template + loss masking ----
+  // ---- Step 3: multi-turn chat template + masking ----
   (function(){
-    var sysEl = document.getElementById('s2-sys'), userEl = document.getElementById('s2-user'), asstEl = document.getElementById('s2-asst');
-    var outEl = document.getElementById('s2-out'), maskEl = document.getElementById('s3-out');
-
+    var ids = ['s2-sys','s2-user1','s2-asst1','s2-user2','s2-asst2'];
+    var els = {}; ids.forEach(function(id){ els[id]=document.getElementById(id); });
+    var maskEl = document.getElementById('s3-out');
     function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    function render(){
+      var sys=esc(els['s2-sys'].value), u1=esc(els['s2-user1'].value), a1=esc(els['s2-asst1'].value),
+          u2=esc(els['s2-user2'].value), a2=esc(els['s2-asst2'].value);
+      var html =
+        '<span class="llmt-tok-masked"><span class="llmt-special">&lt;|system|&gt;</span>\n'+sys+'\n'+
+        '<span class="llmt-special">&lt;|user|&gt;</span>\n'+u1+'\n'+
+        '<span class="llmt-special">&lt;|assistant|&gt;</span>\n</span>'+
+        '<span class="llmt-tok-trained">'+a1+'\n<span class="llmt-special">&lt;|end|&gt;</span></span>\n'+
+        '<span class="llmt-tok-masked"><span class="llmt-special">&lt;|user|&gt;</span>\n'+u2+'\n'+
+        '<span class="llmt-special">&lt;|assistant|&gt;</span>\n</span>'+
+        '<span class="llmt-tok-trained">'+a2+'\n<span class="llmt-special">&lt;|end|&gt;</span></span>';
+      maskEl.innerHTML = html;
+    }
+    ids.forEach(function(id){ els[id].addEventListener('input', render); });
+    render();
+  })();
+
+  // ---- Step 4: LoRA visualizer ----
+  (function(){
+    var d = 8;
+    var rng = G.seededRandom(99);
+    // "true" target update a full fine-tune would learn: rank-3 structure + small noise
+    var U0 = G.randMatrix(d,3,rng,0.6), V0 = G.randMatrix(3,d,rng,0.6);
+    var trueDelta = G.matmul(U0, V0);
+    var noise = G.randMatrix(d,d,rng,0.05);
+    trueDelta = trueDelta.map(function(row,i){ return row.map(function(v,j){ return v+noise[i][j]; }); });
+
+    var slider = document.getElementById('lora-r'), val = document.getElementById('lora-r-val');
+    var canvas = document.getElementById('lora-canvas'), ctx = canvas.getContext('2d');
+    var readout = document.getElementById('lora-readout');
+    var W = canvas.width, H = canvas.height;
+
+    function frob(M){ var s=0; M.forEach(function(row){row.forEach(function(v){s+=v*v;});}); return Math.sqrt(s); }
+
+    function trainLora(r){
+      var rng2 = G.seededRandom(7+r);
+      var B = G.randMatrix(d,r,rng2,0.3), A = G.randMatrix(r,d,rng2,0.3);
+      var lr = 0.05;
+      for (var iter=0; iter<400; iter++){
+        var BA = G.matmul(B,A);
+        var err = BA.map(function(row,i){ return row.map(function(v,j){ return v-trueDelta[i][j]; }); });
+        // gradients: dL/dB = err * A^T, dL/dA = B^T * err
+        var gB = G.matmul(err, G.transpose(A));
+        var gA = G.matmul(G.transpose(B), err);
+        for (var i=0;i<d;i++) for (var k=0;k<r;k++) B[i][k] -= lr*gB[i][k]/d;
+        for (var k2=0;k2<r;k2++) for (var j=0;j<d;j++) A[k2][j] -= lr*gA[k2][j]/d;
+      }
+      return G.matmul(B,A);
+    }
+
+    function drawMat(x0,y0,size,M,label){
+      var flat=[].concat.apply([],M);
+      var mx = Math.max.apply(null, flat.map(Math.abs)) || 1;
+      var cell = size/d;
+      M.forEach(function(row,i){ row.forEach(function(v,j){
+        var t = (v/mx+1)/2;
+        ctx.fillStyle = 'color-mix(in srgb, '+c.accent+' '+Math.round(t*100)+'%, '+c.accent2+')';
+        ctx.fillRect(x0+j*cell, y0+i*cell, cell-1, cell-1);
+      });});
+      ctx.fillStyle=c.text; ctx.font='11px '+c.font; ctx.textAlign='center';
+      ctx.fillText(label, x0+size/2, y0-6);
+      ctx.textAlign='left';
+    }
 
     function render(){
-      var sys = esc(sysEl.value), user = esc(userEl.value), asst = esc(asstEl.value);
-      var plain =
-        '<span class="llmt-special">&lt;|system|&gt;</span>\n' + sys + '\n' +
-        '<span class="llmt-special">&lt;|user|&gt;</span>\n' + user + '\n' +
-        '<span class="llmt-special">&lt;|assistant|&gt;</span>\n' + asst + '\n' +
-        '<span class="llmt-special">&lt;|end|&gt;</span>';
-      outEl.innerHTML = plain;
-
-      var masked =
-        '<span class="llmt-tok-masked"><span class="llmt-special">&lt;|system|&gt;</span>\n' + sys + '\n' +
-        '<span class="llmt-special">&lt;|user|&gt;</span>\n' + user + '\n' +
-        '<span class="llmt-special">&lt;|assistant|&gt;</span>\n</span>' +
-        '<span class="llmt-tok-trained">' + asst + '</span>\n' +
-        '<span class="llmt-tok-trained"><span class="llmt-special">&lt;|end|&gt;</span></span>';
-      maskEl.innerHTML = masked;
+      var r = parseInt(slider.value,10);
+      val.textContent = r;
+      var approx = trainLora(r);
+      var err = approx.map(function(row,i){ return row.map(function(v,j){ return v-trueDelta[i][j]; }); });
+      var relErr = frob(err)/frob(trueDelta);
+      ctx.clearRect(0,0,W,H);
+      drawMat(20,30,160,trueDelta,'ΔW (full fine-tune)');
+      drawMat(220,30,160,approx,'B·A (rank '+r+')');
+      var trainableParams = r*d*2;
+      readout.innerHTML = '<span class="k">trainable params:</span> <span class="hi">'+trainableParams+'</span> of '+(d*d)+' full ('+(100*trainableParams/(d*d)).toFixed(1)+'%)<br>' +
+        '<span class="k">reconstruction error (relative Frobenius norm):</span> '+relErr.toFixed(3);
     }
-    [sysEl,userEl,asstEl].forEach(function(el){ el.addEventListener('input', render); });
+    slider.addEventListener('input', render);
     render();
   })();
 
