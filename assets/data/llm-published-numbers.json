@@ -1,0 +1,51 @@
+{
+  "dolma_v1_6_mix": {
+    "source": "Dolma v1.6 composition, as reported by Ai2 (Soldaini et al., \"Dolma: an Open Corpus of Three Trillion Tokens for Language Model Pretraining Research\", arXiv:2402.00159; allenai/dolma dataset card).",
+    "unit": "% of tokens",
+    "sources": [
+      { "name": "Common Crawl (web)", "pct": 74.6 },
+      { "name": "The Stack (code)", "pct": 13.4 },
+      { "name": "C4 (web)", "pct": 6.5 },
+      { "name": "Reddit", "pct": 2.9 },
+      { "name": "PeS2o (S2ORC papers)", "pct": 2.3 },
+      { "name": "Project Gutenberg (books)", "pct": 0.2 },
+      { "name": "Wikipedia + Wikibooks", "pct": 0.1 }
+    ],
+    "total_tokens_v1": "~3 trillion tokens (Dolma v1.0), ~11 TB after curation from ~200 TB raw"
+  },
+  "olmo2_7b_config": {
+    "source": "OLMo 2 Team (Ai2), \"2 OLMo 2 Furious\", arXiv:2501.00656; allenai/OLMo-2-1124-7B config.json.",
+    "d_model": 4096,
+    "n_layers": 32,
+    "n_heads": 32,
+    "n_kv_heads": 32,
+    "ffn_hidden": 11008,
+    "vocab_size": 100278,
+    "context_length": 4096,
+    "activation": "SwiGLU",
+    "norm": "RMSNorm, reordered to post-norm placement inside each sub-block (a change from OLMo 1's pre-norm)",
+    "positional": "RoPE",
+    "tied_embeddings": false,
+    "notes": "OLMo 2 also adds QK-norm (RMSNorm on queries/keys before the attention dot product) and a z-loss auxiliary term for training stability."
+  },
+  "olmoe_config": {
+    "source": "Muennighoff et al. (Ai2), \"OLMoE: Open Mixture-of-Experts Language Models\", arXiv:2409.02060.",
+    "total_params_b": 6.9,
+    "active_params_b": 1.3,
+    "experts_per_layer": 64,
+    "active_experts_per_token": 8,
+    "num_moe_layers": 16,
+    "routing": "top-k token-choice routing, k=8 of 64, with a load-balancing auxiliary loss"
+  },
+  "tulu3_recipe": {
+    "source": "Lambert et al. (Ai2), \"Tulu 3: Pushing Frontiers in Open Language Model Post-Training\", arXiv:2411.15124; Ai2 Tulu 3.1 release notes.",
+    "stages": ["Supervised fine-tuning (SFT) on a curated persona-driven + skill-specific data mix", "DPO on curated on-policy preference data (Tulu 3 completions vs. other model outputs, judged and ranked)", "RLVR (Reinforcement Learning with Verifiable Rewards) on math, precise instruction-following, and other automatically-checkable tasks"],
+    "rl_algorithm_change": "Tulu 3 (Nov 2024) used PPO for its RLVR stage with a learned value model; Tulu 3.1 switched RLVR to GRPO (no value/critic model, group-relative advantages), which the Ai2 team reported improved results and reduced compute per step."
+  },
+  "chinchilla": {
+    "source": "Hoffmann et al. (DeepMind), \"Training Compute-Optimal Large Language Models\", arXiv:2203.15556.",
+    "compute_formula": "C ≈ 6ND (N = non-embedding parameters, D = training tokens, C in FLOPs)",
+    "compute_optimal_ratio": "~20 tokens per parameter at compute-optimal allocation (the paper's fitted approach 3 exponents give N ∝ C^0.49, D ∝ C^0.51)",
+    "note": "Production models (including OLMo, Llama 3, etc.) commonly train well past the compute-optimal point — i.e. more tokens per parameter than 20:1 — because the extra pretraining compute is repaid many times over in cheaper inference at a fixed, smaller parameter count."
+  }
+}

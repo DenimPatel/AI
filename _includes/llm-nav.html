@@ -1,0 +1,8 @@
+<nav class="nav">
+  <a class="nav-brand" href="{{ '/' | relative_url }}">AI /</a>
+  <a href="{{ '/' | relative_url }}">Home</a>
+  <a href="{{ '/robotics/' | relative_url }}">Robotics</a>
+  <a href="{{ '/llm-training-index.html' | relative_url }}">Guide</a>
+  {% for part in site.data.llm_series %}<a href="{{ part.permalink | relative_url }}"{% if page.permalink == part.permalink %} aria-current="page"{% endif %}>{{ part.short }}</a>
+  {% endfor %}
+</nav>
