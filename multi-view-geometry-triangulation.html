@@ -120,7 +120,7 @@ permalink: /multi-view-geometry-triangulation.html
   <section class="mvg-step" id="posefromE">
     <div class="mvg-step-head"><span class="mvg-step-num">1</span><h2>From E to (R, t): four candidates, one makes sense</h2></div>
     <p class="mvg-eyebrow">Foundations</p>
-    <p>The essential matrix <var>E = [t]&#215;R</var> can be factored back into a rotation and a translation direction via its singular value decomposition, <var>E = U&#931;V&#7488;</var>. The algebra (see Hartley &amp; Zisserman, <em>Multiple View Geometry</em>, §9.6, for the full derivation) always produces exactly <strong>four</strong> candidate poses — two possible rotations, each paired with <var>+t</var> or <var>−t</var> — and all four satisfy the epipolar constraint equally well, because <var>E</var> only fixes <var>t</var> up to an unknown overall scale and sign.</p>
+    <p>The essential matrix <var>E = [t]&#215;R</var> can be factored back into a rotation and a translation direction via its singular value decomposition, <var>E = U&#931;V&#7488;</var>. The algebra always produces exactly <strong>four</strong> candidate poses — two possible rotations, each paired with <var>+t</var> or <var>−t</var> — and all four satisfy the epipolar constraint equally well, because <var>E</var> only fixes <var>t</var> up to an unknown overall scale and sign. (The full worked recipe — the <var>W</var> matrix and all — is in Section 4 below, not deferred to a textbook.)</p>
     <div class="mvg-math">(R&#8321;,t), (R&#8321;,−t), (R&#8322;,t), (R&#8322;,−t)&nbsp;&nbsp;&mdash;&nbsp;&nbsp;only one is physically valid</div>
     <p>Only one of the four puts a triangulated point <strong>in front of both cameras</strong> (positive depth in both) — the other three put it behind one or both. That test is called the <strong>cheirality check</strong>: triangulate a single correspondence with each candidate and keep the one where both depths come out positive. This is also exactly why triangulation (next) and pose recovery are tangled together in practice — you need a candidate pose to triangulate, and triangulating is how you rule the bad candidates out.</p>
   </section>
@@ -162,6 +162,96 @@ permalink: /multi-view-geometry-triangulation.html
     </div>
   </section>
 
+  <section class="mvg-step" id="svddecomp">
+    <div class="mvg-step-head"><span class="mvg-step-num">4</span><h2>The SVD recipe, worked through</h2></div>
+    <p class="mvg-eyebrow">Foundations</p>
+    <p><var>E = [t]&#215;R</var> is built from a rotation and a translation, so it has to be possible to pull those two pieces back out — and unlike most factorizations in this series, the recipe is short enough to write out in full rather than wave at a textbook. Because <var>[t]&#215;</var> is skew-symmetric with rank 2, <var>E</var> always has two equal nonzero singular values and a third that is exactly zero. (With real, noisy correspondences the two nonzero ones only come out <em>approximately</em> equal — the standard fix is to force them, replacing whatever the raw SVD returns with <var>&#931; = diag(1,1,0)</var> before doing anything else.)</p>
+    <div class="mvg-math">E = U&#931;V&#7488;&nbsp;&nbsp;&nbsp;&nbsp;&#931; = diag(1,1,0)<br>W = [[0,&minus;1,0], [1,0,0], [0,0,1]]&nbsp;&nbsp;(a 90&#176; rotation about z &mdash; det(W)=1, WW&#7488;=I)</div>
+    <p><var>W</var> is chosen because <var>UWV&#7488;</var> and <var>U&#931;V&#7488;</var> both reuse the same <var>U</var> and <var>V</var> — swapping <var>&#931;</var> for a rotation-shaped matrix turns "the rank-2 essential-matrix basis" into "a candidate rotation," in the same basis <var>E</var> was already decomposed in. Plugging <var>U</var> and <var>V</var> into <var>W</var> two different ways (<var>W</var> or <var>W&#7488;</var>), and pairing each with either sign of the translation, produces <strong>exactly four</strong> candidate poses:</p>
+    <div class="mvg-math">R &#8712; { UWV&#7488;, UW&#7488;V&#7488; }&nbsp;&nbsp;&nbsp;&nbsp;t &#8712; { +u&#8323;, &minus;u&#8323; }&nbsp;&nbsp;&nbsp;&nbsp;(u&#8323; = U's third column)</div>
+    <p>Why <var>u&#8323;</var> in particular: since <var>E = [t]&#215;R</var>, <var>E&#7488;t = R&#7488;[t]&#215;&#7488;t = &minus;R&#7488;(t&#215;t) = 0</var> — so <var>t</var> lives in the left null space of <var>E</var>, exactly the singular vector paired with the zero singular value, i.e. <var>u&#8323;</var>. That's the same vector that shows up as the epipole in image 2 (<var>e&#8322;&#7488;E = 0 &#8660; E&#7488;e&#8322; = 0</var>): the translation direction and the epipole direction are the same null space, so recovering one recovers the other, up to the scale and sign <var>E</var> never carried in the first place. All four candidates satisfy the epipolar constraint identically well — <var>E</var> genuinely cannot distinguish between them.</p>
+    <div class="mvg-warn">&#9888; One bookkeeping detail the formula above glosses over: <var>UWV&#7488;</var> is only guaranteed to be a proper rotation (<var>det = +1</var>, not a reflection) if <var>det(U) = det(V) = +1</var>. The SVD doesn't promise that on its own — the fix is to flip the sign of whichever singular vector has the unconstrained sign (the one paired with the zero singular value) until both determinants come out positive.</div>
+    <p>Four candidates, one correspondence: which one is real? That's a separate, much simpler question than the algebra above — cheirality, next.</p>
+  </section>
+
+  <section class="mvg-step" id="cheirality">
+    <div class="mvg-step-head"><span class="mvg-step-num">5</span><h2>Cheirality: reconstruct once, check the sign, done</h2></div>
+    <p class="mvg-eyebrow">Interactive</p>
+    <div class="mvg-goal">&#127919; <b>Learning goal:</b> this is not a subtle test. Triangulate <em>one</em> correspondence under each of the four candidates and look at the sign of its depth in both cameras — three candidates put the point behind a camera (physically impossible, since a camera can't photograph what's behind its own lens), and exactly one puts it in front of both. That one is <var>(R, t)</var>.</div>
+    <p>Below: a ground-truth two-camera rig, decomposed live via the exact SVD recipe above, all four candidates triangulating the same point simultaneously. Drag the sliders — the test point and the relative rotation between the cameras — and watch which candidate wins update in real time.</p>
+    <div class="mvg-demo">
+      <div class="mvg-canvas-wrap">
+        <div id="s4-plot3d" class="mvg-plot3d"></div>
+        <p class="mvg-canvas-hint">Drag to orbit, scroll to zoom. Camera 1 is fixed at the origin.</p>
+        <div class="mvg-legend">
+          <span><i style="background:var(--color-text)"></i>camera 1 (fixed)</span>
+          <span><i style="background:#2a9d3f"></i>correct candidate</span>
+          <span><i style="background:#c23b3b"></i>impossible candidates</span>
+        </div>
+      </div>
+      <div class="mvg-controls">
+        <div class="mvg-field"><label>Camera 2 rotation <span class="val" id="s4-rotval"></span></label><input type="range" id="s4-rot" min="-60" max="60" step="1" value="18"></div>
+        <div class="mvg-field"><label>Test point x <span class="val" id="s4-pxval"></span></label><input type="range" id="s4-px" min="-1.5" max="1.5" step="0.05" value="0.4"></div>
+        <div class="mvg-field"><label>Test point depth (z) <span class="val" id="s4-pzval"></span></label><input type="range" id="s4-pz" min="1" max="6" step="0.1" value="3.5"></div>
+        <div class="mvg-readout" id="s4-readout"></div>
+      </div>
+    </div>
+    <div class="mvg-warn">&#9888; The candidate translations are unit vectors (that's all four singular-vector decomposition can give you — recall <var>t</var>'s scale is unrecoverable from <var>E</var> alone). To make the picture legible, each candidate camera 2 here is drawn at the <em>true</em> baseline distance along its recovered direction — real pipelines don't get to do that, they just keep the unit vector and fix the scale later (Section 9, below).</div>
+  </section>
+
+  <section class="mvg-step" id="triangmethods2">
+    <div class="mvg-step-head"><span class="mvg-step-num">6</span><h2>Midpoint vs. optimal: a third and fourth way to triangulate</h2></div>
+    <p class="mvg-eyebrow">Foundations</p>
+    <p>Section 2 already compared linear DLT to nonlinear reprojection refinement. Two more members of the same family are worth knowing, because they sit at opposite ends of "cheap and biased" vs. "correct and expensive."</p>
+    <p><strong>Midpoint triangulation.</strong> Back-project each pixel into a 3D ray, <var>ray = C + &#955;&#183;d</var> (camera center <var>C</var>, unit direction <var>d</var> toward the pixel). With noisy pixels the two rays almost never meet, so take the two points — one on each ray — that are mutually closest, and report their midpoint. Solving for the two closest points is a small 2&#215;2 linear system:</p>
+    <div class="mvg-math">r = C&#8321; &minus; C&#8322;,&nbsp; a = d&#8321;&#183;d&#8321;,&nbsp; b = d&#8321;&#183;d&#8322;,&nbsp; c = d&#8322;&#183;d&#8322;,&nbsp; d&#8242; = d&#8321;&#183;r,&nbsp; e&#8242; = d&#8322;&#183;r<br>t* = (b&#183;e&#8242; &minus; c&#183;d&#8242;) / (ac &minus; b&#178;)&nbsp;&nbsp;&nbsp;&nbsp;s* = (a&#183;e&#8242; &minus; b&#183;d&#8242;) / (ac &minus; b&#178;)<br>M = &#189;[(C&#8321;+t*d&#8321;) + (C&#8322;+s*d&#8322;)]</div>
+    <p>This is fast, closed-form, and geometrically intuitive — and systematically wrong in a specific way. <strong>Worked example:</strong> two cameras a unit apart, <var>C&#8321;=(0,0,0)</var>, <var>C&#8322;=(1,0,0)</var>, true point <var>X=(0.5, 0.3, 4)</var>. Camera 1's ray is exact; camera 2's ray is perturbed by a tiny angle (&#8776; the effect of a couple of pixels of noise at typical focal length) away from the true direction. Solving the system above gives a midpoint <var>M &#8776; (0.480, 0.288, 3.843)</var> — error vector <var>M &minus; X &#8776; (&minus;0.020, &minus;0.012, &minus;0.157)</var>. A single small perturbation on <em>one</em> ray produces an error that is <strong>eight times larger along depth (z) than laterally (x, y)</strong>. That's not a coincidence of this example: minimizing 3D distance to two rays weights every direction in space equally, but the rays themselves are far more sensitive to angular error along the depth axis than across it (a ray sweeps a huge distance in <var>z</var> for a tiny angular nudge, once it's traveled a few units out) — so the point that minimizes 3D ray distance is <em>not</em> the point that minimizes 2D pixel reprojection error. It systematically isn't the maximum-likelihood estimate under pixel noise.</p>
+    <p><strong>Optimal (Hartley&ndash;Sturm) triangulation.</strong> Reframe the problem entirely in pixel space, where the noise actually lives. Instead of asking "which 3D point best explains these rays," ask: find corrected points <var>x&#770;&#8321;, x&#770;&#8322;</var> that (a) satisfy the epipolar constraint <em>exactly</em>, <var>x&#770;&#8322;&#7488;Fx&#770;&#8321; = 0</var>, and (b) are as close as possible to the actually-observed <var>x&#8321;, x&#8322;</var>:</p>
+    <div class="mvg-math">min &#8214;x&#770;&#8321; &minus; x&#8321;&#8214;&#178; + &#8214;x&#770;&#8322; &minus; x&#8322;&#8214;&#178;&nbsp;&nbsp;subject to&nbsp;&nbsp;x&#770;&#8322;&#7488;Fx&#770;&#8321; = 0</div>
+    <p>Once <var>x&#770;&#8321;, x&#770;&#8322;</var> exactly satisfy the epipolar constraint, their rays are guaranteed to intersect exactly — so triangulating them is trivial, any linear method gives the identical answer. All the work is in finding the corrected pair, and Hartley &amp; Zisserman show the constrained minimization reduces to a single-variable function of one parameter along the epipolar line, whose minimum is a root of a degree-6 polynomial (solvable in closed form, no iteration, no local minima). The point of the machinery isn't the polynomial's coefficients — it's that this is provably the pixel-space maximum-likelihood point under Gaussian pixel noise, which is exactly the error the midpoint method above ignores.</p>
+    <div class="mvg-warn">&#9888; The Gauss-Newton reprojection refinement from Section 2 minimizes the same reprojection-error objective, and in practice lands extremely close to the Hartley&ndash;Sturm answer — but it's a local iterative solve seeded from the linear estimate, not a closed-form global optimum. For two views the gap rarely matters; it matters more once outliers or bad initialization are in the picture.</div>
+  </section>
+
+  <section class="mvg-step" id="uncertainty">
+    <div class="mvg-step-head"><span class="mvg-step-num">7</span><h2>How good is a triangulated point? The depth-uncertainty ellipsoid</h2></div>
+    <p class="mvg-eyebrow">Foundations</p>
+    <p>Every triangulated point carries uncertainty inherited from pixel noise, and that uncertainty is not the same in every direction — it forms an ellipsoid stretched along the viewing (depth) axis. The small-baseline stereo approximation makes the size of the stretch concrete. For two cameras separated by baseline <var>B</var>, focal length <var>f</var> (pixels), and disparity <var>d</var> (pixels) between the two observations of the same point:</p>
+    <div class="mvg-math">Z = fB / d</div>
+    <p>Differentiate with respect to disparity to see how a pixel-sized error in <var>d</var> turns into an error in <var>Z</var>:</p>
+    <div class="mvg-math">dZ/dd = &minus;fB / d&#178; = &minus;Z&#178; / (fB)&nbsp;&nbsp;&nbsp;&nbsp;(substituting d = fB/Z)<br>&#8658;&nbsp;&nbsp;&#916;Z &#8776; &#963; &#183; Z&#178; / (fB)&nbsp;&nbsp;&nbsp;&nbsp;for pixel noise &#963;</div>
+    <p>Compare that to the <em>lateral</em> (x, y) uncertainty, which comes from a single camera's angular resolution at that depth and has no baseline in it at all: <var>&#916;X &#8776; &#963;&#183;Z/f</var> — linear in depth, no benefit from a wider rig. Depth uncertainty, by contrast, is quadratic in <var>Z</var> and only inversely linear in <var>B</var>. Spelled out:</p>
+    <div class="mvg-goal">&#127919; <b>The one intuition to keep:</b> doubling your baseline only <em>halves</em> your depth error at a given distance. Doubling your distance <em>quadruples</em> it. Baseline is a linear knob; distance is a quadratic tax. That asymmetry — not sensor noise, not calibration error — is the fundamental reason long-range stereo and triangulation get hard fast, and why active range sensors (LIDAR, radar, ToF) exist for anything beyond a few tens of meters: they measure range directly instead of inferring it from a shrinking intersection angle.</div>
+    <p>Geometrically, this is the same story from the other direction: as a point moves farther from the rig (or the baseline shrinks), the angle between the two rays converging on it narrows, and a fixed pixel-sized wobble in either ray sweeps a much larger span along the now-nearly-parallel viewing direction than across it — exactly the elongated-ellipsoid picture, and exactly why the worked midpoint example above showed an 8:1 depth-to-lateral error ratio.</p>
+  </section>
+
+  <section class="mvg-step" id="deptherror">
+    <div class="mvg-step-head"><span class="mvg-step-num">8</span><h2>Play with it: the uncertainty ellipse</h2></div>
+    <p class="mvg-eyebrow">Interactive</p>
+    <div class="mvg-goal">&#127919; <b>Learning goal:</b> narrow the ray-intersection angle — by shrinking the baseline or pushing the point farther away — and watch the ellipse stretch along the depth axis, exactly tracking the &#916;Z &#8776; &#963;&#183;Z&#178;/(fB) formula shown numerically alongside.</div>
+    <p>Two cameras <var>B</var> apart, both looking at a point at depth <var>Z</var> on their shared perpendicular bisector (keeping the point centered isolates the depth-vs-baseline effect — an off-center point tilts the ellipse instead of just stretching it). The ellipse is drawn <strong>20&#215; actual scale</strong> for visibility; the numbers are the true, unscaled values.</p>
+    <div class="mvg-demo">
+      <div class="mvg-canvas-wrap">
+        <canvas id="s5-canvas" width="480" height="360"></canvas>
+        <p class="mvg-canvas-hint">Depth axis is vertical; baseline axis is horizontal.</p>
+      </div>
+      <div class="mvg-controls">
+        <div class="mvg-field"><label>Baseline B (m) <span class="val" id="s5-baseval"></span></label><input type="range" id="s5-base" min="0.05" max="2" step="0.01" value="0.5"></div>
+        <div class="mvg-field"><label>Depth Z (m) <span class="val" id="s5-depthval"></span></label><input type="range" id="s5-depth" min="1" max="30" step="0.1" value="6"></div>
+        <div class="mvg-field"><label>Pixel noise &#963; (px) <span class="val" id="s5-noiseval"></span></label><input type="range" id="s5-noise" min="0.2" max="5" step="0.1" value="1.5"></div>
+        <div class="mvg-readout" id="s5-readout"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mvg-step" id="scaleambiguity">
+    <div class="mvg-step-head"><span class="mvg-step-num">9</span><h2>Scale ambiguity: the metric you never measured</h2></div>
+    <p class="mvg-eyebrow">Foundations</p>
+    <p>Trace the scale of every quantity on this page back to its source. <var>E</var> is defined only up to an overall scale — it's built from correspondences alone, and <var>E</var> and <var>&#955;E</var> satisfy the identical epipolar constraint for any <var>&#955; &#8800; 0</var>. The SVD recipe above hands back a unit-length <var>t</var> by construction. Every triangulated point inherits that same unknown scale. Nowhere in this entire pipeline — Part 2's essential matrix, this page's pose recovery, this page's triangulation — does an actual physical measurement (meters, millimeters, anything) ever enter. Two uncalibrated-scale images simply cannot tell you whether you're looking at a dollhouse or a house.</p>
+    <p>What you get instead is a reconstruction correct up to a <strong>similarity transform</strong> — a global rotation, a global translation, and a single global scale factor applied to every camera and every point simultaneously, with no way to distinguish the true reconstruction from any rescaled copy of it:</p>
+    <div class="mvg-math">(R, t, {X&#8305;}) &nbsp;and&nbsp; (R, s&#183;t, {s&#183;X&#8305;}) &nbsp;are indistinguishable, for any s &gt; 0</div>
+    <p>That's <strong>7 degrees of freedom</strong> (3 rotation + 3 translation + 1 scale) that no amount of additional two-view geometry can pin down — a <strong>gauge freedom</strong>, not a solvable unknown. The only way out is an external reference: a known physical size somewhere in the scene, a second sensor with its own metric ground truth (IMU, GPS, LIDAR), or a stereo rig with a physically-measured baseline (which is exactly why Section 7's <var>B</var> has to be a real, known number — that's where the metric scale that monocular two-view geometry can't supply comes from). This same 7-DOF freedom reappears, unchanged, as the gauge freedom that has to be fixed (usually by anchoring one camera and one distance) in bundle adjustment when reconstructing from many views in <a href="{{ '/multi-view-geometry-sfm.html' | relative_url }}">Structure from Motion</a>.</p>
+  </section>
+
   <section class="mvg-step" id="cheatsheet">
     <div class="mvg-step-head"><span class="mvg-step-num">✓</span><h2>Cheat sheet</h2></div>
     <p class="mvg-eyebrow">Recap</p>
@@ -172,6 +262,12 @@ permalink: /multi-view-geometry-triangulation.html
         <tr><td>Decompose E</td><td>Essential matrix</td><td>4 candidate (R,t) poses</td><td>Resolved by the cheirality (positive-depth) check</td></tr>
         <tr><td>Linear triangulation</td><td>Both poses + a correspondence</td><td>3D point, one linear solve</td><td>Minimizes algebraic error, not pixel error</td></tr>
         <tr><td>Nonlinear triangulation</td><td>Linear estimate as a starting point</td><td>Refined 3D point</td><td>Minimizes true reprojection error via Gauss-Newton</td></tr>
+        <tr><td>SVD recipe</td><td><code>E = U&#931;V&#7488;</code>, <code>W = [[0,&minus;1,0],[1,0,0],[0,0,1]]</code></td><td><code>R&#8712;{UWV&#7488;,UW&#7488;V&#7488;}</code>, <code>t=&plusmn;u&#8323;</code></td><td>u&#8323; = U's 3rd column (null vector of E&#7488;, since E&#7488;t=0)</td></tr>
+        <tr><td>Cheirality test</td><td>1 correspondence, all 4 candidates</td><td>The correct (R,t)</td><td>Keep the candidate with positive depth in <em>both</em> cameras</td></tr>
+        <tr><td>Midpoint triangulation</td><td>Two back-projected rays</td><td>Midpoint of common perpendicular</td><td>Minimizes 3D ray distance, not pixel error — biased along depth</td></tr>
+        <tr><td>Optimal (Hartley&ndash;Sturm) triangulation</td><td><var>F</var> + noisy <var>x&#8321;, x&#8322;</var></td><td>Corrected <var>x&#770;&#8321;, x&#770;&#8322;</var> on the epipolar constraint</td><td>ML-optimal under Gaussian pixel noise; degree-6 polynomial, closed-form</td></tr>
+        <tr><td>Depth uncertainty</td><td>Pixel noise &#963;, focal <var>f</var>, baseline <var>B</var>, depth <var>Z</var></td><td><code>&#916;Z &#8776; &#963;&#183;Z&#178;/(fB)</code></td><td>Quadratic in distance, only linear (inverse) in baseline</td></tr>
+        <tr><td>Scale ambiguity</td><td>Two uncalibrated-scale views</td><td>Reconstruction up to a similarity transform</td><td>7-DOF gauge (3 rot + 3 trans + 1 scale) — needs an external metric reference</td></tr>
       </tbody>
     </table>
     </div>

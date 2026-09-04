@@ -375,16 +375,21 @@ permalink: /multi-view-geometry-calibration.html
       return [ a[0]*b[0], a[0]*b[1]+a[1]*b[0], a[1]*b[1], a[0]*b[2]+a[2]*b[0], a[1]*b[2]+a[2]*b[1], a[2]*b[2] ];
     }
     function vecSub6(a,b){ var r=[]; for (var i=0;i<6;i++) r.push(a[i]-b[i]); return r; }
+    function normalizeRow(r){ var n=Math.hypot(r[0],r[1],r[2],r[3],r[4],r[5])||1; return r.map(function(x){ return x/n; }); }
+    var SOLVABILITY_FLOOR = 1e-10; // ratio (2nd-smallest / largest) of VtV eigenvalues below which the pose set is treated as degenerate
 
     function solve(){
       if (poses.length === 0) return { status:'empty' };
 
+      // Each row is normalized to unit length first — standard conditioning for this kind of
+      // homogeneous linear solve (the same idea as Hartley normalization used for the eight-point
+      // algorithm), otherwise the huge natural scale spread of h1,h2,h3 entries swamps the numerics.
       var rows = [];
       poses.forEach(function(p){
         var Hp = computeH(TRUE_K, p.R, p.t);
         var h1 = colOf(Hp,0), h2 = colOf(Hp,1);
-        rows.push(vij(h1,h2));
-        rows.push(vecSub6(vij(h1,h1), vij(h2,h2)));
+        rows.push(normalizeRow(vij(h1,h2)));
+        rows.push(normalizeRow(vecSub6(vij(h1,h1), vij(h2,h2))));
       });
 
       // VtV, 6x6
@@ -398,22 +403,27 @@ permalink: /multi-view-geometry-calibration.html
       var smallIdx = order[0].i;
       var b = [0,1,2,3,4,5].map(function(i2){ return eig.vectors[i2][smallIdx]; });
 
-      // stability score: how well-separated the null direction is from the rest of the spectrum
+      // Solvability margin: ratio of the 2nd-smallest eigenvalue of VtV to the largest. The smallest
+      // eigenvalue is the null direction we solve for (~0 by construction); the *next* one tells us
+      // how well-separated that null direction is from real signal. Near the SOLVABILITY_FLOOR or
+      // below means V is effectively rank-deficient — the null space isn't 1-dimensional, so the
+      // "solution" is an arbitrary mix of true and spurious directions.
       var secondSmallest = order[1] ? order[1].v : 0;
-      var largest = order[5].v || 1e-12;
-      var stability = largest > 1e-12 ? Math.min(1, secondSmallest/largest) : 0;
+      var largest = order[5].v || 1e-30;
+      var margin = secondSmallest / largest;
+      var solvable = margin > SOLVABILITY_FLOOR;
 
       var omega = [[b[0],b[1],b[3]],[b[1],b[2],b[4]],[b[3],b[4],b[5]]];
       if (omega[0][0] < 0){ omega = omega.map(function(row){ return row.map(function(v){ return -v; }); }); }
 
       var L = cholesky3(omega);
-      if (!L) return { status:'cholesky-failed', stability: stability, poseCount: poses.length };
+      if (!L) return { status:'cholesky-failed', margin: margin, solvable: solvable, poseCount: poses.length };
 
       var U = transpose3(L);
       var Kraw = invert3(U);
-      if (!Kraw) return { status:'singular', stability: stability, poseCount: poses.length };
+      if (!Kraw) return { status:'singular', margin: margin, solvable: solvable, poseCount: poses.length };
       var norm = Kraw[2][2];
-      if (Math.abs(norm) < 1e-9) return { status:'singular', stability: stability, poseCount: poses.length };
+      if (Math.abs(norm) < 1e-9) return { status:'singular', margin: margin, solvable: solvable, poseCount: poses.length };
       var Khat = Kraw.map(function(row){ return row.map(function(v){ return v/norm; }); });
 
       // Reprojection error: recover per-pose extrinsics from Khat and reproject the board.
@@ -444,7 +454,7 @@ permalink: /multi-view-geometry-calibration.html
       }
       var rms = (nPts > 0 && !badPose) ? Math.sqrt(sqErrSum/nPts) : NaN;
 
-      return { status:'ok', K: Khat, rms: rms, stability: stability, poseCount: poses.length, badPose: badPose };
+      return { status:'ok', K: Khat, rms: rms, margin: margin, solvable: solvable, poseCount: poses.length, badPose: badPose };
     }
 
     function fmtK(K){
@@ -490,10 +500,10 @@ permalink: /multi-view-geometry-calibration.html
         lines.push('<div class="hi">no poses yet — nothing to solve</div>');
       } else if (res.status === 'cholesky-failed' || res.status === 'singular'){
         lines.push('<div class="hi">Cholesky failed — recovered ω is not positive-definite (degenerate pose set)</div>');
-        lines.push('<div><span class="k">stability</span> = ' + (res.stability*100).toFixed(2) + '%</div>');
+        lines.push('<div><span class="k">solvability margin</span> = ' + res.margin.toExponential(1) + ' <span style="opacity:.6">(floor ' + SOLVABILITY_FLOOR.toExponential(0) + ' — V is rank-deficient)</span></div>');
       } else {
         lines.push('<div><span class="k">estimated K&#770;</span> = <span class="hi">' + fmtK(res.K) + '</span></div>');
-        lines.push('<div><span class="k">stability</span> = ' + (res.stability*100).toFixed(2) + '% <span style="opacity:.6">(near 0% ⇒ V is close to rank-deficient)</span></div>');
+        lines.push('<div><span class="k">solvability margin</span> = ' + res.margin.toExponential(1) + ' <span class="' + (res.solvable ? 'hi' : '') + '" style="opacity:' + (res.solvable ? '1' : '.6') + '">' + (res.solvable ? '(above the ' + SOLVABILITY_FLOOR.toExponential(0) + ' floor — well-posed)' : '(at/below the ' + SOLVABILITY_FLOOR.toExponential(0) + ' floor — treat K&#770; as unreliable)') + '</span></div>');
         if (res.badPose || !isFinite(res.rms)){
           lines.push('<div class="hi">reprojection error blew up — extrinsics could not be recovered reliably</div>');
         } else {
