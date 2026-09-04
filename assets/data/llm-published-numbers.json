@@ -45,7 +45,7 @@
   "chinchilla": {
     "source": "Hoffmann et al. (DeepMind), \"Training Compute-Optimal Large Language Models\", arXiv:2203.15556.",
     "compute_formula": "C ≈ 6ND (N = non-embedding parameters, D = training tokens, C in FLOPs)",
-    "compute_optimal_ratio": "~20 tokens per parameter at compute-optimal allocation (the paper's fitted approach 3 exponents give N ∝ C^0.49, D ∝ C^0.51)",
+    "compute_optimal_ratio": "~20 tokens per parameter at compute-optimal allocation, agreed on (to within a small factor) by all three of the paper's independent fitting approaches at Gopher's compute budget (~5.76e23 FLOPs): 67B/1.5T, 67B/1.5T, and 40B/1.9T tokens respectively. The exact coefficients of the paper's parametric loss-curve fit (approach 3) are less robust than this ratio -- later reproduction attempts (e.g. Besiroglu et al., \"Chinchilla Scaling: A replication attempt\", arXiv:2404.10102) flagged ambiguity in the reported constants.",
     "note": "Production models (including OLMo, Llama 3, etc.) commonly train well past the compute-optimal point — i.e. more tokens per parameter than 20:1 — because the extra pretraining compute is repaid many times over in cheaper inference at a fixed, smaller parameter count."
   }
 }
