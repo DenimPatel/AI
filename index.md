@@ -199,10 +199,10 @@ title: Home
     <div class="card"><div class="card-kicker">Math</div><div class="card-title">Linear algebra &amp; quaternions</div><p class="card-body">2 notes on the math underneath it all.</p></div>
     <div class="card"><div class="card-kicker">Interactive · 5 parts</div><div class="card-title">Nonlinear optimization</div><p class="card-body">Gradient descent, Newton, Gauss-Newton &amp; Levenberg-Marquardt, built step by step from robot position through pose, unknown landmarks, trajectories, and 3D rotation.</p></div>
     <div class="card"><div class="card-kicker">Interactive · 6 parts</div><div class="card-title">Multi-view geometry</div><p class="card-body">Perspective projection, epipolar geometry, homographies, triangulation, the trifocal tensor and bundle adjustment, built step by step from one pinhole camera to a working toy structure-from-motion demo.</p></div>
-    <div class="card"><div class="card-kicker">Interactive · 6 parts</div><div class="card-title">LLM training</div><p class="card-body">Tokens, pretraining data, next-token prediction, fine-tuning, RLHF/DPO and guardrails, built step by step using the fully-open OLMo model family as a running example.</p></div>
+    <div class="card"><div class="card-kicker">Interactive · 12 parts</div><div class="card-title">LLM training</div><p class="card-body">Tokens and embeddings, the transformer block, pretraining data and the training loop, scaling laws, fine-tuning and LoRA, RLHF/DPO, reasoning &amp; RLVR, evaluation, inference, and guardrails — built step by step using the fully-open OLMo model family as a running example.</p></div>
   </div>
   <a href="{{ '/robotics/' | relative_url }}" class="btn btn-secondary">View all robotics notes</a>
   <a href="{{ '/nonlinear-optimization.html' | relative_url }}" class="btn btn-ghost">Try the optimization guide →</a>
   <a href="{{ '/multi-view-geometry.html' | relative_url }}" class="btn btn-ghost">Try the multi-view geometry guide →</a>
-  <a href="{{ '/llm-training.html' | relative_url }}" class="btn btn-ghost">Try the LLM training guide →</a>
+  <a href="{{ '/llm-training-index.html' | relative_url }}" class="btn btn-ghost">Try the LLM training guide →</a>
 </section>

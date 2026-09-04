@@ -43,7 +43,7 @@ permalink: /llm-training-pretraining.html
         <button id="loop-step10">Step ×10</button>
         <button id="loop-reset">Reset weights</button>
       </div>
-      <canvas id="loop-canvas" width="600" height="180"></canvas>
+      <div class="llmt-canvas-wrap" style="flex-basis:100%;"><canvas id="loop-canvas" width="600" height="180"></canvas></div>
       <div class="llmt-readout" id="loop-readout"></div>
     </div>
     <p class="llmt-canvas-hint">This model has no attention, no depth, no context beyond one word — it's the smallest possible thing that "trains" in the sense Part 1 through Part 3 describe. Everything else in this series scales this exact loop up: bigger model, more context, vastly more data.</p>

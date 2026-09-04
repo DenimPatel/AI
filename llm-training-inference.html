@@ -45,7 +45,7 @@ permalink: /llm-training-inference.html
         <div class="llmt-field"><label>Min-p <span class="val" id="sm-minp-val">off</span></label><input type="range" id="sm-minp" min="0" max="0.5" step="0.01" value="0"></div>
         <div class="llmt-field"><label>Repetition penalty <span class="val" id="sm-rep-val">1.0</span></label><input type="range" id="sm-rep" min="1" max="2" step="0.05" value="1"></div>
       </div>
-      <canvas id="sm-canvas" width="620" height="260"></canvas>
+      <div class="llmt-canvas-wrap" style="flex-basis:100%;"><canvas id="sm-canvas" width="620" height="260"></canvas></div>
       <div class="llmt-readout" id="sm-readout"></div>
     </div>
     <div style="overflow-x:auto; margin-top:14px;">
@@ -314,9 +314,9 @@ permalink: /llm-training-inference.html
       requests.slice(0,4).forEach(function(r,i){
         var row = document.createElement('div'); row.className='batch-row';
         var seg = document.createElement('div'); seg.className='batch-seg'; seg.style.background=c.accent;
-        seg.style.width = (r.len/maxLen*300)+'px'; seg.style.opacity = 0.9;
+        seg.style.width = (r.len/maxLen*100)+'%'; seg.style.opacity = 0.9;
         var idle = document.createElement('div'); idle.className='batch-seg'; idle.style.background='#ddd';
-        idle.style.width = ((maxLen-r.len)/maxLen*300)+'px';
+        idle.style.width = ((maxLen-r.len)/maxLen*100)+'%';
         row.appendChild(document.createTextNode('req '+i+' ')); row.appendChild(seg); row.appendChild(idle);
         viz.appendChild(row);
       });
@@ -342,7 +342,7 @@ permalink: /llm-training-inference.html
       timeline.forEach(function(count,t){
         var row = document.createElement('div'); row.className='batch-row';
         var seg = document.createElement('div'); seg.className='batch-seg'; seg.style.background=c.accent;
-        seg.style.width = (count/slots*300)+'px';
+        seg.style.width = (count/slots*100)+'%';
         row.appendChild(document.createTextNode('t='+t+' ')); row.appendChild(seg);
         row.appendChild(document.createTextNode(' '+count+'/'+slots+' slots busy'));
         viz.appendChild(row);

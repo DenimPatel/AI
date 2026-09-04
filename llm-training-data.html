@@ -64,7 +64,7 @@ permalink: /llm-training-data.html
       <p class="llmt-eyebrow" style="margin:0 0 8px;">Quality-classifier threshold trade-off</p>
       <p style="margin:0 0 10px;">A quality classifier outputs a score per document; you pick a cutoff. Raise it and you keep cleaner text but throw more of it away — precision vs. recall, made concrete with a small labelled set of 40 toy documents (half genuinely "high quality," half "low quality," scores drawn to overlap realistically).</p>
       <div class="llmt-field"><label>Score threshold <span class="val" id="qc-t-val">0.50</span></label><input type="range" id="qc-t" min="0" max="1" step="0.02" value="0.5"></div>
-      <canvas id="qc-canvas" width="600" height="140"></canvas>
+      <div class="llmt-canvas-wrap" style="flex-basis:100%;"><canvas id="qc-canvas" width="600" height="140"></canvas></div>
       <div class="llmt-readout" id="qc-readout"></div>
     </div>
   </section>
