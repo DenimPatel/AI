@@ -1,6 +1,6 @@
 ---
-title: "LLM Training, Interactively — Part 2: Building the Pretraining Dataset"
-description: How raw web text becomes a trillion-token pretraining corpus — sourcing, filtering, deduplication, and decontamination, using Ai2's fully-documented Dolma dataset as the case study.
+title: "LLM Training, Interactively — Part 4: Building the Pretraining Dataset"
+description: How raw web text becomes a trillion-token pretraining corpus — real Dolma v1.6 source proportions, MinHash/LSH deduplication, contamination checking, and data mixing.
 permalink: /llm-training-data.html
 ---
 <!DOCTYPE html>
@@ -11,105 +11,18 @@ permalink: /llm-training-data.html
 <title>{{ page.title }} · {{ site.title }}</title>
 <meta name="description" content="{{ page.description }}">
 <link rel="stylesheet" href="{{ '/assets/css/styles.css' | relative_url }}">
-<style>
-  .llmt { max-width: 1180px; }
-  .llmt .page-header { padding-top: clamp(32px, 6vw, 56px); }
-  .llmt-step { padding: 48px 0; border-top: 1px solid var(--color-divider); }
-  .llmt-step:first-of-type { border-top: none; }
-  .llmt-step-num {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 30px; height: 30px; border-radius: 50%; background: var(--color-text); color: var(--color-bg);
-    font-family: var(--font-heading); font-weight: 600; font-size: 14px; flex: 0 0 auto;
-  }
-  .llmt-step-head { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
-  .llmt-step-head h2 { margin: 0; font-size: clamp(22px, 3vw, 28px); }
-  .llmt-eyebrow {
-    font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
-    color: var(--color-accent-700); margin: 0 0 4px 42px;
-  }
-  .llmt-goal {
-    display: flex; gap: 10px; margin: 16px 0 20px; padding: 12px 14px;
-    background: var(--color-accent-100); border-left: 3px solid var(--color-accent);
-    border-radius: var(--radius-sm); font-size: 14px; line-height: 1.55;
-  }
-  .llmt-goal b { color: var(--color-accent-800); }
-  .llmt-warn {
-    display: flex; gap: 10px; margin: 16px 0 20px; padding: 12px 14px;
-    background: var(--color-accent-2-100); border-left: 3px solid var(--color-accent-2);
-    border-radius: var(--radius-sm); font-size: 14px; line-height: 1.55;
-  }
-  .llmt-warn b { color: var(--color-accent-2-800); }
-  .llmt-math {
-    font-family: var(--font-mono); font-size: 13.5px; background: var(--color-surface);
-    padding: 12px 14px; border-radius: var(--radius-sm); overflow-x: auto; margin: 0 0 16px;
-    line-height: 1.7;
-  }
-  .llmt-demo {
-    display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;
-    background: var(--color-surface); border-radius: var(--radius-md); padding: 18px;
-    margin-top: 8px;
-  }
-  .llmt-canvas-wrap { flex: 1 1 380px; min-width: 280px; }
-  .llmt-canvas-wrap canvas { width: 100%; height: auto; display: block; background: var(--color-neutral-100); border-radius: var(--radius-sm); }
-  .llmt-canvas-hint { font-size: 11px; opacity: 0.6; margin-top: 6px; }
-  .llmt-controls { flex: 1 1 260px; min-width: 240px; font-size: 13.5px; }
-  .llmt-field { margin-bottom: 14px; }
-  .llmt-field label { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 12.5px; color: color-mix(in srgb, var(--color-text) 70%, transparent); }
-  .llmt-field label span.val { font-family: var(--font-mono); color: var(--color-text); }
-  .llmt-field input[type=range] { width: 100%; accent-color: var(--color-accent); }
-  .llmt-field textarea {
-    width: 100%; font-family: var(--font-mono); font-size: 12.5px; padding: 8px 10px; resize: vertical;
-    border-radius: var(--radius-sm); border: 1px solid var(--color-divider); background: var(--color-bg); color: var(--color-text);
-  }
-  .llmt-btnrow { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 14px; }
-  .llmt-btnrow button {
-    font-family: var(--font-heading); font-weight: 600; font-size: 13px; cursor: pointer;
-    border: 1px solid var(--color-divider); background: var(--color-bg); color: var(--color-text);
-    padding: 7px 13px; border-radius: var(--radius-md);
-  }
-  .llmt-btnrow button:hover { background: color-mix(in srgb, var(--color-text) 6%, transparent); }
-  .llmt-btnrow button.llmt-primary { background: var(--color-accent); color: #fff; border-color: var(--color-accent); }
-  .llmt-btnrow button.llmt-primary:hover { background: var(--color-accent-600); }
-  .llmt-btnrow button:disabled { opacity: 0.45; cursor: default; }
-  .llmt-readout { font-family: var(--font-mono); font-size: 12.5px; line-height: 1.85; background: var(--color-bg); border-radius: var(--radius-sm); padding: 10px 12px; }
-  .llmt-readout .k { opacity: 0.6; }
-  .llmt-readout .hi { color: var(--color-accent-700); font-weight: 600; }
-  .llmt-cheat { width: 100%; border-collapse: collapse; font-size: 13.5px; }
-  .llmt-cheat th, .llmt-cheat td { padding: 10px 12px; border-bottom: 1px solid var(--color-divider); vertical-align: top; text-align: left; }
-  .llmt-cheat th { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.6; }
-  .llmt-cheat code { white-space: nowrap; }
-  .llmt-refs { font-size: 13.5px; line-height: 1.9; }
-  .llmt-refs li { margin-bottom: 2px; }
-  .llmt-next {
-    display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;
-    margin-top: 24px; padding: 18px; background: var(--color-surface); border-radius: var(--radius-md);
-  }
-  @media (max-width: 640px) {
-    .llmt-eyebrow { margin-left: 0; }
-    .llmt-step-head { flex-wrap: wrap; }
-  }
-</style>
+{% include llm-head.html %}
 </head>
 <body>
 
-<nav class="nav">
-  <a class="nav-brand" href="{{ '/' | relative_url }}">AI /</a>
-  <a href="{{ '/' | relative_url }}">Home</a>
-  <a href="{{ '/robotics/' | relative_url }}">Robotics</a>
-  <a href="{{ '/llm-training.html' | relative_url }}">Part 1</a>
-  <a href="{{ '/llm-training-data.html' | relative_url }}">Part 2</a>
-  <a href="{{ '/llm-training-pretraining.html' | relative_url }}">Part 3</a>
-  <a href="{{ '/llm-training-finetuning.html' | relative_url }}">Part 4</a>
-  <a href="{{ '/llm-training-rlhf.html' | relative_url }}">Part 5</a>
-  <a href="{{ '/llm-training-guardrails.html' | relative_url }}">Part 6</a>
-</nav>
+{% include llm-nav.html %}
 
 <main>
 <div class="wrap llmt">
   <section class="page-header">
-    <span class="section-kicker">Interactive guide · Part 2 of 6</span>
+    <span class="section-kicker">Interactive guide · Part 4 of 12</span>
     <h1>Building the pretraining dataset</h1>
-    <p>A base model is, in a real sense, a compressed summary of the text it was trained on — so what goes into that text matters enormously, and gathering it is its own multi-stage engineering problem, well before any GPU runs a training step. We'll follow <strong>Dolma</strong>, Ai2's fully open pretraining corpus for OLMo, through the pipeline that turns raw web crawls into training-ready text.</p>
+    <p>A base model is, in a real sense, a compressed summary of the text it was trained on — so what goes into that text matters enormously, and gathering it is its own multi-stage engineering problem, well before any GPU runs a training step. We'll follow <strong>Dolma</strong>, Ai2's fully open pretraining corpus for OLMo, through the pipeline that turns raw web crawls into training-ready text — with real published proportions, not illustrative guesses.</p>
   </section>
   <div class="stats-rule" style="border-top-color: var(--color-divider); margin-bottom: 8px;"></div>
 
@@ -117,11 +30,11 @@ permalink: /llm-training-data.html
   <section class="llmt-step" id="sources">
     <div class="llmt-step-head"><span class="llmt-step-num">1</span><h2>Where the text comes from</h2></div>
     <p class="llmt-eyebrow">Sourcing</p>
-    <p>No single source has enough high-quality text at trillion-token scale, so pretraining corpora blend several. Dolma mixes web crawl text (via Common Crawl) with more curated sources: code repositories, academic papers, encyclopedic text, and public-domain books. Each source contributes differently — web text gives breadth and volume, code gives structured reasoning patterns, papers and encyclopedic text give density of factual, well-edited prose.</p>
+    <p>No single source has enough high-quality text at trillion-token scale, so pretraining corpora blend several. Below are <strong>Dolma v1.6's actual published token proportions</strong> (Soldaini et al., 2024; Ai2's dataset card) — not an illustrative guess. Notice how dominant web crawl text is by volume, and how small (by percentage) the most carefully-curated sources are.</p>
     <div class="llmt-demo">
       <div class="llmt-canvas-wrap" style="flex-basis:100%;">
-        <canvas id="s1-canvas" width="900" height="220"></canvas>
-        <p class="llmt-canvas-hint">Illustrative relative mix of source types in a Dolma-style corpus — not exact published proportions, which vary by Dolma version. Hover-equivalent: click a bar for a one-line description.</p>
+        <canvas id="s1-canvas" width="900" height="240"></canvas>
+        <p class="llmt-canvas-hint" id="s1-hint">Click a bar for a one-line description. Source: Dolma v1.6, Soldaini et al. 2024 / allenai/dolma dataset card.</p>
       </div>
       <div class="llmt-readout" id="s1-readout">Click a bar above.</div>
     </div>
@@ -131,9 +44,8 @@ permalink: /llm-training-data.html
   <section class="llmt-step" id="funnel">
     <div class="llmt-step-head"><span class="llmt-step-num">2</span><h2>The filtering funnel</h2></div>
     <p class="llmt-eyebrow">Cleaning</p>
-    <p>Raw Common Crawl is mostly not useful training text — boilerplate, navigation menus, spam, non-English pages, near-duplicate pages mirrored across sites. Dolma's pipeline (released as open-source code, not just a description) runs each document through a sequence of filters, each one discarding a further slice:</p>
+    <p>Raw Common Crawl is mostly not useful training text — boilerplate, navigation menus, spam, non-English pages, near-duplicate pages mirrored across sites. Dolma's pipeline (released as open-source code, not just a description) runs each document through a sequence of filters, each one discarding a further slice. Dolma's own paper reports the aggregate result: roughly <strong>200 TB of raw crawled text is curated down to an ~11 TB corpus</strong> (about 3 trillion tokens) — a real, published endpoint. The intermediate per-stage percentages below are a representative shape (Dolma's paper doesn't break out a single universal per-stage retention table across all sources), but they're built to land on that real ~5–6% overall retention.</p>
     <div class="llmt-math">raw crawl → language filter → quality filter → deduplication → PII / toxic-content removal → training-ready text</div>
-    <p>Step through the pipeline below. Percentages are illustrative — a representative shape for a web-crawl cleaning pipeline, not exact published Dolma figures — but the <em>ordering and the scale of the drop</em> is realistic: most of the discarding happens in language and quality filtering, long before dedup ever runs.</p>
     <div class="llmt-demo">
       <div class="llmt-canvas-wrap" style="flex-basis:100%;">
         <canvas id="s2-canvas" width="900" height="260"></canvas>
@@ -148,15 +60,21 @@ permalink: /llm-training-data.html
       </div>
     </div>
     <div class="llmt-warn">⚠️ <span><b>Quality filtering is the trickiest stage:</b> Dolma uses a mix of heuristic rules (too short, too repetitive, too many symbols relative to words) and trained classifiers (does this page resemble the kind of text people actually found useful, e.g. Wikipedia-referenced pages) to score documents. Get the threshold wrong and you either keep boilerplate or throw away legitimate but unusual text — there's no ground truth to check against.</span></div>
+    <div class="llmt-demo" style="flex-direction:column; margin-top:14px;">
+      <p class="llmt-eyebrow" style="margin:0 0 8px;">Quality-classifier threshold trade-off</p>
+      <p style="margin:0 0 10px;">A quality classifier outputs a score per document; you pick a cutoff. Raise it and you keep cleaner text but throw more of it away — precision vs. recall, made concrete with a small labelled set of 40 toy documents (half genuinely "high quality," half "low quality," scores drawn to overlap realistically).</p>
+      <div class="llmt-field"><label>Score threshold <span class="val" id="qc-t-val">0.50</span></label><input type="range" id="qc-t" min="0" max="1" step="0.02" value="0.5"></div>
+      <canvas id="qc-canvas" width="600" height="140"></canvas>
+      <div class="llmt-readout" id="qc-readout"></div>
+    </div>
   </section>
 
   <section class="llmt-step" id="dedup">
-    <div class="llmt-step-head"><span class="llmt-step-num">3</span><h2>Deduplication: finding near-identical documents</h2></div>
+    <div class="llmt-step-head"><span class="llmt-step-num">3</span><h2>Deduplication: MinHash and LSH banding</h2></div>
     <p class="llmt-eyebrow">Cleaning</p>
-    <p>The web republishes the same content constantly — syndicated news, mirrored docs, boilerplate templates. Training on many near-duplicate copies wastes compute and can make the model memorize that specific text more than is useful. Exact-duplicate removal (hashing whole documents) catches identical copies; Dolma also runs <strong>fuzzy</strong> deduplication using <strong>MinHash</strong>, which estimates document similarity without comparing every pair of documents directly (infeasible at trillions of tokens).</p>
-    <p>The core similarity measure is <strong>Jaccard similarity</strong> between two documents' sets of overlapping word "shingles" (short n-grams):</p>
-    <div class="llmt-math">J(A, B) = |A ∩ B| / |A ∪ B|</div>
-    <p>Edit the two passages below (or leave them) and watch the shingle overlap and Jaccard similarity update live. Drag the threshold to see where this pair would be flagged as a near-duplicate pair.</p>
+    <p>The web republishes the same content constantly — syndicated news, mirrored docs, boilerplate templates. Exact-duplicate removal (hashing whole documents) catches identical copies; Dolma also runs <strong>fuzzy</strong> deduplication using <strong>MinHash</strong> plus <strong>locality-sensitive hashing (LSH)</strong>, which flags likely-similar document pairs without ever comparing every pair directly — infeasible at trillions of documents.</p>
+    <p>The similarity measure is <strong>Jaccard similarity</strong> between two documents' sets of overlapping word "shingles":</p>
+    <div class="llmt-math llmt-katex">$$J(A,B) = \frac{|A \cap B|}{|A \cup B|}$$</div>
     <div class="llmt-demo">
       <div class="llmt-canvas-wrap" style="flex-basis:48%;">
         <div class="llmt-field"><label>Document A</label><textarea id="s3-a" rows="4">the robot returned to the workbench where a dataset of text waited to be read</textarea></div>
@@ -169,20 +87,41 @@ permalink: /llm-training-data.html
         <div class="llmt-readout" id="s3-readout"></div>
       </div>
     </div>
+    <p>Comparing full shingle sets for every pair is still too slow at scale. <strong>MinHash + LSH</strong> compresses each document to a small signature, splits that signature into <var>b</var> bands of <var>r</var> rows each, and only checks pairs that collide in at least one band — turning an O(n²) all-pairs comparison into a fast lookup, at the cost of a probabilistic (not exact) similarity threshold, whose sharpness is tunable via b and r.</p>
+    <div class="llmt-math llmt-katex">$$P(\text{flagged as candidate pair} \mid \text{true similarity } s) = 1-(1-s^r)^b$$</div>
+    <div class="llmt-demo">
+      <div class="llmt-canvas-wrap">
+        <canvas id="lsh-canvas" width="480" height="260"></canvas>
+      </div>
+      <div class="llmt-controls">
+        <div class="llmt-field"><label>Bands b <span class="val" id="lsh-b-val">20</span></label><input type="range" id="lsh-b" min="1" max="50" step="1" value="20"></div>
+        <div class="llmt-field"><label>Rows per band r <span class="val" id="lsh-r-val">5</span></label><input type="range" id="lsh-r" min="1" max="20" step="1" value="5"></div>
+        <div class="llmt-readout" id="lsh-readout"></div>
+      </div>
+    </div>
+    <p class="llmt-canvas-hint">The steep S-curve is the point: with the right (b, r), pairs above the similarity threshold are caught with high probability while pairs below it are almost never even checked — that's what makes fuzzy dedup at trillion-token scale tractable at all.</p>
   </section>
 
-  <section class="llmt-step" id="decon">
+  <section class="llmt-step" id="contamination">
     <div class="llmt-step-head"><span class="llmt-step-num">4</span><h2>Decontamination: keeping the exam out of the textbook</h2></div>
     <p class="llmt-eyebrow">Cleaning</p>
-    <p>If a benchmark's evaluation questions (or worse, its answers) leak into pretraining data, the model can score well by memorization rather than by genuine capability — inflating reported results. Dolma's pipeline explicitly screens for and removes text that overlaps with known evaluation sets, a step usually called <strong>decontamination</strong>. This is another place where transparency matters: if you can't see the training data, you can't verify that a benchmark score means what it claims to mean.</p>
-    <div class="llmt-goal">💡 <span><b>PII and safety scrubbing</b> happen around the same stage: filters look for patterns resembling personal data (emails, phone numbers, ID numbers) and remove or mask them, and classifiers flag clearly toxic or unsafe pages for removal — separate from (and a preview of) the more targeted safety work in Part 6.</span></div>
+    <p>If a benchmark's evaluation questions (or worse, its answers) leak into pretraining data, the model can score well by memorization rather than genuine capability — inflating reported results. The same n-gram-overlap machinery from deduplication is reused here, just checked against benchmark text instead of other training documents.</p>
+    <div class="llmt-demo" style="flex-direction:column;">
+      <div class="llmt-field"><label>Benchmark question text</label><textarea id="con-bench" rows="2">What is the capital of Australia? A) Sydney B) Canberra C) Melbourne D) Perth</textarea></div>
+      <div class="llmt-field"><label>Candidate training document</label><textarea id="con-doc" rows="2">Quiz answers: 1. What is the capital of Australia? Answer: Canberra. 2. What is the largest ocean?</textarea></div>
+      <div class="llmt-readout" id="con-readout"></div>
+    </div>
+    <div class="llmt-goal">💡 <span><b>PII and safety scrubbing</b> happen around the same stage: filters look for patterns resembling personal data (emails, phone numbers, ID numbers) and remove or mask them, and classifiers flag clearly toxic or unsafe pages for removal — separate from (and a preview of) the more targeted safety work in Part 12.</span></div>
   </section>
 
   <section class="llmt-step" id="mixing">
-    <div class="llmt-step-head"><span class="llmt-step-num">5</span><h2>Data mixing, and other fully-open recipes</h2></div>
+    <div class="llmt-step-head"><span class="llmt-step-num">5</span><h2>Data mixing and epoch budgets</h2></div>
     <p class="llmt-eyebrow">Wrap-up</p>
-    <p>The final step isn't just "keep what survives filtering" — it's choosing how much of each surviving source to actually show the model, and in what order across training (some recipes upweight higher-quality sources late in training). Getting this mixture right is empirical: labs train smaller models on candidate mixtures and measure downstream performance before committing a mixture to a full-scale run.</p>
-    <p>If you want to go deeper on this stage specifically, two other fully-documented efforts are worth reading: Hugging Face's <strong>FineWeb</strong>, which publishes both a massive filtered web dataset and a very detailed write-up of exactly which filtering choices moved benchmark scores, and <strong>Pythia</strong> (EleutherAI), an older but foundational suite built specifically to make data and training dynamics inspectable for research.</p>
+    <p>The final step isn't just "keep what survives filtering" — it's choosing how much of each surviving source to actually show the model. Reweighting a small, high-quality source upward means training on it for more than one <strong>epoch</strong> (full pass) — fine in moderation, but repeating low-diversity text too many times can hurt more than it helps. Adjust the sliders below (starting from Dolma v1.6's real proportions) against a fixed 3-trillion-token training budget and watch the implied epoch count per source.</p>
+    <div class="llmt-demo" style="flex-direction:column;">
+      <div id="mix-sliders"></div>
+      <div class="llmt-readout" id="mix-readout"></div>
+    </div>
   </section>
 
   <section class="llmt-step" id="cheatsheet">
@@ -195,7 +134,7 @@ permalink: /llm-training-data.html
         <tr><td>Sourcing</td><td>Assemble diverse, large-scale raw text</td><td>Common Crawl + code, papers, books, encyclopedic text</td></tr>
         <tr><td>Language filter</td><td>Keep only target-language text</td><td>Language ID classifiers</td></tr>
         <tr><td>Quality filter</td><td>Discard boilerplate / low-value text</td><td>Heuristic rules + trained classifiers</td></tr>
-        <tr><td>Deduplication</td><td>Remove exact and near-duplicate documents</td><td>Exact hashing + MinHash / Jaccard similarity</td></tr>
+        <tr><td>Deduplication</td><td>Remove exact and near-duplicate documents</td><td>Exact hashing + MinHash/LSH banding</td></tr>
         <tr><td>PII / safety scrub</td><td>Remove personal data and clearly unsafe content</td><td>Pattern matching + classifiers</td></tr>
         <tr><td>Decontamination</td><td>Prevent eval-set leakage into training data</td><td>Overlap search against benchmark text</td></tr>
         <tr><td>Mixing</td><td>Weight sources for the best downstream model</td><td>Small-scale ablations before committing at scale</td></tr>
@@ -209,9 +148,8 @@ permalink: /llm-training-data.html
     <p class="llmt-eyebrow">References</p>
     <ul class="llmt-refs">
       <li>Soldaini et al., <a href="https://arxiv.org/abs/2402.00159">"Dolma: an Open Corpus of Three Trillion Tokens for Language Model Pretraining Research"</a> (2024).</li>
+      <li>Broder, <a href="https://ieeexplore.ieee.org/document/666900">"On the resemblance and containment of documents"</a> (1997) — MinHash.</li>
       <li>Penedo et al., <a href="https://arxiv.org/abs/2406.17557">"The FineWeb Datasets: Decanting the Web for the Finest Text Data at Scale"</a> (2024).</li>
-      <li>Biderman et al., <a href="https://arxiv.org/abs/2304.01373">"Pythia: A Suite for Analyzing Large Language Models Across Training and Scaling"</a> (2023).</li>
-      <li><a href="https://commoncrawl.org/">Common Crawl</a> — the raw web-crawl foundation most pretraining corpora start from.</li>
       <li><a href="https://huggingface.co/datasets/allenai/dolma">Dolma dataset card and code</a> (Hugging Face / Ai2).</li>
     </ul>
   </section>
@@ -219,7 +157,7 @@ permalink: /llm-training-data.html
 
   <div class="llmt-next">
     <span>Once the dataset exists, the actual training loop — turning trillions of tokens into a base model — has its own moving parts: loss, optimizers, schedules, and scale.</span>
-    <a class="btn btn-secondary" href="{{ '/llm-training-pretraining.html' | relative_url }}">Continue: pretraining at scale →</a>
+    <a class="btn btn-secondary" href="{{ '/llm-training-pretraining.html' | relative_url }}">Continue: pretraining, the training loop →</a>
   </div>
 </div>
 </main>
@@ -231,69 +169,119 @@ permalink: /llm-training-data.html
   </div>
 </footer>
 
+<script src="{{ '/assets/js/llm-guide.js' | relative_url }}"></script>
 {% raw %}
 <script>
 (function(){
   "use strict";
-  function css(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
-  var COLOR_ACCENT = css('--color-accent') || '#0088b0';
-  var COLOR_ACCENT2 = css('--color-accent-2') || '#d6006c';
-  var COLOR_TEXT = css('--color-text') || '#201e1d';
-  var PALETTE = [css('--color-accent-700'),css('--color-accent-500'),css('--color-accent-300'),css('--color-accent-2-500'),css('--color-neutral-500'),css('--color-accent-2-700')];
+  var G = window.LLMG, c = G.colors();
+  var PALETTE = [c.accent700 || c.accent, c.accent500, c.accent400, c.accent2, '#999', c.accent2 && (c.accent2)];
+  var DATA_URL = "{% endraw %}{{ '/assets/data/llm-published-numbers.json' | relative_url }}{% raw %}";
 
-  // ---- Step 1: source mix bar chart ----
-  (function(){
-    var canvas = document.getElementById('s1-canvas'), ctx = canvas.getContext('2d');
-    var W = canvas.width, H = canvas.height;
-    var readout = document.getElementById('s1-readout');
-    var sources = [
-      {name:'Web crawl (Common Crawl-derived)', pct:0.55, desc:'Broad, high-volume, noisy general web text — the largest single source by token count.'},
-      {name:'Code repositories', pct:0.13, desc:'Source code from public repos — improves structured reasoning and programming ability.'},
-      {name:'Academic papers', pct:0.10, desc:'Scientific text (e.g. peS2o-style corpora) — dense, well-edited, technical.'},
-      {name:'Encyclopedic text', pct:0.08, desc:'Wikipedia and similar — high factual density, heavily edited.'},
-      {name:'Books', pct:0.08, desc:'Public-domain long-form text — long-range coherence and narrative structure.'},
-      {name:'Q&A / forums', pct:0.06, desc:'Structured question-answer text (e.g. StackExchange-style) — useful for instruction-like patterns even before fine-tuning.'}
-    ];
-    var barW = (W-40) / sources.length;
-    var selected = null;
-    function draw(){
-      ctx.clearRect(0,0,W,H);
-      var maxPct = Math.max.apply(null, sources.map(function(s){return s.pct;}));
-      sources.forEach(function(s,i){
-        var x = 20 + i*barW;
-        var h = (H-60) * (s.pct/maxPct);
-        ctx.fillStyle = s===selected ? COLOR_ACCENT : PALETTE[i%PALETTE.length];
-        ctx.fillRect(x+10, H-40-h, barW-20, h);
-        ctx.fillStyle = COLOR_TEXT;
-        ctx.font = '11px ' + (css('--font-body')||'sans-serif');
-        ctx.textAlign = 'center';
-        ctx.fillText((s.pct*100).toFixed(0)+'%', x+barW/2, H-44-h);
-        wrapText(s.name, x+barW/2, H-22, barW-6);
-      });
-      ctx.textAlign = 'left';
-    }
-    function wrapText(text, cx, y, maxW){
-      var words = text.split(' '), line='', lines=[];
-      words.forEach(function(w){
-        var test = line ? line+' '+w : w;
-        if (ctx.measureText(test).width > maxW && line){ lines.push(line); line = w; } else { line = test; }
-      });
-      lines.push(line);
-      ctx.textAlign = 'center';
-      lines.forEach(function(l,i){ ctx.fillText(l, cx, y + i*11); });
-    }
-    canvas.addEventListener('click', function(e){
-      var rect = canvas.getBoundingClientRect();
-      var mx = (e.clientX-rect.left) * (W/rect.width);
-      var idx = Math.floor((mx-20)/barW);
-      if (idx>=0 && idx<sources.length){
-        selected = sources[idx];
-        readout.innerHTML = '<span class="hi">' + selected.name + '</span> — ' + selected.desc;
-        draw();
+  function shingles(text, n){
+    var words = text.toLowerCase().replace(/[^\w\s]/g,'').trim().split(/\s+/);
+    var set = new Set();
+    for (var i=0;i<=words.length-n;i++){ set.add(words.slice(i,i+n).join(' ')); }
+    return set;
+  }
+  function jaccard(setA, setB){
+    var inter = 0;
+    setA.forEach(function(x){ if (setB.has(x)) inter++; });
+    var union = setA.size + setB.size - inter;
+    return union ? inter/union : 0;
+  }
+
+  fetch(DATA_URL).then(function(r){return r.json();}).then(function(data){
+    var dolma = data.dolma_v1_6_mix.sources;
+
+    // ---- Step 1: real Dolma source mix ----
+    (function(){
+      var canvas = document.getElementById('s1-canvas'), ctx = canvas.getContext('2d');
+      var W = canvas.width, H = canvas.height;
+      var readout = document.getElementById('s1-readout');
+      var descs = {
+        'Common Crawl (web)': 'Broad, high-volume, noisy general web text — the largest single source by far.',
+        'The Stack (code)': 'Source code from public repositories — improves structured reasoning and programming ability.',
+        'C4 (web)': 'An independently-filtered web corpus (Colossal Clean Crawled Corpus), included alongside raw Common Crawl.',
+        'Reddit': 'Conversational, informal text with natural back-and-forth structure.',
+        'PeS2o (S2ORC papers)': 'Scientific papers — dense, well-edited, technical text.',
+        'Project Gutenberg (books)': 'Public-domain long-form books — long-range coherence and narrative structure.',
+        'Wikipedia + Wikibooks': 'Encyclopedic text — high factual density, heavily edited, tiny share by token count.'
+      };
+      var barW = (W-40) / dolma.length;
+      var selected = null;
+      function draw(){
+        ctx.clearRect(0,0,W,H);
+        var maxPct = Math.max.apply(null, dolma.map(function(s){return s.pct;}));
+        dolma.forEach(function(s,i){
+          var x = 20 + i*barW;
+          var h = Math.max(2,(H-70) * Math.sqrt(s.pct/maxPct)); // sqrt scale so tiny sources stay visible/clickable
+          ctx.fillStyle = s===selected ? c.accent : PALETTE[i%PALETTE.length];
+          ctx.fillRect(x+10, H-40-h, barW-20, h);
+          ctx.fillStyle = c.text;
+          ctx.font = '11px ' + c.font;
+          ctx.textAlign = 'center';
+          ctx.fillText(s.pct+'%', x+barW/2, H-44-h);
+          wrapText(s.name, x+barW/2, H-22, barW-6);
+        });
+        ctx.textAlign = 'left';
       }
-    });
-    draw();
-  })();
+      function wrapText(text, cx, y, maxW){
+        var words = text.split(' '), line='', lines=[];
+        words.forEach(function(w){
+          var test = line ? line+' '+w : w;
+          if (ctx.measureText(test).width > maxW && line){ lines.push(line); line = w; } else { line = test; }
+        });
+        lines.push(line);
+        ctx.textAlign = 'center';
+        lines.forEach(function(l,i){ ctx.fillText(l, cx, y + i*11); });
+      }
+      canvas.addEventListener('click', function(e){
+        var rect = canvas.getBoundingClientRect();
+        var mx = (e.clientX-rect.left) * (W/rect.width);
+        var idx = Math.floor((mx-20)/barW);
+        if (idx>=0 && idx<dolma.length){
+          selected = dolma[idx];
+          readout.innerHTML = '<span class="hi">' + selected.name + '</span> (' + selected.pct + '% of tokens) — ' + (descs[selected.name]||'');
+          draw();
+        }
+      });
+      draw();
+      renderMix(dolma);
+    })();
+
+    // ---- Data mixing sliders ----
+    function renderMix(dolma){
+      var container = document.getElementById('mix-sliders');
+      var readout = document.getElementById('mix-readout');
+      var weights = dolma.map(function(s){ return s.pct; });
+      var TOTAL_TOKENS = 3e12;
+      var nativeSizeTokens = dolma.map(function(s){ return TOTAL_TOKENS * s.pct/100; });
+
+      dolma.forEach(function(s, i){
+        var row = document.createElement('div'); row.className='llmt-field';
+        row.innerHTML = '<label>'+s.name+' <span class="val" id="mix-v-'+i+'">'+s.pct.toFixed(1)+'%</span></label>' +
+          '<input type="range" min="0" max="90" step="0.5" value="'+s.pct+'" id="mix-s-'+i+'">';
+        container.appendChild(row);
+      });
+      function render(){
+        var raw = weights.map(function(w,i){ return parseFloat(document.getElementById('mix-s-'+i).value); });
+        var sum = raw.reduce(function(a,b){return a+b;},0) || 1;
+        var norm = raw.map(function(w){ return 100*w/sum; });
+        var rows = dolma.map(function(s,i){
+          document.getElementById('mix-v-'+i).textContent = norm[i].toFixed(1)+'%';
+          var tokensUsed = TOTAL_TOKENS*norm[i]/100;
+          var epochs = tokensUsed/nativeSizeTokens[i];
+          return { name: s.name, pct: norm[i], epochs: epochs };
+        });
+        readout.innerHTML = rows.map(function(r){
+          return '<span class="k">'+r.name+':</span> '+r.pct.toFixed(1)+'% of 3T budget = '+(3*r.pct/100).toFixed(2)+'T tokens → <span class="'+(r.epochs>4?'bad':'hi')+'">'+r.epochs.toFixed(1)+'× epochs</span> over its native size';
+        }).join('<br>');
+      }
+      dolma.forEach(function(s,i){ document.getElementById('mix-s-'+i).addEventListener('input', render); });
+      render();
+    }
+  });
 
   // ---- Step 2: filtering funnel ----
   (function(){
@@ -301,11 +289,11 @@ permalink: /llm-training-data.html
     var W = canvas.width, H = canvas.height;
     var readout = document.getElementById('s2-readout');
     var stages = [
-      {name:'Raw crawl', frac:1.00, note:'Every page Common Crawl fetched, unfiltered.'},
-      {name:'After language filter', frac:0.55, note:'Keep target-language (e.g. English) pages; discard the rest.'},
-      {name:'After quality filter', frac:0.22, note:'Discard boilerplate, spam, and low-value pages via heuristics + classifiers.'},
-      {name:'After deduplication', frac:0.16, note:'Collapse exact and near-duplicate documents found via MinHash.'},
-      {name:'After PII / safety scrub', frac:0.15, note:'Remove or mask personal data; drop clearly unsafe pages.'}
+      {name:'Raw crawl', frac:1.00, note:'Every page Common Crawl fetched, unfiltered (~200 TB, per Dolma\'s paper).'},
+      {name:'After language filter', frac:0.45, note:'Keep target-language (e.g. English) pages; discard the rest.'},
+      {name:'After quality filter', frac:0.18, note:'Discard boilerplate, spam, and low-value pages via heuristics + classifiers.'},
+      {name:'After deduplication', frac:0.09, note:'Collapse exact and near-duplicate documents found via MinHash/LSH.'},
+      {name:'After PII / safety scrub', frac:0.055, note:'Remove or mask personal data; drop clearly unsafe pages. Lands near Dolma\'s real ~11TB / ~200TB ≈ 5.5% overall retention.'}
     ];
     var stageIdx = 0;
     function draw(){
@@ -316,21 +304,21 @@ permalink: /llm-training-data.html
         var s = stages[i];
         var x = 30 + i*(barW+14);
         var h = (H-60) * s.frac;
-        ctx.fillStyle = i===stageIdx ? COLOR_ACCENT : (css('--color-accent-300')||'#99e0ff');
+        ctx.fillStyle = i===stageIdx ? c.accent : c.accent400;
         ctx.fillRect(x, H-40-h, barW, h);
-        ctx.fillStyle = COLOR_TEXT;
-        ctx.font = '11px ' + (css('--font-body')||'sans-serif');
+        ctx.fillStyle = c.text;
+        ctx.font = '11px ' + c.font;
         ctx.textAlign='center';
-        ctx.fillText((s.frac*100).toFixed(0)+'%', x+barW/2, H-44-h);
+        ctx.fillText((s.frac*100).toFixed(1)+'%', x+barW/2, H-44-h);
         ctx.save();
         ctx.translate(x+barW/2, H-14);
-        ctx.font = '10px ' + (css('--font-body')||'sans-serif');
+        ctx.font = '10px ' + c.font;
         ctx.fillText(s.name, 0, 0);
         ctx.restore();
       }
       ctx.textAlign='left';
       var cur = stages[stageIdx];
-      readout.innerHTML = '<span class="k">stage:</span> <span class="hi">' + cur.name + '</span> — ' + (cur.frac*100).toFixed(0) + '% of raw crawl remains<br><span class="k">what happened:</span> ' + cur.note;
+      readout.innerHTML = '<span class="k">stage:</span> <span class="hi">' + cur.name + '</span> — ' + (cur.frac*100).toFixed(1) + '% of raw crawl remains<br><span class="k">what happened:</span> ' + cur.note;
     }
     document.getElementById('s2-next').addEventListener('click', function(){ stageIdx = Math.min(stages.length-1, stageIdx+1); draw(); });
     document.getElementById('s2-prev').addEventListener('click', function(){ stageIdx = Math.max(0, stageIdx-1); draw(); });
@@ -338,24 +326,46 @@ permalink: /llm-training-data.html
     draw();
   })();
 
+  // ---- Quality classifier threshold ----
+  (function(){
+    var slider = document.getElementById('qc-t'), val = document.getElementById('qc-t-val');
+    var canvas = document.getElementById('qc-canvas'), ctx = canvas.getContext('2d');
+    var readout = document.getElementById('qc-readout');
+    var W = canvas.width, H = canvas.height;
+    var rng = G.seededRandom(42);
+    function gauss(mean, sd){ var u1=rng(),u2=rng(); return mean + sd*Math.sqrt(-2*Math.log(u1+1e-9))*Math.cos(2*Math.PI*u2); }
+    var docs = [];
+    for (var i=0;i<20;i++) docs.push({score: Math.max(0,Math.min(1,gauss(0.7,0.15))), quality:true});
+    for (i=0;i<20;i++) docs.push({score: Math.max(0,Math.min(1,gauss(0.35,0.18))), quality:false});
+
+    function render(){
+      var t = parseFloat(slider.value);
+      val.textContent = t.toFixed(2);
+      ctx.clearRect(0,0,W,H);
+      docs.forEach(function(d,i){
+        var x = 20 + d.score*(W-40);
+        var y = d.quality ? H*0.3 : H*0.7;
+        ctx.beginPath(); ctx.arc(x,y,4,0,2*Math.PI);
+        ctx.fillStyle = d.score>=t ? c.accent : '#ccc';
+        ctx.fill();
+      });
+      ctx.strokeStyle = c.accent2; ctx.beginPath();
+      var tx = 20+t*(W-40); ctx.moveTo(tx,10); ctx.lineTo(tx,H-10); ctx.stroke();
+      var tp = docs.filter(function(d){return d.quality && d.score>=t;}).length;
+      var fp = docs.filter(function(d){return !d.quality && d.score>=t;}).length;
+      var fn = docs.filter(function(d){return d.quality && d.score<t;}).length;
+      var precision = tp/(tp+fp||1), recall = tp/(tp+fn||1);
+      readout.innerHTML = '<span class="k">kept:</span> '+(tp+fp)+' of 40 docs &nbsp; <span class="k">precision:</span> '+(precision*100).toFixed(0)+'% &nbsp; <span class="k">recall:</span> '+(recall*100).toFixed(0)+'%';
+    }
+    slider.addEventListener('input', render);
+    render();
+  })();
+
   // ---- Step 3: Jaccard similarity / dedup demo ----
   (function(){
     var aInput = document.getElementById('s3-a'), bInput = document.getElementById('s3-b');
     var thresh = document.getElementById('s3-threshold'), tval = document.getElementById('s3-tval');
     var readout = document.getElementById('s3-readout');
-
-    function shingles(text, n){
-      var words = text.toLowerCase().trim().split(/\s+/);
-      var set = new Set();
-      for (var i=0;i<=words.length-n;i++){ set.add(words.slice(i,i+n).join(' ')); }
-      return set;
-    }
-    function jaccard(setA, setB){
-      var inter = 0;
-      setA.forEach(function(x){ if (setB.has(x)) inter++; });
-      var union = setA.size + setB.size - inter;
-      return union ? inter/union : 0;
-    }
     function render(){
       tval.textContent = parseFloat(thresh.value).toFixed(2);
       var sa = shingles(aInput.value, 3), sb = shingles(bInput.value, 3);
@@ -364,10 +374,55 @@ permalink: /llm-training-data.html
       readout.innerHTML =
         '<span class="k">shingles in A:</span> ' + sa.size + '&nbsp;&nbsp;<span class="k">shingles in B:</span> ' + sb.size + '<br>' +
         '<span class="k">Jaccard similarity:</span> <span class="hi">' + j.toFixed(3) + '</span><br>' +
-        '<span class="k">threshold:</span> ' + parseFloat(thresh.value).toFixed(2) + '<br>' +
-        '<span class="k">verdict:</span> <span class="hi" style="color:' + (isDup ? (css('--color-accent-2-700')||'#aa0b56') : (css('--color-accent-700')||'#006786')) + '">' + (isDup ? 'flagged as near-duplicate — one copy would be dropped' : 'kept as distinct documents') + '</span>';
+        '<span class="k">verdict:</span> <span class="' + (isDup?'bad':'hi') + '">' + (isDup ? 'flagged as near-duplicate — one copy would be dropped' : 'kept as distinct documents') + '</span>';
+      window._lastJaccard = j;
+      if (window._renderLsh) window._renderLsh();
     }
     [aInput,bInput,thresh].forEach(function(el){ el.addEventListener('input', render); });
+    render();
+  })();
+
+  // ---- MinHash/LSH banding ----
+  (function(){
+    var bS = document.getElementById('lsh-b'), rS = document.getElementById('lsh-r');
+    var bV = document.getElementById('lsh-b-val'), rV = document.getElementById('lsh-r-val');
+    var canvas = document.getElementById('lsh-canvas'), ctx = canvas.getContext('2d');
+    var readout = document.getElementById('lsh-readout');
+    var W = canvas.width, H = canvas.height;
+    function render(){
+      var b = +bS.value, r = +rS.value;
+      bV.textContent = b; rV.textContent = r;
+      var pts = [];
+      for (var i=0;i<=100;i++){
+        var s = i/100;
+        var p = 1-Math.pow(1-Math.pow(s,r), b);
+        pts.push({x:s, y:p});
+      }
+      var axes = G.drawLines(ctx, W, H, [{points:pts, color:c.accent}], [0,1], [0,1], {xLabel:'true Jaccard similarity s', yLabel:'P(flagged as candidate)'});
+      var s0 = window._lastJaccard != null ? window._lastJaccard : 0.5;
+      var p0 = 1-Math.pow(1-Math.pow(s0,r), b);
+      var mx = axes.px(s0), my = axes.py(p0);
+      ctx.fillStyle = c.accent2; ctx.beginPath(); ctx.arc(mx,my,5,0,2*Math.PI); ctx.fill();
+      readout.innerHTML = '<span class="k">this pair\'s Jaccard similarity (from Section 3 above):</span> '+s0.toFixed(3)+'<br><span class="k">P(caught by this b,r banding):</span> <span class="hi">'+(p0*100).toFixed(1)+'%</span>';
+    }
+    window._renderLsh = render;
+    [bS,rS].forEach(function(el){ el.addEventListener('input', render); });
+    render();
+  })();
+
+  // ---- Contamination checker ----
+  (function(){
+    var benchInput = document.getElementById('con-bench'), docInput = document.getElementById('con-doc');
+    var readout = document.getElementById('con-readout');
+    function render(){
+      var sBench = shingles(benchInput.value, 4), sDoc = shingles(docInput.value, 4);
+      var overlap = 0;
+      sBench.forEach(function(x){ if (sDoc.has(x)) overlap++; });
+      var frac = sBench.size ? overlap/sBench.size : 0;
+      readout.innerHTML = '<span class="k">4-gram overlap:</span> '+overlap+' of '+sBench.size+' benchmark 4-grams found verbatim in the candidate document<br>' +
+        '<span class="k">contamination flag:</span> <span class="'+(frac>0.3?'bad':'hi')+'">'+(frac>0.3?'likely contaminated — document overlaps substantially with eval text':'below typical contamination threshold')+'</span>';
+    }
+    [benchInput,docInput].forEach(function(el){ el.addEventListener('input', render); });
     render();
   })();
 
