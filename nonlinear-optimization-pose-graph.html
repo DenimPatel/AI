@@ -45,6 +45,9 @@ permalink: /nonlinear-optimization-pose-graph.html
     padding: 12px 14px; border-radius: var(--radius-sm); overflow-x: auto; margin: 0 0 16px;
     line-height: 1.7;
   }
+  .nlo-math sub, .nlo-math sup, p sub, p sup, td sub, td sup {
+    font-size: 0.72em;
+  }
   .nlo-demo {
     display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;
     background: var(--color-surface); border-radius: var(--radius-md); padding: 18px;
@@ -131,7 +134,7 @@ permalink: /nonlinear-optimization-pose-graph.html
     <div class="nlo-step-head"><span class="nlo-step-num">1</span><h2>Composing motion: the same rotation, the other way</h2></div>
     <p class="nlo-eyebrow">Foundations</p>
     <div class="nlo-goal">🎯 <b>Learning goal:</b> a bearing measurement converts a world-frame offset <em>into</em> the robot's body frame (part 2). Odometry does the reverse: it converts a body-frame motion command <em>out into</em> the world frame, using the same rotation matrix run the other direction.</div>
-    <div class="nlo-math">p&#7522;&#8330;&#8321; = p&#7522; + R(θ&#7522;) · u&#7522;&nbsp;&nbsp;&nbsp;&nbsp;u&#7522; = measured (forward, left) motion, in the robot's own frame at time i</div>
+    <div class="nlo-math">p<sub>i</sub>&#8330;&#8321; = p<sub>i</sub> + R(θ<sub>i</sub>) · u<sub>i</sub>&nbsp;&nbsp;&nbsp;&nbsp;u<sub>i</sub> = measured (forward, left) motion, in the robot's own frame at time i</div>
     <p>The robot always reports odometry in its own frame — "I moved 2.5 forward and drifted 0.4 to my left" — because that's all its wheels or IMU actually know. Drag the heading slider and watch the <em>same</em> reported motion produce a completely different push across the world, depending only on which way the robot happened to be facing when it made that move.</p>
     <div class="nlo-demo">
       <div class="nlo-canvas-wrap">
@@ -142,7 +145,7 @@ permalink: /nonlinear-optimization-pose-graph.html
         </div>
       </div>
       <div class="nlo-controls">
-        <div class="nlo-field"><label>Heading at time i, θ&#7522; <span class="val" id="s1-tval"></span></label><input type="range" id="s1-theta" min="-180" max="180" step="1" value="35"></div>
+        <div class="nlo-field"><label><span>Heading at time i, θ<sub>i</sub></span> <span class="val" id="s1-tval"></span></label><input type="range" id="s1-theta" min="-180" max="180" step="1" value="35"></div>
         <div class="nlo-readout" id="s1-readout"></div>
       </div>
     </div>
@@ -536,7 +539,7 @@ permalink: /nonlinear-optimization-pose-graph.html
       document.getElementById('s1-tval').textContent = thetaDeg.toFixed(0) + '°';
       document.getElementById('s1-readout').innerHTML =
         '<div><span class="k">reported (body frame)</span> = (' + u.dx.toFixed(2) + ', ' + u.dy.toFixed(2) + ')</div>' +
-        '<div><span class="k">R(θ&#7522;) · u</span> = <span class="hi">(' + worldDx.toFixed(2) + ', ' + worldDy.toFixed(2) + ')</span> world frame</div>';
+        '<div><span class="k">R(θ<sub>i</sub>) · u</span> = <span class="hi">(' + worldDx.toFixed(2) + ', ' + worldDy.toFixed(2) + ')</span> world frame</div>';
     }
     document.getElementById('s1-theta').addEventListener('input', draw);
     draw();

@@ -44,6 +44,22 @@ permalink: /multi-view-geometry-sfm.html
     padding: 12px 14px; border-radius: var(--radius-sm); overflow-x: auto; margin: 0 0 16px;
     line-height: 1.7;
   }
+  .mvg-math sub, .mvg-math sup, p sub, p sup, td sub, td sup {
+    font-size: 0.72em;
+  }
+  .mvg-matrix-eq { display: inline-flex; align-items: center; gap: 8px; vertical-align: middle; flex-wrap: wrap; }
+  .mvg-matrix-wrap { display: inline-flex; align-items: stretch; vertical-align: middle; }
+  .mvg-bracket {
+    font-family: var(--font-mono); font-size: 2.6em; font-weight: 300; line-height: 1;
+    display: flex; align-items: center; transform: scaleX(0.6); user-select: none; opacity: 0.85;
+  }
+  .mvg-bracket-sm { font-size: 1.9em; }
+  .mvg-matrix-grid {
+    display: inline-grid; grid-template-columns: repeat(3, minmax(1.7em, auto));
+    align-items: center; justify-items: end; gap: 4px 16px; padding: 2px 8px;
+  }
+  .mvg-matrix-grid.cols-2 { grid-template-columns: repeat(2, minmax(2.2em, auto)); }
+  .mvg-matrix-grid.cols-1 { grid-template-columns: minmax(2.2em, auto); }
   .mvg-demo {
     display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;
     background: var(--color-surface); border-radius: var(--radius-md); padding: 18px;
@@ -195,7 +211,35 @@ permalink: /multi-view-geometry-sfm.html
     <div class="mvg-step-head"><span class="mvg-step-num">4</span><h2>Eliminate the points first: the Schur complement</h2></div>
     <p class="mvg-eyebrow">The one trick that makes BA practical</p>
     <p>The Gauss-Newton normal equations are <var>J&#7488;J&#183;&Delta; = −J&#7488;r</var>. Split the unknown update <var>&Delta;</var> into a camera part <var>&Delta;c</var> and a point part <var>&Delta;p</var>, and — because <var>J = [J<sub>c</sub>|J<sub>p</sub>]</var> — the normal equations split into a matching 2×2 block system:</p>
-    <div class="mvg-math">&#9121; U<sub>cc</sub> &nbsp;&nbsp;W &#9124; &#9121;&Delta;c&#9124;&nbsp; &nbsp;&#9121;e<sub>c</sub>&#9124;<br>&#9125;W&#7488;&nbsp; V<sub>pp</sub>&#9128; &#9125;&Delta;p&#9128;&nbsp;=&nbsp;&#9125;e<sub>p</sub>&#9128;<br>&#9126;&#9129; &#9126;&#9129;&nbsp;&nbsp; &#9126;&#9129;</div>
+    <div class="mvg-math">
+      <span class="mvg-matrix-eq">
+        <span class="mvg-matrix-wrap">
+          <span class="mvg-bracket mvg-bracket-sm" aria-hidden="true">[</span>
+          <span class="mvg-matrix-grid cols-2">
+            <span>U<sub>cc</sub></span><span>W</span>
+            <span>W<sup>T</sup></span><span>V<sub>pp</sub></span>
+          </span>
+          <span class="mvg-bracket mvg-bracket-sm" aria-hidden="true">]</span>
+        </span>
+        <span class="mvg-matrix-wrap">
+          <span class="mvg-bracket mvg-bracket-sm" aria-hidden="true">[</span>
+          <span class="mvg-matrix-grid cols-1">
+            <span>&Delta;c</span>
+            <span>&Delta;p</span>
+          </span>
+          <span class="mvg-bracket mvg-bracket-sm" aria-hidden="true">]</span>
+        </span>
+        =
+        <span class="mvg-matrix-wrap">
+          <span class="mvg-bracket mvg-bracket-sm" aria-hidden="true">[</span>
+          <span class="mvg-matrix-grid cols-1">
+            <span>e<sub>c</sub></span>
+            <span>e<sub>p</sub></span>
+          </span>
+          <span class="mvg-bracket mvg-bracket-sm" aria-hidden="true">]</span>
+        </span>
+      </span>
+    </div>
     <p>where <var>U<sub>cc</sub> = J<sub>c</sub>&#7488;J<sub>c</sub></var>, <var>V<sub>pp</sub> = J<sub>p</sub>&#7488;J<sub>p</sub></var>, <var>W = J<sub>c</sub>&#7488;J<sub>p</sub></var>, and <var>e<sub>c</sub>, e<sub>p</sub></var> are the matching pieces of <var>−J&#7488;r</var>. The sparsity from the last section says something very precise about these three blocks: an entry of <var>U<sub>cc</sub></var> connecting camera <var>i</var> to camera <var>i&prime;</var> (<var>i≠i&prime;</var>) sums over residuals that depend on <em>both</em> cameras' params at once — but no residual ever does, since one observation only ever involves one camera. So <var>U<sub>cc</sub></var> is exactly block-diagonal (one 6×6 block per camera), and by the identical argument so is <var>V<sub>pp</sub></var> (one 3×3 block per point). Only <var>W</var>, whose <var>(i,j)</var> block sums over the single residual that <em>does</em> involve both camera <var>i</var> and point <var>j</var>, is nonzero off the block-diagonal — dense-ish, patterned by whichever cameras actually see whichever points.</p>
     <p>A block-diagonal matrix inverts block-by-block, for free (invert each tiny 3×3 point block independently — trivial compared to inverting the whole thing). That's the opening <var>V<sub>pp</sub></var> gives you. Take the bottom block row of the system, <var>W&#7488;&Delta;c + V<sub>pp</sub>&Delta;p = e<sub>p</sub></var>, and solve it for <var>&Delta;p</var>:</p>
     <div class="mvg-math">&Delta;p = V<sub>pp</sub>&#8315;&#185;(e<sub>p</sub> − W&#7488;&Delta;c)</div>

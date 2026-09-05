@@ -44,6 +44,19 @@ permalink: /multi-view-geometry-calibration.html
     padding: 12px 14px; border-radius: var(--radius-sm); overflow-x: auto; margin: 0 0 16px;
     line-height: 1.7;
   }
+  .mvg-math sub, .mvg-math sup, p sub, p sup, td sub, td sup, code sub, code sup {
+    font-size: 0.72em;
+  }
+  .mvg-matrix-eq { display: inline-flex; align-items: center; gap: 8px; vertical-align: middle; }
+  .mvg-matrix-wrap { display: inline-flex; align-items: stretch; vertical-align: middle; }
+  .mvg-bracket {
+    font-family: var(--font-mono); font-size: 2.6em; font-weight: 300; line-height: 1;
+    display: flex; align-items: center; transform: scaleX(0.6); user-select: none; opacity: 0.85;
+  }
+  .mvg-matrix-grid {
+    display: inline-grid; grid-template-columns: repeat(3, minmax(1.7em, auto));
+    align-items: center; justify-items: end; gap: 4px 16px; padding: 2px 8px;
+  }
   .mvg-demo {
     display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;
     background: var(--color-surface); border-radius: var(--radius-md); padding: 18px;
@@ -126,7 +139,7 @@ permalink: /multi-view-geometry-calibration.html
   <section class="mvg-step" id="setup">
     <div class="mvg-step-head"><span class="mvg-step-num">0</span><h2>The problem, and the object that's actually linear</h2></div>
     <p class="mvg-eyebrow">Setup</p>
-    <p><strong>Calibration</strong> means recovering the intrinsic matrix <var>K</var> — and often lens distortion coefficients — from images of a target whose geometry you know exactly, almost always a flat checkerboard, photographed from several different poses (different positions and tilts relative to the camera). The obstacle is that <var>K</var> doesn't sit anywhere you can solve for linearly: it shows up inside a perspective divide, buried in a product with an unknown rotation and translation for every single photo. Trying to fit <code>fx&#7793;, f&#7796;, c&#7793;, c&#7796;</code> directly against pixel measurements is a nasty nonlinear problem with a different unknown pose per image.</p>
+    <p><strong>Calibration</strong> means recovering the intrinsic matrix <var>K</var> — and often lens distortion coefficients — from images of a target whose geometry you know exactly, almost always a flat checkerboard, photographed from several different poses (different positions and tilts relative to the camera). The obstacle is that <var>K</var> doesn't sit anywhere you can solve for linearly: it shows up inside a perspective divide, buried in a product with an unknown rotation and translation for every single photo. Trying to fit <code>f<sub>x</sub>, f<sub>y</sub>, c<sub>x</sub>, c<sub>y</sub></code> directly against pixel measurements is a nasty nonlinear problem with a different unknown pose per image.</p>
     <p>The fix is to stop looking for <var>K</var> and look for a related quantity that <em>is</em> linear: the <strong>image of the absolute conic</strong>, written <var>ω</var> (omega):</p>
     <div class="mvg-math">ω = K&#8315;ᵀK&#8315;&#185;</div>
     <p>Part 0 introduced a conic as a symmetric 3×3 matrix <var>C</var> with <code>x&#771;ᵀCx&#771; = 0</code>. <var>ω</var> is exactly that kind of object — the image, under this camera, of a specific conic that lives entirely at infinity in 3D (the "absolute conic") and is never itself visible in any photo. What makes it useful isn't the geometric picture though, it's two algebraic facts: <var>ω</var> is symmetric (6 numbers, and since it's only ever used up to scale, 5 real degrees of freedom — the same 5 DOF as a general <var>K</var>), and <strong>it depends only on <var>K</var>, never on where the camera is pointed</strong>. A camera held at ten different angles has ten different extrinsics but the exact same <var>ω</var> in every shot. That's the whole strategy: each photo of the checkerboard contributes linear equations in the six entries of <var>ω</var>, and once enough photos have piled up enough equations, solving for <var>ω</var> is ordinary linear algebra.</p>
@@ -186,30 +199,43 @@ permalink: /multi-view-geometry-calibration.html
   <section class="mvg-step" id="skew">
     <div class="mvg-step-head"><span class="mvg-step-num">3</span><h2>The other two degrees of freedom: skew and non-square pixels</h2></div>
     <p class="mvg-eyebrow">Extending K</p>
-    <p>Part 1's demo used the simplest possible <var>K</var>: a single shared focal length (<code>f&#7793; = f&#7796;</code>) and zero skew. The fully general intrinsic matrix has <strong>5 degrees of freedom</strong>, and the Zhang derivation above never assumed anything simpler:</p>
-    <div class="mvg-math">K = &#9121;f&#7793;&nbsp; s&nbsp; c&#7793;&#9124;<br>&#9125;0&nbsp; f&#7796;&nbsp; c&#7796;&#9128;<br>&#9126;0&nbsp; 0&nbsp;&nbsp; 1 &#9129;</div>
-    <p><strong>Skew <var>s</var></strong> is nonzero when the sensor's row and column axes aren't exactly perpendicular. On virtually every real manufactured sensor this is extremely close to zero — it's rarely worth modeling — but the calibration math has to allow for it to be correct in general, and Zhang's linear solve recovers it automatically as one of <var>ω</var>'s five degrees of freedom with no extra work. <strong>f&#7793; ≠ f&#7796;</strong> means pixels aren't square: either the physical sensor elements aren't square (common on older or cheaper sensors), or — far more common in practice — the image was resized or cropped anisotropically somewhere in the pipeline (different scale factors in x and y), which silently turns square pixels into rectangular ones from the math's point of view.</p>
+    <p>Part 1's demo used the simplest possible <var>K</var>: a single shared focal length (<code>f<sub>x</sub> = f<sub>y</sub></code>) and zero skew. The fully general intrinsic matrix has <strong>5 degrees of freedom</strong>, and the Zhang derivation above never assumed anything simpler:</p>
+    <div class="mvg-math">
+      <span class="mvg-matrix-eq">
+        K =
+        <span class="mvg-matrix-wrap">
+          <span class="mvg-bracket" aria-hidden="true">[</span>
+          <span class="mvg-matrix-grid">
+            <span>f<sub>x</sub></span><span>s</span><span>c<sub>x</sub></span>
+            <span>0</span><span>f<sub>y</sub></span><span>c<sub>y</sub></span>
+            <span>0</span><span>0</span><span>1</span>
+          </span>
+          <span class="mvg-bracket" aria-hidden="true">]</span>
+        </span>
+      </span>
+    </div>
+    <p><strong>Skew <var>s</var></strong> is nonzero when the sensor's row and column axes aren't exactly perpendicular. On virtually every real manufactured sensor this is extremely close to zero — it's rarely worth modeling — but the calibration math has to allow for it to be correct in general, and Zhang's linear solve recovers it automatically as one of <var>ω</var>'s five degrees of freedom with no extra work. <strong>f<sub>x</sub> ≠ f<sub>y</sub></strong> means pixels aren't square: either the physical sensor elements aren't square (common on older or cheaper sensors), or — far more common in practice — the image was resized or cropped anisotropically somewhere in the pipeline (different scale factors in x and y), which silently turns square pixels into rectangular ones from the math's point of view.</p>
     <div class="mvg-warn">⚠️ <span>Skew is small enough on real hardware that plenty of practical calibration pipelines fix <code>s = 0</code> by assumption to make the nonlinear refinement step better-conditioned. That's a modeling choice, not a mathematical necessity — the demo below keeps the full 5-DOF form so you can see what skew actually does to an image.</span></div>
   </section>
 
   <section class="mvg-step" id="demo-skew">
     <div class="mvg-step-head"><span class="mvg-step-num">4</span><h2>Play: the full 5-DOF K</h2></div>
     <p class="mvg-eyebrow">Interactive</p>
-    <div class="mvg-goal">🎯 <b>Learning goal:</b> skew shears the image, f&#7793; ≠ f&#7796; stretches it unevenly — both are ordinary entries of K, computed live from x&#771; = K[R|t]X&#771; with a fixed camera pose.</div>
+    <div class="mvg-goal">🎯 <span><b>Learning goal:</b> skew shears the image, f<sub>x</sub> ≠ f<sub>y</sub> stretches it unevenly — both are ordinary entries of K, computed live from x&#771; = K[R|t]X&#771; with a fixed camera pose.</span></div>
     <p>A checkerboard at a fixed, tilted pose, projected through a fully general <var>K</var>. The two arrows show where <var>K</var> sends the camera-plane's unit x- and y-directions — they're literally <var>K</var>'s first two columns. When they're perpendicular and equal length, pixels are square and skew is zero, same as every earlier demo in this series.</p>
     <div class="mvg-demo">
       <div class="mvg-canvas-wrap mvg-imgplane">
         <canvas id="s4-canvas" width="480" height="360"></canvas>
       </div>
       <div class="mvg-controls">
-        <div class="mvg-field"><label>f&#7793; <span class="val" id="s4-fxval"></span></label><input type="range" id="s4-fx" min="300" max="900" step="5" value="600"></div>
-        <div class="mvg-field"><label>f&#7796; <span class="val" id="s4-fyval"></span></label><input type="range" id="s4-fy" min="300" max="900" step="5" value="600"></div>
+        <div class="mvg-field"><label><span>f<sub>x</sub></span> <span class="val" id="s4-fxval"></span></label><input type="range" id="s4-fx" min="300" max="900" step="5" value="600"></div>
+        <div class="mvg-field"><label><span>f<sub>y</sub></span> <span class="val" id="s4-fyval"></span></label><input type="range" id="s4-fy" min="300" max="900" step="5" value="600"></div>
         <div class="mvg-field"><label>skew s <span class="val" id="s4-sval"></span></label><input type="range" id="s4-s" min="-200" max="200" step="2" value="0"></div>
         <div class="mvg-btnrow"><button id="s4-reset">Reset to square pixels</button></div>
         <div class="mvg-readout" id="s4-readout"></div>
       </div>
     </div>
-    <p>Push <b>skew</b> away from 0 and the checkerboard squares turn into parallelograms — the grid lines that were vertical in the world stop being vertical in the image, even though nothing about the camera's pose moved. Separate <b>f&#7793;</b> and <b>f&#7796;</b> and the squares stretch into rectangles along one axis. Both effects are exactly what the two extra off-diagonal-ish degrees of freedom in <var>K</var> encode.</p>
+    <p>Push <b>skew</b> away from 0 and the checkerboard squares turn into parallelograms — the grid lines that were vertical in the world stop being vertical in the image, even though nothing about the camera's pose moved. Separate <b>f<sub>x</sub></b> and <b>f<sub>y</sub></b> and the squares stretch into rectangles along one axis. Both effects are exactly what the two extra off-diagonal-ish degrees of freedom in <var>K</var> encode.</p>
   </section>
 
   <section class="mvg-step" id="diagnosing">
@@ -231,7 +257,7 @@ permalink: /multi-view-geometry-calibration.html
         <tr><td>Zhang constraint 1</td><td><code>h&#8321;ᵀωh&#8322; = 0</code></td><td>From r&#8321;ᵀr&#8322; = 0 (rotation columns orthogonal)</td><td>One row of V per pose</td></tr>
         <tr><td>Zhang constraint 2</td><td><code>h&#8321;ᵀωh&#8321; = h&#8322;ᵀωh&#8322;</code></td><td>From r&#8321;ᵀr&#8321; = r&#8322;ᵀr&#8322; (rotation columns unit length)</td><td>Second row of V per pose</td></tr>
         <tr><td>Minimum poses</td><td>≥ 3, orientation-diverse</td><td>2 constraints/pose, 5 unknowns up to scale ⟹ ≥2.5 poses</td><td>Fewer, or all-coplanar, ⟹ V rank-deficient</td></tr>
-        <tr><td>Full intrinsics</td><td><code>K = [[f&#7793;,s,c&#7793;],[0,f&#7796;,c&#7796;],[0,0,1]]</code></td><td>5 DOF: focal lengths, skew, principal point</td><td>Part 1's demo fixed f&#7793;=f&#7796;, s=0</td></tr>
+        <tr><td>Full intrinsics</td><td><code>K = [[f<sub>x</sub>,s,c<sub>x</sub>],[0,f<sub>y</sub>,c<sub>y</sub>],[0,0,1]]</code></td><td>5 DOF: focal lengths, skew, principal point</td><td>Part 1's demo fixed f<sub>x</sub>=f<sub>y</sub>, s=0</td></tr>
         <tr><td>Reprojection error</td><td>RMS, in pixels</td><td>Distance between reprojected and detected corners</td><td>&lt; 0.5 px good, &gt; 1 px investigate</td></tr>
       </tbody>
     </table>
@@ -458,8 +484,8 @@ permalink: /multi-view-geometry-calibration.html
     }
 
     function fmtK(K){
-      return 'f&#7793;=' + K[0][0].toFixed(1) + ', f&#7796;=' + K[1][1].toFixed(1) +
-             ', s=' + K[0][1].toFixed(2) + ', c&#7793;=' + K[0][2].toFixed(1) + ', c&#7796;=' + K[1][2].toFixed(1);
+      return 'f<sub>x</sub>=' + K[0][0].toFixed(1) + ', f<sub>y</sub>=' + K[1][1].toFixed(1) +
+             ', s=' + K[0][1].toFixed(2) + ', c<sub>x</sub>=' + K[0][2].toFixed(1) + ', c<sub>y</sub>=' + K[1][2].toFixed(1);
     }
 
     function draw(){
@@ -605,7 +631,7 @@ permalink: /multi-view-geometry-calibration.html
         '<div><span class="k">K</span> = [[' + fx.toFixed(0) + ', ' + s.toFixed(0) + ', ' + cx0.toFixed(0) + '], [0, ' + fy.toFixed(0) + ', ' + cy0.toFixed(0) + '], [0, 0, 1]]</div>' +
         '<div><span class="k">column 1 (image of x&#771;-direction)</span> <span class="hi">— teal arrow</span></div>' +
         '<div><span class="k">column 2 (image of y&#771;-direction)</span> <span class="hi">— pink arrow</span></div>' +
-        '<div>' + (Math.abs(s) < 1e-6 && Math.abs(fx-fy) < 1e-6 ? 'square pixels, zero skew — same as Part 1&rsquo;s demo' : (s !== 0 ? 'nonzero skew ⇒ arrows not perpendicular ⇒ sheared grid' : 'f&#7793; &ne; f&#7796; ⇒ arrows unequal length ⇒ stretched grid')) + '</div>';
+        '<div>' + (Math.abs(s) < 1e-6 && Math.abs(fx-fy) < 1e-6 ? 'square pixels, zero skew — same as Part 1&rsquo;s demo' : (s !== 0 ? 'nonzero skew ⇒ arrows not perpendicular ⇒ sheared grid' : 'f<sub>x</sub> &ne; f<sub>y</sub> ⇒ arrows unequal length ⇒ stretched grid')) + '</div>';
     }
     Object.keys(els).forEach(function(k){ els[k].addEventListener('input', update); });
     document.getElementById('s4-reset').addEventListener('click', function(){

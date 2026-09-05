@@ -44,6 +44,19 @@ permalink: /multi-view-geometry-epipolar.html
     padding: 12px 14px; border-radius: var(--radius-sm); overflow-x: auto; margin: 0 0 16px;
     line-height: 1.7;
   }
+  .mvg-math sub, .mvg-math sup, p sub, p sup, td sub, td sup {
+    font-size: 0.72em;
+  }
+  .mvg-matrix-eq { display: inline-flex; align-items: center; gap: 8px; vertical-align: middle; }
+  .mvg-matrix-wrap { display: inline-flex; align-items: stretch; vertical-align: middle; }
+  .mvg-bracket {
+    font-family: var(--font-mono); font-size: 2.6em; font-weight: 300; line-height: 1;
+    display: flex; align-items: center; transform: scaleX(0.6); user-select: none; opacity: 0.85;
+  }
+  .mvg-matrix-grid {
+    display: inline-grid; grid-template-columns: repeat(3, minmax(1.7em, auto));
+    align-items: center; justify-items: end; gap: 4px 16px; padding: 2px 8px;
+  }
   .mvg-demo {
     display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;
     background: var(--color-surface); border-radius: var(--radius-md); padding: 18px;
@@ -135,7 +148,20 @@ permalink: /multi-view-geometry-epipolar.html
     <p class="mvg-eyebrow">Foundations</p>
     <p>The two camera centers and a 3D point <var>X</var> define a plane — the <strong>epipolar plane</strong>. It slices each image plane along a line: the epipolar line. Every epipolar line in image 2 passes through one fixed point, the <strong>epipole</strong> <var>e&#8322;</var> — the image, in camera 2, of camera 1's own center (and vice versa for <var>e&#8321;</var> in image 1).</p>
     <p>For <strong>calibrated</strong> cameras (points expressed in normalized camera coordinates, intrinsics already divided out), the relationship between the two cameras' relative rotation <var>R</var> and translation <var>t</var> is packed into the 3×3 <strong>essential matrix</strong>:</p>
-    <div class="mvg-math">E = [t]&#215; R&nbsp;&nbsp;&nbsp;&nbsp;where [t]&#215; = &#9121; 0&nbsp; −t&#7787;&nbsp; t&#7797;&#9124;<br>&#9125;t&#7787;&nbsp; 0&nbsp; −t&#7793;&#9128;<br>&#9126;−t&#7797; t&#7793;&nbsp; 0 &#9129;</div>
+    <div class="mvg-math">
+      <span class="mvg-matrix-eq">
+        E = [t]&#215; R&nbsp;&nbsp;&nbsp;&nbsp;where [t]&#215; =
+        <span class="mvg-matrix-wrap">
+          <span class="mvg-bracket" aria-hidden="true">[</span>
+          <span class="mvg-matrix-grid">
+            <span>0</span><span>−t<sub>z</sub></span><span>t<sub>y</sub></span>
+            <span>t<sub>z</sub></span><span>0</span><span>−t<sub>x</sub></span>
+            <span>−t<sub>y</sub></span><span>t<sub>x</sub></span><span>0</span>
+          </span>
+          <span class="mvg-bracket" aria-hidden="true">]</span>
+        </span>
+      </span>
+    </div>
     <p>and the constraint that a correspondence <var>(x&#8321;, x&#8322;)</var> must satisfy is beautifully simple:</p>
     <div class="mvg-math">x&#8322;&#7488; E x&#8321; = 0</div>
     <p>For raw pixel coordinates (intrinsics <em>not</em> divided out — the usual case with an uncalibrated or unknown camera), the same idea generalizes to the <strong>fundamental matrix</strong> <var>F = K&#8322;&#8315;&#7488;EK&#8321;&#8315;&#185;</var>, with the identical-looking constraint:</p>
@@ -180,7 +206,20 @@ permalink: /multi-view-geometry-epipolar.html
     <p>Camera 1's center, camera 2's center, and <var>X</var> all sit in one plane &mdash; the epipolar plane from Step 1. Equivalently: the baseline vector <var>t</var>, the ray direction <var>Rx&#771;&#8321;</var> (camera 1's ray, expressed in camera 2's frame), and the ray direction <var>x&#771;&#8322;</var> are three vectors lying in that same plane, so they're <strong>coplanar</strong>. Three vectors <var>a, b, c</var> are coplanar exactly when their scalar triple product vanishes: <var>a&middot;(b&#215;c) = 0</var>. Applied here:</p>
     <div class="mvg-math">x&#771;&#8322; &middot; (t &#215; Rx&#771;&#8321;) = 0</div>
     <p>The cross product <var>t &#215; (&middot;)</var> is a linear map &mdash; it can be written as a matrix multiply. For <var>t = (t&#8321;, t&#8322;, t&#8323;)</var>, define the <strong>skew-symmetric matrix</strong> <var>[t]&#215;</var> so that <var>[t]&#215; v = t &#215; v</var> for any <var>v</var>:</p>
-    <div class="mvg-math">[t]&#215; = &#9121; 0&nbsp;&nbsp; −t&#8323;&nbsp;&nbsp; t&#8322; &#9124;<br>&#9125; t&#8323;&nbsp;&nbsp; 0&nbsp;&nbsp; −t&#8321; &#9128;<br>&#9126;−t&#8322;&nbsp;&nbsp; t&#8321;&nbsp;&nbsp; 0&nbsp;&#9129;</div>
+    <div class="mvg-math">
+      <span class="mvg-matrix-eq">
+        [t]&#215; =
+        <span class="mvg-matrix-wrap">
+          <span class="mvg-bracket" aria-hidden="true">[</span>
+          <span class="mvg-matrix-grid">
+            <span>0</span><span>−t&#8323;</span><span>t&#8322;</span>
+            <span>t&#8323;</span><span>0</span><span>−t&#8321;</span>
+            <span>−t&#8322;</span><span>t&#8321;</span><span>0</span>
+          </span>
+          <span class="mvg-bracket" aria-hidden="true">]</span>
+        </span>
+      </span>
+    </div>
     <p>Substituting turns the triple product into a pure matrix expression, and <em>that's</em> the whole derivation:</p>
     <div class="mvg-math">x&#771;&#8322;&#7488; [t]&#215; R x&#771;&#8321; = 0&nbsp;&nbsp;&nbsp;&nbsp;&mdash;&nbsp; define&nbsp; E := [t]&#215;R&nbsp; &mdash;&nbsp;&nbsp;&nbsp;&nbsp; x&#771;&#8322;&#7488; E x&#771;&#8321; = 0</div>
     <p>Nothing more went into it than "three vectors in one plane have zero triple product." <var>E</var> is just the matrix form of "cross with <var>t</var>, then rotate by <var>R</var>."</p>
