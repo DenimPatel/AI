@@ -100,17 +100,23 @@ permalink: /multi-view-geometry-homography.html
   <a href="{{ '/robotics/' | relative_url }}">Robotics</a>
   <a href="{{ '/multi-view-geometry-projective.html' | relative_url }}">Part 0</a>
   <a href="{{ '/multi-view-geometry.html' | relative_url }}">Part 1</a>
-  <a href="{{ '/multi-view-geometry-epipolar.html' | relative_url }}">Part 2</a>
-  <a href="{{ '/multi-view-geometry-homography.html' | relative_url }}" aria-current="page">Part 3</a>
-  <a href="{{ '/multi-view-geometry-triangulation.html' | relative_url }}">Part 4</a>
-  <a href="{{ '/multi-view-geometry-trifocal.html' | relative_url }}">Part 5</a>
-  <a href="{{ '/multi-view-geometry-sfm.html' | relative_url }}">Part 6</a>
+  <a href="{{ '/multi-view-geometry-calibration.html' | relative_url }}">Part 2</a>
+  <a href="{{ '/multi-view-geometry-epipolar.html' | relative_url }}">Part 3</a>
+  <a href="{{ '/multi-view-geometry-ransac.html' | relative_url }}">Part 4</a>
+  <a href="{{ '/multi-view-geometry-stereo.html' | relative_url }}">Part 5</a>
+  <a href="{{ '/multi-view-geometry-homography.html' | relative_url }}" aria-current="page">Part 6</a>
+  <a href="{{ '/multi-view-geometry-triangulation.html' | relative_url }}">Part 7</a>
+  <a href="{{ '/multi-view-geometry-pnp.html' | relative_url }}">Part 8</a>
+  <a href="{{ '/multi-view-geometry-trifocal.html' | relative_url }}">Part 9</a>
+  <a href="{{ '/multi-view-geometry-sfm.html' | relative_url }}">Part 10</a>
+  <a href="{{ '/multi-view-geometry-sfm-pipelines.html' | relative_url }}">Part 11</a>
+  <a href="{{ '/multi-view-geometry-beyond.html' | relative_url }}">Part 12</a>
 </nav>
 
 <main>
 <div class="wrap mvg">
   <section class="page-header">
-    <span class="section-kicker">Interactive guide · Part 3 of 7</span>
+    <span class="section-kicker">Interactive guide · Part 6 of 13</span>
     <h1>Homography</h1>
     <p>Epipolar geometry (<a href="{{ '/multi-view-geometry-epipolar.html' | relative_url }}">Part 2</a>) narrows a match down to a line but never to a point — depth is still unknown. There's one important special case where that ambiguity disappears entirely: when the scene, or the camera motion, is flat. Then one image can predict the other <em>exactly</em>, pixel for pixel, with a single 3×3 matrix — the <strong>homography</strong>.</p>
   </section>

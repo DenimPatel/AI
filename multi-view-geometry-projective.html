@@ -100,17 +100,23 @@ permalink: /multi-view-geometry-projective.html
   <a href="{{ '/robotics/' | relative_url }}">Robotics</a>
   <a href="{{ '/multi-view-geometry-projective.html' | relative_url }}" aria-current="page">Part 0</a>
   <a href="{{ '/multi-view-geometry.html' | relative_url }}">Part 1</a>
-  <a href="{{ '/multi-view-geometry-epipolar.html' | relative_url }}">Part 2</a>
-  <a href="{{ '/multi-view-geometry-homography.html' | relative_url }}">Part 3</a>
-  <a href="{{ '/multi-view-geometry-triangulation.html' | relative_url }}">Part 4</a>
-  <a href="{{ '/multi-view-geometry-trifocal.html' | relative_url }}">Part 5</a>
-  <a href="{{ '/multi-view-geometry-sfm.html' | relative_url }}">Part 6</a>
+  <a href="{{ '/multi-view-geometry-calibration.html' | relative_url }}">Part 2</a>
+  <a href="{{ '/multi-view-geometry-epipolar.html' | relative_url }}">Part 3</a>
+  <a href="{{ '/multi-view-geometry-ransac.html' | relative_url }}">Part 4</a>
+  <a href="{{ '/multi-view-geometry-stereo.html' | relative_url }}">Part 5</a>
+  <a href="{{ '/multi-view-geometry-homography.html' | relative_url }}">Part 6</a>
+  <a href="{{ '/multi-view-geometry-triangulation.html' | relative_url }}">Part 7</a>
+  <a href="{{ '/multi-view-geometry-pnp.html' | relative_url }}">Part 8</a>
+  <a href="{{ '/multi-view-geometry-trifocal.html' | relative_url }}">Part 9</a>
+  <a href="{{ '/multi-view-geometry-sfm.html' | relative_url }}">Part 10</a>
+  <a href="{{ '/multi-view-geometry-sfm-pipelines.html' | relative_url }}">Part 11</a>
+  <a href="{{ '/multi-view-geometry-beyond.html' | relative_url }}">Part 12</a>
 </nav>
 
 <main>
 <div class="wrap mvg">
   <section class="page-header">
-    <span class="section-kicker">Interactive guide · Part 0 of 7</span>
+    <span class="section-kicker">Interactive guide · Part 0 of 13</span>
     <h1>Projective Geometry &amp; Homogeneous Coordinates</h1>
     <p>Every later part of this series writes things like <code>x&#771; = K[R|t]X&#771;</code>, says two vectors are "equal up to scale" (<code>≅</code>), and pulls lines and intersections out of cross products as if that were obvious. It isn't obvious — it's <strong>projective geometry</strong>, a different (and, once it clicks, simpler) way of doing geometry where points at infinity are just points, lines and points are interchangeable, and "scale doesn't matter" is a first-class rule rather than an asterisk. This page builds that language from scratch, with nothing assumed from later parts.</p>
   </section>

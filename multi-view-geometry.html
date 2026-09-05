@@ -100,17 +100,23 @@ permalink: /multi-view-geometry.html
   <a href="{{ '/robotics/' | relative_url }}">Robotics</a>
   <a href="{{ '/multi-view-geometry-projective.html' | relative_url }}">Part 0</a>
   <a href="{{ '/multi-view-geometry.html' | relative_url }}" aria-current="page">Part 1</a>
-  <a href="{{ '/multi-view-geometry-epipolar.html' | relative_url }}">Part 2</a>
-  <a href="{{ '/multi-view-geometry-homography.html' | relative_url }}">Part 3</a>
-  <a href="{{ '/multi-view-geometry-triangulation.html' | relative_url }}">Part 4</a>
-  <a href="{{ '/multi-view-geometry-trifocal.html' | relative_url }}">Part 5</a>
-  <a href="{{ '/multi-view-geometry-sfm.html' | relative_url }}">Part 6</a>
+  <a href="{{ '/multi-view-geometry-calibration.html' | relative_url }}">Part 2</a>
+  <a href="{{ '/multi-view-geometry-epipolar.html' | relative_url }}">Part 3</a>
+  <a href="{{ '/multi-view-geometry-ransac.html' | relative_url }}">Part 4</a>
+  <a href="{{ '/multi-view-geometry-stereo.html' | relative_url }}">Part 5</a>
+  <a href="{{ '/multi-view-geometry-homography.html' | relative_url }}">Part 6</a>
+  <a href="{{ '/multi-view-geometry-triangulation.html' | relative_url }}">Part 7</a>
+  <a href="{{ '/multi-view-geometry-pnp.html' | relative_url }}">Part 8</a>
+  <a href="{{ '/multi-view-geometry-trifocal.html' | relative_url }}">Part 9</a>
+  <a href="{{ '/multi-view-geometry-sfm.html' | relative_url }}">Part 10</a>
+  <a href="{{ '/multi-view-geometry-sfm-pipelines.html' | relative_url }}">Part 11</a>
+  <a href="{{ '/multi-view-geometry-beyond.html' | relative_url }}">Part 12</a>
 </nav>
 
 <main>
 <div class="wrap mvg">
   <section class="page-header">
-    <span class="section-kicker">Interactive guide</span>
+    <span class="section-kicker">Interactive guide · Part 1 of 13</span>
     <h1>Multi-View Geometry, Interactively</h1>
     <p>Multi-view geometry is the math behind turning flat photographs into 3D structure — how self-driving cars, AR headsets and 3D scanners figure out where things are from pictures alone. This guide builds it up one idea at a time, using one running scene: <strong>a small wireframe cube, watched by one or more pinhole cameras you can drag around</strong>. Every section is a small playground — move the cameras, break the assumptions, watch the geometry respond.</p>
   </section>
@@ -339,8 +345,8 @@ permalink: /multi-view-geometry.html
 {% endraw %}
 
   <div class="mvg-next">
-    <span>One camera can't see depth. Two cameras looking at the same point are constrained to each other in a very specific way — that constraint is epipolar geometry.</span>
-    <a class="btn btn-secondary" href="{{ '/multi-view-geometry-epipolar.html' | relative_url }}">Continue: epipolar geometry →</a>
+    <span>Everything above assumed the camera's intrinsics <var>K</var> were just handed to you. The next part shows how you actually get them — camera calibration.</span>
+    <a class="btn btn-secondary" href="{{ '/multi-view-geometry-calibration.html' | relative_url }}">Continue: camera calibration →</a>
   </div>
 </div>
 </main>

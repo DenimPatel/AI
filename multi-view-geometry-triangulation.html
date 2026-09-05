@@ -94,17 +94,23 @@ permalink: /multi-view-geometry-triangulation.html
   <a href="{{ '/robotics/' | relative_url }}">Robotics</a>
   <a href="{{ '/multi-view-geometry-projective.html' | relative_url }}">Part 0</a>
   <a href="{{ '/multi-view-geometry.html' | relative_url }}">Part 1</a>
-  <a href="{{ '/multi-view-geometry-epipolar.html' | relative_url }}">Part 2</a>
-  <a href="{{ '/multi-view-geometry-homography.html' | relative_url }}">Part 3</a>
-  <a href="{{ '/multi-view-geometry-triangulation.html' | relative_url }}" aria-current="page">Part 4</a>
-  <a href="{{ '/multi-view-geometry-trifocal.html' | relative_url }}">Part 5</a>
-  <a href="{{ '/multi-view-geometry-sfm.html' | relative_url }}">Part 6</a>
+  <a href="{{ '/multi-view-geometry-calibration.html' | relative_url }}">Part 2</a>
+  <a href="{{ '/multi-view-geometry-epipolar.html' | relative_url }}">Part 3</a>
+  <a href="{{ '/multi-view-geometry-ransac.html' | relative_url }}">Part 4</a>
+  <a href="{{ '/multi-view-geometry-stereo.html' | relative_url }}">Part 5</a>
+  <a href="{{ '/multi-view-geometry-homography.html' | relative_url }}">Part 6</a>
+  <a href="{{ '/multi-view-geometry-triangulation.html' | relative_url }}" aria-current="page">Part 7</a>
+  <a href="{{ '/multi-view-geometry-pnp.html' | relative_url }}">Part 8</a>
+  <a href="{{ '/multi-view-geometry-trifocal.html' | relative_url }}">Part 9</a>
+  <a href="{{ '/multi-view-geometry-sfm.html' | relative_url }}">Part 10</a>
+  <a href="{{ '/multi-view-geometry-sfm-pipelines.html' | relative_url }}">Part 11</a>
+  <a href="{{ '/multi-view-geometry-beyond.html' | relative_url }}">Part 12</a>
 </nav>
 
 <main>
 <div class="wrap mvg">
   <section class="page-header">
-    <span class="section-kicker">Interactive guide · Part 4 of 7</span>
+    <span class="section-kicker">Interactive guide · Part 7 of 13</span>
     <h1>Triangulation &amp; Recovering Pose</h1>
     <p>Epipolar geometry (<a href="{{ '/multi-view-geometry-epipolar.html' | relative_url }}">Part 2</a>) tells you where a match <em>could</em> be; homographies (<a href="{{ '/multi-view-geometry-homography.html' | relative_url }}">Part 3</a>) only work on flat scenes. This part closes the loop for the general case: given two cameras and a correspondence, actually compute the 3D point — the first real moment of 3D reconstruction in this series.</p>
   </section>
@@ -275,8 +281,8 @@ permalink: /multi-view-geometry-triangulation.html
 {% endraw %}
 
   <div class="mvg-next">
-    <span>Two views constrain a point to a line, then a point. Add a third view and there's an even tighter constraint — one that can predict a point's location without any triangulation at all.</span>
-    <a class="btn btn-secondary" href="{{ '/multi-view-geometry-trifocal.html' | relative_url }}">Continue: the trifocal tensor →</a>
+    <span>Triangulation assumed you already had two calibrated camera poses. In a real reconstruction, every <em>new</em> camera has to be located against a 3D map that already exists — that's PnP, camera resection.</span>
+    <a class="btn btn-secondary" href="{{ '/multi-view-geometry-pnp.html' | relative_url }}">Continue: PnP & camera resection →</a>
   </div>
 </div>
 </main>

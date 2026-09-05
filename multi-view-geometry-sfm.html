@@ -95,17 +95,23 @@ permalink: /multi-view-geometry-sfm.html
   <a href="{{ '/robotics/' | relative_url }}">Robotics</a>
   <a href="{{ '/multi-view-geometry-projective.html' | relative_url }}">Part 0</a>
   <a href="{{ '/multi-view-geometry.html' | relative_url }}">Part 1</a>
-  <a href="{{ '/multi-view-geometry-epipolar.html' | relative_url }}">Part 2</a>
-  <a href="{{ '/multi-view-geometry-homography.html' | relative_url }}">Part 3</a>
-  <a href="{{ '/multi-view-geometry-triangulation.html' | relative_url }}">Part 4</a>
-  <a href="{{ '/multi-view-geometry-trifocal.html' | relative_url }}">Part 5</a>
-  <a href="{{ '/multi-view-geometry-sfm.html' | relative_url }}" aria-current="page">Part 6</a>
+  <a href="{{ '/multi-view-geometry-calibration.html' | relative_url }}">Part 2</a>
+  <a href="{{ '/multi-view-geometry-epipolar.html' | relative_url }}">Part 3</a>
+  <a href="{{ '/multi-view-geometry-ransac.html' | relative_url }}">Part 4</a>
+  <a href="{{ '/multi-view-geometry-stereo.html' | relative_url }}">Part 5</a>
+  <a href="{{ '/multi-view-geometry-homography.html' | relative_url }}">Part 6</a>
+  <a href="{{ '/multi-view-geometry-triangulation.html' | relative_url }}">Part 7</a>
+  <a href="{{ '/multi-view-geometry-pnp.html' | relative_url }}">Part 8</a>
+  <a href="{{ '/multi-view-geometry-trifocal.html' | relative_url }}">Part 9</a>
+  <a href="{{ '/multi-view-geometry-sfm.html' | relative_url }}" aria-current="page">Part 10</a>
+  <a href="{{ '/multi-view-geometry-sfm-pipelines.html' | relative_url }}">Part 11</a>
+  <a href="{{ '/multi-view-geometry-beyond.html' | relative_url }}">Part 12</a>
 </nav>
 
 <main>
 <div class="wrap mvg">
   <section class="page-header">
-    <span class="section-kicker">Interactive guide · Part 6 of 7</span>
+    <span class="section-kicker">Interactive guide · Part 10 of 13</span>
     <h1>Bundle Adjustment &amp; Structure from Motion</h1>
     <p>Every part so far used two or three cameras. Real reconstructions — a phone scan, a drone survey, a SLAM map — use dozens to thousands of views of hundreds of thousands of points. Making every camera and every point agree with every observation, all at once, is <strong>bundle adjustment</strong>: the payoff this whole series has been building toward, and the finale of this guide.</p>
   </section>
@@ -287,6 +293,11 @@ permalink: /multi-view-geometry-sfm.html
     <p style="margin-top:20px;">That's the field, start to finish: perspective projection sets up the problem, epipolar geometry and homographies constrain matches between views, triangulation and the trifocal tensor turn constraints into 3D structure, and bundle adjustment ties the whole thing together into one globally consistent reconstruction — the same nonlinear least-squares machinery from the <a href="{{ '/nonlinear-optimization.html' | relative_url }}">Nonlinear Optimization series</a>, aimed at cameras and 3D points instead of a single robot.</p>
   </section>
 {% endraw %}
+
+  <div class="mvg-next">
+    <span>Bundle adjustment is the optimizer. The system built around it — turning an unordered folder of photos into a registered reconstruction, incrementally or all at once — is next.</span>
+    <a class="btn btn-secondary" href="{{ '/multi-view-geometry-sfm-pipelines.html' | relative_url }}">Continue: SfM pipelines →</a>
+  </div>
 </div>
 </main>
 

@@ -100,17 +100,23 @@ permalink: /multi-view-geometry-epipolar.html
   <a href="{{ '/robotics/' | relative_url }}">Robotics</a>
   <a href="{{ '/multi-view-geometry-projective.html' | relative_url }}">Part 0</a>
   <a href="{{ '/multi-view-geometry.html' | relative_url }}">Part 1</a>
-  <a href="{{ '/multi-view-geometry-epipolar.html' | relative_url }}" aria-current="page">Part 2</a>
-  <a href="{{ '/multi-view-geometry-homography.html' | relative_url }}">Part 3</a>
-  <a href="{{ '/multi-view-geometry-triangulation.html' | relative_url }}">Part 4</a>
-  <a href="{{ '/multi-view-geometry-trifocal.html' | relative_url }}">Part 5</a>
-  <a href="{{ '/multi-view-geometry-sfm.html' | relative_url }}">Part 6</a>
+  <a href="{{ '/multi-view-geometry-calibration.html' | relative_url }}">Part 2</a>
+  <a href="{{ '/multi-view-geometry-epipolar.html' | relative_url }}" aria-current="page">Part 3</a>
+  <a href="{{ '/multi-view-geometry-ransac.html' | relative_url }}">Part 4</a>
+  <a href="{{ '/multi-view-geometry-stereo.html' | relative_url }}">Part 5</a>
+  <a href="{{ '/multi-view-geometry-homography.html' | relative_url }}">Part 6</a>
+  <a href="{{ '/multi-view-geometry-triangulation.html' | relative_url }}">Part 7</a>
+  <a href="{{ '/multi-view-geometry-pnp.html' | relative_url }}">Part 8</a>
+  <a href="{{ '/multi-view-geometry-trifocal.html' | relative_url }}">Part 9</a>
+  <a href="{{ '/multi-view-geometry-sfm.html' | relative_url }}">Part 10</a>
+  <a href="{{ '/multi-view-geometry-sfm-pipelines.html' | relative_url }}">Part 11</a>
+  <a href="{{ '/multi-view-geometry-beyond.html' | relative_url }}">Part 12</a>
 </nav>
 
 <main>
 <div class="wrap mvg">
   <section class="page-header">
-    <span class="section-kicker">Interactive guide · Part 2 of 7</span>
+    <span class="section-kicker">Interactive guide · Part 3 of 13</span>
     <h1>Epipolar Geometry</h1>
     <p><a href="{{ '/multi-view-geometry.html' | relative_url }}">Part 1</a> ended on a cliffhanger: one camera can't see depth. Add a second camera, and something remarkable happens — a point's location in image 1 doesn't tell you exactly where it is in image 2, but it tells you it must lie somewhere on <em>one specific line</em>. That's the epipolar constraint, and it turns 2D point-matching into a 1D search.</p>
   </section>
@@ -294,8 +300,8 @@ permalink: /multi-view-geometry-epipolar.html
 {% endraw %}
 
   <div class="mvg-next">
-    <span>Epipolar geometry constrains where a match <em>can</em> be — but it never pins a point down exactly. A special case, when the scene is a flat plane, lets one image predict the other completely.</span>
-    <a class="btn btn-secondary" href="{{ '/multi-view-geometry-homography.html' | relative_url }}">Continue: homography →</a>
+    <span>Every estimator on this page — 8-point, 7-point, 5-point — silently assumed clean correspondences. Real feature matching has outliers, and RANSAC is how every one of these gets made robust to them.</span>
+    <a class="btn btn-secondary" href="{{ '/multi-view-geometry-ransac.html' | relative_url }}">Continue: RANSAC & robust estimation →</a>
   </div>
 </div>
 </main>
