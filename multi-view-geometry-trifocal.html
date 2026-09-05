@@ -173,7 +173,7 @@ permalink: /multi-view-geometry-trifocal.html
   <section class="mvg-step" id="transferdemo">
     <div class="mvg-step-head"><span class="mvg-step-num">4</span><h2>True trifocal transfer: points <em>and</em> lines</h2></div>
     <p class="mvg-eyebrow">The real demo</p>
-    <div class="mvg-goal">🎯 <b>Learning goal:</b> <var>T</var>, built once from the camera matrices, transfers a point exactly (matching the fake triangulate-then-project method to within numerical noise) and transfers an entire <strong>line</strong> exactly — something no pair of two-view fundamental matrices can ever do, because <var>F</var> alone only ever hands you a line-shaped constraint, never a full second-order transfer.</p>
+    <div class="mvg-goal">🎯 <b>Learning goal:</b> <var>T</var>, built once from the camera matrices, transfers a point exactly (matching the fake triangulate-then-project method to within numerical noise) and transfers an entire <strong>line</strong> exactly — something no pair of two-view fundamental matrices can ever do, because <var>F</var> alone only ever hands you a line-shaped constraint, never a full second-order transfer.</div>
     <p><strong>Point transfer, derived from the incidence relation above.</strong> Fix x&#771;&#8321; and define the 3×3 matrix M(x&#771;&#8321;) = &#8721;&#7522; x&#8321;&#8305; T&#7522; (linear in x&#771;&#8321;, nothing else). The incidence relation says l&#8322;&#7488;M(x&#771;&#8321;)l&#8323;=0 for <strong>every</strong> line l&#8322; through x&#771;&#8322; and <strong>every</strong> line l&#8323; through x&#771;&#8323;. Hold l&#8322; fixed at any one line through x&#771;&#8322; and let l&#8323; range over every line through x&#771;&#8323;: the only vector that's orthogonal to an entire pencil of lines through a point is that point itself. So:</p>
     <div class="mvg-math">x&#771;&#8323; &#8773; M(x&#771;&#8321;)&#7488; l&#8322;&nbsp;&nbsp;&nbsp;&nbsp;for <em>any single</em> line l&#8322; through x&#771;&#8322; (e.g. the vertical image line x=x&#8322; through it)</div>
     <p>No triangulation, no camera centers, no depth — just one matrix built from x&#771;&#8321; and T, applied to one line through x&#771;&#8322;. The demo below computes this and compares it, pixel for pixel, against the old triangulate-then-project shortcut.</p>
@@ -458,6 +458,186 @@ permalink: /multi-view-geometry-trifocal.html
     });
     depthEl.addEventListener('input', update);
     noiseEl.addEventListener('input', update);
+    update();
+  })();
+
+  // ---------- Step 4: real trifocal-tensor transfer (point + line) ----------
+  (function(){
+    var canvas1 = document.getElementById('s5-canvas1'), ctx1 = canvas1.getContext('2d');
+    var canvas2 = document.getElementById('s5-canvas2'), ctx2 = canvas2.getContext('2d');
+    var canvas3 = document.getElementById('s5-canvas3'), ctx3 = canvas3.getContext('2d');
+    var W = canvas1.width, H = canvas1.height;
+
+    var cam1 = MVG.orbitCamera(0.7, 0.25, 7, [0,0,0]);
+    var cam2 = MVG.orbitCamera(-0.6, 0.4, 7, [0,0,0]);
+    var cam3 = MVG.orbitCamera(2.4, -0.1, 7, [0,0,0]);
+    var K = { fx: 340, fy: 340, cx: W/2, cy: H/2 };
+
+    // ---- small 3x3 matrix helpers ----
+    function outer3(a,b){ return [[a[0]*b[0],a[0]*b[1],a[0]*b[2]],[a[1]*b[0],a[1]*b[1],a[1]*b[2]],[a[2]*b[0],a[2]*b[1],a[2]*b[2]]]; }
+    function subMat3(A,B){ var R=[[0,0,0],[0,0,0],[0,0,0]]; for (var i=0;i<3;i++) for (var j=0;j<3;j++) R[i][j]=A[i][j]-B[i][j]; return R; }
+    function transpose3(M){ return [[M[0][0],M[1][0],M[2][0]],[M[0][1],M[1][1],M[2][1]],[M[0][2],M[1][2],M[2][2]]]; }
+    function matMul3(A,B){ var R=[[0,0,0],[0,0,0],[0,0,0]]; for (var i=0;i<3;i++) for (var j=0;j<3;j++){ var s=0; for (var k=0;k<3;k++) s+=A[i][k]*B[k][j]; R[i][j]=s; } return R; }
+    function col3(M,j){ return [M[0][j],M[1][j],M[2][j]]; }
+    function weightedSum3(Ts,w){ var R=[[0,0,0],[0,0,0],[0,0,0]]; for (var i=0;i<3;i++) for (var r=0;r<3;r++) for (var c=0;c<3;c++) R[r][c]+=w[i]*Ts[i][r][c]; return R; }
+
+    // ---- build the trifocal tensor T_i = a_i b4^T - a4 b_i^T from the (known) relative poses ----
+    // Camera 1 is canonical ([I|0]) in its OWN frame; P' and P'' below are cameras 2,3 expressed
+    // in that same camera-1-centered frame, so this is the exact formula from the "realT" section,
+    // applied to camera-1-normalized coordinates rather than raw pixels.
+    function buildTrifocalTensor(){
+      var R21 = matMul3(cam2.R, transpose3(cam1.R));
+      var t21 = MVG.matVec(cam2.R, MVG.sub(cam1.C, cam2.C));
+      var R31 = matMul3(cam3.R, transpose3(cam1.R));
+      var t31 = MVG.matVec(cam3.R, MVG.sub(cam1.C, cam3.C));
+      var A = R21, a4 = t21, B = R31, b4 = t31;
+      var Ts = [];
+      for (var i=0;i<3;i++){
+        var ai = col3(A,i), bi = col3(B,i);
+        Ts.push(subMat3(outer3(ai,b4), outer3(a4,bi)));
+      }
+      return Ts;
+    }
+    var Ti = buildTrifocalTensor();
+
+    // ---- normalized <-> pixel coordinate conversions (T is defined in camera-1-normalized coords) ----
+    function toNormalized(pixel){ return [(pixel[0]-K.cx)/K.fx, (pixel[1]-K.cy)/K.fy, 1]; }
+    function toPixelPoint(xn){ return [K.fx*xn[0]/xn[2]+K.cx, K.fy*xn[1]/xn[2]+K.cy]; }
+    function toPixelLine(ln){ return [ ln[0]/K.fx, ln[1]/K.fy, -(K.cx/K.fx)*ln[0] - (K.cy/K.fy)*ln[1] + ln[2] ]; }
+    function lineThroughVertical(xn){ return [1,0,-xn[0]/xn[2]]; }
+
+    // ---- the two formulas from the "realT"/"transferdemo" sections, verbatim ----
+    function Mmat(x1n){ return weightedSum3(Ti, x1n); }               // M(x1) = sum_i x1^i T_i
+    function transferPoint(x1n, l2n){ return MVG.matVec(transpose3(Mmat(x1n)), l2n); } // x3 = M(x1)^T l2
+
+    function rayDirWorld(pixel){
+      var dCam = MVG.normalize([(pixel[0]-K.cx)/K.fx, (pixel[1]-K.cy)/K.fy, 1]);
+      var Rt = [[cam1.R[0][0],cam1.R[1][0],cam1.R[2][0]],[cam1.R[0][1],cam1.R[1][1],cam1.R[2][1]],[cam1.R[0][2],cam1.R[1][2],cam1.R[2][2]]];
+      return MVG.matVec(Rt, dCam);
+    }
+
+    var pickedPixel = [W/2 + 25, H/2 - 10];
+    var edgeIdx = 0;
+    var depthEl = document.getElementById('s5-depth');
+    var cycleBtn = document.getElementById('s5-cycle');
+
+    function drawPixelLine(ctx, l, color, dash){
+      var a=l[0], b=l[1], c=l[2];
+      var cands = [];
+      if (Math.abs(b) > 1e-9){ cands.push([0, -c/b]); cands.push([W, -(a*W+c)/b]); }
+      if (Math.abs(a) > 1e-9){ cands.push([-c/a, 0]); cands.push([-(b*H+c)/a, H]); }
+      var pad = 4000;
+      var valid = cands.filter(function(p){ return isFinite(p[0]) && isFinite(p[1]) && Math.abs(p[0])<pad && Math.abs(p[1])<pad; });
+      if (valid.length < 2) return;
+      ctx.save();
+      ctx.strokeStyle = color; ctx.lineWidth = 2;
+      if (dash) ctx.setLineDash(dash);
+      ctx.beginPath(); ctx.moveTo(valid[0][0], valid[0][1]); ctx.lineTo(valid[valid.length-1][0], valid[valid.length-1][1]); ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawCube(ctx, cam, highlightEdge){
+      ctx.clearRect(0,0,W,H);
+      ctx.fillStyle = 'rgba(0,0,0,0.06)'; ctx.fillRect(0,0,W,H);
+      var pts = CUBE_VERTS.map(function(X){ return MVG.project(K, cam, X); });
+      ctx.strokeStyle = COLOR_TEXT; ctx.lineWidth = 1.5; ctx.globalAlpha = 0.3;
+      CUBE_EDGES.forEach(function(e, idx){
+        if (idx === highlightEdge) return;
+        var a = pts[e[0]], b = pts[e[1]];
+        if (!a || !b) return;
+        ctx.beginPath(); ctx.moveTo(a.u, a.v); ctx.lineTo(b.u, b.v); ctx.stroke();
+      });
+      ctx.globalAlpha = 1;
+      if (highlightEdge !== null && highlightEdge !== undefined){
+        var e = CUBE_EDGES[highlightEdge];
+        var a = pts[e[0]], b = pts[e[1]];
+        if (a && b){
+          ctx.strokeStyle = '#1a7a3a'; ctx.lineWidth = 3;
+          ctx.beginPath(); ctx.moveTo(a.u, a.v); ctx.lineTo(b.u, b.v); ctx.stroke();
+        }
+      }
+      return pts;
+    }
+
+    function update(){
+      var dir = rayDirWorld(pickedPixel);
+      var depth = parseFloat(depthEl.value);
+      var X = MVG.add(cam1.C, MVG.scale(dir, depth));
+
+      var p1 = MVG.project(K, cam1, X), p2 = MVG.project(K, cam2, X), p3 = MVG.project(K, cam3, X);
+
+      drawCube(ctx1, cam1, edgeIdx);
+      drawCube(ctx2, cam2, edgeIdx);
+      var pts3 = drawCube(ctx3, cam3, edgeIdx);
+
+      ctx1.fillStyle = COLOR_ACCENT; ctx1.beginPath(); ctx1.arc(pickedPixel[0], pickedPixel[1], 6, 0, 7); ctx1.fill();
+      if (p2){ ctx2.fillStyle = COLOR_ACCENT; ctx2.beginPath(); ctx2.arc(p2.u, p2.v, 6, 0, 7); ctx2.fill(); }
+
+      var readout = '';
+      var fakeErr = null, realErr = null;
+
+      if (p2 && p3){
+        // -- fake method: Part-4 triangulate-then-project, exactly as in the demo above --
+        var P1m = projectionMatrix(K, cam1), P2m = projectionMatrix(K, cam2);
+        var Xrec = triangulateLinear(P1m, [pickedPixel[0], pickedPixel[1]], P2m, [p2.u, p2.v]);
+        var predFake = MVG.project(K, cam3, Xrec);
+
+        // -- real method: build M(x1) from T, transfer through ANY line through x2, no 3D point at all --
+        var x1n = toNormalized(pickedPixel);
+        var x2n = toNormalized([p2.u, p2.v]);
+        var l2n = lineThroughVertical(x2n);
+        var x3n_pred = transferPoint(x1n, l2n);
+        var predReal = toPixelPoint(x3n_pred);
+
+        if (predFake){
+          ctx3.strokeStyle = COLOR_ACCENT2; ctx3.lineWidth = 2;
+          ctx3.beginPath(); ctx3.arc(predFake.u, predFake.v, 9, 0, 7); ctx3.stroke();
+          fakeErr = Math.hypot(predFake.u - p3.u, predFake.v - p3.v);
+        }
+        ctx3.strokeStyle = COLOR_ACCENT; ctx3.lineWidth = 2;
+        ctx3.beginPath(); ctx3.arc(predReal[0], predReal[1], 6, 0, 7); ctx3.stroke();
+        realErr = Math.hypot(predReal[0] - p3.u, predReal[1] - p3.v);
+        var agree = predFake ? Math.hypot(predReal[0]-predFake.u, predReal[1]-predFake.v) : null;
+
+        readout += '<div><span class="k">real transfer error vs. true view-3 point</span> = <span class="hi">' + realErr.toExponential(2) + ' px</span></div>';
+        readout += '<div><span class="k">real vs. fake method agreement</span> = <span class="hi">' + (agree===null?'—':agree.toExponential(2) + ' px') + '</span></div>';
+      }
+      ctx3.fillStyle = COLOR_TEXT;
+      ctx3.beginPath(); ctx3.arc(p3 ? p3.u : -100, p3 ? p3.v : -100, 4, 0, 7); ctx3.fill();
+
+      // -- line transfer: pick a cube edge, transfer it from views 1&2 into view 3, draw over the real edge --
+      var e = CUBE_EDGES[edgeIdx];
+      var Xa = CUBE_VERTS[e[0]], Xb = CUBE_VERTS[e[1]];
+      var a1 = MVG.project(K, cam1, Xa), b1 = MVG.project(K, cam1, Xb);
+      var a2 = MVG.project(K, cam2, Xa), b2 = MVG.project(K, cam2, Xb);
+      var a3 = MVG.project(K, cam3, Xa), b3 = MVG.project(K, cam3, Xb);
+      var lineErrMax = null;
+      if (a1 && b1 && a2 && b2 && a3 && b3){
+        var x1a = toNormalized([a1.u,a1.v]), x1b = toNormalized([b1.u,b1.v]);
+        var l2n_edge = MVG.cross(toNormalized([a2.u,a2.v]), toNormalized([b2.u,b2.v]));
+        var x3a_n = transferPoint(x1a, l2n_edge), x3b_n = transferPoint(x1b, l2n_edge);
+        var l3n = MVG.cross(x3a_n, x3b_n);
+        var l3px = toPixelLine(l3n);
+        drawPixelLine(ctx3, l3px, COLOR_ACCENT, [6,4]);
+        var nrm = Math.hypot(l3px[0], l3px[1]) || 1;
+        var d1 = Math.abs(l3px[0]*a3.u + l3px[1]*a3.v + l3px[2]) / nrm;
+        var d2 = Math.abs(l3px[0]*b3.u + l3px[1]*b3.v + l3px[2]) / nrm;
+        lineErrMax = Math.max(d1, d2);
+      }
+      readout += '<div><span class="k">transferred-line distance from true edge</span> = <span class="hi">' + (lineErrMax===null ? '(off-frame)' : lineErrMax.toExponential(2) + ' px') + '</span></div>';
+      readout += '<div><span class="k">edge transferred (dashed, view 3)</span> = #' + edgeIdx + ' of ' + CUBE_EDGES.length + '</div>';
+
+      document.getElementById('s5-depthval').textContent = depth.toFixed(2);
+      document.getElementById('s5-readout').innerHTML = readout;
+    }
+
+    canvas1.addEventListener('click', function(e){
+      var rect = canvas1.getBoundingClientRect();
+      pickedPixel = [ (e.clientX-rect.left)/rect.width*W, (e.clientY-rect.top)/rect.height*H ];
+      update();
+    });
+    depthEl.addEventListener('input', update);
+    cycleBtn.addEventListener('click', function(){ edgeIdx = (edgeIdx+1) % CUBE_EDGES.length; update(); });
     update();
   })();
 

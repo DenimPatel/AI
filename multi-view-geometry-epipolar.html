@@ -206,12 +206,12 @@ permalink: /multi-view-geometry-epipolar.html
       <div class="mvg-canvas-wrap" style="flex-basis:100%;">
         <div class="mvg-imgrow">
           <div class="mvg-imgcol">
-            <h4>Image 1 (8 correspondences)</h4>
-            <canvas id="s3-canvas1" width="420" height="300"></canvas>
+            <h4>Image 1 (20 correspondences)</h4>
+            <canvas id="s3-canvas1" width="960" height="540"></canvas>
           </div>
           <div class="mvg-imgcol">
             <h4>Image 2 &mdash; truth vs. recovered epipolar line</h4>
-            <canvas id="s3-canvas2" width="420" height="300"></canvas>
+            <canvas id="s3-canvas2" width="960" height="540"></canvas>
           </div>
         </div>
         <p class="mvg-canvas-hint" id="s3-legend">Gray dashed = ground truth. Green = recovered with Hartley normalization. Red = recovered without it.</p>
@@ -247,11 +247,11 @@ permalink: /multi-view-geometry-epipolar.html
         <div class="mvg-imgrow">
           <div class="mvg-imgcol">
             <h4>Image 1</h4>
-            <canvas id="s4e-canvas1" width="420" height="300"></canvas>
+            <canvas id="s4e-canvas1" width="960" height="540"></canvas>
           </div>
           <div class="mvg-imgcol">
             <h4>Image 2 &mdash; recovered epipolar line</h4>
-            <canvas id="s4e-canvas2" width="420" height="300"></canvas>
+            <canvas id="s4e-canvas2" width="960" height="540"></canvas>
           </div>
         </div>
       </div>
@@ -675,6 +675,27 @@ permalink: /multi-view-geometry-epipolar.html
     var u = Math.random() || 1e-9, v = Math.random();
     return Math.sqrt(-2*Math.log(u)) * Math.cos(2*Math.PI*v);
   }
+  // Small deterministic PRNG (mulberry32) so the synthetic scene is stable across reloads.
+  function makeRNG(seed){
+    return function(){
+      seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+      var t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  // A general-position (non-planar) cloud of N 3D points for correspondence demos.
+  function randomCloud(n, rng){
+    var pts = [];
+    for (var i=0;i<n;i++) pts.push([(rng()-0.5)*1.8, (rng()-0.5)*1.8, (rng()-0.5)*1.8]);
+    return pts;
+  }
+  // A coplanar cloud (all y=0) for the "planar scene" degeneracy.
+  function planarCloud(n, rng){
+    var pts = [];
+    for (var i=0;i<n;i++) pts.push([(rng()-0.5)*1.8, 0, (rng()-0.5)*1.8]);
+    return pts;
+  }
   // ---------- Step 5: eight-point algorithm walkthrough ----------
   (function(){
     var canvas1 = document.getElementById('s3-canvas1'), ctx1 = canvas1.getContext('2d');
@@ -682,8 +703,9 @@ permalink: /multi-view-geometry-epipolar.html
     var W1=canvas1.width, H1=canvas1.height, W2=canvas2.width, H2=canvas2.height;
 
     var cam1 = MVG.orbitCamera(0.7, 0.25, 7, [0,0,0]);
-    var K1 = { fx: 420, fy: 420, cx: W1/2, cy: H1/2 };
-    var K2 = { fx: 420, fy: 420, cx: W2/2, cy: H2/2 };
+    var K1 = { fx: 800, fy: 800, cx: W1/2, cy: H1/2 };
+    var K2 = { fx: 800, fy: 800, cx: W2/2, cy: H2/2 };
+    var SCENE = randomCloud(20, makeRNG(1234));
 
     var azEl = document.getElementById('s3-az'), elEl = document.getElementById('s3-el'), noiseEl = document.getElementById('s3-noise');
     var resampleBtn = document.getElementById('s3-resample');
@@ -692,31 +714,34 @@ permalink: /multi-view-geometry-epipolar.html
     var noiseVec = [];
     function regenerateNoise(){
       var s = parseFloat(noiseEl.value);
-      noiseVec = CUBE_VERTS.map(function(){ return [gaussianNoise()*s, gaussianNoise()*s, gaussianNoise()*s, gaussianNoise()*s]; });
+      noiseVec = SCENE.map(function(){ return [gaussianNoise()*s, gaussianNoise()*s, gaussianNoise()*s, gaussianNoise()*s]; });
     }
     regenerateNoise();
 
     function buildAMatrixHTML(A){
       var headers = ['x&#8321;x&#8322;','y&#8321;x&#8322;','x&#8322;','x&#8321;y&#8322;','y&#8321;y&#8322;','y&#8322;','x&#8321;','y&#8321;','1'];
+      var shown = A.slice(0, 10);
       var html = '<table class="mvg-cheat" style="font-size:11.5px;"><thead><tr><th>#</th>' +
         headers.map(function(h){ return '<th>'+h+'</th>'; }).join('') + '</tr></thead><tbody>';
-      A.forEach(function(row,i){
+      shown.forEach(function(row,i){
         html += '<tr><td>'+(i+1)+'</td>' + row.map(function(v){ return '<td>'+v.toFixed(1)+'</td>'; }).join('') + '</tr>';
       });
       html += '</tbody></table>';
+      if (A.length > shown.length) html += '<p class="mvg-canvas-hint">(' + (A.length - shown.length) + ' more rows feed the solve below, not shown)</p>';
       return html;
     }
 
     function update(){
       var cam2 = MVG.orbitCamera(parseFloat(azEl.value), parseFloat(elEl.value), 7, [0,0,0]);
       var pts1clean = [], pts2clean = [], pts1 = [], pts2 = [];
-      CUBE_VERTS.forEach(function(X, i){
+      SCENE.forEach(function(X, i){
         var p1 = MVG.project(K1, cam1, X), p2 = MVG.project(K2, cam2, X);
         if (!p1 || !p2) return;
         pts1clean.push([p1.u, p1.v]); pts2clean.push([p2.u, p2.v]);
         pts1.push([p1.u + noiseVec[i][0], p1.v + noiseVec[i][1]]);
         pts2.push([p2.u + noiseVec[i][2], p2.v + noiseVec[i][3]]);
       });
+      if (pts1.length < 8) return; // a point swung behind a camera this frame; skip until sliders move on
 
       var corrsRawClean = pts1clean.map(function(p,i){ return [p[0],p[1],pts2clean[i][0],pts2clean[i][1]]; });
       var corrsRaw = pts1.map(function(p,i){ return [p[0],p[1],pts2[i][0],pts2[i][1]]; });
