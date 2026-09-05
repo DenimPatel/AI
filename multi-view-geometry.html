@@ -98,18 +98,25 @@ permalink: /multi-view-geometry.html
   <a class="nav-brand" href="{{ '/' | relative_url }}">AI /</a>
   <a href="{{ '/' | relative_url }}">Home</a>
   <a href="{{ '/robotics/' | relative_url }}">Robotics</a>
+  <a href="{{ '/multi-view-geometry-projective.html' | relative_url }}">Part 0</a>
   <a href="{{ '/multi-view-geometry.html' | relative_url }}" aria-current="page">Part 1</a>
-  <a href="{{ '/multi-view-geometry-epipolar.html' | relative_url }}">Part 2</a>
-  <a href="{{ '/multi-view-geometry-homography.html' | relative_url }}">Part 3</a>
-  <a href="{{ '/multi-view-geometry-triangulation.html' | relative_url }}">Part 4</a>
-  <a href="{{ '/multi-view-geometry-trifocal.html' | relative_url }}">Part 5</a>
-  <a href="{{ '/multi-view-geometry-sfm.html' | relative_url }}">Part 6</a>
+  <a href="{{ '/multi-view-geometry-calibration.html' | relative_url }}">Part 2</a>
+  <a href="{{ '/multi-view-geometry-epipolar.html' | relative_url }}">Part 3</a>
+  <a href="{{ '/multi-view-geometry-ransac.html' | relative_url }}">Part 4</a>
+  <a href="{{ '/multi-view-geometry-stereo.html' | relative_url }}">Part 5</a>
+  <a href="{{ '/multi-view-geometry-homography.html' | relative_url }}">Part 6</a>
+  <a href="{{ '/multi-view-geometry-triangulation.html' | relative_url }}">Part 7</a>
+  <a href="{{ '/multi-view-geometry-pnp.html' | relative_url }}">Part 8</a>
+  <a href="{{ '/multi-view-geometry-trifocal.html' | relative_url }}">Part 9</a>
+  <a href="{{ '/multi-view-geometry-sfm.html' | relative_url }}">Part 10</a>
+  <a href="{{ '/multi-view-geometry-sfm-pipelines.html' | relative_url }}">Part 11</a>
+  <a href="{{ '/multi-view-geometry-beyond.html' | relative_url }}">Part 12</a>
 </nav>
 
 <main>
 <div class="wrap mvg">
   <section class="page-header">
-    <span class="section-kicker">Interactive guide</span>
+    <span class="section-kicker">Interactive guide · Part 1 of 13</span>
     <h1>Multi-View Geometry, Interactively</h1>
     <p>Multi-view geometry is the math behind turning flat photographs into 3D structure — how self-driving cars, AR headsets and 3D scanners figure out where things are from pictures alone. This guide builds it up one idea at a time, using one running scene: <strong>a small wireframe cube, watched by one or more pinhole cameras you can drag around</strong>. Every section is a small playground — move the cameras, break the assumptions, watch the geometry respond.</p>
   </section>
@@ -179,6 +186,141 @@ permalink: /multi-view-geometry.html
     <div class="mvg-warn">⚠️ <span><b>The takeaway:</b> no single image, however sharp, can recover depth on its own. To pin down that missing dimension you need a second viewpoint — and how two (or more) views of the same point constrain each other is exactly what <strong>epipolar geometry</strong> is about, next.</span></div>
   </section>
 
+  <section class="mvg-step" id="fov">
+    <div class="mvg-step-head"><span class="mvg-step-num">4</span><h2>Focal length, sensor size, and field of view</h2></div>
+    <p class="mvg-eyebrow">From millimeters to pixels</p>
+    <p>The sliders in Step 2 called <var>f&#7793;, f&#7796;</var> "focal length in pixels," but a real lens spec sheet talks in millimeters and a sensor spec talks in millimeters too. The bridge between them is simple trigonometry. A ray hitting the very edge of a sensor of width <var>w</var> (mm), a distance <var>f</var> (mm) behind the pinhole, makes an angle <var>&#952;</var> with the optical axis where <code>tan(&#952;) = (w/2) / f</code> — half the sensor width over the focal length. The full field of view is twice that:</p>
+    <div class="mvg-math">FOV = 2 · atan( w / (2f) )</div>
+    <p>To get from millimeters to the <var>f&#7793;</var> pixels this page's <var>K</var> actually uses, divide by the physical size of one pixel — the <strong>pixel pitch</strong> <var>p</var> = (sensor width in mm) / (image width in pixels):</p>
+    <div class="mvg-math">f&#7793; (px) = f (mm) / p (mm/px) = f (mm) · image_width (px) / sensor_width (mm)</div>
+    <p><strong>Grounding it in a real number.</strong> A typical modern phone's main camera is quoted as "27mm equivalent" — a focal length normalized to a 36mm-wide full-frame sensor, so its FOV is <code>2·atan(36/(2·27)) = 2·atan(0.667) ≈ 67°</code> horizontally, regardless of the phone's actual (much smaller) sensor. Suppose the real sensor is 4000 pixels wide with a 1.4µm pixel pitch — a physical width of <code>4000 · 0.0014mm ≈ 5.6mm</code>. Solving the FOV formula backward for the real focal length gives <code>f = (w/2) / tan(FOV/2) = 2.8 / tan(33.5°) ≈ 4.2mm</code>, and in pixels that's <code>f&#7793; = 4.2 / 0.0014 ≈ 3000px</code>. So when a paper or a calibration file reports "<var>f&#7793;</var> ≈ 3000" for a 4000px-wide phone photo, that's a completely ordinary, slightly-wide-of-normal phone lens — not a special number. Compare that to Step 2's slider range (150–1200px on a 480px-wide canvas): a canvas that narrow needs proportionally smaller pixel focal lengths to show the same field of view, which is why <code>f&#7793;=1200</code> there already looks like a telephoto zoom.</p>
+    <div class="mvg-demo">
+      <div class="mvg-canvas-wrap" style="flex-basis:100%;">
+        <div class="mvg-readout" id="s5-readout"></div>
+      </div>
+      <div class="mvg-controls" style="flex-basis:100%;">
+        <div class="mvg-field"><label>Focal length f (mm) <span class="val" id="s5-fval"></span></label><input type="range" id="s5-f" min="1" max="50" step="0.1" value="4.2"></div>
+        <div class="mvg-field"><label>Sensor width (mm) <span class="val" id="s5-wval"></span></label><input type="range" id="s5-w" min="2" max="36" step="0.1" value="5.6"></div>
+        <div class="mvg-field"><label>Image width (px) <span class="val" id="s5-pxval"></span></label><input type="range" id="s5-px" min="480" max="8000" step="10" value="4000"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mvg-step" id="conventions">
+    <div class="mvg-step-head"><span class="mvg-step-num">5</span><h2>Coordinate convention traps</h2></div>
+    <p class="mvg-eyebrow">The bug that isn't a bug</p>
+    <p>This series uses the <strong>OpenCV / computer-vision convention</strong>: from the camera's point of view, <var>x</var> points right, <var>y</var> points down (matching image row order — row 0 is the top), and <var>z</var> points forward, out along the optical axis, into the scene. Check the handedness: <code>x × y = (1,0,0) × (0,1,0) = (0,0,1) = z</code> — it's a perfectly ordinary <strong>right-handed</strong> frame, it just <em>feels</em> left-handed to people used to math-class axes because <var>y</var> is flipped from "up."</p>
+    <p><strong>OpenGL and most classic graphics/robotics-visualization code</strong> instead use <var>y</var> up, <var>x</var> right, and <var>z</var> <em>backward</em> — the camera looks down its own <strong>−z</strong> axis, so anything visible has <em>negative</em> camera-space <var>z</var>. Also right-handed (<code>x × y = z</code> still holds), but a 180° rotation apart from the CV convention around the <var>x</var>-axis. <strong>COLMAP</strong>, a common SfM/MVS tool referenced later in this series, uses the same convention as this page (<var>x</var>-right, <var>y</var>-down, <var>z</var>-forward, world-to-camera <code>X_cam = RX_world + t</code>) — one less conversion if you're pulling data from it. <strong>Robotics body frames</strong> (ROS's REP-103) go a third way again: <var>x</var>-forward, <var>y</var>-left, <var>z</var>-up, meant for a vehicle chassis rather than a camera, so a robot's camera driver almost always publishes an explicit <code>camera_link → base_link</code> rotation to bridge the two worlds.</p>
+    <div style="overflow-x:auto;">
+    <table class="mvg-cheat">
+      <thead><tr><th>Convention</th><th>x</th><th>y</th><th>z (camera looks along)</th><th>Handed</th></tr></thead>
+      <tbody>
+        <tr><td>OpenCV / this series / COLMAP</td><td>right</td><td>down</td><td>+z (forward)</td><td>right</td></tr>
+        <tr><td>OpenGL / classic graphics</td><td>right</td><td>up</td><td>−z (backward)</td><td>right</td></tr>
+        <tr><td>ROS body frame (REP-103)</td><td>forward</td><td>left</td><td>z is up, not forward</td><td>right</td></tr>
+        <tr><td>Blender world</td><td>right</td><td>forward</td><td>z is up, camera looks along local −z</td><td>right</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p style="margin-top:14px;"><strong>If a rotation "looks weird," check these before assuming your math is wrong:</strong></p>
+    <div style="overflow-x:auto;">
+    <table class="mvg-cheat">
+      <thead><tr><th>Symptom</th><th>Usual cause</th></tr></thead>
+      <tbody>
+        <tr><td>Image looks vertically flipped</td><td>Mixed a y-down (CV) source with a y-up (OpenGL) renderer without flipping <var>v → H−v</var></td></tr>
+        <tr><td>Points that should be visible are "behind" the camera</td><td>Forward axis sign mismatch — CV convention is +z-forward, OpenGL is −z-forward</td></tr>
+        <tr><td>Everything rotated 180°</td><td>Row-vector vs column-vector convention mismatch: <code>Rv</code> vs <code>vR</code> transposes the rotation</td></tr>
+        <tr><td>Scene is mirror-imaged (correct up to a reflection)</td><td>Accidentally landed on a left-handed frame — usually one axis sign flipped when converting between conventions</td></tr>
+        <tr><td>Depth values are negative</td><td>Working in an OpenGL-style camera frame where visible points have <var>z_cam &lt; 0</var>, not a bug in triangulation</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <section class="mvg-step" id="distortion">
+    <div class="mvg-step-head"><span class="mvg-step-num">6</span><h2>Lens distortion: the pinhole model's first lie</h2></div>
+    <p class="mvg-eyebrow">Brown&ndash;Conrady model</p>
+    <p>Real lenses aren't pinholes — they're curved glass, and that curvature bends light differently near the edges of the frame than at the center. The standard fix (the <strong>Brown&ndash;Conrady model</strong>) applies a correction in <em>normalized camera coordinates</em> <code>(x, y) = (X_cam/Z_cam, Y_cam/Z_cam)</code>, <em>before</em> the linear <var>K</var> multiply — distortion is a property of the lens, not the sensor's pixel grid. Let <code>r&#178; = x&#178; + y&#178;</code> (squared distance from the optical axis):</p>
+    <div class="mvg-math">
+      radial:&nbsp;&nbsp; x&#7523; = x·(1 + k&#8321;r&#178; + k&#8322;r&#8308; + k&#8323;r&#8310;)&nbsp;&nbsp;&nbsp;&nbsp;y&#7523; = y·(1 + k&#8321;r&#178; + k&#8322;r&#8308; + k&#8323;r&#8310;)<br>
+      tangential (decentered lens):&nbsp;&nbsp; &#916;x = 2p&#8321;xy + p&#8322;(r&#178;+2x&#178;)&nbsp;&nbsp;&nbsp;&nbsp;&#916;y = p&#8321;(r&#178;+2y&#178;) + 2p&#8322;xy<br>
+      x_distorted = x&#7523; + &#916;x&nbsp;&nbsp;&nbsp;&nbsp;y_distorted = y&#7523; + &#916;y
+    </div>
+    <p>Positive <var>k&#8321;</var> pushes points away from center faster than linearly (<strong>pincushion</strong>); negative <var>k&#8321;</var> pulls them in (<strong>barrel</strong> — the classic wide-angle "fisheye bulge"). <var>k&#8322;, k&#8323;</var> refine the curve further out; <var>p&#8321;, p&#8322;</var> capture a lens that isn't perfectly centered over the sensor. Only after this correction does the pixel formula from Step 1 apply: <code>x&#771; = K·(x_distorted, y_distorted, 1)</code>.</p>
+    <div class="mvg-warn">⚠️ <span><b>Why this matters for the rest of the series:</b> every later part — the essential/fundamental matrix, homographies, triangulation — is built on <code>x&#771; = K[R|t]X&#771;</code>, a strictly <em>linear</em> (projective) relationship. Distortion is <em>not</em> linear, and it breaks the one property projective transforms are supposed to preserve: straight 3D lines stop projecting to straight image lines. That's why every real pipeline <strong>undistorts</strong> the image (or just the matched point coordinates) as a preprocessing step, before any of the linear algebra in Parts 2&ndash;6 is allowed to touch the data.</span></div>
+    <p><strong>Undistorting</strong> means inverting the model above: given an observed distorted point <code>(x_d, y_d)</code>, find the <code>(x, y)</code> that produced it. There's no closed form, so OpenCV's <code>undistortPoints</code> (and this demo) use a few steps of fixed-point iteration, starting from the distorted point itself as a first guess:</p>
+    <div class="mvg-math">x&#8320; = x_d, y&#8320; = y_d;&nbsp;&nbsp; repeat: r&#178; = x&#7522;&#178;+y&#7522;&#178;,&nbsp; radial = 1+k&#8321;r&#178;+k&#8322;r&#8308;+k&#8323;r&#8310;,&nbsp; x&#7522;&#8330;&#8321; = (x_d − &#916;x&#7522;)/radial,&nbsp; y&#7522;&#8330;&#8321; = (y_d − &#916;y&#7522;)/radial</div>
+    <p>Play with it below: the grid is drawn as it would <em>actually</em> land on the sensor — perfectly straight world lines, forward-distorted by the sliders' <var>k</var>/<var>p</var> values. Toggle "recovered" to run the iteration above on those same distorted points and watch the straight grid come back.</p>
+    <div class="mvg-demo">
+      <div class="mvg-canvas-wrap">
+        <canvas id="s6-canvas" width="480" height="360"></canvas>
+        <p class="mvg-canvas-hint">Solid: distorted (what the sensor sees). Dashed, when toggled: recovered via iterative undistortion.</p>
+      </div>
+      <div class="mvg-controls">
+        <div class="mvg-field"><label>k&#8321; (radial) <span class="val" id="s6-k1val"></span></label><input type="range" id="s6-k1" min="-0.5" max="0.5" step="0.005" value="-0.18"></div>
+        <div class="mvg-field"><label>k&#8322; (radial) <span class="val" id="s6-k2val"></span></label><input type="range" id="s6-k2" min="-0.3" max="0.3" step="0.005" value="0.06"></div>
+        <div class="mvg-field"><label>p&#8321; (tangential) <span class="val" id="s6-p1val"></span></label><input type="range" id="s6-p1" min="-0.05" max="0.05" step="0.001" value="0"></div>
+        <div class="mvg-field"><label>p&#8322; (tangential) <span class="val" id="s6-p2val"></span></label><input type="range" id="s6-p2" min="-0.05" max="0.05" step="0.001" value="0"></div>
+        <div class="mvg-btnrow"><button id="s6-toggle" class="mvg-primary">Show recovered (undistorted) grid</button></div>
+        <div class="mvg-readout" id="s6-readout"></div>
+      </div>
+    </div>
+    <div class="mvg-warn">⚠️ <span><b>Simplified for the demo:</b> this uses the standard 5-parameter still-photo model (<var>k&#8321;,k&#8322;,k&#8323;,p&#8321;,p&#8322;</var>), which is what OpenCV's default calibration estimates. Very wide fisheye lenses (&gt;120° FOV) need a different, non-polynomial model (e.g. the equidistant/Kannala&ndash;Brandt model) entirely — the radial series above simply doesn't converge that far from the optical axis.</span></div>
+  </section>
+
+  <section class="mvg-step" id="vanishing">
+    <div class="mvg-step-head"><span class="mvg-step-num">7</span><h2>Vanishing points and the horizon line</h2></div>
+    <p class="mvg-eyebrow">Where parallel lines meet — and what it buys you</p>
+    <p>Part 0 built the point at infinity for a 2D direction; the exact same idea exists one dimension up. A 3D direction <var>d</var> has an <strong>ideal point</strong> <code>X&#771;&#8734; = (d, 0)</code> — a homogeneous 4-vector with a zero last coordinate, representing "infinitely far away, along <var>d</var>." Project it through the ordinary camera equation:</p>
+    <div class="mvg-math">X&#771;&#8734; = (d, 0)&nbsp;&nbsp;&nbsp;&nbsp;x&#771; = K[R|t] X&#771;&#8734; = K(R·d + t·0) = K·R·d</div>
+    <p>The translation <var>t</var> drops out entirely — only vanishes because it's multiplied by the ideal point's zero last coordinate. So every 3D line running parallel to direction <var>d</var>, no matter where it sits in space, projects to a 2D line through the same fixed image point <code>v = K·R·d</code> — the <strong>vanishing point</strong> of that direction. This is literally "the image of the point at infinity," not a separate phenomenon: it's the same machinery from Part 0's <code>x&#771; ≅ y&#771;</code> and ideal points, just run through a camera.</p>
+    <p>A <strong>plane</strong>'s directions all lie in a 2D subspace, so their vanishing points all lie on one image line — the image of that plane's <em>line at infinity</em>. For the ground plane, that's the <strong>horizon line</strong>: the vanishing points of any two non-parallel horizontal directions determine it completely, by exactly the same construction as Part 0's duality demo — <code>l = v&#8321; × v&#8322;</code>.</p>
+    <p><strong>The payoff — single-view metrology.</strong> If a scene has three mutually orthogonal directions (the corner of a room, a cube, most buildings), their three vanishing points constrain <var>K</var> itself. Each orthogonal pair <var>(d&#7522;, d&#7527;)</var> gives one linear constraint on the <strong>image of the absolute conic</strong> <var>&#969; = K&#8315;&#7488;K&#8315;&#185;</var>: <code>v&#7522;&#7488; &#969; v&#7527; = 0</code> — <var>v&#7522;</var> and <var>v&#7527;</var> are said to be <em>conjugate</em> with respect to &#969;. Assuming zero skew and square pixels and a known principal point <var>(c&#7793;,c&#7796;)</var> (so <var>K&#8315;&#185;v = ((u−c&#7793;)/f, (v−c&#7796;)/f, 1)</var>), that constraint collapses to one clean equation for the focal length:</p>
+    <div class="mvg-math">(u&#7522;−c&#7793;)(u&#7527;−c&#7793;) + (v&#7522;−c&#7796;)(v&#7527;−c&#7796;) + f&#178; = 0&nbsp;&nbsp;&#8658;&nbsp;&nbsp; f = &#8730;( −[(u&#7522;−c&#7793;)(u&#7527;−c&#7793;) + (v&#7522;−c&#7796;)(v&#7527;−c&#7796;)] )</div>
+    <p>Recovering intrinsics (and, with all three pairs, the full <var>K</var>) from vanishing points alone, with no ruler and no checkerboard — one photo of a rectangular room is enough. Part 2 defines &#969; properly (it's the image of the absolute conic, a stand-in for <var>K</var> that ignores camera position) and shows where this constraint actually comes from.</p>
+    <div class="mvg-demo">
+      <div class="mvg-canvas-wrap">
+        <div id="s7-plot3d" class="mvg-plot3d"></div>
+        <p class="mvg-canvas-hint">Drag to orbit. Cube edges come in 3 parallel families along the world x/y/z axes.</p>
+        <div class="mvg-imgplane">
+          <canvas id="s7-canvas" width="480" height="360"></canvas>
+        </div>
+        <p class="mvg-canvas-hint">Dashed: cube edges extended to their vanishing point. Solid horizontal line: the horizon (vp&#7793; &#215; vp&#8348;).</p>
+      </div>
+      <div class="mvg-controls">
+        <div class="mvg-field"><label>Camera azimuth <span class="val" id="s7-azval"></span></label><input type="range" id="s7-az" min="-3.14" max="3.14" step="0.01" value="0.9"></div>
+        <div class="mvg-field"><label>Camera elevation <span class="val" id="s7-elval"></span></label><input type="range" id="s7-el" min="-1.2" max="1.2" step="0.01" value="0.45"></div>
+        <div class="mvg-field"><label>Distance from cube <span class="val" id="s7-distval"></span></label><input type="range" id="s7-dist" min="4" max="12" step="0.1" value="6.5"></div>
+        <div class="mvg-field"><label>True focal length f&#7793;=f&#7796; (px) <span class="val" id="s7-fval"></span></label><input type="range" id="s7-f" min="200" max="900" step="5" value="420"></div>
+        <div class="mvg-readout" id="s7-readout"></div>
+      </div>
+    </div>
+    <p>The x-direction and z-direction vanishing points (both "horizontal" cube edge families) recover <var>f&#7793;</var> from nothing but their pixel positions via the formula above — watch <b>recovered f</b> track the <b>true f</b> slider as you orbit and re-zoom the camera.</p>
+  </section>
+
+  <section class="mvg-step" id="idealization">
+    <div class="mvg-step-head"><span class="mvg-step-num">8</span><h2>Why a pinhole is an idealization</h2></div>
+    <p class="mvg-eyebrow">The assumptions everything else quietly relies on</p>
+    <p>Two more simplifications are baked into <code>x&#771; = K[R|t]X&#771;</code> that are worth naming honestly, even without an interactive demo attached.</p>
+    <p><strong>Aperture and diffraction.</strong> A true point-sized pinhole lets through essentially no light, and worse, an infinitesimally small aperture <em>diffracts</em> light — the image actually gets blurrier as the hole shrinks past a certain point, not sharper. Real cameras trade the ideal point aperture for a finite lens opening, which lets in usable light but focuses only one distance perfectly; everything nearer or farther blurs into a small disk (the <strong>circle of confusion</strong>), which is exactly what "depth of field" is. The pinhole model this whole series uses is the <var>f</var>-number → ∞ limit of a real lens — everything in perfect focus at every depth, which no physical camera actually achieves.</p>
+    <p><strong>Rolling shutter.</strong> Every equation in this series treats an image as one instantaneous snapshot: every pixel captured at the exact same instant, from the exact same camera pose. Most CMOS sensors don't work that way — they expose row by row, so the last row of a frame can be captured milliseconds after the first. For a static scene this is invisible; for a fast-moving camera (a car, a drone, a phone being waved around) or a fast-moving subject, different rows are effectively different camera poses, and treating the frame as one rigid snapshot introduces real geometric error. SLAM and structure-from-motion systems built for fast motion either use global-shutter cameras or explicitly model the per-row pose as a smooth trajectory (rolling-shutter bundle adjustment) rather than a single <var>[R|t]</var>.</p>
+  </section>
+
+  <section class="mvg-step" id="general-camera">
+    <div class="mvg-step-head"><span class="mvg-step-num">9</span><h2>The general projective camera P</h2></div>
+    <p class="mvg-eyebrow">Putting it all in one 3×4 matrix</p>
+    <p>Collect everything from Step 1 into a single 3×4 matrix <code>P = K[R|t]</code>. Written out, <var>P</var> is exactly Part 0's "camera is a linear map <var>P³ → P²</var>" made concrete:</p>
+    <div class="mvg-math">x&#771; = P X&#771;,&nbsp;&nbsp;&nbsp;&nbsp; P = [M | p&#8324;]&nbsp; (M = K R, the leading 3×3 block; p&#8324; = Kt, the last column)</div>
+    <p><strong>The camera center is the null space of P.</strong> Recall from Step 1 that <code>t = −RC</code>. Plug the camera center <var>C</var>'s homogeneous coordinates <code>C&#771; = (C, 1)</code> into <var>P</var>:</p>
+    <div class="mvg-math">P C&#771; = K[R|t] (C,1) = K(R·C + t) = K(R·C − R·C) = K·0 = 0</div>
+    <p><var>C</var> is the <em>one</em> 3D point <var>P</var> sends to the zero vector — it has no well-defined image because it's not a direction from itself, it's the projection center itself. Solved the other way, <code>C = −M&#8315;&#185;p&#8324;</code> (a finite point, whenever <var>M</var> is invertible) — this is how you recover a camera's position directly from a raw <var>P</var> matrix, with no separate <var>R</var>, <var>t</var> needed.</p>
+    <p><strong>Back-projection.</strong> Forward projection loses depth (Step 3); the reverse map — a pixel back out into a 3D ray — is exactly the set of points that <var>P</var> maps to that pixel. The ray through camera center <var>C</var> in direction <code>M&#8315;&#185;x&#771;</code> works: parametrize <code>X(&#955;) = C + &#955;M&#8315;&#185;x&#771;</code> and apply <var>M</var> and add <var>p&#8324;</var>:</p>
+    <div class="mvg-math">M·X(&#955;) + p&#8324; = M·C + &#955;·x&#771; + p&#8324; = (M·C + p&#8324;) + &#955;x&#771; = 0 + &#955;x&#771; &#8773; x&#771;&nbsp;&nbsp;&nbsp;&nbsp;(using M·C + p&#8324; = 0 from PC&#771;=0 above)</div>
+    <p>— every point on that ray projects back to the same pixel, for any <var>&#955;</var>, which is the depth ambiguity from Step 3 stated as one line of algebra. (<var>M</var>'s third row also gives the <strong>principal ray</strong> — the 3D direction the optical axis points, <code>det(M)·m&#8323;</code> — the sign fixing which way is "in front.")</p>
+    <p><strong>Recovering K and R from a raw P: RQ decomposition.</strong> Given only the numbers in <var>P</var> (e.g. from a calibration routine that fit <var>P</var> directly with no <var>K</var>/<var>R</var> split), factor the leading 3×3 block <code>M = K·R</code> — upper-triangular <var>K</var> times orthogonal <var>R</var>. This is an <strong>RQ decomposition</strong>, not the more familiar QR: QR factors a matrix as (orthogonal)×(upper-triangular) — the wrong order for what's needed here, since <var>K</var> (upper-triangular) has to come <em>first</em> and the rotation <var>R</var> (orthogonal) <em>second</em> to match <code>M = KR</code>. In practice it's computed by reversing rows/columns, running ordinary QR, and reversing back — with a final sign fix-up so <var>K</var>'s diagonal comes out positive (focal lengths shouldn't be negative) and <var>det(R) = +1</var> (a proper rotation, not a reflection).</p>
+    <p><strong>Finite vs. infinite cameras.</strong> Everything above assumes <code>det(M) ≠ 0</code> — a <strong>finite camera</strong> with an ordinary 3D center. When <code>det(M) = 0</code>, <var>M</var> has no inverse and the "camera center" pushed out by solving <code>PC&#771;=0</code> turns out to have a zero last coordinate — the center itself is a point at infinity. That's an <strong>affine (orthographic / weak-perspective) camera</strong>: parallel rays instead of rays converging on a finite point, no perspective foreshortening. It's the right model for a very distant or very long-lens camera, where the scene's own depth range is negligible next to the viewing distance and perspective effects are too small to matter.</p>
+  </section>
+
   <section class="mvg-step" id="cheatsheet">
     <div class="mvg-step-head"><span class="mvg-step-num">✓</span><h2>Cheat sheet</h2></div>
     <p class="mvg-eyebrow">Recap</p>
@@ -190,6 +332,12 @@ permalink: /multi-view-geometry.html
         <tr><td>Intrinsics</td><td><code>K</code></td><td>The camera itself</td><td>Focal length, principal point (lens + sensor geometry)</td></tr>
         <tr><td>Projection</td><td><code>x&#771; = K[R|−RC]X&#771;</code></td><td>Both</td><td>The full map from a 3D world point to a 2D pixel</td></tr>
         <tr><td>What's lost</td><td>Depth <var>z_cam</var></td><td>&mdash;</td><td>Every point on a ray from <var>C</var> maps to the same pixel</td></tr>
+        <tr><td>Field of view</td><td><code>FOV = 2·atan(w / 2f)</code></td><td>Lens + sensor</td><td>Relates focal length (mm) to sensor width and pixel-space <var>f&#7793;</var></td></tr>
+        <tr><td>Lens distortion</td><td><code>x&#7523; = x(1+k&#8321;r&#178;+k&#8322;r&#8308;+k&#8323;r&#8310;) + tangential</code></td><td>Lens imperfection</td><td>Applied in normalized coords before <var>K</var>; must be undone before <var>E</var>/<var>F</var>/<var>H</var> are valid</td></tr>
+        <tr><td>General camera</td><td><code>P = K[R|t]</code>, 3×4</td><td>Both</td><td>The camera as a linear map <var>P³ → P²</var>; <code>x&#771; = PX&#771;</code></td></tr>
+        <tr><td>Camera center</td><td><code>C&#771; = null(P)</code></td><td>&mdash;</td><td><code>PC&#771; = 0</code>; the one point with no well-defined image</td></tr>
+        <tr><td>Intrinsics/extrinsics from P</td><td>RQ decomposition</td><td>&mdash;</td><td><code>M = KR</code> (upper-triangular × orthogonal, note the order vs. QR)</td></tr>
+        <tr><td>Vanishing point</td><td><code>v = K·R·d</code></td><td>Direction <var>d</var></td><td>Image of the point at infinity <code>X&#771;&#8734;=(d,0)</code> along <var>d</var></td></tr>
       </tbody>
     </table>
     </div>
@@ -197,8 +345,8 @@ permalink: /multi-view-geometry.html
 {% endraw %}
 
   <div class="mvg-next">
-    <span>One camera can't see depth. Two cameras looking at the same point are constrained to each other in a very specific way — that constraint is epipolar geometry.</span>
-    <a class="btn btn-secondary" href="{{ '/multi-view-geometry-epipolar.html' | relative_url }}">Continue: epipolar geometry →</a>
+    <span>Everything above assumed the camera's intrinsics <var>K</var> were just handed to you. The next part shows how you actually get them — camera calibration.</span>
+    <a class="btn btn-secondary" href="{{ '/multi-view-geometry-calibration.html' | relative_url }}">Continue: camera calibration →</a>
   </div>
 </div>
 </main>
@@ -396,6 +544,255 @@ permalink: /multi-view-geometry.html
         '<div><span class="k">projected pixel offset</span> = <span class="hi">(' + (p?p.u.toFixed(3):'—') + ', ' + (p?p.v.toFixed(3):'—') + ')</span> — unchanged as depth moves</div>';
     }
     slider.addEventListener('input', update);
+    update();
+  })();
+
+  // ---------- Step 4: FOV / focal length / sensor size calculator ----------
+  (function(){
+    var els = {
+      f: document.getElementById('s5-f'), w: document.getElementById('s5-w'), px: document.getElementById('s5-px')
+    };
+    if (!els.f) return;
+    function update(){
+      var f = parseFloat(els.f.value), w = parseFloat(els.w.value), pxw = parseFloat(els.px.value);
+      var fovRad = 2*Math.atan(w/(2*f));
+      var fovDeg = fovRad*180/Math.PI;
+      var pitch = w/pxw; // mm per pixel
+      var fpx = f/pitch;
+      document.getElementById('s5-fval').textContent = f.toFixed(1);
+      document.getElementById('s5-wval').textContent = w.toFixed(1);
+      document.getElementById('s5-pxval').textContent = pxw.toFixed(0);
+      document.getElementById('s5-readout').innerHTML =
+        '<div><span class="k">pixel pitch</span> = ' + (pitch*1000).toFixed(2) + ' &micro;m/px</div>' +
+        '<div><span class="k">horizontal FOV</span> = <span class="hi">' + fovDeg.toFixed(1) + '&deg;</span></div>' +
+        '<div><span class="k">f&#7793; (pixels)</span> = <span class="hi">' + fpx.toFixed(0) + ' px</span></div>';
+    }
+    Object.keys(els).forEach(function(k){ els[k].addEventListener('input', update); });
+    update();
+  })();
+
+  // ---------- Step 6: lens distortion demo ----------
+  (function(){
+    var canvas = document.getElementById('s6-canvas');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var W = canvas.width, H = canvas.height;
+    var K6 = { fx: 220, fy: 220, cx: W/2, cy: H/2 };
+
+    function distort(x, y, k1, k2, p1, p2){
+      var r2 = x*x + y*y;
+      var radial = 1 + k1*r2 + k2*r2*r2;
+      var dx = 2*p1*x*y + p2*(r2 + 2*x*x);
+      var dy = p1*(r2 + 2*y*y) + 2*p2*x*y;
+      return [x*radial + dx, y*radial + dy];
+    }
+    function undistort(xd, yd, k1, k2, p1, p2){
+      var x = xd, y = yd;
+      for (var i=0;i<8;i++){
+        var r2 = x*x + y*y;
+        var radial = 1 + k1*r2 + k2*r2*r2;
+        var dx = 2*p1*x*y + p2*(r2 + 2*x*x);
+        var dy = p1*(r2 + 2*y*y) + 2*p2*x*y;
+        x = (xd - dx)/radial;
+        y = (yd - dy)/radial;
+      }
+      return [x, y];
+    }
+
+    var GRID = []; // normalized-coordinate grid lines, each an array of [x,y]
+    (function(){
+      var ext = 0.85, step = 0.1, samples = 24;
+      for (var gx = -ext; gx <= ext+1e-9; gx += step){
+        var line = [];
+        for (var i=0;i<=samples;i++){ line.push([gx, -ext + (2*ext)*i/samples]); }
+        GRID.push(line);
+      }
+      for (var gy = -ext; gy <= ext+1e-9; gy += step){
+        var line2 = [];
+        for (var j=0;j<=samples;j++){ line2.push([-ext + (2*ext)*j/samples, gy]); }
+        GRID.push(line2);
+      }
+    })();
+
+    function toPx(nx, ny){ return [K6.fx*nx + K6.cx, K6.fy*ny + K6.cy]; }
+
+    var els = {
+      k1: document.getElementById('s6-k1'), k2: document.getElementById('s6-k2'),
+      p1: document.getElementById('s6-p1'), p2: document.getElementById('s6-p2')
+    };
+    var showRecovered = false;
+    var toggleBtn = document.getElementById('s6-toggle');
+
+    function drawGrid(transform, color, dashed){
+      ctx.strokeStyle = color; ctx.lineWidth = 1.5;
+      ctx.setLineDash(dashed ? [5,4] : []);
+      GRID.forEach(function(line){
+        ctx.beginPath();
+        line.forEach(function(pt, i){
+          var tp = transform(pt[0], pt[1]);
+          var px = toPx(tp[0], tp[1]);
+          if (i===0) ctx.moveTo(px[0], px[1]); else ctx.lineTo(px[0], px[1]);
+        });
+        ctx.stroke();
+      });
+      ctx.setLineDash([]);
+    }
+
+    function update(){
+      var k1 = parseFloat(els.k1.value), k2 = parseFloat(els.k2.value);
+      var p1 = parseFloat(els.p1.value), p2 = parseFloat(els.p2.value);
+      document.getElementById('s6-k1val').textContent = k1.toFixed(3);
+      document.getElementById('s6-k2val').textContent = k2.toFixed(3);
+      document.getElementById('s6-p1val').textContent = p1.toFixed(3);
+      document.getElementById('s6-p2val').textContent = p2.toFixed(3);
+
+      ctx.clearRect(0,0,W,H);
+      ctx.fillStyle = 'rgba(0,0,0,0.05)'; ctx.fillRect(0,0,W,H);
+
+      // distorted (observed) grid: forward-distort ideal straight-line points
+      drawGrid(function(x,y){ return distort(x,y,k1,k2,p1,p2); }, COLOR_ACCENT2, false);
+
+      var maxErr = 0;
+      if (showRecovered){
+        // recover by undistorting the already-distorted points, then redraw
+        drawGrid(function(x,y){
+          var d = distort(x,y,k1,k2,p1,p2);
+          var u = undistort(d[0], d[1], k1, k2, p1, p2);
+          maxErr = Math.max(maxErr, Math.hypot(u[0]-x, u[1]-y));
+          return u;
+        }, COLOR_ACCENT, true);
+      }
+
+      document.getElementById('s6-readout').innerHTML =
+        '<div><span class="k">r&#178; at grid edge</span> &#8776; ' + (0.85*0.85*2).toFixed(2) + '</div>' +
+        (showRecovered
+          ? '<div><span class="k">max recovery error</span> = <span class="hi">' + maxErr.toExponential(2) + '</span> (iterative undistort converging back to straight)</div>'
+          : '<div><span class="k">recovered grid</span> = hidden — click the button to invert the model</div>');
+    }
+    Object.keys(els).forEach(function(k){ els[k].addEventListener('input', update); });
+    toggleBtn.addEventListener('click', function(){
+      showRecovered = !showRecovered;
+      toggleBtn.textContent = showRecovered ? 'Hide recovered (undistorted) grid' : 'Show recovered (undistorted) grid';
+      update();
+    });
+    update();
+  })();
+
+  // ---------- Step 7: vanishing points & horizon demo ----------
+  (function(){
+    var plotDiv = document.getElementById('s7-plot3d');
+    if (!plotDiv) return;
+    Plotly.newPlot(plotDiv, [ cubeLineTrace(COLOR_TEXT, 4) ], baseLayout(), { displayModeBar:false, responsive:true });
+
+    var canvas = document.getElementById('s7-canvas'), ctx = canvas.getContext('2d');
+    var W = canvas.width, H = canvas.height;
+
+    var els = {
+      az: document.getElementById('s7-az'), el: document.getElementById('s7-el'),
+      dist: document.getElementById('s7-dist'), f: document.getElementById('s7-f')
+    };
+
+    function readK(){
+      var f = parseFloat(els.f.value);
+      return { fx:f, fy:f, cx: W/2, cy: H/2 };
+    }
+    function readCam(){
+      return MVG.orbitCamera(parseFloat(els.az.value), parseFloat(els.el.value), parseFloat(els.dist.value), [0,0,0]);
+    }
+    function cross3(a,b){ return [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]]; }
+
+    // Direction-family edges from the shared CUBE_EDGES: group by which axis differs between endpoints.
+    function edgeDir(e){
+      var a = CUBE_VERTS[e[0]], b = CUBE_VERTS[e[1]];
+      if (Math.abs(a[0]-b[0]) > 1e-6) return 'x';
+      if (Math.abs(a[1]-b[1]) > 1e-6) return 'y';
+      return 'z';
+    }
+    var edgesByDir = { x:[], y:[], z:[] };
+    CUBE_EDGES.forEach(function(e){ edgesByDir[edgeDir(e)].push(e); });
+
+    function lineThroughPx(p1, p2){ return cross3([p1.u,p1.v,1], [p2.u,p2.v,1]); }
+
+    function drawExtended(lineCoeffs, color){
+      // a*x + b*y + c = 0 -> draw across the canvas box
+      var a=lineCoeffs[0], b=lineCoeffs[1], c=lineCoeffs[2];
+      var pts = [];
+      if (Math.abs(b) > 1e-9){ pts.push([0, -c/b]); pts.push([W, -(a*W+c)/b]); }
+      if (Math.abs(a) > 1e-9){ pts.push([-c/a, 0]); pts.push([-(b*H+c)/a, H]); }
+      // keep the two points furthest apart that lie roughly within an extended box
+      if (pts.length < 2) return;
+      ctx.strokeStyle = color; ctx.lineWidth = 1.5; ctx.setLineDash([6,5]);
+      ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]); ctx.lineTo(pts[pts.length-1][0], pts[pts.length-1][1]); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    function update(){
+      var cam = readCam(), K = readK();
+      Plotly.deleteTraces(plotDiv, Array.from({length: plotDiv.data.length - 1}, function(_,i){ return i+1; })).catch(function(){});
+      Plotly.addTraces(plotDiv, [ cameraFrustumTrace(cam, COLOR_ACCENT), cameraCenterTrace(cam, COLOR_ACCENT2) ]);
+
+      ctx.clearRect(0,0,W,H);
+      ctx.fillStyle = 'rgba(0,0,0,0.05)'; ctx.fillRect(0,0,W,H);
+
+      var pts = CUBE_VERTS.map(function(X){ return MVG.project(K, cam, X); });
+
+      // draw actual cube edges solid
+      ctx.strokeStyle = COLOR_TEXT; ctx.lineWidth = 2;
+      CUBE_EDGES.forEach(function(e){
+        var a = pts[e[0]], b = pts[e[1]];
+        if (!a || !b) return;
+        ctx.beginPath(); ctx.moveTo(a.u, a.v); ctx.lineTo(b.u, b.v); ctx.stroke();
+      });
+
+      // vanishing point per direction, via analytic v = K*(R*d) and via line-intersection (dual construction)
+      var dirColor = { x: COLOR_ACCENT, y: COLOR_TEXT, z: COLOR_ACCENT2 };
+      var dirVec = { x:[1,0,0], y:[0,1,0], z:[0,0,1] };
+      var vp = {};
+      ['x','y','z'].forEach(function(dname){
+        var dCam = MVG.matVec(cam.R, dirVec[dname]);
+        if (Math.abs(dCam[2]) > 1e-5){
+          vp[dname] = { u: K.fx*dCam[0]/dCam[2] + K.cx, v: K.fy*dCam[1]/dCam[2] + K.cy };
+        }
+        // draw the 2 edges of this family extended toward the vanishing point
+        var edges = edgesByDir[dname];
+        for (var i=0;i<2 && i<edges.length;i++){
+          var e = edges[i];
+          var a = pts[e[0]], b = pts[e[1]];
+          if (!a || !b) continue;
+          var l = lineThroughPx(a, b);
+          drawExtended(l, dirColor[dname]);
+        }
+      });
+
+      // horizon line through x and z vanishing points (both "horizontal" families)
+      var recoveredF = NaN;
+      if (vp.x && vp.z){
+        var lh = cross3([vp.x.u, vp.x.v, 1], [vp.z.u, vp.z.v, 1]);
+        drawExtended(lh, COLOR_TEXT);
+        var dux = vp.x.u - K.cx, duy = vp.x.v - K.cy;
+        var dzx = vp.z.u - K.cx, dzy = vp.z.v - K.cy;
+        var f2 = -(dux*dzx + duy*dzy);
+        if (f2 > 0) recoveredF = Math.sqrt(f2);
+      }
+      // mark vanishing points that land on/near the visible canvas
+      ['x','y','z'].forEach(function(dname){
+        var v = vp[dname];
+        if (!v) return;
+        ctx.fillStyle = dirColor[dname];
+        ctx.beginPath(); ctx.arc(Math.max(-2000,Math.min(2000,v.u)), Math.max(-2000,Math.min(2000,v.v)), 4, 0, 7); ctx.fill();
+      });
+
+      document.getElementById('s7-azval').textContent = parseFloat(els.az.value).toFixed(2);
+      document.getElementById('s7-elval').textContent = parseFloat(els.el.value).toFixed(2);
+      document.getElementById('s7-distval').textContent = parseFloat(els.dist.value).toFixed(1);
+      document.getElementById('s7-fval').textContent = K.fx.toFixed(0);
+      document.getElementById('s7-readout').innerHTML =
+        '<div><span class="k">vp&#7793;</span> = ' + (vp.x ? '(' + vp.x.u.toFixed(0) + ', ' + vp.x.v.toFixed(0) + ')' : '&mdash; (near-parallel to image plane)') + '</div>' +
+        '<div><span class="k">vp&#8348;</span> = ' + (vp.z ? '(' + vp.z.u.toFixed(0) + ', ' + vp.z.v.toFixed(0) + ')' : '&mdash;') + '</div>' +
+        '<div><span class="k">true f&#7793;</span> = ' + K.fx.toFixed(0) + ' px</div>' +
+        '<div><span class="k">recovered f</span> = <span class="hi">' + (isNaN(recoveredF) ? '&mdash;' : recoveredF.toFixed(0) + ' px') + '</span> (from v&#7522;&#7488;&#969;v&#7527;=0)</div>';
+    }
+    Object.keys(els).forEach(function(k){ els[k].addEventListener('input', update); });
     update();
   })();
 
