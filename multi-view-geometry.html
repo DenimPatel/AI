@@ -753,7 +753,7 @@ permalink: /multi-view-geometry.html
     // second canvas: the cube seen through the distorted lens
     var cubeCanvas = document.getElementById('s6-cube'), cubeCtx = cubeCanvas ? cubeCanvas.getContext('2d') : null;
     var CW = cubeCanvas ? cubeCanvas.width : 0, CH = cubeCanvas ? cubeCanvas.height : 0;
-    var cam6 = (typeof MVG !== 'undefined') ? MVG.orbitCamera(0.7, 0.32, 6, [0,0,0]) : null;
+    var cam6 = (typeof MVG !== 'undefined') ? MVG.orbitCamera(0.7, 0.32, 3.4, [0,0,0]) : null;
     var Kc6 = { fx: 300, fy: 300, cx: CW/2, cy: CH/2 };
     function projectDistorted(X, k1, k2, p1, p2, straight){
       var Xc = MVG.worldToCamera(cam6, X);
