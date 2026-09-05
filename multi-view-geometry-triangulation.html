@@ -157,6 +157,19 @@ permalink: /multi-view-geometry-triangulation.html
           <span><i style="background:var(--color-accent-2)"></i>nonlinear (refined)</span>
         </div>
       </div>
+      <div class="mvg-canvas-wrap">
+        <div class="mvg-imgrow" style="display:flex; gap:12px; flex-wrap:wrap;">
+          <div style="flex:1 1 180px;">
+            <h4 style="margin:0 0 4px; font-size:12px; text-transform:uppercase; letter-spacing:.06em; opacity:.7;">Image 1 observation</h4>
+            <canvas id="s3-canvas1" width="420" height="300"></canvas>
+          </div>
+          <div style="flex:1 1 180px;">
+            <h4 style="margin:0 0 4px; font-size:12px; text-transform:uppercase; letter-spacing:.06em; opacity:.7;">Image 2 observation</h4>
+            <canvas id="s3-canvas2" width="420" height="300"></canvas>
+          </div>
+        </div>
+        <p class="mvg-canvas-hint">The actual inputs: ring = where the true point projects, dot = the noisy pixel the triangulators receive. Every estimation error traces back to these two offsets.</p>
+      </div>
       <div class="mvg-controls">
         <div class="mvg-field"><label>Pixel noise σ <span class="val" id="s3-noiseval"></span></label><input type="range" id="s3-noise" min="0" max="12" step="0.1" value="4"></div>
         <div class="mvg-field"><label>Baseline (camera separation) <span class="val" id="s3-baseval"></span></label><input type="range" id="s3-base" min="0.6" max="5" step="0.05" value="3"></div>
@@ -216,6 +229,23 @@ permalink: /multi-view-geometry-triangulation.html
     <div class="mvg-math">min &#8214;x&#770;&#8321; &minus; x&#8321;&#8214;&#178; + &#8214;x&#770;&#8322; &minus; x&#8322;&#8214;&#178;&nbsp;&nbsp;subject to&nbsp;&nbsp;x&#770;&#8322;&#7488;Fx&#770;&#8321; = 0</div>
     <p>Once <var>x&#770;&#8321;, x&#770;&#8322;</var> exactly satisfy the epipolar constraint, their rays are guaranteed to intersect exactly — so triangulating them is trivial, any linear method gives the identical answer. All the work is in finding the corrected pair, and Hartley &amp; Zisserman show the constrained minimization reduces to a single-variable function of one parameter along the epipolar line, whose minimum is a root of a degree-6 polynomial (solvable in closed form, no iteration, no local minima). The point of the machinery isn't the polynomial's coefficients — it's that this is provably the pixel-space maximum-likelihood point under Gaussian pixel noise, which is exactly the error the midpoint method above ignores.</p>
     <div class="mvg-warn">&#9888; The Gauss-Newton reprojection refinement from Section 2 minimizes the same reprojection-error objective, and in practice lands extremely close to the Hartley&ndash;Sturm answer — but it's a local iterative solve seeded from the linear estimate, not a closed-form global optimum. For two views the gap rarely matters; it matters more once outliers or bad initialization are in the picture.</div>
+    <div class="mvg-goal">&#127919; <b>Learning goal:</b> all four methods on the <em>same</em> noisy observation. Midpoint is the fastest and visibly biased along depth; DLT and Gauss&ndash;Newton agree closely; the epipolar-consistent optimal correction (Hartley&ndash;Sturm's objective, minimized numerically here) lands on essentially the same answer as GN &mdash; the bar chart makes the depth-bias of midpoint impossible to miss.</div>
+    <div class="mvg-demo">
+      <div class="mvg-canvas-wrap">
+        <div id="s6-plot3d" class="mvg-plot3d" style="height:340px;"></div>
+        <p class="mvg-canvas-hint">Drag to orbit. Diamond-open = truth; gray = midpoint; teal = linear DLT; pink = Gauss&ndash;Newton; purple = epipolar-consistent optimal.</p>
+      </div>
+      <div class="mvg-canvas-wrap">
+        <canvas id="s6-bars" width="420" height="240"></canvas>
+        <p class="mvg-canvas-hint">3D reconstruction error per method, split into depth (z) and lateral (x,y) components. Watch midpoint&#8217;s depth bar dwarf its lateral one &mdash; the 8:1 bias from the worked example, live.</p>
+      </div>
+      <div class="mvg-controls">
+        <div class="mvg-field"><label>Pixel noise &#963; (px) <span class="val" id="s6-noiseval"></span></label><input type="range" id="s6-noise" min="0" max="12" step="0.1" value="5"></div>
+        <div class="mvg-field"><label>Baseline (camera separation) <span class="val" id="s6-baseval"></span></label><input type="range" id="s6-base" min="0.6" max="5" step="0.05" value="1.2"></div>
+        <div class="mvg-btnrow"><button id="s6-resample" class="mvg-primary">New noisy observation</button></div>
+        <div class="mvg-readout" id="s6-readout"></div>
+      </div>
+    </div>
   </section>
 
   <section class="mvg-step" id="uncertainty">
@@ -238,12 +268,13 @@ permalink: /multi-view-geometry-triangulation.html
     <div class="mvg-demo">
       <div class="mvg-canvas-wrap">
         <canvas id="s5-canvas" width="480" height="360"></canvas>
-        <p class="mvg-canvas-hint">Depth axis is vertical; baseline axis is horizontal.</p>
+        <p class="mvg-canvas-hint">Depth axis is vertical; baseline axis is horizontal. Faint dots = 60 repeated triangulations of noisy observations (Monte-Carlo); the ellipse is the analytic prediction.</p>
       </div>
       <div class="mvg-controls">
         <div class="mvg-field"><label>Baseline B (m) <span class="val" id="s5-baseval"></span></label><input type="range" id="s5-base" min="0.05" max="2" step="0.01" value="0.5"></div>
         <div class="mvg-field"><label>Depth Z (m) <span class="val" id="s5-depthval"></span></label><input type="range" id="s5-depth" min="1" max="30" step="0.1" value="6"></div>
         <div class="mvg-field"><label>Pixel noise &#963; (px) <span class="val" id="s5-noiseval"></span></label><input type="range" id="s5-noise" min="0.2" max="5" step="0.1" value="1.5"></div>
+        <div class="mvg-btnrow"><button id="s5-mc" class="mvg-primary">Run 60 Monte-Carlo trials</button></div>
         <div class="mvg-readout" id="s5-readout"></div>
       </div>
     </div>
@@ -256,6 +287,17 @@ permalink: /multi-view-geometry-triangulation.html
     <p>What you get instead is a reconstruction correct up to a <strong>similarity transform</strong> — a global rotation, a global translation, and a single global scale factor applied to every camera and every point simultaneously, with no way to distinguish the true reconstruction from any rescaled copy of it:</p>
     <div class="mvg-math">(R, t, {X&#8305;}) &nbsp;and&nbsp; (R, s&#183;t, {s&#183;X&#8305;}) &nbsp;are indistinguishable, for any s &gt; 0</div>
     <p>That's <strong>7 degrees of freedom</strong> (3 rotation + 3 translation + 1 scale) that no amount of additional two-view geometry can pin down — a <strong>gauge freedom</strong>, not a solvable unknown. The only way out is an external reference: a known physical size somewhere in the scene, a second sensor with its own metric ground truth (IMU, GPS, LIDAR), or a stereo rig with a physically-measured baseline (which is exactly why Section 7's <var>B</var> has to be a real, known number — that's where the metric scale that monocular two-view geometry can't supply comes from). This same 7-DOF freedom reappears, unchanged, as the gauge freedom that has to be fixed (usually by anchoring one camera and one distance) in bundle adjustment when reconstructing from many views in <a href="{{ '/multi-view-geometry-sfm.html' | relative_url }}">Structure from Motion</a>.</p>
+    <div class="mvg-goal">&#127919; <b>Learning goal:</b> drag the global scale slider. The reconstruction grows and shrinks like a dollhouse, but the reprojection error &mdash; the only thing the images can actually measure &mdash; stays exactly at zero for <em>every</em> scale. Nothing in the two images moves. That is what "7-DOF gauge freedom" feels like.</div>
+    <div class="mvg-demo">
+      <div class="mvg-canvas-wrap">
+        <div id="s9-plot3d" class="mvg-plot3d" style="height:320px;"></div>
+        <p class="mvg-canvas-hint">Drag to orbit. The whole reconstruction (cube + cameras) is scaled by the slider about the origin.</p>
+      </div>
+      <div class="mvg-controls">
+        <div class="mvg-field"><label>Global scale s <span class="val" id="s9-scaleval"></span></label><input type="range" id="s9-scale" min="0.3" max="3" step="0.05" value="1"></div>
+        <div class="mvg-readout" id="s9-readout"></div>
+      </div>
+    </div>
   </section>
 
   <section class="mvg-step" id="cheatsheet">
@@ -431,6 +473,33 @@ permalink: /multi-view-geometry-triangulation.html
     }
 
     var lastObs = null;
+    var imgCanvas1 = document.getElementById('s3-canvas1'), imgCtx1 = imgCanvas1 ? imgCanvas1.getContext('2d') : null;
+    var imgCanvas2 = document.getElementById('s3-canvas2'), imgCtx2 = imgCanvas2 ? imgCanvas2.getContext('2d') : null;
+
+    function drawObs(imgCtx, canvas, cam, obs){
+      if (!imgCtx) return;
+      var W = canvas.width, H = canvas.height;
+      imgCtx.clearRect(0,0,W,H);
+      imgCtx.fillStyle = 'rgba(0,0,0,0.05)'; imgCtx.fillRect(0,0,W,H);
+      var ccx = W/2, ccy = H/2;
+      imgCtx.strokeStyle = COLOR_DIVIDER; imgCtx.lineWidth = 1.5;
+      imgCtx.strokeRect(10, 10, W-20, H-20);
+      imgCtx.fillStyle = COLOR_ACCENT;
+      imgCtx.beginPath(); imgCtx.arc(ccx, ccy, 3, 0, 7); imgCtx.fill();
+      var pTrue = MVG.project(K, cam, Xtrue);
+      var truePix = [ccx + pTrue.u, ccy + pTrue.v];
+      var obsPix = [ccx + obs[0], ccy + obs[1]];
+      // ring = noise-free projection, dot = noisy observation, segment = the noise offset
+      imgCtx.strokeStyle = COLOR_TEXT; imgCtx.lineWidth = 1.6;
+      imgCtx.beginPath(); imgCtx.arc(truePix[0], truePix[1], 8, 0, 7); imgCtx.stroke();
+      imgCtx.strokeStyle = COLOR_ACCENT2; imgCtx.lineWidth = 1.4;
+      imgCtx.beginPath(); imgCtx.moveTo(truePix[0], truePix[1]); imgCtx.lineTo(obsPix[0], obsPix[1]); imgCtx.stroke();
+      imgCtx.fillStyle = COLOR_ACCENT2;
+      imgCtx.beginPath(); imgCtx.arc(obsPix[0], obsPix[1], 4.5, 0, 7); imgCtx.fill();
+      var d = Math.hypot(obs[0]-pTrue.u, obs[1]-pTrue.v);
+      imgCtx.fillStyle = COLOR_TEXT; imgCtx.font = '11px monospace';
+      imgCtx.fillText('noise ' + d.toFixed(1) + ' px', 14, 24);
+    }
 
     function resample(){
       var [cam1, cam2] = cams();
@@ -463,12 +532,15 @@ permalink: /multi-view-geometry-triangulation.html
       }
 
       Plotly.react(div, [
-        camTrace(cam1, COLOR_ACCENT), camTrace(cam2, COLOR_ACCENT),
+        cameraFrustumTrace(cam1, COLOR_ACCENT), cameraFrustumTrace(cam2, COLOR_ACCENT),
         rayTrace(cam1, Xlin, 'rgba(32,30,29,0.35)'), rayTrace(cam2, Xlin, 'rgba(32,30,29,0.35)'),
         markerTrace(Xtrue, COLOR_TEXT, 8, 'diamond-open'),
         markerTrace(Xlin, '#9b9797', 6),
         markerTrace(Xnl, COLOR_ACCENT2, 6)
       ], layout(), { displayModeBar:false, responsive:true });
+
+      drawObs(imgCtx1, imgCanvas1, cam1, lastObs.x1);
+      drawObs(imgCtx2, imgCanvas2, cam2, lastObs.x2);
 
       var errLin = MVG.norm(MVG.sub(Xlin, Xtrue));
       var errNl = MVG.norm(MVG.sub(Xnl, Xtrue));
@@ -567,6 +639,19 @@ permalink: /multi-view-geometry-triangulation.html
     for (var i=0;i<3;i++) for (var j=0;j<4;j++){ var s=0; for (var k=0;k<3;k++) s+=Kmat[i][k]*Rt34[k][j]; P[i][j]=s; }
     return P;
   }
+  // Wireframe frustum for a camera (matches Part 1's style).
+  function cameraFrustumTrace(cam, color, size){
+    size = size || 0.45;
+    var right = cam.R[0], down = cam.R[1], fwd = cam.R[2];
+    var corners = [[-1,-1],[1,-1],[1,1],[-1,1]].map(function(s){
+      return MVG.add(MVG.add(cam.C, MVG.scale(fwd, size)),
+        MVG.add(MVG.scale(right, s[0]*size*0.6), MVG.scale(down, s[1]*size*0.6)));
+    });
+    var xs=[], ys=[], zs=[];
+    corners.forEach(function(pt){ xs.push(cam.C[0],pt[0],null); ys.push(cam.C[1],pt[1],null); zs.push(cam.C[2],pt[2],null); });
+    for (var i=0;i<4;i++){ var a=corners[i], b=corners[(i+1)%4]; xs.push(a[0],b[0],null); ys.push(a[1],b[1],null); zs.push(a[2],b[2],null); }
+    return { type:'scatter3d', mode:'lines', x:xs, y:ys, z:zs, line:{ color:color, width:3 }, hoverinfo:'skip' };
+  }
 
   // ---------- Step 5: cheirality demo ----------
   (function(){
@@ -660,6 +745,28 @@ permalink: /multi-view-geometry-triangulation.html
     var f = 800; // fixed pixel focal length for this demo
 
     var baseEl = document.getElementById('s5-base'), depthEl = document.getElementById('s5-depth'), noiseEl = document.getElementById('s5-noise');
+    var mcBtn = document.getElementById('s5-mc');
+    var mcPts = []; // Monte-Carlo triangulation results, drawn in the side view
+
+    function runMC(){
+      var B = parseFloat(baseEl.value), Z = parseFloat(depthEl.value), sigma = parseFloat(noiseEl.value);
+      mcPts = [];
+      // parallel cameras at (∓B/2, 0, 0), identity rotations, looking along +z
+      var cam1 = { R: [[1,0,0],[0,1,0],[0,0,1]], C: [-B/2, 0, 0] };
+      var cam2 = { R: [[1,0,0],[0,1,0],[0,0,1]], C: [ B/2, 0, 0] };
+      var P1 = projectionMatrix({fx:f, fy:f, cx:0, cy:0}, cam1);
+      var P2 = projectionMatrix({fx:f, fy:f, cx:0, cy:0}, cam2);
+      var p1t = MVG.project({fx:f, fy:f, cx:0, cy:0}, cam1, [0,0,Z]);
+      var p2t = MVG.project({fx:f, fy:f, cx:0, cy:0}, cam2, [0,0,Z]);
+      for (var k=0; k<60; k++){
+        var o1 = [p1t.u + gaussianNoise(sigma), p1t.v + gaussianNoise(sigma)];
+        var o2 = [p2t.u + gaussianNoise(sigma), p2t.v + gaussianNoise(sigma)];
+        var X = triangulateLinear(P1, o1, P2, o2);
+        if (isFinite(X[0]) && isFinite(X[2])) mcPts.push([X[0], X[2]]);
+      }
+      update();
+    }
+    if (mcBtn) mcBtn.addEventListener('click', runMC);
 
     function update(){
       var B = parseFloat(baseEl.value), Z = parseFloat(depthEl.value), sigma = parseFloat(noiseEl.value);
@@ -708,14 +815,294 @@ permalink: /multi-view-geometry-triangulation.html
       ctx.fillStyle = COLOR_TEXT;
       ctx.beginPath(); ctx.arc(pt[0], pt[1], 4, 0, 7); ctx.fill();
 
-      document.getElementById('s5-readout').innerHTML =
-        '<div><span class="k">ray intersection angle</span> = <span class="hi">' + angleDeg.toFixed(1) + '&#176;</span></div>' +
-        '<div><span class="k">&#916;Z &#8776; &#963;&#183;Z&#178;/(fB)</span> = <span class="hi">' + dZ.toFixed(4) + ' m</span></div>' +
-        '<div><span class="k">&#916;X &#8776; &#963;&#183;Z/f</span> = ' + dX.toFixed(4) + ' m</div>' +
-        '<div><span class="k">depth / lateral ratio</span> = ' + (dZ/dX).toFixed(2) + '&#215;</div>';
+      // Monte-Carlo scatter (world x = lateral/horizontal, z = depth/vertical)
+      if (mcPts.length){
+        ctx.fillStyle = COLOR_ACCENT;
+        mcPts.forEach(function(p){
+          var q = toPx(p[0], p[1]);
+          ctx.globalAlpha = 0.35;
+          ctx.beginPath(); ctx.arc(q[0], q[1], 2.4, 0, 7); ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+        // empirical spread vs analytic prediction
+        var lat = mcPts.map(function(p){ return p[0]; }), dep = mcPts.map(function(p){ return p[1]; });
+        function std(arr){ var m = arr.reduce(function(a,b){return a+b;},0)/arr.length;
+          return Math.sqrt(arr.reduce(function(a,b){return a+(b-m)*(b-m);},0)/arr.length); }
+        var sLat = std(lat), sDep = std(dep);
+        document.getElementById('s5-readout').innerHTML =
+          '<div><span class="k">ray intersection angle</span> = <span class="hi">' + angleDeg.toFixed(1) + '&#176;</span></div>' +
+          '<div><span class="k">&#916;Z &#8776; &#963;&#183;Z&#178;/(fB)</span> = <span class="hi">' + dZ.toFixed(4) + ' m</span></div>' +
+          '<div><span class="k">&#916;X &#8776; &#963;&#183;Z/f</span> = ' + dX.toFixed(4) + ' m</div>' +
+          '<div><span class="k">depth / lateral ratio</span> = ' + (dZ/dX).toFixed(2) + '&#215;</div>' +
+          '<div><span class="k">Monte-Carlo empirical std (60 trials)</span>: depth = <span class="hi">' + sDep.toFixed(4) + ' m</span>, lateral = ' + sLat.toFixed(4) + ' m <span style="opacity:.6">(should land close to the analytic &#916;s above)</span></div>';
+      } else {
+        document.getElementById('s5-readout').innerHTML =
+          '<div><span class="k">ray intersection angle</span> = <span class="hi">' + angleDeg.toFixed(1) + '&#176;</span></div>' +
+          '<div><span class="k">&#916;Z &#8776; &#963;&#183;Z&#178;/(fB)</span> = <span class="hi">' + dZ.toFixed(4) + ' m</span></div>' +
+          '<div><span class="k">&#916;X &#8776; &#963;&#183;Z/f</span> = ' + dX.toFixed(4) + ' m</div>' +
+          '<div><span class="k">depth / lateral ratio</span> = ' + (dZ/dX).toFixed(2) + '&#215;</div>';
+      }
     }
 
-    [baseEl, depthEl, noiseEl].forEach(function(el){ el.addEventListener('input', update); });
+    [baseEl, depthEl, noiseEl].forEach(function(el){
+      el.addEventListener('input', function(){ mcPts = []; update(); });
+    });
+    update();
+  })();
+
+  // ---------- Step 6: four-method triangulation shootout ----------
+  (function(){
+    var div = document.getElementById('s6-plot3d');
+    if (!div) return;
+    var K = { fx: 480, fy: 480, cx: 0, cy: 0 };
+    var Xtrue = [0.5, -0.4, 0.6];
+    var noiseEl = document.getElementById('s6-noise'), baseEl = document.getElementById('s6-base');
+    var barsCanvas = document.getElementById('s6-bars'), barsCtx = barsCanvas ? barsCanvas.getContext('2d') : null;
+
+    function cams(){
+      var b = parseFloat(baseEl.value);
+      return [ MVG.orbitCamera(-b*0.28, 0.2, 7, [0,0,0]), MVG.orbitCamera(b*0.28, 0.2, 7, [0,0,0]) ];
+    }
+    function layout3d(){
+      return {
+        autosize:true, margin:{l:0,r:0,t:0,b:0}, showlegend:false, paper_bgcolor:'transparent',
+        scene: {
+          xaxis:{ range:[-3,3], backgroundcolor:'transparent', gridcolor:COLOR_DIVIDER, zerolinecolor:COLOR_DIVIDER, color:COLOR_TEXT, title:'x' },
+          yaxis:{ range:[-3,3], backgroundcolor:'transparent', gridcolor:COLOR_DIVIDER, zerolinecolor:COLOR_DIVIDER, color:COLOR_TEXT, title:'y' },
+          zaxis:{ range:[-3,3], backgroundcolor:'transparent', gridcolor:COLOR_DIVIDER, zerolinecolor:COLOR_DIVIDER, color:COLOR_TEXT, title:'z' },
+          aspectmode:'cube', camera:{ eye:{x:1.4,y:-1.4,z:1.0} }
+        }
+      };
+    }
+    function mv3(M, v){ return [M[0][0]*v[0]+M[0][1]*v[1]+M[0][2]*v[2], M[1][0]*v[0]+M[1][1]*v[1]+M[1][2]*v[2], M[2][0]*v[0]+M[2][1]*v[1]+M[2][2]*v[2]]; }
+    function inv3(M){
+      var a=M[0][0],b=M[0][1],c=M[0][2],d=M[1][0],e=M[1][1],f=M[1][2],g=M[2][0],h=M[2][1],i=M[2][2];
+      var A=e*i-f*h, B=-(d*i-f*g), C=d*h-e*g, D=-(b*i-c*h), E=a*i-c*g, F=-(a*h-b*g), G=b*f-c*e, Hh=-(a*f-c*d), I=a*e-b*d;
+      var det=a*A+b*B+c*C;
+      return [[A/det,D/det,G/det],[B/det,E/det,Hh/det],[C/det,F/det,I/det]];
+    }
+    function camRay(cam, x){
+      var dCam = [ (x[0]-K.cx)/K.fx, (x[1]-K.cy)/K.fy, 1 ];
+      return MVG.normalize(mv3(mat3T(cam.R), dCam));
+    }
+    // Midpoint triangulation: closest points on the two back-projected rays, then average.
+    function midpointTriangulate(cam1, cam2, x1, x2){
+      var d1 = camRay(cam1, x1), d2 = camRay(cam2, x2);
+      var r = MVG.sub(cam1.C, cam2.C);
+      var a = MVG.dot(d1,d1), b = MVG.dot(d1,d2), c = MVG.dot(d2,d2);
+      var dp = MVG.dot(d1,r), ep = MVG.dot(d2,r);
+      var den = a*c - b*b;
+      if (Math.abs(den) < 1e-12) return MVG.add(cam1.C, MVG.scale(d1, 1));
+      var t = (b*ep - c*dp)/den, s = (a*ep - b*dp)/den;
+      var P1 = MVG.add(cam1.C, MVG.scale(d1, t)), P2 = MVG.add(cam2.C, MVG.scale(d2, s));
+      return MVG.scale(MVG.add(P1, P2), 0.5);
+    }
+    function fundamentalOf(cam1, cam2){
+      var R = mat3Mul(cam2.R, mat3T(cam1.R));
+      var t = mv3(cam2.R, MVG.sub(cam1.C, cam2.C));
+      var E = mat3Mul(skew(t), R);
+      var Km = [[K.fx,0,K.cx],[0,K.fy,K.cy],[0,0,1]];
+      var Ki = inv3(Km);
+      return mat3Mul(mat3Mul(mat3T(Ki), E), Ki);
+    }
+    function footOfPerp(p, l){
+      var n2 = l[0]*l[0] + l[1]*l[1];
+      if (n2 < 1e-12) return p.slice();
+      var d = l[0]*p[0] + l[1]*p[1] + l[2];
+      return [ p[0] - l[0]*d/n2, p[1] - l[1]*d/n2 ];
+    }
+    // Epipolar-consistent optimal correction: minimize d(x̂1,x1)² + d(foot(x̂2, F x̂1), x̂2)²
+    // over x̂1 (2-D coordinate descent). This is Hartley–Sturm's objective; they solve it in
+    // closed form via a degree-6 polynomial — here it's minimized numerically, same optimum.
+    function optimalCorrect(F, x1, x2){
+      function cost(p){
+        var l2 = mv3(F, [p[0], p[1], 1]);
+        var x2c = footOfPerp(x2, l2);
+        var d1 = p[0]-x1[0], d2 = p[1]-x1[1];
+        var d3 = x2c[0]-x2[0], d4 = x2c[1]-x2[1];
+        return d1*d1 + d2*d2 + d3*d3 + d4*d4;
+      }
+      var p = x1.slice(), step = 30;
+      for (var it=0; it<60; it++){
+        var c0 = cost(p);
+        var bestP = null, bestC = c0;
+        for (var ax=0; ax<2; ax++){
+          for (var sgn=-1; sgn<=1; sgn+=2){
+            var q = p.slice(); q[ax] += sgn*step;
+            var cq = cost(q);
+            if (cq < bestC){ bestC = cq; bestP = q; }
+          }
+        }
+        if (bestP) p = bestP; else step *= 0.7;
+        if (step < 0.02) break;
+      }
+      var l2 = mv3(F, [p[0], p[1], 1]);
+      return { x1c: p, x2c: footOfPerp(x2, l2) };
+    }
+
+    var lastObs = null;
+    function resample(){
+      var cs = cams();
+      var noise = parseFloat(noiseEl.value);
+      var p1 = MVG.project(K, cs[0], Xtrue), p2 = MVG.project(K, cs[1], Xtrue);
+      lastObs = {
+        x1: [p1.u + gaussianNoise(noise), p1.v + gaussianNoise(noise)],
+        x2: [p2.u + gaussianNoise(noise), p2.v + gaussianNoise(noise)]
+      };
+      render();
+    }
+
+    function drawBars(errs){
+      if (!barsCtx) return;
+      var ctx = barsCtx, W = barsCanvas.width, H = barsCanvas.height;
+      ctx.clearRect(0,0,W,H);
+      ctx.fillStyle = 'rgba(0,0,0,0.04)'; ctx.fillRect(0,0,W,H);
+      var names = ['midpoint', 'linear DLT', 'Gauss-Newton', 'optimal'];
+      var cols = ['#9b9797', COLOR_ACCENT, COLOR_ACCENT2, '#8a5cff'];
+      var maxE = 0.01;
+      errs.forEach(function(e){ maxE = Math.max(maxE, e.lat, e.dep); });
+      var x0 = 96, bw = 26, gap = 34;
+      ctx.font = '11px monospace'; ctx.fillStyle = COLOR_TEXT;
+      ctx.strokeStyle = COLOR_DIVIDER; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(x0-6, 16); ctx.lineTo(x0-6, H-40); ctx.lineTo(W-14, H-40); ctx.stroke();
+      errs.forEach(function(e, i){
+        var bx = x0 + i*(2*bw+gap);
+        var hLat = (e.lat/maxE)*(H-70);
+        var hDep = (e.dep/maxE)*(H-70);
+        ctx.fillStyle = cols[i];
+        ctx.fillRect(bx, H-40-hLat, bw, hLat);
+        ctx.globalAlpha = 0.55;
+        ctx.fillRect(bx+bw+4, H-40-hDep, bw, hDep);
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = COLOR_TEXT;
+        ctx.fillText(names[i], bx-8, H-24);
+      });
+      ctx.fillStyle = COLOR_TEXT;
+      ctx.fillText('light bar = depth (z) error', x0, 14);
+      ctx.fillText('solid = lateral (x,y) error', x0, 28);
+    }
+
+    function render(){
+      if (!lastObs) return;
+      var cs = cams();
+      var cam1 = cs[0], cam2 = cs[1];
+      var P1 = projectionMatrix(K, cam1), P2 = projectionMatrix(K, cam2);
+      var Xm = midpointTriangulate(cam1, cam2, lastObs.x1, lastObs.x2);
+      var Xl = triangulateLinear(P1, lastObs.x1, P2, lastObs.x2);
+      var Xg = triangulateNonlinear(K, cs, [lastObs.x1, lastObs.x2], Xl);
+      var F = fundamentalOf(cam1, cam2);
+      var opt = optimalCorrect(F, lastObs.x1, lastObs.x2);
+      var Xo = triangulateLinear(P1, opt.x1c, P2, opt.x2c);
+
+      function markerTrace(X, color, size, symbol){
+        return { type:'scatter3d', mode:'markers', x:[X[0]], y:[X[1]], z:[X[2]], marker:{ size:size||7, color:color, symbol: symbol||'circle' }, hoverinfo:'skip' };
+      }
+      Plotly.react(div, [
+        cameraFrustumTrace(cam1, COLOR_ACCENT), cameraFrustumTrace(cam2, COLOR_ACCENT),
+        markerTrace(Xtrue, COLOR_TEXT, 8, 'diamond-open'),
+        markerTrace(Xm, '#9b9797', 6),
+        markerTrace(Xl, COLOR_ACCENT, 6),
+        markerTrace(Xg, COLOR_ACCENT2, 6),
+        markerTrace(Xo, '#8a5cff', 6)
+      ], layout3d(), { displayModeBar:false, responsive:true });
+
+      function err(X){ return { tot: MVG.norm(MVG.sub(X, Xtrue)), dep: Math.abs(X[2]-Xtrue[2]), lat: Math.hypot(X[0]-Xtrue[0], X[1]-Xtrue[1]) }; }
+      var errs = [err(Xm), err(Xl), err(Xg), err(Xo)];
+      drawBars(errs);
+
+      document.getElementById('s6-noiseval').textContent = parseFloat(noiseEl.value).toFixed(1) + ' px';
+      document.getElementById('s6-baseval').textContent = parseFloat(baseEl.value).toFixed(2);
+      var names = ['midpoint', 'linear DLT', 'Gauss-Newton', 'optimal'];
+      document.getElementById('s6-readout').innerHTML =
+        names.map(function(n, i){
+          return '<div><span class="k">' + n + '</span> error = <span class="hi">' + errs[i].tot.toFixed(3) + '</span>' +
+            ' <span style="opacity:.6">(depth ' + errs[i].dep.toFixed(3) + ', lateral ' + errs[i].lat.toFixed(3) + ')</span></div>';
+        }).join('');
+    }
+
+    document.getElementById('s6-resample').addEventListener('click', resample);
+    noiseEl.addEventListener('input', function(){ resample(); });
+    baseEl.addEventListener('input', resample);
+    resample();
+  })();
+
+  // ---------- Step 9: scale-ambiguity demo ----------
+  (function(){
+    var div = document.getElementById('s9-plot3d');
+    if (!div) return;
+    var scaleEl = document.getElementById('s9-scale');
+    var K = { fx: 480, fy: 480, cx: 0, cy: 0 };
+
+    // base scene: a small cube and two cameras looking at it
+    var R0 = 0.9;
+    var CUBE = [];
+    [-1,1].forEach(function(sx){ [-1,1].forEach(function(sy){ [-1,1].forEach(function(sz){
+      CUBE.push([sx*R0, sy*R0, sz*R0 + 1.4]);
+    }); }); });
+    var EDGES = [];
+    for (var i=0;i<8;i++) for (var j=i+1;j<8;j++){
+      var d = 0; for (var k=0;k<3;k++) d += Math.abs(CUBE[i][k]-CUBE[j][k]) > 1e-6 ? 1 : 0;
+      if (d === 1) EDGES.push([i,j]);
+    }
+    var cam1 = { R: [[1,0,0],[0,1,0],[0,0,1]], C: [0, 0, -3.2] };
+    var cam2 = MVG.orbitCamera(0.55, 0.2, 4.6, [0, 0, 1.4]);
+
+    function frustum(cam, color, size){
+      size = size || 0.4;
+      var corners = [[-1,-1],[1,-1],[1,1],[-1,1]].map(function(s){
+        return [
+          cam.C[0] + cam.R[2][0]*size + cam.R[0][0]*s[0]*size*0.6 + cam.R[1][0]*s[1]*size*0.6,
+          cam.C[1] + cam.R[2][1]*size + cam.R[0][1]*s[0]*size*0.6 + cam.R[1][1]*s[1]*size*0.6,
+          cam.C[2] + cam.R[2][2]*size + cam.R[0][2]*s[0]*size*0.6 + cam.R[1][2]*s[1]*size*0.6
+        ];
+      });
+      var xs=[], ys=[], zs=[];
+      corners.forEach(function(pt){ xs.push(cam.C[0],pt[0],null); ys.push(cam.C[1],pt[1],null); zs.push(cam.C[2],pt[2],null); });
+      for (var i2=0;i2<4;i2++){ var a=corners[i2], b=corners[(i2+1)%4]; xs.push(a[0],b[0],null); ys.push(a[1],b[1],null); zs.push(a[2],b[2],null); }
+      return { type:'scatter3d', mode:'lines', x:xs, y:ys, z:zs, line:{ color:color, width:3 }, hoverinfo:'skip' };
+    }
+
+    function update(){
+      var s = parseFloat(scaleEl.value);
+      document.getElementById('s9-scaleval').textContent = s.toFixed(2) + '&times;'.replace('&times;','x');
+      function sc(p){ return [p[0]*s, p[1]*s, p[2]*s]; }
+      var cubeS = CUBE.map(sc);
+      var cam1S = { R: cam1.R, C: sc(cam1.C) };
+      var cam2S = { R: cam2.R, C: sc(cam2.C) };
+      var xs=[], ys=[], zs=[];
+      EDGES.forEach(function(e){
+        var a = cubeS[e[0]], b = cubeS[e[1]];
+        xs.push(a[0],b[0],null); ys.push(a[1],b[1],null); zs.push(a[2],b[2],null);
+      });
+      var traces = [
+        { type:'scatter3d', mode:'lines', x:xs, y:ys, z:zs, line:{ color:COLOR_TEXT, width:4 }, hoverinfo:'skip' },
+        frustum(cam1S, COLOR_ACCENT), frustum(cam2S, COLOR_ACCENT2)
+      ];
+      Plotly.react(div, traces, {
+        autosize:true, margin:{l:0,r:0,t:0,b:0}, showlegend:false, paper_bgcolor:'transparent',
+        scene: {
+          xaxis:{ range:[-4,4], backgroundcolor:'transparent', gridcolor:COLOR_DIVIDER, zerolinecolor:COLOR_DIVIDER, color:COLOR_TEXT, title:'x' },
+          yaxis:{ range:[-4,4], backgroundcolor:'transparent', gridcolor:COLOR_DIVIDER, zerolinecolor:COLOR_DIVIDER, color:COLOR_TEXT, title:'y' },
+          zaxis:{ range:[-4,4], backgroundcolor:'transparent', gridcolor:COLOR_DIVIDER, zerolinecolor:COLOR_DIVIDER, color:COLOR_TEXT, title:'z' },
+          aspectmode:'cube', camera:{ eye:{x:1.4,y:-1.4,z:1.0} }
+        }
+      }, { displayModeBar:false, responsive:true });
+
+      // the only thing images can measure: pixels. Scale the whole world -> identical pixels.
+      var maxDiff = 0;
+      CUBE.forEach(function(X, i2){
+        var pA = MVG.project(K, cam1, X), pB = MVG.project(K, cam1S, cubeS[i2]);
+        if (pA && pB) maxDiff = Math.max(maxDiff, Math.hypot(pA.u-pB.u, pA.v-pB.v));
+        pA = MVG.project(K, cam2, X); pB = MVG.project(K, cam2S, cubeS[i2]);
+        if (pA && pB) maxDiff = Math.max(maxDiff, Math.hypot(pA.u-pB.u, pA.v-pB.v));
+      });
+      document.getElementById('s9-readout').innerHTML =
+        '<div><span class="k">reconstruction scale</span> = <span class="hi">' + s.toFixed(2) + '&times;</span></div>' +
+        '<div><span class="k">cube edge length</span> = <span class="hi">' + (1.8*s).toFixed(2) + ' units</span> <span style="opacity:.6">— meters? millimeters? undecidable</span></div>' +
+        '<div><span class="k">max reprojection difference vs. s=1</span> = <span class="hi">' + maxDiff.toExponential(1) + ' px</span> <span class="hi">— zero at every scale</span></div>' +
+        '<div style="opacity:.65">Both reconstructions produce pixel-identical images. Nothing in the two views breaks the tie — that requires an external metric reference (a known size, IMU, or a measured stereo baseline).</div>';
+    }
+    scaleEl.addEventListener('input', update);
     update();
   })();
 

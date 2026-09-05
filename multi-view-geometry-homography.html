@@ -203,6 +203,7 @@ permalink: /multi-view-geometry-homography.html
       </div>
       <div class="mvg-controls">
         <label class="mvg-toggle"><input type="checkbox" id="s3-fifth"> Add a 5th correspondence (overdetermined)</label>
+        <label class="mvg-toggle"><input type="checkbox" id="s3-hartley" checked> Hartley-normalize before solving (as the warning above says)</label>
         <div class="mvg-btnrow">
           <button id="s3-jitter">Jitter all points (simulate click noise)</button>
           <button id="s3-reset">Reset points</button>
@@ -220,6 +221,27 @@ permalink: /multi-view-geometry-homography.html
     <p><strong>Symmetric transfer error</strong> pushes each point through <var>H</var> forward and its match back through <var>H&#8315;&#185;</var>, and sums both squared pixel distances. Unlike <var>F</var> — where <var>x&#8322;&#7488;Fx&#8321;=0</var> is already symmetric in the two images — <var>H</var> maps one image <em>onto</em> the other, so a one-directional error silently rewards a degenerate <var>H</var> that maps everything to a single point in image 2 (zero forward error) while doing arbitrarily badly in reverse; summing both directions closes that loophole.</p>
     <p><strong>Reprojection error</strong> is the "real" cost used when jointly refining <var>H</var> and the correspondences themselves: instead of trusting the measured, noisy <var>(x&#8321;, x&#8322;)</var> as ground truth, it optimizes over both <var>H</var> and a set of "true" plane points <var>x&#770;&#8321;, x&#770;&#8322;</var> satisfying <var>x&#770;&#8322;=Hx&#770;&#8321;</var> exactly, and minimizes <var>&#8214;x&#8321;&minus;x&#770;&#8321;&#8214;&#178; + &#8214;x&#8322;&minus;x&#770;&#8322;&#8214;&#178;</var> — the distance from each observation to its nearest point actually consistent with some homography. It's the statistically correct (maximum-likelihood, under Gaussian pixel noise) cost, and the most expensive: it adds two new unknowns per correspondence.</p>
     <p><strong>Sampson error</strong> is the cheap first-order approximation to reprojection error, the same trick used for <var>F</var>'s Sampson distance: instead of solving the nonlinear correction, linearize the constraint <var>g(x&#8321;,x&#8322;) = x&#771;&#8322;&#215;Hx&#771;&#8321;</var> around the measured points and divide its magnitude by the local sensitivity (the Jacobian norm) to convert an algebraic residual into an approximate geometric one — one evaluation of <var>H</var> and a small Jacobian, no extra unknowns, and close to reprojection error when the residual is already small (which is the only regime it's meant for).</p>
+    <div class="mvg-goal">🎯 <b>Learning goal:</b> the three costs computed on the <em>same</em> fitted <var>H</var> and the same noisy correspondences. Symmetric transfer is what you can draw as segments; Sampson tracks it closely at small residuals; reprojection (small Gauss&ndash;Newton fit of each point pair) is the statistically right number the other two are approximating. Drag &#963; up and watch all three grow — and watch the DLT's own algebraic fit get left behind.</div>
+    <div class="mvg-demo">
+      <div class="mvg-canvas-wrap" style="flex-basis:100%;">
+        <div class="mvg-imgrow">
+          <div class="mvg-imgcol">
+            <h4>Image 1 — x&#8321; (filled) vs H&#8315;&#185;x&#8322; (ring)</h4>
+            <canvas id="s4e-canvas1" width="300" height="220"></canvas>
+          </div>
+          <div class="mvg-imgcol">
+            <h4>Image 2 — x&#8322; (filled) vs Hx&#8321; (ring)</h4>
+            <canvas id="s4e-canvas2" width="300" height="220"></canvas>
+          </div>
+        </div>
+        <p class="mvg-canvas-hint">Segments = the two one-directional transfer errors whose squares sum to the symmetric transfer error. H is the DLT fit on the noisy points (Hartley-normalized).</p>
+      </div>
+      <div class="mvg-controls">
+        <div class="mvg-field"><label>Correspondence noise &#963; (px) <span class="val" id="s4e-sigmaval"></span></label><input type="range" id="s4e-sigma" min="0" max="4" step="0.1" value="1"></div>
+        <div class="mvg-btnrow"><button id="s4e-resample" class="mvg-primary">Resample noise</button></div>
+        <div class="mvg-readout" id="s4e-readout"></div>
+      </div>
+    </div>
   </section>
 
   <section class="mvg-step" id="decompose">
@@ -262,6 +284,30 @@ permalink: /multi-view-geometry-homography.html
     <p><strong>Planar AR-marker pose (ArUco / AprilTag).</strong> A printed marker of known real-world size defines a plane with a known local coordinate frame. Detect its four corners in the image, DLT-fit the homography from the marker's canonical corners to the observed ones, then run exactly the decomposition above (using the camera's known <var>K</var>) to get the marker's <var>(R,t)</var> relative to the camera directly — this is the whole pose-estimation step in ArUco and AprilTag, correspondence-to-pose with nothing else involved.</p>
     <p><strong>Inverse perspective mapping (bird's-eye view).</strong> A forward-facing road camera sees the ground plane in perspective — lane markings converge toward a vanishing point. Given the homography that maps that ground plane onto a top-down virtual camera, warping the whole image through it turns the road into a rectangle, which is what parking-assist and lane-detection systems actually run their geometry on.</p>
     <div class="mvg-warn">&#9888; <span><b>Only the ground plane is real:</b> IPM's homography is fit assuming <em>everything</em> in the image lies on the ground — true for lane paint and flat pavement, false for anything with height. A curb, a parked car, another vehicle's body: none of it is on the assumed plane, so IPM smears and distorts it exactly the way §2's off-plane point drifted away from its prediction. The demo below makes that failure visible on purpose.</span></div>
+    <div class="mvg-goal">🎯 <b>Learning goal:</b> the panorama case. The camera only <em>rotates</em> (zero baseline — the exact case that kills <var>E</var>), so image 2 is a pure-rotation homography of image 1, valid for <em>every</em> depth. Warping image 2 into image 1's frame through <var>H = K R K&#8315;&#185;</var> aligns the two photos pixel-perfectly in the overlap — drag the rotation slider and watch the blended overlay stay seamless.</div>
+    <div class="mvg-demo">
+      <div class="mvg-canvas-wrap" style="flex-basis:100%;">
+        <div class="mvg-imgrow">
+          <div class="mvg-imgcol">
+            <h4>Photo 1 (yaw 0)</h4>
+            <canvas id="s6-canvas1" width="300" height="220"></canvas>
+          </div>
+          <div class="mvg-imgcol">
+            <h4>Photo 2 (rotated camera)</h4>
+            <canvas id="s6-canvas2" width="300" height="220"></canvas>
+          </div>
+          <div class="mvg-imgcol">
+            <h4>Photo 2 warped into photo 1's frame</h4>
+            <canvas id="s6-canvas3" width="300" height="220"></canvas>
+          </div>
+        </div>
+        <p class="mvg-canvas-hint">Right canvas: photo 1 in its original pixels (left half) cross-faded into the H-warped photo 2 (right half) — the checkerboard and the colored disks must line up across the fade with no ghosting, because pure rotation has no parallax.</p>
+      </div>
+      <div class="mvg-controls">
+        <div class="mvg-field"><label>Camera 2 yaw (rotation) <span class="val" id="s6-yawval"></span></label><input type="range" id="s6-yaw" min="0.05" max="0.55" step="0.01" value="0.3"></div>
+        <div class="mvg-readout" id="s6-readout"></div>
+      </div>
+    </div>
     <div class="mvg-demo">
       <div class="mvg-canvas-wrap" style="flex-basis:100%;">
         <div class="mvg-imgrow">
@@ -631,12 +677,27 @@ permalink: /multi-view-geometry-homography.html
 
     var dragIdx = -1;
     var fifthEl = document.getElementById('s3-fifth');
+    var hartleyEl = document.getElementById('s3-hartley');
     var jitterBtn = document.getElementById('s3-jitter');
     var resetBtn = document.getElementById('s3-reset');
     var readout = document.getElementById('s3-readout');
     var amatrixEl = document.getElementById('s3-amatrix');
 
     function activeN(){ return fifthEl.checked ? 5 : 4; }
+
+    // Hartley normalization: centroid → 0, mean distance → √2. Returns T and normalized points.
+    function hartleyNormalizePts(pts){
+      var n = pts.length, cx=0, cy=0;
+      pts.forEach(function(p){ cx+=p[0]; cy+=p[1]; }); cx/=n; cy/=n;
+      var md = 0;
+      pts.forEach(function(p){ md += Math.hypot(p[0]-cx, p[1]-cy); }); md/=n;
+      var s = md > 1e-9 ? Math.SQRT2/md : 1;
+      return { T: [[s,0,-s*cx],[0,s,-s*cy],[0,0,1]], pts: pts.map(function(p){ return [s*(p[0]-cx), s*(p[1]-cy)]; }) };
+    }
+    function applyMat3(M, p){
+      var w = M[2][0]*p[0] + M[2][1]*p[1] + M[2][2];
+      return [ (M[0][0]*p[0] + M[0][1]*p[1] + M[0][2])/w, (M[1][0]*p[0] + M[1][1]*p[1] + M[1][2])/w ];
+    }
 
     function dltNull(corr){
       var A = [];
@@ -649,6 +710,30 @@ permalink: /multi-view-geometry-homography.html
       var eig = jacobiEigen(AtA);
       var h = eig.vectors[0]; // eigenvector of smallest eigenvalue = the null vector
       return { H: [[h[0],h[1],h[2]],[h[3],h[4],h[5]],[h[6],h[7],h[8]]], A: A, eigSmall: eig.values[0], eigNext: eig.values[1] };
+    }
+
+    // Solve the DLT on raw coordinates AND on Hartley-normalized coordinates, so the toggle
+    // switches which one drives the warp and the readout can compare conditioning + accuracy.
+    function solveBoth(corr){
+      var raw = dltNull(corr);
+      var n1 = hartleyNormalizePts(corr.map(function(c){ return c[0]; }));
+      var n2 = hartleyNormalizePts(corr.map(function(c){ return c[1]; }));
+      var corrNorm = n1.pts.map(function(p,i){ return [p, n2.pts[i]]; });
+      var norm = dltNull(corrNorm);
+      // denormalize: H = T2⁻¹ Ĥ T1
+      var T1 = n1.T, T2 = n2.T, T2inv = mat3Inverse(T2);
+      var Hden = matMulG(matMulG(T2inv, norm.H), T1);
+      // mean symmetric transfer error (px) of each candidate H over all correspondences
+      function symErr(H){
+        var Hinv = mat3Inverse(H);
+        var s = 0;
+        corr.forEach(function(c){
+          var f = applyMat3(H, c[0]), b = applyMat3(Hinv, c[1]);
+          s += Math.hypot(f[0]-c[1][0], f[1]-c[1][1]) + Math.hypot(b[0]-c[0][0], b[1]-c[0][1]);
+        });
+        return s / corr.length;
+      }
+      return { raw: raw, norm: norm, Hdenorm: Hden, symErrRaw: symErr(raw.H), symErrNorm: symErr(Hden) };
     }
 
     function drawSource(){
@@ -671,8 +756,10 @@ permalink: /multi-view-geometry-homography.html
       drawSource();
       var n = activeN();
       var corr = []; for (var i=0;i<n;i++) corr.push([srcPts[i], dstPts[i]]);
-      var res = dltNull(corr);
-      var Hm = res.H;
+      var both = solveBoth(corr);
+      var useHartley = hartleyEl.checked;
+      var Hm = useHartley ? both.Hdenorm : both.raw.H;
+      var res = useHartley ? both.norm : both.raw;
       var Hinv = mat3Inverse(Hm);
 
       var img = ctx2.createImageData(W,H);
@@ -694,14 +781,18 @@ permalink: /multi-view-geometry-homography.html
         ctx2.strokeStyle = '#fff'; ctx2.lineWidth = 1.5; ctx2.stroke();
       }
 
-      amatrixEl.innerHTML = 'A, row pair for correspondence 1 (of ' + (2*n) + ' rows total, 9 columns):<br>' +
+      amatrixEl.innerHTML = (useHartley ? 'Normalized' : 'Raw (unnormalized)') +
+        ' A, row pair for correspondence 1 (of ' + (2*n) + ' rows total, 9 columns):<br>' +
         fmtRow(res.A[0]) + '<br>' + fmtRow(res.A[1]);
 
       readout.innerHTML =
-        '<div><span class="k">correspondences</span> = <span class="hi">' + n + '</span></div>' +
-        '<div><span class="k">A</span> is <span class="hi">' + (2*n) + '&#215;9</span> (' + (n===4 ? 'exact null space' : 'overdetermined &rarr; least squares') + ')</div>' +
-        '<div><span class="k">smallest eigenvalue of A&#7488;A</span> = <span class="hi">' + res.eigSmall.toExponential(2) + '</span> <span style="opacity:.6">(' + (n===4 ? '&asymp;0 &mdash; exact fit' : 'residual, not 0 &mdash; noise gets spread out, not eliminated') + ')</span></div>' +
-        '<div><span class="k">next-smallest eigenvalue</span> = ' + res.eigNext.toExponential(2) + ' <span style="opacity:.6">(gap from the smallest &asymp; how well-conditioned this layout is)</span></div>';
+        '<div><span class="k">correspondences</span> = <span class="hi">' + n + '</span>' +
+        ' &nbsp;<span class="k">solving</span> = ' + (useHartley ? '<span class="hi">Hartley-normalized</span>' : '<span class="hi" style="color:' + COLOR_ACCENT2 + '">raw pixels</span>') + '</div>' +
+        '<div><span class="k">smallest eigenvalue of A&#7488;A</span> = <span class="hi">' + res.eigSmall.toExponential(2) + '</span> <span style="opacity:.6">(' + (n===4 ? '&asymp;0 &mdash; exact fit' : 'residual, not 0 &mdash; noise spread, not eliminated') + ')</span></div>' +
+        '<div><span class="k">next-smallest eigenvalue</span> = ' + res.eigNext.toExponential(2) + ' <span style="opacity:.6">(gap &asymp; conditioning)</span></div>' +
+        '<div><span class="k">mean symmetric transfer error</span> &mdash; this solve: <span class="hi">' + (useHartley ? both.symErrNorm : both.symErrRaw).toFixed(3) + ' px</span>' +
+        ' &nbsp;|&nbsp; the other one: ' + (useHartley ? both.symErrRaw : both.symErrNorm).toFixed(3) + ' px</div>' +
+        '<div style="opacity:.6">On this small canvas both usually work; hit Jitter a few times and watch the raw solve degrade first. At real photo scales (1000s of px) the raw solve is the one the warning box is about.</div>';
     }
 
     function nearestIdx(mx,my){
@@ -920,6 +1011,277 @@ permalink: /multi-view-geometry-homography.html
         '<div>The lane grid rectifies to a clean rectangle; the box (real height, not on the ground plane) smears radially &mdash; exactly IPM&#8217;s failure mode on real obstacles.</div>';
     }
     pitchEl.addEventListener('input', update);
+    update();
+  })();
+
+  // ---------- Step 4 demo: three error metrics on one fitted H ----------
+  (function(){
+    var c1 = document.getElementById('s4e-canvas1');
+    if (!c1) return;
+    var ctx1 = c1.getContext('2d');
+    var c2 = document.getElementById('s4e-canvas2'), ctx2 = c2.getContext('2d');
+    var W = c1.width, H = c1.height;
+    var sigmaEl = document.getElementById('s4e-sigma'), resampleBtn = document.getElementById('s4e-resample');
+    var readout = document.getElementById('s4e-readout');
+
+    var BASE_SRC = [ [70,60], [230,55], [235,165], [65,170], [190,95] ];
+    var BASE_DST = [ [45,80], [255,50], [225,195], [80,150], [175,70] ];
+    var colors = [COLOR_ACCENT, COLOR_ACCENT2, COLOR_TEXT, '#8a5cff', '#e08a1e'];
+    var seed = 99;
+    function mulberry32(sd){
+      return function(){
+        sd |= 0; sd = (sd + 0x6D2B79F5) | 0;
+        var t = Math.imul(sd ^ (sd >>> 15), 1 | sd);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+    function gauss(rand){
+      var u = 0, v = 0;
+      while (u === 0) u = rand();
+      while (v === 0) v = rand();
+      return Math.sqrt(-2*Math.log(u)) * Math.cos(2*Math.PI*v);
+    }
+    function applyH2(M, p){
+      var w = M[2][0]*p[0] + M[2][1]*p[1] + M[2][2];
+      return [ (M[0][0]*p[0] + M[0][1]*p[1] + M[0][2])/w, (M[1][0]*p[0] + M[1][1]*p[1] + M[1][2])/w ];
+    }
+    // Hartley-normalized DLT (same recipe as Step 3's toggle-on path)
+    function fitH(corr){
+      function normPts(pts){
+        var n=pts.length, cx=0, cy=0;
+        pts.forEach(function(p){ cx+=p[0]; cy+=p[1]; }); cx/=n; cy/=n;
+        var md=0; pts.forEach(function(p){ md += Math.hypot(p[0]-cx, p[1]-cy); }); md/=n;
+        var s = md > 1e-9 ? Math.SQRT2/md : 1;
+        return { T: [[s,0,-s*cx],[0,s,-s*cy],[0,0,1]], pts: pts.map(function(p){ return [s*(p[0]-cx), s*(p[1]-cy)]; }) };
+      }
+      var n1 = normPts(corr.map(function(c){ return c[0]; }));
+      var n2 = normPts(corr.map(function(c){ return c[1]; }));
+      var A = [];
+      corr.forEach(function(c, i){
+        var x=n1.pts[i][0], y=n1.pts[i][1], xp=n2.pts[i][0], yp=n2.pts[i][1];
+        A.push([-x,-y,-1, 0,0,0, xp*x,xp*y,xp]);
+        A.push([0,0,0, -x,-y,-1, yp*x,yp*y,yp]);
+      });
+      var eig = jacobiEigen(matTMatN(A));
+      var h = eig.vectors[0];
+      var Hn = [[h[0],h[1],h[2]],[h[3],h[4],h[5]],[h[6],h[7],h[8]]];
+      return matMulG(matMulG(mat3Inverse(n2.T), Hn), n1.T);
+    }
+    // Sampson distance (px) for a homography correspondence.
+    function sampsonH(Hm, x1, x2){
+      var h1=Hm[0], h2=Hm[1], h3=Hm[2];
+      var x=x1[0], y=x1[1];
+      var w = h3[0]*x + h3[1]*y + h3[2];
+      var r1 = h1[0]*x + h1[1]*y + h1[2] - x2[0]*w;
+      var r2 = h2[0]*x + h2[1]*y + h2[2] - x2[1]*w;
+      var J11 = h1[0]-x2[0]*h3[0], J12 = h1[1]-x2[0]*h3[1];
+      var J21 = h2[0]-x2[1]*h3[0], J22 = h2[1]-x2[1]*h3[1];
+      var a = J11*J11 + J12*J12 + w*w;
+      var b = J11*J21 + J12*J22;
+      var c = J21*J21 + J22*J22 + w*w;
+      var det = a*c - b*b;
+      if (Math.abs(det) < 1e-15) return Math.hypot(r1, r2);
+      var m1 = ( c*r1 - b*r2)/det, m2 = (-b*r1 + a*r2)/det;
+      return Math.sqrt(Math.max(r1*m1 + r2*m2, 0));
+    }
+    // Reprojection error (px): 2-DOF Gauss-Newton over the corrected plane point x̂1, x̂2 = Hx̂1.
+    function reprojectionError(Hm, x1, x2){
+      var p = x1.slice();
+      for (var it=0; it<20; it++){
+        var hp = applyH2(Hm, p);
+        var r = [ x1[0]-p[0], x1[1]-p[1], x2[0]-hp[0], x2[1]-hp[1] ];
+        var eps = 1e-4, Jh = [];
+        for (var k=0;k<2;k++){
+          var p2 = p.slice(); p2[k] += eps;
+          var hp2 = applyH2(Hm, p2);
+          Jh.push([ (hp2[0]-hp[0])/eps, (hp2[1]-hp[1])/eps ]);
+        }
+        var J = [[-1,0],[0,-1],[-Jh[0][0],-Jh[0][1]],[-Jh[1][0],-Jh[1][1]]];
+        var A = [[0,0],[0,0]], bv = [0,0];
+        for (var i=0;i<4;i++){
+          for (var j=0;j<2;j++){
+            bv[j] += J[i][j]*r[i];
+            for (var j2=0;j2<2;j2++) A[j][j2] += J[i][j]*J[i][j2];
+          }
+        }
+        var det = A[0][0]*A[1][1] - A[0][1]*A[1][0];
+        if (Math.abs(det) < 1e-14) break;
+        p[0] += ( A[1][1]*bv[0] - A[0][1]*bv[1])/det;
+        p[1] += (-A[1][0]*bv[0] + A[0][0]*bv[1])/det;
+      }
+      var hpf = applyH2(Hm, p);
+      return Math.sqrt( (x1[0]-p[0])*(x1[0]-p[0]) + (x1[1]-p[1])*(x1[1]-p[1]) +
+        (x2[0]-hpf[0])*(x2[0]-hpf[0]) + (x2[1]-hpf[1])*(x2[1]-hpf[1]) );
+    }
+
+    function update(){
+      var sigma = parseFloat(sigmaEl.value);
+      document.getElementById('s4e-sigmaval').textContent = sigma.toFixed(1);
+      var rand = mulberry32(seed);
+      var corr = BASE_SRC.map(function(s, i){
+        return [ s.slice(), [ BASE_DST[i][0] + gauss(rand)*sigma, BASE_DST[i][1] + gauss(rand)*sigma ] ];
+      });
+      var Hm = fitH(corr);
+      var Hinv = mat3Inverse(Hm);
+
+      function drawView(ctx, ptsFilled, ptsPredicted, which){
+        ctx.clearRect(0,0,W,H);
+        var CELL = 22;
+        for (var y=0;y<H;y+=CELL) for (var x=0;x<W;x+=CELL){
+          ctx.fillStyle = ((x/CELL|0)+(y/CELL|0))%2===0 ? 'rgba(0,0,0,0.05)' : 'rgba(0,0,0,0)';
+          ctx.fillRect(x,y,CELL,CELL);
+        }
+        corr.forEach(function(c2, i){
+          var pf = ptsFilled[i], pp = ptsPredicted[i];
+          ctx.strokeStyle = colors[i]; ctx.lineWidth = 1.6; ctx.globalAlpha = 0.9;
+          ctx.beginPath(); ctx.moveTo(pf[0], pf[1]); ctx.lineTo(pp[0], pp[1]); ctx.stroke();
+          ctx.globalAlpha = 1;
+          ctx.fillStyle = colors[i];
+          ctx.beginPath(); ctx.arc(pf[0], pf[1], 5, 0, 7); ctx.fill();
+          ctx.strokeStyle = colors[i]; ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.arc(pp[0], pp[1], 7, 0, 7); ctx.stroke();
+        });
+      }
+      var fwd = corr.map(function(c2){ return applyH2(Hm, c2[0]); });          // H x1
+      var bwd = corr.map(function(c2){ return applyH2(Hinv, c2[1]); });        // H⁻¹ x2
+      drawView(ctx1, corr.map(function(c2){ return c2[0]; }), bwd, 1);
+      drawView(ctx2, corr.map(function(c2){ return c2[1]; }), fwd, 2);
+
+      var rows = corr.map(function(c2, i){
+        var sym = Math.hypot(fwd[i][0]-c2[1][0], fwd[i][1]-c2[1][1]) +
+                  Math.hypot(bwd[i][0]-c2[0][0], bwd[i][1]-c2[0][1]);
+        var samp = sampsonH(Hm, c2[0], c2[1]);
+        var rep = reprojectionError(Hm, c2[0], c2[1]);
+        return { i:i, sym:sym, samp:samp, rep:rep };
+      });
+      var tot = rows.reduce(function(acc,r){ return { sym:acc.sym+r.sym, samp:acc.samp+r.samp, rep:acc.rep+r.rep }; }, {sym:0,samp:0,rep:0});
+      readout.innerHTML =
+        rows.map(function(r){
+          return '<div><span class="k" style="color:' + colors[r.i] + '">&#9679;</span> <span class="k">corr ' + r.i + '</span> &nbsp;' +
+            '<span class="k">sym.transfer</span> = ' + r.sym.toFixed(2) +
+            ' &nbsp;<span class="k">Sampson</span> = <span class="hi">' + r.samp.toFixed(2) + '</span>' +
+            ' &nbsp;<span class="k">reprojection</span> = <span class="hi">' + r.rep.toFixed(2) + ' px</span></div>';
+        }).join('') +
+        '<div><span class="k">totals</span> &nbsp;sym = ' + tot.sym.toFixed(2) + ' &nbsp;Sampson = ' + tot.samp.toFixed(2) + ' &nbsp;reproj = <span class="hi">' + tot.rep.toFixed(2) + '</span> <span style="opacity:.6">(Sampson &#8776; reproj at small &#963;; sym counts both directions so it runs ~&#8730;2&times; larger)</span></div>';
+    }
+    sigmaEl.addEventListener('input', update);
+    resampleBtn.addEventListener('click', function(){ seed = (seed*16807 + 13) % 2147483647; update(); });
+    update();
+  })();
+
+  // ---------- Step 6 demo: pure-rotation homography panorama ----------
+  (function(){
+    var cv1 = document.getElementById('s6-canvas1');
+    if (!cv1) return;
+    var ctx1 = cv1.getContext('2d');
+    var cv2 = document.getElementById('s6-canvas2'), ctx2 = cv2.getContext('2d');
+    var cv3 = document.getElementById('s6-canvas3'), ctx3 = cv3.getContext('2d');
+    var W = cv1.width, Hh = cv1.height;
+    var yawEl = document.getElementById('s6-yaw');
+
+    var f = 280, cx = W/2, cy = Hh/2;
+    var WALL_Z = 8, WALL_HW = 6, WALL_HH = 3.2;
+    var DISKS = [
+      { x:-2.5, y:1.0, r:0.5, c:[206,84,58] },
+      { x:0.8, y:-0.8, r:0.45, c:[0,136,176] },
+      { x:2.6, y:1.4, r:0.4, c:[138,92,255] }
+    ];
+    function ryMat(a){ var c=Math.cos(a), s=Math.sin(a); return [[c,0,s],[0,1,0],[-s,0,c]]; }
+    function sceneColor(camYaw, px, py){
+      var R = ryMat(camYaw); // world->cam
+      var dx = (px-cx)/f, dy = (py-cy)/f;
+      // world dir = Rᵀ d_cam
+      var wx = R[0][0]*dx + R[0][1]*dy + R[0][2],
+          wy = R[1][0]*dx + R[1][1]*dy + R[1][2],
+          wz = R[2][0]*dx + R[2][1]*dy + R[2][2];
+      // (Rᵀ columns: world dir = [R00*dx+R01*dy+R02, R10.., R20..] — R rows are world→cam rows)
+      wx = R[0][0]*dx + R[1][0]*dy + R[2][0];
+      wy = R[0][1]*dx + R[1][1]*dy + R[2][1];
+      wz = R[0][2]*dx + R[1][2]*dy + R[2][2];
+      if (wz > 1e-6){
+        var t = WALL_Z/wz;
+        var X = t*wx, Y = t*wy;
+        if (Math.abs(X) <= WALL_HW && Math.abs(Y) <= WALL_HH){
+          for (var i=0;i<DISKS.length;i++){
+            var dd = DISKS[i];
+            if (Math.hypot(X-dd.x, Y-dd.y) < dd.r) return dd.c;
+          }
+          var chk = (Math.floor(X/1.2)+Math.floor(Y/1.2))%2===0;
+          var v = chk ? 205 : 235;
+          return [v, v, v];
+        }
+      }
+      return [225, 232, 238];
+    }
+    function renderTo(ctx, yaw){
+      var img = ctx.createImageData(W, Hh);
+      var o = 0;
+      for (var py=0; py<Hh; py++){
+        for (var px=0; px<W; px++){
+          var c = sceneColor(yaw, px+0.5, py+0.5);
+          img.data[o++]=c[0]; img.data[o++]=c[1]; img.data[o++]=c[2]; img.data[o++]=255;
+        }
+      }
+      ctx.putImageData(img, 0, 0);
+      return img;
+    }
+    function matMul(A,B){
+      var C=[[0,0,0],[0,0,0],[0,0,0]];
+      for (var i=0;i<3;i++) for (var j=0;j<3;j++){ var s=0; for (var k=0;k<3;k++) s+=A[i][k]*B[k][j]; C[i][j]=s; }
+      return C;
+    }
+    function matInv(M){
+      function inv(m){
+        var a=m[0][0],b=m[0][1],c=m[0][2],d=m[1][0],e=m[1][1],f2=m[1][2],g=m[2][0],h=m[2][1],i2=m[2][2];
+        var A=e*i2-f2*h, B=-(d*i2-f2*g), C2=d*h-e*g, D=-(b*i2-c*h), E=a*i2-c*g, F=-(a*h-b*g), G=b*f2-c*e, Hh2=-(a*f2-c*d), I=a*e-b*d;
+        var det=a*A+b*B+c*C2;
+        return [[A/det,D/det,G/det],[B/det,E/det,Hh2/det],[C2/det,F/det,I/det]];
+      }
+      return inv(M);
+    }
+    function applyM(M, p){
+      var w = M[2][0]*p[0]+M[2][1]*p[1]+M[2][2];
+      return [ (M[0][0]*p[0]+M[0][1]*p[1]+M[0][2])/w, (M[1][0]*p[0]+M[1][1]*p[1]+M[1][2])/w ];
+    }
+
+    var Kmat = [[f,0,cx],[0,f,cy],[0,0,1]], Kinv = matInv(Kmat);
+
+    function update(){
+      var yaw = parseFloat(yawEl.value);
+      document.getElementById('s6-yawval').textContent = yaw.toFixed(2);
+      var img1 = renderTo(ctx1, 0);
+      var img2 = renderTo(ctx2, yaw);
+      // pure-rotation H: x2 ≅ K R21 K⁻¹ x1, R21 = Ry(yaw)·Ry(0)ᵀ = Ry(yaw)
+      var H = matMul(matMul(Kmat, ryMat(yaw)), Kinv);
+      var out = ctx3.createImageData(W, Hh);
+      var o = 0;
+      for (var py=0; py<Hh; py++){
+        for (var px=0; px<W; px++){
+          // sample photo 2 at H·p1
+          var p2 = applyM(H, [px+0.5, py+0.5]);
+          var i2 = -1;
+          if (p2[0]>=0 && p2[0]<W && p2[1]>=0 && p2[1]<Hh){
+            i2 = (Math.floor(p2[1])*W + Math.floor(p2[0]))*4;
+          }
+          // crossfade across the overlap: left = photo1, right = warped photo2
+          var wgt = Math.max(0, Math.min(1, (px - 90)/120));
+          var i1 = o;
+          for (var k=0;k<3;k++){
+            var v1 = img1.data[i1+k];
+            var v2 = i2 >= 0 ? img2.data[i2+k] : 240;
+            out.data[o++] = Math.round(v1*(1-wgt) + v2*wgt);
+          }
+          out.data[o++] = 255;
+        }
+      }
+      ctx3.putImageData(out, 0, 0);
+      document.getElementById('s6-readout').innerHTML =
+        '<div><span class="k">relative rotation</span> = Ry(' + yaw.toFixed(2) + ' rad) &nbsp;<span class="k">baseline</span> = 0</div>' +
+        '<div><span class="k">H = K R K&#8315;&#185;</span> = [[' + H[0].map(function(v){return v.toFixed(2);}).join(', ') + '], ...]</div>' +
+        '<div><span class="hi">No ghosting across the fade</span> — with zero parallax one 3&times;3 matrix explains every pixel at every depth. Add translation and only one plane would stay aligned (that&#8217;s &#167;2).</div>';
+    }
+    yawEl.addEventListener('input', update);
     update();
   })();
 

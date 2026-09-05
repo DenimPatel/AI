@@ -274,6 +274,7 @@ permalink: /multi-view-geometry-sfm.html
           <label style="display:flex; align-items:center; gap:6px; margin:0;"><input type="checkbox" id="s3-l2" checked style="width:auto;"> L2 (plain squared loss)</label>
           <label style="display:flex; align-items:center; gap:6px; margin:0;"><input type="checkbox" id="s3-huber" checked style="width:auto;"> Huber (&delta; = 3px)</label>
           <label style="display:flex; align-items:center; gap:6px; margin:0;"><input type="checkbox" id="s3-cauchy" checked style="width:auto;"> Cauchy (c = 3px)</label>
+          <label style="display:flex; align-items:center; gap:6px; margin:0;"><input type="checkbox" id="s3-tukey" checked style="width:auto;"> Tukey (c = 6px)</label>
         </div>
         <div class="mvg-readout" id="s3-readout"></div>
       </div>
@@ -311,6 +312,17 @@ permalink: /multi-view-geometry-sfm.html
     <div class="mvg-math">R<sub>new</sub> = R<sub>old</sub>&#183;exp([&delta;]&#215;) &nbsp;&approx;&nbsp; R<sub>old</sub>&#183;(I + [&delta;]&#215;) &nbsp;&nbsp;for small &delta; &#8712; &#8477;&#179;</div>
     <p>Because <var>exp([&delta;]&#215;)</var> is a genuine rotation matrix for <em>any</em> <var>&delta;</var> (it's the Rodrigues formula — the same exponential map that turns an axis-angle vector into a rotation), <var>R<sub>new</sub></var> is automatically, exactly orthogonal again — no re-normalization hack required. Gauss-Newton's actual unknown for the rotation part is the free 3-vector <var>&delta;</var>, not the 9 entries of <var>R</var> itself; the Jacobian column for "camera <var>i</var>'s rotation" is <var>&part;r/&part;&delta;</var>, evaluated at <var>&delta;=0</var>. Paired with 3 more unknowns for translation, that's exactly the 6 pose DOF per camera claimed all the way back at the start of this section.</p>
     <p>This is precisely the missing piece the toy demo skipped by freezing camera poses: naively perturbing <var>R</var>'s 9 numbers and adding the result back is exactly the trap described above. The "optimize camera poses" toggle in the demo implements the rule on this page — every pose update is <var>R &larr; R&#183;exp([&delta;]&#215;)</var>, computed by finite-differencing the reprojection residual with respect to <var>&delta;</var> at <var>&delta;=0</var>, never by touching <var>R</var>'s entries directly.</p>
+    <div class="mvg-goal">&#127919; <b>Learning goal:</b> apply the same 100 small increments three different ways and watch the orthogonality error <var>&#8214;R&#7488;R &minus; I&#8214;</var> behave. Naive additive updates drift off the manifold quadratically (the curve lifts off immediately); additive + polar re-orthonormalization repairs the damage after the fact; the exponential map never leaves the manifold at all — its error is floating-point zero by construction.</div>
+    <div class="mvg-demo">
+      <div class="mvg-canvas-wrap" style="flex-basis:100%;">
+        <canvas id="s7-canvas" width="720" height="280" style="width:100%; max-width:720px; height:auto; display:block; background:var(--color-neutral-100); border-radius:var(--radius-sm);"></canvas>
+        <p class="mvg-canvas-hint">Orthogonality error per applied increment (log scale feel: the additive curve is visually off the chart within ~10 steps). Green = exp map (Rodrigues), blue = additive + polar repair, red = raw additive.</p>
+      </div>
+      <div class="mvg-controls">
+        <div class="mvg-field"><label>Increment size |&delta;| (rad) <span class="val" id="s7-stepval"></span></label><input type="range" id="s7-step" min="0.005" max="0.2" step="0.005" value="0.05"></div>
+        <div class="mvg-readout" id="s7-readout"></div>
+      </div>
+    </div>
   </section>
 
   <section class="mvg-step" id="cheatsheet">
@@ -716,10 +728,23 @@ permalink: /multi-view-geometry-sfm.html
 
     function render(){
       var initVerts = window.__mvgInit;
+      // per-point mean reprojection residual (across the cameras that see it) for coloring
+      var ptResid = CUBE_VERTS.map(function(_, pi){
+        var s = 0, n = 0;
+        CAMS.forEach(function(c, ci){
+          if (!allObs[pi][ci]) return;
+          var r = reprojResidual(K, c, Xs[pi], allObs[pi][ci]);
+          s += Math.hypot(r[0], r[1]); n++;
+        });
+        return n ? s/n : 0;
+      });
       Plotly.react(div, [
         cubeLineTraceFromVerts(CUBE_VERTS, COLOR_TEXT, 4, 0.9),
         cubeLineTraceFromVerts(initVerts, '#9b9797', 2, 0.5),
         cubeLineTraceFromVerts(Xs, COLOR_ACCENT2, 3, 1),
+        { type:'scatter3d', mode:'markers',
+          x: Xs.map(function(X){return X[0];}), y: Xs.map(function(X){return X[1];}), z: Xs.map(function(X){return X[2];}),
+          marker:{ size:6, color: ptResid, colorscale:'RdYlGn', reversescale:true, showscale:false, line:{width:1, color:'#fff'} }, hoverinfo:'skip' },
         camMarkersTrace(CAMS, COLOR_ACCENT)
       ], layout3d(), { displayModeBar:false, responsive:true });
 
@@ -728,10 +753,13 @@ permalink: /multi-view-geometry-sfm.html
       var meanErr = 0;
       Xs.forEach(function(X,i){ meanErr += MVG.norm(MVG.sub(X, CUBE_VERTS[i])); });
       meanErr /= Xs.length;
+      var worst = 0;
+      ptResid.forEach(function(v,i){ if (v > ptResid[worst]) worst = i; });
       var readout =
         '<div><span class="k">iteration</span> = <span class="hi">' + iterCount + '</span></div>' +
         '<div><span class="k">total reprojection cost</span> = <span class="hi">' + costHistory[costHistory.length-1].toFixed(1) + '</span></div>' +
-        '<div><span class="k">mean point error vs. truth</span> = ' + meanErr.toFixed(3) + '</div>';
+        '<div><span class="k">mean point error vs. truth</span> = ' + meanErr.toFixed(3) + '</div>' +
+        '<div><span class="k">worst point by residual</span> = #' + worst + ' at <span class="hi">' + ptResid[worst].toFixed(2) + ' px</span> mean <span style="opacity:.6">(markers colored green&rarr;red by residual)</span></div>';
       if (optPosesEl.checked){
         var meanCamErr = 0;
         CAMS.forEach(function(c,i){ meanCamErr += MVG.norm(MVG.sub(c.C, TRUE_CAMS[i].C)); });
@@ -800,6 +828,13 @@ permalink: /multi-view-geometry-sfm.html
 
     function huberWeight(r){ var a = Math.abs(r); return a<=HUBER_DELTA ? 1 : HUBER_DELTA/a; }
     function cauchyWeight(r){ return 1/(1 + (r*r)/(CAUCHY_C*CAUCHY_C)); }
+    var TUKEY_C = 6;
+    function tukeyWeight(r){
+      var a = Math.abs(r);
+      if (a >= TUKEY_C) return 0;
+      var q = 1 - (a*a)/(TUKEY_C*TUKEY_C);
+      return q*q;
+    }
 
     // clean observations, fixed once per page load (small realistic noise, not the outlier)
     var cleanObs = CAMS3.map(function(c){
@@ -830,7 +865,7 @@ permalink: /multi-view-geometry-sfm.html
     }
 
     var outlierEl = document.getElementById('s3-outlier');
-    var l2El = document.getElementById('s3-l2'), huberEl = document.getElementById('s3-huber'), cauchyEl = document.getElementById('s3-cauchy');
+    var l2El = document.getElementById('s3-l2'), huberEl = document.getElementById('s3-huber'), cauchyEl = document.getElementById('s3-cauchy'), tukeyEl = document.getElementById('s3-tukey');
 
     var layoutOpts = layout3d();
 
@@ -844,7 +879,8 @@ permalink: /multi-view-geometry-sfm.html
       var results = {
         l2: solveIRLS(obsList, null, 15),
         huber: solveIRLS(obsList, huberWeight, 15),
-        cauchy: solveIRLS(obsList, cauchyWeight, 15)
+        cauchy: solveIRLS(obsList, cauchyWeight, 15),
+        tukey: solveIRLS(obsList, tukeyWeight, 15)
       };
 
       var traces = [
@@ -862,6 +898,7 @@ permalink: /multi-view-geometry-sfm.html
       addPt('l2', COLOR_ACCENT2, 'L2', l2El.checked);
       addPt('huber', COLOR_ACCENT, 'Huber', huberEl.checked);
       addPt('cauchy', '#9b6bd1', 'Cauchy', cauchyEl.checked);
+      addPt('tukey', '#2a9d5c', 'Tukey', tukeyEl.checked);
 
       Plotly.react(div, traces, layoutOpts, { displayModeBar:false, responsive:true });
       document.getElementById('s3-legend').innerHTML = legend || '<span style="opacity:.6">toggle a loss to show it</span>';
@@ -870,10 +907,11 @@ permalink: /multi-view-geometry-sfm.html
         '<div><span class="k">outlier on camera 0</span> = ' + mag.toFixed(0) + ' px off truth</div>' +
         '<div><span class="k">L2 point error</span> = <span class="hi">' + MVG.norm(MVG.sub(results.l2, TRUE_X)).toFixed(3) + '</span></div>' +
         '<div><span class="k">Huber point error</span> = ' + MVG.norm(MVG.sub(results.huber, TRUE_X)).toFixed(3) + '</div>' +
-        '<div><span class="k">Cauchy point error</span> = ' + MVG.norm(MVG.sub(results.cauchy, TRUE_X)).toFixed(3) + '</div>';
+        '<div><span class="k">Cauchy point error</span> = ' + MVG.norm(MVG.sub(results.cauchy, TRUE_X)).toFixed(3) + '</div>' +
+        '<div><span class="k">Tukey point error</span> = ' + MVG.norm(MVG.sub(results.tukey, TRUE_X)).toFixed(3) + ' <span style="opacity:.6">(redescending: full rejection past c, strongest outlier immunity — but a bad c can reject good data too)</span></div>';
     }
 
-    [outlierEl, l2El, huberEl, cauchyEl].forEach(function(el){ el.addEventListener('input', update); });
+    [outlierEl, l2El, huberEl, cauchyEl, tukeyEl].forEach(function(el){ el.addEventListener('input', update); });
     update();
   })();
 
@@ -932,6 +970,87 @@ permalink: /multi-view-geometry-sfm.html
 
     [rotEl, transEl, scaleEl].forEach(function(el){ el.addEventListener('input', update); });
     pinEl.addEventListener('change', update);
+    update();
+  })();
+
+  // ---------- Step 7: rotation-update comparison (additive vs exp-map) ----------
+  (function(){
+    var canvas = document.getElementById('s7-canvas');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var stepEl = document.getElementById('s7-step');
+    var W = canvas.width, H = canvas.height;
+
+    function orthErr(R){
+      var RtR = matMul3(transpose3(R), R);
+      var e = 0;
+      for (var i=0;i<3;i++) for (var j=0;j<3;j++){ var v = RtR[i][j] - (i===j?1:0); e += v*v; }
+      return Math.sqrt(e);
+    }
+    // Gram-Schmidt row re-orthonormalization (cheap stand-in for a full polar repair)
+    function reorthonormalize(R){
+      var r0 = [R[0][0],R[0][1],R[0][2]], r1 = [R[1][0],R[1][1],R[1][2]];
+      function norml(v){ var n = Math.hypot(v[0],v[1],v[2])||1; return [v[0]/n,v[1]/n,v[2]/n]; }
+      r0 = norml(r0);
+      var d = r0[0]*r1[0] + r0[1]*r1[1] + r0[2]*r1[2];
+      r1 = norml([r1[0]-d*r0[0], r1[1]-d*r0[1], r1[2]-d*r0[2]]);
+      var r2 = [ (r0[1]*r1[2]-r0[2]*r1[1]), (r0[2]*r1[0]-r0[0]*r1[2]), (r0[0]*r1[1]-r0[1]*r1[0]) ];
+      return [r0, r1, r2];
+    }
+
+    function update(){
+      var step = parseFloat(stepEl.value);
+      document.getElementById('s7-stepval').textContent = step.toFixed(3) + ' rad';
+      var axis = MVG.normalize([1, 0.3, 0.2]);
+      var w = MVG.scale(axis, step);
+      var Wx = skew3(w);
+      var Rexp = [[1,0,0],[0,1,0],[0,0,1]];
+      var Radd = [[1,0,0],[0,1,0],[0,0,1]];
+      var Rpol = [[1,0,0],[0,1,0],[0,0,1]];
+      var errsExp = [], errsAdd = [], errsPol = [];
+      for (var k=0; k<100; k++){
+        Rexp = matMul3(Rexp, expmapSO3(w));            // multiplicative: stays on SO(3)
+        Radd = [[ Radd[0][0]+Wx[0][0], Radd[0][1]+Wx[0][1], Radd[0][2]+Wx[0][2] ],
+                [ Radd[1][0]+Wx[1][0], Radd[1][1]+Wx[1][1], Radd[1][2]+Wx[1][2] ],
+                [ Radd[2][0]+Wx[2][0], Radd[2][1]+Wx[2][1], Radd[2][2]+Wx[2][2] ]]; // additive: leaves SO(3)
+        Rpol = reorthonormalize(Radd);                  // additive, repaired after the fact
+        errsExp.push(orthErr(Rexp));
+        errsAdd.push(orthErr(Radd));
+        errsPol.push(orthErr(Rpol));
+      }
+
+      ctx.clearRect(0,0,W,H);
+      ctx.fillStyle = 'rgba(0,0,0,0.04)'; ctx.fillRect(0,0,W,H);
+      var padL = 60, padB = 30, padT = 14, padR = 14;
+      var maxE = Math.max(1e-3, Math.max.apply(null, errsAdd));
+      function X(i){ return padL + (i/(errsAdd.length-1))*(W-padL-padR); }
+      function Y(v){ return H-padB - (Math.min(v, maxE)/maxE)*(H-padT-padB); }
+      ctx.strokeStyle = COLOR_DIVIDER; ctx.lineWidth = 1; ctx.font = '10px monospace'; ctx.fillStyle = COLOR_TEXT;
+      for (var g=0; g<=3; g++){
+        var gy = padT + (g/3)*(H-padT-padB);
+        ctx.beginPath(); ctx.moveTo(padL, gy); ctx.lineTo(W-padR, gy); ctx.stroke();
+        ctx.globalAlpha = 0.7; ctx.fillText((maxE*(1-g/3)).toExponential(0), 4, gy+3); ctx.globalAlpha = 1;
+      }
+      function series(vals, color, lw){
+        ctx.strokeStyle = color; ctx.lineWidth = lw;
+        ctx.beginPath();
+        vals.forEach(function(v,i){ if (i===0) ctx.moveTo(X(i), Y(v)); else ctx.lineTo(X(i), Y(v)); });
+        ctx.stroke();
+      }
+      series(errsAdd, '#c23b3b', 2.2);
+      series(errsPol, COLOR_ACCENT, 2.2);
+      series(errsExp, '#2a9d5c', 2.6);
+      ctx.fillStyle = '#c23b3b'; ctx.fillText('raw additive R + [δ]×', padL+8, padT+12);
+      ctx.fillStyle = COLOR_ACCENT; ctx.fillText('additive + re-orthonormalized', padL+8, padT+26);
+      ctx.fillStyle = '#2a9d5c'; ctx.fillText('exp map: R·exp([δ]×)  — never leaves SO(3)', padL+8, padT+40);
+      ctx.fillStyle = COLOR_TEXT;
+      ctx.fillText('increment #', W/2-24, H-8);
+
+      document.getElementById('s7-readout').innerHTML =
+        '<div><span class="k">after 100 increments</span>: exp-map &#8214;R&#7488;R&minus;I&#8214; = <span class="hi">' + errsExp[99].toExponential(1) + '</span>, repaired = ' + errsPol[99].toExponential(1) + ', raw additive = <span class="hi" style="color:#c23b3b">' + errsAdd[99].toExponential(1) + '</span></div>' +
+        '<div style="opacity:.65">Every BA/SLAM codebase updates rotations multiplicatively for exactly this reason — this page&#8217;s refineAllPoses uses applyPoseDelta &rarr; expmapSO3.</div>';
+    }
+    stepEl.addEventListener('input', update);
     update();
   })();
 

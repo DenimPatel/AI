@@ -204,6 +204,24 @@ permalink: /multi-view-geometry-ransac.html
     <p><strong>LO-RANSAC</strong> (locally-optimized RANSAC) changes the outer loop itself: whenever a new best model is found, before continuing to sample, immediately re-fit that model with ordinary least squares on its <em>entire</em> current inlier set (a non-minimal, well-conditioned fit, not another minimal draw), then re-count inliers under the refit model. This local refinement step converges to noticeably better final models, and in practice needs far fewer outer-loop iterations to get there &mdash; because a well-fit "best so far" model recruits more true inliers on the next inlier count, tightening the estimate quickly instead of waiting for a lucky minimal sample to land near-perfectly.</p>
     <p><strong>MAGSAC / MAGSAC++</strong> attacks a different weak point: every variant above still needs the user to pick <var>&#964;</var>, and getting it wrong silently degrades results &mdash; too tight and true inliers get discarded (weaker fit, less data used); too loose and outliers leak in (biased fit). MAGSAC removes that choice by not committing to a single noise scale at all: instead of thresholding at one <var>&#964;</var>, it marginalizes the model's quality over a whole range of plausible noise scales, weighting each point's contribution by how it would be scored across that range rather than by a hard cutoff at one guessed value. The result is a method with no <var>&#964;</var> to tune and no single wrong guess to silently degrade the fit.</p>
     <div class="mvg-warn">&#9888;&#65039; <span>All of the above are still <em>hypothesize-and-verify</em> methods built on RANSAC's minimal-sample core &mdash; they change how a candidate is scored or refined, not the basic sample/fit/evaluate loop.</span></div>
+    <div class="mvg-goal">&#127919; <b>Learning goal:</b> same data, same 400 minimal samples &mdash; plain RANSAC (max inlier count) and MSAC (min truncated squared cost) usually land on <em>different</em> lines, because several candidates tie on count and MSAC breaks the tie by how well the inliers actually fit.</div>
+    <div class="mvg-demo">
+      <div class="mvg-canvas-wrap">
+        <canvas id="s3-canvas" width="480" height="320"></canvas>
+        <div class="mvg-legend">
+          <span><i style="background:var(--color-accent)"></i>RANSAC best (max count)</span>
+          <span><i style="background:var(--color-accent-2)"></i>MSAC best (min cost)</span>
+        </div>
+      </div>
+      <div class="mvg-controls">
+        <div class="mvg-field"><label>Inlier threshold &#964; (px) <span class="val" id="s3-tauval"></span></label><input type="range" id="s3-tau" min="8" max="60" step="1" value="22"></div>
+        <div class="mvg-btnrow">
+          <button id="s3-run" class="mvg-primary">Run RANSAC vs MSAC (400 samples)</button>
+          <button id="s3-newdata">New data</button>
+        </div>
+        <div class="mvg-readout" id="s3-readout"></div>
+      </div>
+    </div>
   </section>
 
   <section class="mvg-step" id="demo-ncalc">
@@ -244,6 +262,17 @@ permalink: /multi-view-geometry-ransac.html
     </div>
     <p>where <code>(Fx&#771;&#8321;)&#8321;</code>, <code>(Fx&#771;&#8321;)&#8322;</code> denote just the <em>first two</em> components of the 3-vector <code>Fx&#771;&#8321;</code> (the line's <var>a, b</var> coefficients &mdash; its third component, the line's <var>c</var>, is left out), and similarly for <code>F&#7488;x&#771;&#8322;</code>. It comes from linearizing the true point-to-epipolar-line Euclidean distance around the current estimate of <var>F</var>: the numerator is the same algebraic error, and the denominator rescales it by (approximately) the local steepness of the two epipolar lines involved, converting an otherwise-arbitrary algebraic quantity into something that behaves like squared pixel distance. It's this Sampson distance, not raw <code>x&#771;&#8322;&#7488;Fx&#771;&#8321;</code>, that real libraries (OpenCV, COLMAP, and the rest) actually threshold against when running RANSAC over F or E.</p>
     <div class="mvg-warn">&#9888;&#65039; <span>Sampson distance is still an approximation, not the exact reprojection error a full bundle adjustment would use &mdash; but it's first-order accurate, needs no iterative solve, and is what makes RANSAC-for-F fast enough to run per-frame in real systems.</span></div>
+    <div class="mvg-goal">&#127919; <b>Learning goal:</b> three correspondences, three different epipolar lines. Drag the points and watch the <em>ordering by algebraic error</em> disagree with the <em>ordering by Sampson distance</em> &mdash; the raw algebraic number isn't a distance, and thresholding it would bake an arbitrary per-line scale into &#964;.</div>
+    <div class="mvg-demo">
+      <div class="mvg-canvas-wrap mvg-imgplane">
+        <canvas id="s5-canvas" width="480" height="360"></canvas>
+        <p class="mvg-canvas-hint">Each colored line is a different correspondence&#8217;s epipolar line (a different <var>x&#771;&#8321;</var>); drag the matching-colored point <var>x&#771;&#8322;</var>. The thin segment is the true point-to-line pixel distance.</p>
+      </div>
+      <div class="mvg-controls">
+        <div class="mvg-readout" id="s5-readout"></div>
+        <p class="mvg-canvas-hint">Algebraic error = |x&#771;&#8322;&#7488;Fx&#771;&#8321;| (unitless). Sampson = algebraic / &#8730;(gradient terms) &mdash; pixels. True = |x&#771;&#8322;&#7488;l| / &#8214;(a,b)&#8214;, the exact point-line distance. Same data, three different numbers &mdash; only the last two are comparable across lines.</p>
+      </div>
+    </div>
   </section>
 
   <section class="mvg-step" id="cheatsheet">
@@ -367,6 +396,11 @@ permalink: /multi-view-geometry-ransac.html
       }
       iter++;
       draw();
+      // adaptive stopping: re-estimate w from the best model found so far and stop once we've
+      // run the (shrinking) N the formula demands — the loop from the "practical loop" note above.
+      var wHat = best ? best.count / pts.length : (1 - parseFloat(outlierEl.value));
+      var nAdaptive = iterCount(0.99, wHat, 2);
+      if (isFinite(nAdaptive) && iter >= Math.min(maxIter, nAdaptive)){ stopRun(); }
     }
 
     function stopRun(){
@@ -406,6 +440,8 @@ permalink: /multi-view-geometry-ransac.html
       var w = 1 - outlierRatio;
       var s = 2, p = 0.99;
       var Nest = iterCount(p, w, s);
+      var wHat = best ? best.count / pts.length : w;
+      var nAdaptive = iterCount(p, wHat, s);
       var maxIter = parseInt(maxIterEl.value, 10);
 
       document.getElementById('s2-outlierval').textContent = outlierRatio.toFixed(2);
@@ -413,9 +449,11 @@ permalink: /multi-view-geometry-ransac.html
       document.getElementById('s2-maxiterval').textContent = maxIter;
       document.getElementById('s2-readout').innerHTML =
         '<div><span class="k">iteration</span> = ' + iter + ' / ' + maxIter + '</div>' +
-        '<div><span class="k">best inlier count</span> = <span class="hi">' + (best ? best.count : 0) + ' / ' + pts.length + '</span></div>' +
-        '<div><span class="k">assumed w = 1 &minus; outlier ratio</span> = ' + w.toFixed(2) + '</div>' +
-        '<div><span class="k">N (est., s=2, p=0.99)</span> = <span class="hi">' + (isFinite(Nest) ? Math.ceil(Nest) : '&#8734;') + '</span></div>';
+        '<div><span class="k">best inlier count</span> = <span class="hi">' + (best ? best.count : 0) + ' / ' + pts.length + '</span>' +
+        ' <span class="k">&rarr; w&#770; = ' + wHat.toFixed(2) + '</span></div>' +
+        '<div><span class="k">N (est., s=2, p=0.99, w from slider)</span> = <span class="hi">' + (isFinite(Nest) ? Math.ceil(Nest) : '&#8734;') + '</span></div>' +
+        '<div><span class="k">adaptive stop: N(w&#770;)</span> = <span class="hi">' + (isFinite(nAdaptive) ? Math.ceil(nAdaptive) : '&#8734;') + '</span>' +
+        (isFinite(nAdaptive) && iter >= Math.min(maxIter, nAdaptive) ? ' <span class="hi">&mdash; stopping now</span>' : ' <span style="opacity:.6">(shrink as w&#770; improves)</span>') + '</div>';
     }
 
     function drawLine(line, color, dashed){
@@ -519,6 +557,237 @@ permalink: /multi-view-geometry-ransac.html
     pEl.addEventListener('input', update);
     wEl.addEventListener('input', update);
     sEl.addEventListener('input', update);
+    update();
+  })();
+
+  // ---------- Step 3: RANSAC vs MSAC on the same 400 samples ----------
+  (function(){
+    var canvas = document.getElementById('s3-canvas');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var W = canvas.width, H = canvas.height;
+    var tauEl = document.getElementById('s3-tau');
+
+    var pts = [];
+    function genData(){
+      pts = [];
+      var ax = 40 + Math.random()*60, ay = 50 + Math.random()*220;
+      var bx = W-40 - Math.random()*60, by = 50 + Math.random()*220;
+      for (var k=0;k<44;k++){
+        if (Math.random() < 0.78){
+          var t = Math.random();
+          pts.push({
+            x: ax + t*(bx-ax) + (Math.random()-0.5)*20,
+            y: ay + t*(by-ay) + (Math.random()-0.5)*20
+          });
+        } else {
+          pts.push({ x: 16+Math.random()*(W-32), y: 16+Math.random()*(H-32) });
+        }
+      }
+      runSearch();
+    }
+    function fitLine(i, j){
+      var l = cross([pts[i].x, pts[i].y, 1], [pts[j].x, pts[j].y, 1]);
+      var n = Math.hypot(l[0], l[1]) || 1;
+      return [l[0]/n, l[1]/n, l[2]/n];
+    }
+    function residual(line, p){ return Math.abs(line[0]*p.x + line[1]*p.y + line[2]); }
+    function drawLine(line, color, dashed){
+      var a=line[0], b=line[1], c=line[2];
+      var cands = [];
+      if (Math.abs(b) > 1e-9){ cands.push([0, -c/b]); cands.push([W, -(c+a*W)/b]); }
+      if (Math.abs(a) > 1e-9){ cands.push([-c/a, 0]); cands.push([-(c+b*H)/a, H]); }
+      if (cands.length < 2) return;
+      ctx.strokeStyle = color; ctx.lineWidth = dashed ? 2 : 2.6;
+      if (dashed) ctx.setLineDash([7,5]); else ctx.setLineDash([]);
+      ctx.beginPath(); ctx.moveTo(cands[0][0], cands[0][1]); ctx.lineTo(cands[1][0], cands[1][1]); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    var bestCount = null, bestCost = null;
+    function runSearch(){
+      var tau = parseFloat(tauEl.value);
+      bestCount = null; bestCost = null;
+      for (var it=0; it<400; it++){
+        var i = Math.floor(Math.random()*pts.length), j;
+        do { j = Math.floor(Math.random()*pts.length); } while (j === i);
+        var line = fitLine(i, j);
+        var cost = 0, count = 0;
+        for (var k=0;k<pts.length;k++){
+          var r = residual(line, pts[k]);
+          if (r < tau){ count++; cost += r*r; } else { cost += tau*tau; }
+        }
+        // plain RANSAC: strict max count, ties keep the FIRST found
+        if (!bestCount || count > bestCount.count) bestCount = { line: line, count: count, cost: cost };
+        // MSAC: minimize total truncated squared cost
+        if (!bestCost || cost < bestCost.cost) bestCost = { line: line, count: count, cost: cost };
+      }
+      draw();
+    }
+
+    function draw(){
+      ctx.clearRect(0,0,W,H);
+      ctx.fillStyle = 'rgba(0,0,0,0.04)'; ctx.fillRect(0,0,W,H);
+      var tau = parseFloat(tauEl.value);
+      var inCount = {}, inCost = {};
+      if (bestCount) bestCount.line && pts.forEach(function(p,k){ if (residual(bestCount.line,p) < tau) inCount[k]=1; });
+      if (bestCost) pts.forEach(function(p,k){ if (residual(bestCost.line,p) < tau) inCost[k]=1; });
+      pts.forEach(function(p,k){
+        var both = inCount[k] && inCost[k];
+        ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, 7);
+        ctx.fillStyle = both ? COLOR_ACCENT : (inCount[k] ? COLOR_ACCENT : (inCost[k] ? COLOR_ACCENT2 : '#8a8a8a'));
+        ctx.globalAlpha = (inCount[k] || inCost[k]) ? 0.9 : 0.5;
+        ctx.fill(); ctx.globalAlpha = 1;
+      });
+      if (bestCost) drawLine(bestCost.line, COLOR_ACCENT2, true);
+      if (bestCount) drawLine(bestCount.line, COLOR_ACCENT, false);
+
+      document.getElementById('s3-tauval').textContent = tau.toFixed(0);
+      document.getElementById('s3-readout').innerHTML =
+        '<div><span class="k">RANSAC best (max count)</span>: ' + bestCount.count + ' inliers, cost = ' + Math.round(bestCount.cost) + '</div>' +
+        '<div><span class="k">MSAC best (min cost)</span>: ' + bestCost.count + ' inliers, cost = <span class="hi">' + Math.round(bestCost.cost) + '</span></div>' +
+        (bestCount.count === bestCost.count
+          ? '<div><span class="hi">Same inlier count &mdash; the count is blind to fit quality; MSAC breaks the tie on residuals.</span></div>'
+          : '<div><span class="hi">Different models &mdash; MSAC traded one raw count for a genuinely tighter fit.</span></div>');
+    }
+
+    tauEl.addEventListener('input', runSearch);
+    document.getElementById('s3-run').addEventListener('click', runSearch);
+    document.getElementById('s3-newdata').addEventListener('click', genData);
+    genData();
+  })();
+
+  // ---------- Step 5: algebraic vs Sampson vs true pixel distance ----------
+  (function(){
+    var canvas = document.getElementById('s5-canvas');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var W = canvas.width, H = canvas.height;
+
+    // Build a real F from two fixed synthetic cameras (same machinery as Part 3).
+    function norml(v){ var n = Math.hypot(v[0],v[1],v[2])||1; return [v[0]/n,v[1]/n,v[2]/n]; }
+    function crossv(a,b){ return [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]]; }
+    function orbit(az, el, dist){
+      var C = [dist*Math.cos(el)*Math.sin(az), dist*Math.sin(el), dist*Math.cos(el)*Math.cos(az)];
+      var fwd = norml([-C[0],-C[1],-C[2]]);
+      var right = norml(crossv(fwd,[0,1,0]));
+      var down = crossv(fwd,right);
+      return { C:C, R:[right,down,fwd] };
+    }
+    var cam1 = orbit(0.7, 0.25, 7), cam2 = orbit(-0.55, 0.12, 7);
+    var K = 400;
+    function K3(){ return [[K,0,W/2],[0,K,H/2],[0,0,1]]; }
+    function matMul(A,B){
+      var C=[[0,0,0],[0,0,0],[0,0,0]];
+      for (var i=0;i<3;i++) for (var j=0;j<3;j++){ var s=0; for (var k2=0;k2<3;k2++) s+=A[i][k2]*B[k2][j]; C[i][j]=s; }
+      return C;
+    }
+    function transpose(A){ return [[A[0][0],A[1][0],A[2][0]],[A[0][1],A[1][1],A[2][1]],[A[0][2],A[1][2],A[2][2]]]; }
+    function inverse3(M){
+      function inv(m){
+        var a=m[0][0],b=m[0][1],c=m[0][2],d=m[1][0],e=m[1][1],f=m[1][2],g=m[2][0],h=m[2][1],i2=m[2][2];
+        var A=e*i2-f*h, B=-(d*i2-f*g), C2=d*h-e*g, D=-(b*i2-c*h), E=a*i2-c*g, F2=-(a*h-b*g), G=b*f-c*e, Hh=-(a*f-c*d), I=a*e-b*d;
+        var det=a*A+b*B+c*C2;
+        return [[A/det,D/det,G/det],[B/det,E/det,Hh/det],[C2/det,F2/det,I/det]];
+      }
+      return inv(M);
+    }
+    function matVec(M,v){ return M.map(function(row){ return row[0]*v[0]+row[1]*v[1]+row[2]*v[2]; }); }
+    // E = [t]x R with t from cam1 to cam2 in cam1 frame (cam1 at origin, R1=I for simplicity):
+    var Rrel = matMul(cam2.R, transpose(cam1.R));
+    var tvec = matVec(cam2.R, [cam1.C[0]-cam2.C[0], cam1.C[1]-cam2.C[1], cam1.C[2]-cam2.C[2]]);
+    var tx = [[0,-tvec[2],tvec[1]],[tvec[2],0,-tvec[0]],[-tvec[1],tvec[0],0]];
+    var E = matMul(tx, Rrel);
+    var F = matMul(matMul(transpose(inverse3(K3())), E), inverse3(K3()));
+
+    var COLORS = ['#2a9d5c', '#e08a1e', '#8a5cff'];
+    var x1s = [ [70,110], [W*0.62, 70], [W*0.38, H-90] ];
+    var x2s = [ [W*0.6, H*0.55], [W*0.42, H*0.72], [W*0.7, H*0.4] ];
+    var dragIdx = -1;
+
+    function drawClipLine(line, color){
+      var a=line[0], b=line[1], c=line[2];
+      var cands = [];
+      if (Math.abs(b) > 1e-9){ cands.push([0, -c/b]); cands.push([W, -(c+a*W)/b]); }
+      if (Math.abs(a) > 1e-9){ cands.push([-c/a, 0]); cands.push([-(c+b*H)/a, H]); }
+      if (cands.length < 2) return;
+      ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.globalAlpha = 0.85;
+      ctx.beginPath(); ctx.moveTo(cands[0][0], cands[0][1]); ctx.lineTo(cands[1][0], cands[1][1]); ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+    function closestOnLine(line, p){
+      var a=line[0], b=line[1], c=line[2];
+      var d = a*p[0] + b*p[1] + c;
+      var n2 = a*a + b*b;
+      if (n2 < 1e-12) return null;
+      return [ p[0] - a*d/n2, p[1] - b*d/n2 ];
+    }
+
+    function update(){
+      ctx.clearRect(0,0,W,H);
+      ctx.fillStyle = 'rgba(0,0,0,0.05)'; ctx.fillRect(0,0,W,H);
+      var rows = [];
+      x1s.forEach(function(x1, i){
+        var l = matVec(F, [x1[0], x1[1], 1]);
+        drawClipLine(l, COLORS[i]);
+        var p = x2s[i];
+        // foot of perpendicular
+        var foot = closestOnLine(l, p);
+        if (foot){
+          ctx.strokeStyle = COLORS[i]; ctx.lineWidth = 1; ctx.globalAlpha = 0.7;
+          ctx.beginPath(); ctx.moveTo(p[0], p[1]); ctx.lineTo(foot[0], foot[1]); ctx.stroke();
+          ctx.globalAlpha = 1;
+        }
+        // draggable point
+        ctx.fillStyle = COLORS[i];
+        ctx.beginPath(); ctx.arc(p[0], p[1], 7, 0, 7); ctx.fill();
+        ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
+        ctx.font = 'bold 11px sans-serif';
+        ctx.fillText('x2-' + i, p[0]+10, p[1]+4);
+        // the three numbers
+        var alg = Math.abs(p[0]*l[0] + p[1]*l[1] + l[2]);
+        var g1 = Math.hypot(l[0], l[1]);
+        var l1 = matVec(transpose(F), [p[0], p[1], 1]);
+        var g2 = Math.hypot(l1[0], l1[1]);
+        var sampson = alg / Math.sqrt(g1*g1 + g2*g2);
+        var trueD = g1 > 1e-12 ? alg/g1 : Infinity;
+        rows.push({ i:i, alg: alg, sampson: sampson, trueD: trueD });
+        // x1 marker
+        ctx.fillStyle = COLORS[i]; ctx.globalAlpha = 0.85;
+        ctx.beginPath(); ctx.arc(x1[0], x1[1], 4, 0, 7); ctx.fill();
+        ctx.globalAlpha = 1;
+      });
+      // rankings
+      var byAlg = rows.slice().sort(function(a,b){ return a.alg-b.alg; }).map(function(r){ return r.i; });
+      var bySamp = rows.slice().sort(function(a,b){ return a.sampson-b.sampson; }).map(function(r){ return r.i; });
+      var same = byAlg.join('') === bySamp.join('');
+      document.getElementById('s5-readout').innerHTML =
+        rows.map(function(r){
+          return '<div><span class="k" style="color:' + COLORS[r.i] + '">&#9679;</span> <span class="k">corr ' + r.i + '</span> &nbsp;' +
+            '<span class="k">algebraic</span> = ' + r.alg.toFixed(1) +
+            ' &nbsp;<span class="k">Sampson</span> = <span class="hi">' + r.sampson.toFixed(1) + ' px</span>' +
+            ' &nbsp;<span class="k">true</span> = ' + r.trueD.toFixed(1) + ' px</div>';
+        }).join('') +
+        '<div><span class="k">order by algebraic:</span> ' + byAlg.join(' &rarr; ') +
+        ' &nbsp;&nbsp;<span class="k">order by Sampson:</span> <span class="hi">' + bySamp.join(' &rarr; ') + '</span></div>' +
+        '<div>' + (same ? '<span style="opacity:.6">orders agree here — drag points until they don&#8217;t, then ask which number you&#8217;d want a threshold measured in</span>' : '<span class="hi">orders disagree — the algebraic number is not a distance; its scale depends on the line&#8217;s gradient.</span>') + '</div>';
+    }
+
+    canvas.addEventListener('pointerdown', function(e){
+      var rect = canvas.getBoundingClientRect();
+      var mx = (e.clientX-rect.left)*(W/rect.width), my = (e.clientY-rect.top)*(H/rect.height);
+      var best = -1, bestD = 20;
+      x2s.forEach(function(p,i){ var d = Math.hypot(p[0]-mx, p[1]-my); if (d < bestD){ bestD = d; best = i; } });
+      if (best >= 0){ dragIdx = best; canvas.setPointerCapture(e.pointerId); }
+    });
+    canvas.addEventListener('pointermove', function(e){
+      if (dragIdx < 0) return;
+      var rect = canvas.getBoundingClientRect();
+      x2s[dragIdx] = [ (e.clientX-rect.left)*(W/rect.width), (e.clientY-rect.top)*(H/rect.height) ];
+      update();
+    });
+    canvas.addEventListener('pointerup', function(){ dragIdx = -1; });
+    canvas.addEventListener('pointercancel', function(){ dragIdx = -1; });
     update();
   })();
 
