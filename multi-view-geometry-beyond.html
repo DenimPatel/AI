@@ -151,6 +151,19 @@ permalink: /multi-view-geometry-beyond.html
     <p>MVS is run once per reference view, so a scene photographed from fifty images yields fifty depth maps — each one noisy, each one seeing a different part of the scene, and none of them individually consistent with the others (the same physical surface, estimated from two different reference views, rarely comes back at exactly the same depth). Turning that pile of overlapping, disagreeing depth maps into one coherent 3D model is <strong>depth fusion</strong>, and there are two standard routes.</p>
     <p><strong>TSDF fusion.</strong> Lay a regular 3D voxel grid over the scene. For every voxel, and every depth map that "sees" it (i.e. the voxel projects into that camera's field of view), compute the <strong>signed distance</strong> from the voxel to the surface implied by that depth map along the corresponding camera ray — positive in front of the surface, negative behind it, and <em>truncated</em> to a small band near zero so that voxels far from any observed surface don't get polluted by one noisy reading (hence <strong>T</strong>runcated <strong>S</strong>igned <strong>D</strong>istance <strong>F</strong>unction). Average that signed distance into the voxel across every depth map that observes it. The result is a smooth scalar field over the whole volume, and the surface is defined implicitly as wherever that field crosses zero — extractable as an explicit mesh with a standard algorithm like marching cubes. Averaging many noisy per-view estimates into each voxel is what makes TSDF fusion robust to the disagreement between individual depth maps: no single view's error dominates.</p>
     <p><strong>Poisson surface reconstruction.</strong> The point-based alternative: instead of a depth-map-per-voxel average, start from an <strong>oriented point cloud</strong> — the fused 3D points from MVS (or even directly from a dense point set), each carrying an estimated surface normal. Poisson reconstruction fits a smooth implicit function whose gradient best matches those normals everywhere, by solving a Poisson equation (a specific linear PDE — the same "Poisson" as in Poisson's equation from physics) over the volume; the output surface is again the zero level set of that function, extracted the same way. It tends to produce smoother, more watertight meshes than raw TSDF fusion, at the cost of needing decent normal estimates going in.</p>
+    <div class="mvg-goal">🎯 <b>Learning goal:</b> TSDF fusion, in cross-section. Two noisy depth maps of the same floor-and-box scene vote on every voxel; each casts a truncated signed distance (red = in front of surface, blue = behind, white = zero). Slide the truncation distance and noise level, and watch the averaged zero crossing (black) sit where the true surface is — <em>between</em> the two maps' noisy disagreements, which is the whole trick. The truncation band is why voxels far from any surface never corrupt the field.</div>
+    <div class="mvg-demo">
+      <div class="mvg-canvas-wrap" style="flex-basis:100%;">
+        <canvas id="s2-tsdf" width="720" height="360" style="width:100%; max-width:720px; height:auto; display:block; background:var(--color-neutral-100); border-radius:var(--radius-sm);"></canvas>
+        <p class="mvg-canvas-hint">Cross-section (x horizontal, depth vertical). Dashed lines: the two individual depth maps&#8217; surfaces; black solid: the TSDF zero crossing extracted from the fused field.</p>
+      </div>
+      <div class="mvg-controls">
+        <div class="mvg-field"><label>Truncation distance &#964; <span class="val" id="s2-tauval"></span></label><input type="range" id="s2-tau" min="0.08" max="1.2" step="0.02" value="0.3"></div>
+        <div class="mvg-field"><label>Depth-map 2 noise &#963; <span class="val" id="s2-noiseval"></span></label><input type="range" id="s2-dnoise" min="0" max="0.25" step="0.01" value="0.08"></div>
+        <div class="mvg-btnrow"><button id="s2-tsdf-resample" class="mvg-primary">Resample depth-map noise</button></div>
+        <div class="mvg-readout" id="s2-tsdfreadout"></div>
+      </div>
+    </div>
   </section>
 
   <section class="mvg-step" id="demo-mvs">
@@ -177,6 +190,11 @@ permalink: /multi-view-geometry-beyond.html
         <p class="mvg-canvas-hint">Heatmap: bright = the warped "other view" agrees well with the reference view at this candidate depth (low SAD over a small window); dark = it doesn't.</p>
         <canvas id="s3-curve" width="640" height="140" style="margin-top:10px;"></canvas>
         <p class="mvg-canvas-hint">Average photo-consistency across the whole image, plotted against swept depth Z. Dashed markers = the two true surface depths (box top, floor); the curve should peak right at them.</p>
+        <div class="mvg-btnrow" style="margin-top:10px;">
+          <button id="s3-dm" class="mvg-primary">Compute full depth map (argmax-Z per pixel)</button>
+        </div>
+        <canvas id="s3-depthmap" width="96" height="72" style="margin-top:8px; width:192px; height:144px; image-rendering:pixelated; background:var(--color-neutral-100); border-radius:var(--radius-sm);"></canvas>
+        <p class="mvg-canvas-hint">The end product of the sweep: per-pixel best-Z rendered as brightness (bright = nearer, dark = farther). Two distinct depth layers visible: the raised box and the floor around it — this is a dense depth map, no features matched anywhere.</p>
       </div>
       <div class="mvg-controls">
         <div class="mvg-field"><label>Sweep depth Z <span class="val" id="s3-zval"></span></label><input type="range" id="s3-z" min="0" max="1" step="0.002" value="0.5"></div>
@@ -232,6 +250,17 @@ permalink: /multi-view-geometry-beyond.html
     <p><strong>Back end.</strong> Runs slower, usually on a separate background thread, and doesn't touch every frame: a <strong>windowed</strong> (or "local") bundle adjustment — the same nonlinear least-squares machinery as Part 10, but restricted to a sliding window of recent keyframes rather than the whole trajectory — periodically refines poses and map points to keep small per-frame errors from accumulating unbounded. The front end reads the back end's latest refined estimate but never waits on it.</p>
     <p><strong>Loop closure.</strong> Incremental SfM (Part 11) already flagged that chaining relative poses frame-by-frame accumulates drift with no way to self-correct. SLAM's fix is to actively look for it: an image-retrieval / place-recognition step continuously checks whether the current view matches somewhere the system has already mapped. When it finds a match — "this is the same corner I saw ten minutes ago" — that becomes a new constraint between two keyframes that are far apart in time but geometrically close, fed into a <strong>pose-graph optimization</strong>: a lighter-weight cousin of full bundle adjustment that optimizes only the relative poses between keyframes (not the full 3D map alongside them), cheap enough to run globally and snap the accumulated drift back into consistency the moment a loop closes.</p>
     <div class="mvg-warn">⚠️ <span><b>Visual-inertial (VIO/VI-SLAM):</b> fusing an IMU's high-rate accelerometer and gyroscope measurements with the vision pipeline solves two separate problems at once. First, bridging fast motion between camera frames — a whip-pan or a bump can move the camera enough between two frames that visual tracking alone loses the match, while the IMU samples at hundreds of Hz and can carry the pose estimate through the gap. Second, and just as important: pure vision from a single moving camera can only ever recover structure and motion <em>up to an unknown overall scale</em> — the exact ambiguity Part 7 and Part 11 both flagged (a scene and its poses look identical whether it's a tabletop model or the real building, twice the size, twice as far away). An accelerometer measures physical acceleration in real units (m/s&#178;), which pure vision has no equivalent of — integrating it twice gives an absolute physical distance reference that resolves the scale ambiguity outright.</span></div>
+    <div class="mvg-goal">🎯 <b>Learning goal:</b> the pose graph, the data structure behind loop closure. Camera nodes along a walked loop; odometry edges (thin) accumulated drift; one loop-closure edge (thick teal) added when place recognition fires. Slide the closure weight from 0 to 1 and watch the drift redistribute around the whole loop instead of piling up at the seam — the same relaxation the Part 11 demo ran, driven by a single slider.</div>
+    <div class="mvg-demo">
+      <div class="mvg-canvas-wrap" style="flex-basis:100%;">
+        <canvas id="s6-posegraph" width="720" height="300" style="width:100%; max-width:720px; height:auto; display:block; background:var(--color-neutral-100); border-radius:var(--radius-sm);"></canvas>
+      </div>
+      <div class="mvg-controls">
+        <div class="mvg-field"><label>Loop-closure constraint weight <span class="val" id="s6-wval"></span></label><input type="range" id="s6-w" min="0" max="1" step="0.02" value="0"></div>
+        <div class="mvg-readout" id="s6-readout"></div>
+        <p class="mvg-canvas-hint">Red = drifted odometry-only trajectory; teal = current pose-graph estimate as the loop-closure edge&#8217;s weight grows. Full derivation of pose-graph optimization: <a href="{{ '/nonlinear-optimization-pose-graph.html' | relative_url }}">Nonlinear Optimization: pose graphs</a>.</p>
+      </div>
+    </div>
   </section>
 
   <section class="mvg-step" id="cheatsheet">
@@ -600,6 +629,40 @@ permalink: /multi-view-geometry-beyond.html
       scheduleUpdate();
     });
 
+    // Full dense depth map: sweep every candidate Z, keep the per-pixel argmax of photo-consistency.
+    var dmBtn = document.getElementById('s3-dm'), dmCanvas = document.getElementById('s3-depthmap');
+    if (dmBtn) dmBtn.addEventListener('click', function(){
+      var dctx = dmCanvas.getContext('2d');
+      var DW = dmCanvas.width, DH = dmCanvas.height;
+      var N = 60;
+      var best = new Float32Array(DW*DH), bestScore = new Float32Array(DW*DH).fill(-1);
+      for (var k=0; k<N; k++){
+        var Z = ZMIN + (ZMAX-ZMIN)*k/(N-1);
+        var sc = computeConsistency(Z, refData, otherData, baseline);
+        for (var i=0; i<DW*DH; i++){
+          if (sc[i] > bestScore[i]){ bestScore[i] = sc[i]; best[i] = Z; }
+        }
+      }
+      var img = dctx.createImageData(DW, DH);
+      var layerSpread = 0;
+      for (var j=0; j<DW*DH; j++){
+        // brightness: nearer depth = brighter (inverted depth)
+        var v = Math.round(255 * (1 - (best[j]-ZMIN)/(ZMAX-ZMIN)));
+        img.data[j*4] = v; img.data[j*4+1] = v; img.data[j*4+2] = v; img.data[j*4+3] = 255;
+      }
+      // quick two-layer sanity readout: histogram of best depths at coarse bins
+      var bins = new Array(10).fill(0);
+      for (var j2=0; j2<DW*DH; j2++){
+        bins[Math.min(9, Math.floor((best[j2]-ZMIN)/(ZMAX-ZMIN)*10))]++;
+      }
+      var peakBins = bins.map(function(c,i){ return {c:c,i:i}; }).sort(function(a,b){ return b.c-a.c; }).slice(0,2);
+      dctx.putImageData(img, 0, 0);
+      document.getElementById('s3-readout').innerHTML =
+        '<div><span class="k">dense depth map computed</span> over ' + N + ' candidate depths, ' + (DW*DH) + ' pixels</div>' +
+        '<div><span class="k">dominant depth layers</span> = ' + peakBins.map(function(b){ return 'Z&asymp;' + (ZMIN+(ZMAX-ZMIN)*b.i/10).toFixed(2) + ' (' + Math.round(100*b.c/(DW*DH)) + '%)'; }).join(', ') + '</div>' +
+        '<div style="opacity:.65">Two layers &mdash; box top and floor &mdash; exactly the scene&#8217;s two surfaces. Brighter = nearer. This is the plane-sweep&#8217;s actual output, no feature matches involved.</div>';
+    });
+
     update(parseFloat(zEl.value));
   })();
 
@@ -783,6 +846,230 @@ permalink: /multi-view-geometry-beyond.html
     }
     Object.keys(buttons).forEach(function(k){ buttons[k].addEventListener('click', function(){ setMode(k); }); });
     setMode('points');
+  })();
+
+  // ================================================================
+  // Step 2: TSDF fusion cross-section demo
+  // ================================================================
+  (function(){
+    var canvas = document.getElementById('s2-tsdf');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var W = canvas.width, H = canvas.height;
+    var tauEl = document.getElementById('s2-tau'), noiseEl = document.getElementById('s2-dnoise');
+    var resampleBtn = document.getElementById('s2-tsdf-resample');
+
+    var NX = 144, NZ = 72;
+    var XMIN = -2, XMAX = 2, ZMIN = 1.2, ZMAX = 4.4;
+    var BOX_HW = 1.1, BOX_Z = 2.0, FLOOR_Z = 3.4;
+    var nzCol = null;
+    function resampleNoise(){
+      var s = parseFloat(noiseEl.value);
+      nzCol = [];
+      for (var i=0;i<NX;i++) nzCol.push((Math.random()-0.5)*2*s);
+    }
+    function surf1(x){ return Math.abs(x) <= BOX_HW ? BOX_Z : FLOOR_Z; }
+    function surf2(x){ return surf1(x - 0.12) + (nzCol ? nzCol[Math.max(0, Math.min(NX-1, Math.round((x-XMIN)/(XMAX-XMIN)*(NX-1))))] : 0); }
+
+    function update(){
+      var tau = parseFloat(tauEl.value);
+      document.getElementById('s2-tauval').textContent = tau.toFixed(2);
+      document.getElementById('s2-noiseval').textContent = parseFloat(noiseEl.value).toFixed(2);
+      var xOf = function(ci){ return XMIN + (XMAX-XMIN)*ci/(NX-1); };
+      var zOf = function(ri){ return ZMIN + (ZMAX-ZMIN)*ri/(NZ-1); };
+      var cw = W/NX, chh = (H-30)/NZ;
+      // compute fused TSDF
+      var tsdf = new Float32Array(NX*NZ), wsum = new Float32Array(NX*NZ);
+      for (var ri=0; ri<NZ; ri++){
+        for (var ci=0; ci<NX; ci++){
+          var vx = xOf(ci), vz = zOf(ri);
+          var s1 = vz - surf1(vx), s2 = vz - surf2(vx);
+          if (Math.abs(s1) <= tau){ tsdf[ri*NX+ci] += s1/tau; wsum[ri*NX+ci] += 1; }
+          if (Math.abs(s2) <= tau){ tsdf[ri*NX+ci] += s2/tau; wsum[ri*NX+ci] += 1; }
+        }
+      }
+      // draw voxels (flip rows so depth increases downward)
+      for (var r2=0; r2<NZ; r2++){
+        for (var c2=0; c2<NX; c2++){
+          var idx = r2*NX+c2;
+          var x0 = c2*cw, y0 = H-30 - (r2+1)*chh;
+          if (wsum[idx] > 0){
+            var v = tsdf[idx]/wsum[idx]; // -1..1
+            var rr2, gg, bb;
+            if (v > 0){ rr2 = 214; gg = Math.round(120-80*v); bb = Math.round(90-70*v); }   // in front: red
+            else { rr2 = Math.round(90+70*(1+v)); gg = Math.round(140+60*(1+v)); bb = 214; } // behind: blue
+            var a = 0.15 + 0.55*Math.abs(v);
+            ctx.fillStyle = 'rgba(' + rr2 + ',' + gg + ',' + bb + ',' + a.toFixed(2) + ')';
+          } else {
+            ctx.fillStyle = 'rgba(32,30,29,0.05)';
+          }
+          ctx.fillRect(x0, y0, cw+0.5, chh+0.5);
+        }
+      }
+      // zero crossing of the fused field: small black markers at sign changes
+      ctx.fillStyle = COLOR_TEXT;
+      for (var r3=0; r3<NZ; r3++){
+        for (var c3=0; c3<NX-1; c3++){
+          var a1 = wsum[r3*NX+c3] > 0 ? tsdf[r3*NX+c3]/wsum[r3*NX+c3] : null;
+          var b1 = wsum[r3*NX+c3+1] > 0 ? tsdf[r3*NX+c3+1]/wsum[r3*NX+c3+1] : null;
+          if (a1 !== null && b1 !== null && a1*b1 < 0){
+            var t3 = a1/(a1-b1);
+            var px = (c3+t3)*cw, py = H-30 - (r3+0.5)*chh;
+            ctx.fillRect(px-1, py-1, 2.5, 2.5);
+          }
+        }
+      }
+      // individual (noisy) surfaces, dashed
+      function drawSurf(fn, color){
+        ctx.strokeStyle = color; ctx.lineWidth = 1.6; ctx.setLineDash([5,4]);
+        ctx.beginPath();
+        for (var c4=0; c4<NX; c4++){
+          var x = xOf(c4), z = fn(x);
+          var px2 = c4*cw, py2 = H-30 - ((z-ZMIN)/(ZMAX-ZMIN))*NZ*chh;
+          if (c4===0) ctx.moveTo(px2, py2); else ctx.lineTo(px2, py2);
+        }
+        ctx.stroke(); ctx.setLineDash([]);
+      }
+      drawSurf(surf1, 'rgba(32,30,29,0.55)');
+      drawSurf(surf2, 'rgba(214,0,108,0.55)');
+      // ground line + labels
+      ctx.strokeStyle = COLOR_DIVIDER;
+      ctx.beginPath(); ctx.moveTo(0, H-30); ctx.lineTo(W, H-30); ctx.stroke();
+      ctx.fillStyle = COLOR_TEXT; ctx.font = '11px monospace';
+      ctx.fillText('x', W/2-4, H-10);
+      ctx.save(); ctx.translate(12, H/2); ctx.rotate(-Math.PI/2); ctx.fillText('depth', -16, 0); ctx.restore();
+      document.getElementById('s2-tsdfreadout').innerHTML =
+        '<div><span class="k">voxels integrated</span> = ' + Array.from(wsum).filter(function(v){ return v>0; }).length + ' / ' + (NX*NZ) + ' <span style="opacity:.6">(the rest lie outside every truncation band — exactly the pollution guard)</span></div>' +
+        '<div><span class="k">read it</span>: red = in front of surface, blue = behind; the black speck line is the fused zero crossing, sitting between the two dashed per-map surfaces.</div>';
+    }
+    tauEl.addEventListener('input', update);
+    noiseEl.addEventListener('input', function(){ resampleNoise(); update(); });
+    resampleBtn.addEventListener('click', function(){ resampleNoise(); update(); });
+    resampleNoise();
+    update();
+  })();
+
+  // ================================================================
+  // Step 6: pose-graph sketch (loop closure weight slider)
+  // ================================================================
+  (function(){
+    var canvas = document.getElementById('s6-posegraph');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var W = canvas.width, H = canvas.height;
+    var wEl = document.getElementById('s6-w');
+    var N = 12, RADIUS = 3.0;
+
+    function mulberry(seed){
+      return function(){
+        seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+        var t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+    var truth = [], drifted = [], odomEdges = [], loopMeas = null;
+    (function build(){
+      var rand = mulberry(20260905);
+      for (var i=0;i<N;i++){
+        var a = i*2*Math.PI/N;
+        truth.push({ x: RADIUS*Math.cos(a), y: RADIUS*Math.sin(a), th: a + Math.PI/2 });
+      }
+      function rel(a, b){
+        var dx = b.x-a.x, dy = b.y-a.y;
+        var c = Math.cos(-a.th), s = Math.sin(-a.th);
+        return { x: c*dx - s*dy, y: s*dx + c*dy, th: b.th - a.th };
+      }
+      function compose(a, r){
+        var c = Math.cos(a.th), s = Math.sin(a.th);
+        return { x: a.x + c*r.x - s*r.y, y: a.y + s*r.x + c*r.y, th: a.th + r.th };
+      }
+      var nz = 0.05;
+      drifted = [{ x: truth[0].x, y: truth[0].y, th: truth[0].th }];
+      for (var k=1;k<N;k++){
+        var z = rel(truth[k-1], truth[k]);
+        z = { x: z.x + (rand()-0.5)*2*nz, y: z.y + (rand()-0.5)*2*nz, th: z.th + (rand()-0.5)*2*nz*0.5 };
+        odomEdges.push(z);
+        drifted.push(compose(drifted[k-1], z));
+      }
+      loopMeas = rel(truth[N-1], truth[0]); // the revisit measurement (assumed exact)
+    })();
+
+    function relPose(a, b){
+      var dx = b.x-a.x, dy = b.y-a.y;
+      var c = Math.cos(-a.th), s = Math.sin(-a.th);
+      return { x: c*dx - s*dy, y: s*dx + c*dy, th: b.th - a.th };
+    }
+    function compose(a, r){
+      var c = Math.cos(a.th), s = Math.sin(a.th);
+      return { x: a.x + c*r.x - s*r.y, y: a.y + s*r.x + c*r.y, th: a.th + r.th };
+    }
+    function relax(loopW){
+      var nodes = drifted.map(function(p){ return { x:p.x, y:p.y, th:p.th }; });
+      var edges = [];
+      for (var i=0;i<N-1;i++) edges.push({ a:i, b:i+1, z: odomEdges[i], w: 1 });
+      edges.push({ a:N-1, b:0, z: loopMeas, w: loopW*6 });
+      for (var it=0; it<300; it++){
+        edges.forEach(function(e){
+          if (e.w <= 0) return;
+          var A = nodes[e.a], B = nodes[e.b];
+          var cur = relPose(A, B);
+          var ex = e.z.x - cur.x, ey = e.z.y - cur.y;
+          var eth = e.z.th - cur.th;
+          while (eth > Math.PI) eth -= 2*Math.PI;
+          while (eth < -Math.PI) eth += 2*Math.PI;
+          var ca = Math.cos(A.th), sa = Math.sin(A.th);
+          var exw = ca*ex - sa*ey, eyw = sa*ex + ca*ey;
+          var kb = 0.5/(1 + e.w), ka = 0.5*e.w/(1 + e.w);
+          B.x += exw*kb; B.y += eyw*kb; B.th += eth*kb;
+          A.x -= exw*ka; A.y -= eyw*ka; A.th -= eth*ka;
+        });
+      }
+      return nodes;
+    }
+    function toPx(p){
+      var sc = Math.min(W, H)*0.40 / (RADIUS*1.55);
+      return [ W/2 + p.x*sc, H/2 - p.y*sc ];
+    }
+    function drawPath(pts, color, lw, dash){
+      ctx.strokeStyle = color; ctx.lineWidth = lw;
+      if (dash) ctx.setLineDash(dash);
+      ctx.beginPath();
+      pts.forEach(function(p,i){ var q = toPx(p); if (i===0) ctx.moveTo(q[0],q[1]); else ctx.lineTo(q[0],q[1]); });
+      ctx.stroke(); ctx.setLineDash([]);
+      pts.forEach(function(p){
+        var q = toPx(p);
+        ctx.fillStyle = color;
+        ctx.beginPath(); ctx.arc(q[0], q[1], 3.4, 0, 7); ctx.fill();
+      });
+    }
+    function draw(){
+      var w = parseFloat(wEl.value);
+      document.getElementById('s6-wval').textContent = w.toFixed(2);
+      var current = relax(w);
+      ctx.clearRect(0,0,W,H);
+      ctx.fillStyle = 'rgba(0,0,0,0.03)'; ctx.fillRect(0,0,W,H);
+      // loop-closure edge
+      var qa = toPx(current[N-1]), qb = toPx(current[0]);
+      ctx.strokeStyle = w > 0.01 ? COLOR_ACCENT : 'rgba(32,30,29,0.25)';
+      ctx.lineWidth = w > 0.01 ? 2.6 : 1.4;
+      if (w <= 0.01) ctx.setLineDash([4,4]);
+      ctx.beginPath(); ctx.moveTo(qa[0],qa[1]); ctx.lineTo(qb[0],qb[1]); ctx.stroke(); ctx.setLineDash([]);
+      drawPath(truth.concat([truth[0]]), 'rgba(32,30,29,0.5)', 1.3, [5,4]);
+      drawPath(drifted, '#c23b3b', 1.6);
+      drawPath(current, COLOR_ACCENT, 2.2);
+      var q0 = toPx(truth[0]);
+      ctx.fillStyle = COLOR_TEXT;
+      ctx.beginPath(); ctx.arc(q0[0], q0[1], 4, 0, 7); ctx.fill();
+      var seam = Math.hypot(current[N-1].x - current[0].x, current[N-1].y - current[0].y);
+      var seam0 = Math.hypot(drifted[N-1].x - drifted[0].x, drifted[N-1].y - drifted[0].y);
+      var trueGap = Math.hypot(truth[N-1].x - truth[0].x, truth[N-1].y - truth[0].y);
+      document.getElementById('s6-readout').innerHTML =
+        '<div><span class="k">loop gap</span>: odometry-only = <span class="hi" style="color:#c23b3b">' + seam0.toFixed(2) + ' units</span> &rarr; current estimate = <span class="hi">' + seam.toFixed(2) + ' units</span> <span class="k">(true edge length ' + trueGap.toFixed(2) + ')</span></div>' +
+        '<div style="opacity:.65">' + (w >= 0.99 ? 'Full-weight loop closure: the drift is spread around the whole loop instead of sitting at the seam — this is the pose-graph optimization SLAM runs the moment place recognition fires.' : 'Raise the closure weight: the revisit constraint drags the whole trajectory back into agreement with itself.') + '</div>';
+    }
+    wEl.addEventListener('input', draw);
+    draw();
   })();
 
 })();

@@ -158,6 +158,8 @@ permalink: /multi-view-geometry-pnp.html
           <canvas id="s2-canvas" width="480" height="360"></canvas>
         </div>
         <p class="mvg-canvas-hint">Observed pixels fed to the solver (orange = outlier draws).</p>
+        <canvas id="s2-curve" width="480" height="160" style="width:100%; height:auto; display:block; background:var(--color-neutral-100); border-radius:var(--radius-sm);"></canvas>
+        <p class="mvg-canvas-hint">Gauss&ndash;Newton convergence: total reprojection cost vs iteration. Pure least squares dives fast when the outliers are absent &mdash; drag the outlier slider up and watch it plateau at a wrong answer, no matter how many steps it takes.</p>
         <div class="mvg-legend">
           <span><i style="background:var(--color-text)"></i>true camera</span>
           <span><i style="background:#9b9797"></i>DLT-recovered (raw)</span>
@@ -183,6 +185,18 @@ permalink: /multi-view-geometry-pnp.html
     <div class="mvg-math">d&#8321;&#178; + d&#8322;&#178; &minus; 2 d&#8321;d&#8322; cos&thinsp;&theta;&#8321;&#8322; = d&#8321;&#8322;&#178;</div>
     <p>The same relation holds for the <var>(1,3)</var> and <var>(2,3)</var> pairs, giving three simultaneous quadratics in <var>d&#8321;, d&#8322;, d&#8323;</var> &mdash; known coefficients (<var>&theta;&#8339;&#7488;</var>, <var>d&#8339;&#7488;</var>), three unknowns. Eliminating variables between the three equations produces a single <strong>quartic</strong> polynomial in one of them, which has <strong>up to 4 real roots</strong> &mdash; so P3P alone hands back up to 4 algebraically valid camera poses, all consistent with the same three rays and three distances.</p>
     <div class="mvg-warn">&#9888;&#65039; <span><b>A pattern you've now seen three times.</b> Part 6's homography decomposition gave 2 candidate poses off a flat scene; Part 7's essential-matrix decomposition gave 4 candidates for relative pose. P3P's quartic is the same story a third time: a minimal solver, working from too little information to be unambiguous by itself, algebraically returns several equally valid answers &mdash; and one extra piece of information (a cheirality check, a positive-depth check, or here a <strong>4th point</strong>) is what picks the physical one. With a 4th correspondence in hand, whichever of the &le;4 candidates reprojects it with the least error wins.</span></div>
+    <div class="mvg-goal">&#127919; <b>Learning goal:</b> three points + the ray angles from <var>K</var>, solved for camera-to-point distances &mdash; watch the solver hand back every algebraically valid pose as a frustum, then add the 4th point and see it pick the winner. Slide the camera azimuth to change the ray geometry and watch the candidate count change &mdash; the quartic really does have a variable number of real roots.</div>
+    <div class="mvg-demo">
+      <div class="mvg-canvas-wrap">
+        <div id="s3-plot3d" class="mvg-plot3d" style="height:340px;"></div>
+        <p class="mvg-canvas-hint">Drag to orbit. Black frustum = ground truth; colored frustums = P3P candidates (up to 4); the winner by 4th-point reprojection is drawn brighter with a dashed line to the 4th point.</p>
+      </div>
+      <div class="mvg-controls">
+        <div class="mvg-field"><label>Camera azimuth (ray geometry) <span class="val" id="s3-azval"></span></label><input type="range" id="s3-az" min="0.1" max="1.2" step="0.01" value="0.55"></div>
+        <div class="mvg-readout" id="s3-readout"></div>
+        <p class="mvg-canvas-hint">The three law-of-cosines quadratics are solved numerically here (multi-start Newton on the distance triplet, clustered); the textbook route eliminates them into one closed-form quartic in a single variable. Same roots, either way.</p>
+      </div>
+    </div>
   </section>
 
   <section class="mvg-step" id="epnp">
@@ -208,6 +222,10 @@ permalink: /multi-view-geometry-pnp.html
       <div class="mvg-canvas-wrap">
         <div id="s6-plot3d" class="mvg-plot3d"></div>
         <p class="mvg-canvas-hint">Drag to orbit. Point color: green = RANSAC inlier, red = outlier.</p>
+        <div class="mvg-imgplane">
+          <canvas id="s6-canvas" width="480" height="360"></canvas>
+        </div>
+        <p class="mvg-canvas-hint">The image plane: observed pixels colored by the RANSAC verdict (green = inlier, red = outlier, gray = not yet scored).</p>
         <div class="mvg-legend">
           <span><i style="background:var(--color-text)"></i>true camera</span>
           <span><i style="background:#9b9797"></i>naive DLT (all points)</span>
@@ -217,6 +235,7 @@ permalink: /multi-view-geometry-pnp.html
       <div class="mvg-controls">
         <div class="mvg-field"><label>Outlier fraction <span class="val" id="s6-outval"></span></label><input type="range" id="s6-out" min="0" max="0.5" step="0.02" value="0.25"></div>
         <div class="mvg-field"><label>Pixel noise &sigma; <span class="val" id="s6-noiseval"></span></label><input type="range" id="s6-noise" min="0" max="4" step="0.1" value="1"></div>
+        <div class="mvg-field"><label>Inlier threshold &#964; (px) <span class="val" id="s6-tauval"></span></label><input type="range" id="s6-tau" min="2" max="25" step="1" value="6"></div>
         <div class="mvg-btnrow">
           <button id="s6-resample" class="mvg-primary">New correspondences</button>
           <button id="s6-run">Run RANSAC</button>
@@ -451,9 +470,10 @@ permalink: /multi-view-geometry-pnp.html
     }
     return M.map(function(row,i){ return row[i]===0 ? 0 : row[n]/row[i]; });
   }
-  function refinePoseGN(K, points3D, obsPix, cam0, iters){
+  function refinePoseGN(K, points3D, obsPix, cam0, iters, history){
     var cam = { R: cam0.R.map(function(r){ return r.slice(); }), C: cam0.C.slice() };
     iters = iters || 8;
+    if (history) history.push(totalCost(K, cam, points3D, obsPix));
     for (var it=0; it<iters; it++){
       var r0 = reprojResidualsPose(K, cam, points3D, obsPix);
       var m = r0.length;
@@ -472,8 +492,15 @@ permalink: /multi-view-geometry-pnp.html
       for (var i2=0;i2<6;i2++) H[i2][i2] += 1e-6;
       var delta = solveLinearN(H, g.map(function(v){ return -v; }));
       cam = applyPoseDelta(cam, [delta[0],delta[1],delta[2]], [delta[3],delta[4],delta[5]]);
+      if (history) history.push(totalCost(K, cam, points3D, obsPix));
     }
     return cam;
+  }
+  function totalCost(K, cam, points3D, obsPix){
+    var r = reprojResidualsPose(K, cam, points3D, obsPix);
+    var s = 0;
+    for (var i=0;i<r.length;i++) s += r[i]*r[i];
+    return s;
   }
   function poseErrors(camTrue, camEst){
     var Rtr = matMulG(transposeG(camTrue.R), camEst.R);
@@ -531,6 +558,7 @@ permalink: /multi-view-geometry-pnp.html
     var div = document.getElementById('s2-plot3d');
     var canvas = document.getElementById('s2-canvas'), ctx = canvas.getContext('2d');
     var W = canvas.width, H = canvas.height;
+    var curveCanvas = document.getElementById('s2-curve'), curveCtx = curveCanvas ? curveCanvas.getContext('2d') : null;
     var noiseEl = document.getElementById('s2-noise'), outEl = document.getElementById('s2-out');
     var base = trueObs();
     var obs = null, outlierMask = null;
@@ -545,9 +573,33 @@ permalink: /multi-view-geometry-pnp.html
       render();
     }
 
+    function drawCurve(history){
+      if (!curveCtx) return;
+      var ctx = curveCtx, CW = curveCanvas.width, CH = curveCanvas.height;
+      ctx.clearRect(0,0,CW,CH);
+      ctx.fillStyle = 'rgba(0,0,0,0.04)'; ctx.fillRect(0,0,CW,CH);
+      var padL = 52, padB = 22, padT = 12, padR = 12;
+      var maxC = Math.max.apply(null, history.concat([1]));
+      function X(i){ return padL + (i/(history.length-1||1))*(CW-padL-padR); }
+      function Y(v){ return CH-padB - (v/maxC)*(CH-padT-padB); }
+      ctx.strokeStyle = COLOR_DIVIDER; ctx.fillStyle = COLOR_TEXT; ctx.lineWidth = 1; ctx.font = '10px monospace';
+      for (var g=0; g<=2; g++){
+        var gy = padT + (g/2)*(CH-padT-padB);
+        ctx.beginPath(); ctx.moveTo(padL, gy); ctx.lineTo(CW-padR, gy); ctx.stroke();
+        ctx.globalAlpha = 0.7; ctx.fillText(Math.round(maxC*(1-g/2)), 4, gy+3); ctx.globalAlpha = 1;
+      }
+      ctx.strokeStyle = COLOR_ACCENT2; ctx.lineWidth = 2;
+      ctx.beginPath();
+      history.forEach(function(v, i){ if (i===0) ctx.moveTo(X(i), Y(v)); else ctx.lineTo(X(i), Y(v)); });
+      ctx.stroke();
+      ctx.fillText('reprojection cost', padL+6, padT+10);
+      ctx.fillText('GN iteration', CW/2-30, CH-6);
+    }
+
     function render(){
+      var history = [];
       var camRaw = dltResection(K, POINTS3D, obs);
-      var camRefined = refinePoseGN(K, POINTS3D, obs, camRaw, 10);
+      var camRefined = refinePoseGN(K, POINTS3D, obs, camRaw, 10, history);
       var eRaw = poseErrors(TRUE_CAM, camRaw), eRef = poseErrors(TRUE_CAM, camRefined);
 
       Plotly.react(div, [
@@ -563,25 +615,166 @@ permalink: /multi-view-geometry-pnp.html
         ctx.fillStyle = outlierMask[i] ? '#e08a1e' : COLOR_ACCENT;
         ctx.beginPath(); ctx.arc(W/2+o[0], H/2+o[1], 4, 0, 7); ctx.fill();
       });
+      drawCurve(history);
 
       document.getElementById('s2-noiseval').textContent = parseFloat(noiseEl.value).toFixed(1) + ' px';
       document.getElementById('s2-outval').textContent = (parseFloat(outEl.value)*100).toFixed(0) + '%';
       document.getElementById('s2-readout').innerHTML =
         '<div><span class="k">raw DLT</span> rotation err <span class="hi">' + eRaw.rotDeg.toFixed(2) + '&deg;</span>, translation err <span class="hi">' + eRaw.transErr.toFixed(3) + '</span></div>' +
-        '<div><span class="k">after Gauss&ndash;Newton</span> rotation err <span class="hi">' + eRef.rotDeg.toFixed(2) + '&deg;</span>, translation err <span class="hi">' + eRef.transErr.toFixed(3) + '</span></div>' +
+        '<div><span class="k">after Gauss&ndash;Newton</span> rotation err <span class="hi">' + eRef.rotDeg.toFixed(2) + '&deg;</span>, translation err <span class="hi">' + eRef.transErr.toFixed(3) + '</span>' +
+        ' <span class="k">(' + history.length + ' cost evaluations)</span></div>' +
         '<div><span class="k">true camera C</span> = (' + TRUE_CAM.C.map(function(v){return v.toFixed(2);}).join(', ') + ')</div>';
     }
 
     document.getElementById('s2-resample').addEventListener('click', resample);
-    noiseEl.addEventListener('input', function(){ document.getElementById('s2-noiseval').textContent = parseFloat(noiseEl.value).toFixed(1) + ' px'; });
-    outEl.addEventListener('input', function(){ document.getElementById('s2-outval').textContent = (parseFloat(outEl.value)*100).toFixed(0) + '%'; });
+    noiseEl.addEventListener('input', resample);
+    outEl.addEventListener('input', resample);
     resample();
+  })();
+
+  // ---------- Step 3: P3P candidate-poses demo ----------
+  (function(){
+    var div = document.getElementById('s3-plot3d');
+    if (!div) return;
+    var azEl = document.getElementById('s3-az');
+    var readout = document.getElementById('s3-readout');
+    var CAND_COLORS = [COLOR_ACCENT, COLOR_ACCENT2, '#8a5cff', '#e08a1e'];
+
+    function camFor(az){
+      return MVG.orbitCamera(az, 0.24, 6.5, [0,0,0]);
+    }
+    // Solve the three law-of-cosines quadratics for (d1,d2,d3) via multi-start Newton.
+    function solveP3Pdistances(pts, cam){
+      var obs = pts.map(function(X){ return MVG.project(K, cam, X); });
+      var rays = obs.map(function(o){ return MVG.normalize([ (o.u-K.cx)/K.fx, (o.v-K.cy)/K.fy, 1 ]); });
+      var lens = [
+        MVG.norm(MVG.sub(pts[1], pts[2])), // a = |X2-X3| opposite X1
+        MVG.norm(MVG.sub(pts[0], pts[2])), // b = |X1-X3|
+        MVG.norm(MVG.sub(pts[0], pts[1]))  // c = |X1-X2|
+      ];
+      var cosA = MVG.dot(rays[1], rays[2]); // angle between rays to X2,X3 (at camera, opposite a)
+      var cosB = MVG.dot(rays[0], rays[2]);
+      var cosG = MVG.dot(rays[0], rays[1]);
+      function F(d){
+        return [
+          d[0]*d[0] + d[1]*d[1] - 2*d[0]*d[1]*cosG - lens[2]*lens[2],
+          d[0]*d[0] + d[2]*d[2] - 2*d[0]*d[2]*cosB - lens[1]*lens[1],
+          d[1]*d[1] + d[2]*d[2] - 2*d[1]*d[2]*cosA - lens[0]*lens[0]
+        ];
+      }
+      function JF(d){
+        return [
+          [ 2*d[0]-2*d[1]*cosG, 2*d[1]-2*d[0]*cosG, 0 ],
+          [ 2*d[0]-2*d[2]*cosB, 0, 2*d[2]-2*d[0]*cosB ],
+          [ 0, 2*d[1]-2*d[2]*cosA, 2*d[2]-2*d[1]*cosA ]
+        ];
+      }
+      function solve3(A, b){
+        var n=3, M=A.map(function(row,i){ return row.concat([b[i]]); });
+        for (var col=0; col<n; col++){
+          var piv=col;
+          for (var r=col+1;r<n;r++) if (Math.abs(M[r][col])>Math.abs(M[piv][col])) piv=r;
+          var tmp=M[col]; M[col]=M[piv]; M[piv]=tmp;
+          var pv=M[col][col]; if (Math.abs(pv)<1e-14) continue;
+          for (var r2=0;r2<n;r2++){ if (r2===col) continue; var f=M[r2][col]/pv; for (var c2=col;c2<=n;c2++) M[r2][c2]-=f*M[col][c2]; }
+        }
+        return M.map(function(row,i){ return row[i]===0?0:row[n]/row[i]; });
+      }
+      var sols = [];
+      for (var start=0; start<80; start++){
+        var d = [ 0.5+Math.random()*11, 0.5+Math.random()*11, 0.5+Math.random()*11 ];
+        for (var it=0; it<40; it++){
+          var fv = F(d), Jv = JF(d);
+          if (Math.hypot(fv[0],fv[1],fv[2]) < 1e-10) break;
+          var delta = solve3(Jv, fv.map(function(v){ return -v; }));
+          d = [d[0]+delta[0], d[1]+delta[1], d[2]+delta[2]];
+          if (d.some(function(v){ return !isFinite(v) || v <= 0 || v > 60; })) break;
+        }
+        var fin = F(d);
+        if (Math.hypot(fin[0],fin[1],fin[2]) < 1e-6 && d.every(function(v){ return v > 0.05 && v < 60; })){
+          var dup = sols.some(function(s){ return Math.hypot(s[0]-d[0], s[1]-d[1], s[2]-d[2]) < 0.05; });
+          if (!dup) sols.push(d.slice());
+        }
+      }
+      return sols;
+    }
+    // Rigid pose from camera-frame coordinates Yᵢ = dᵢ·rayᵢ to world points Xᵢ.
+    // With exactly 3 points a centered Kabsch/polar solve is rank-deficient (the centered
+    // cloud spans a plane), so build orthonormal triads from the triangle edges instead:
+    // edge vectors transform as ΔY = R ΔX, so triads built by the same Gram–Schmidt in both
+    // frames satisfy Tc = R·Tw exactly — R = Tc·Twᵀ, exact for any non-degenerate triangle.
+    function triadRows(P){
+      var e1 = MVG.normalize(MVG.sub(P[1], P[0]));
+      var v = MVG.sub(P[2], P[0]);
+      var e2 = MVG.normalize(MVG.sub(v, MVG.scale(e1, MVG.dot(v, e1))));
+      var e3 = MVG.cross(e1, e2);
+      return [e1, e2, e3]; // rows of the triad matrix (columns of the frame basis)
+    }
+    function poseFromDepthTriplet(pts, cam, d){
+      var obs = pts.map(function(X){ return MVG.project(K, cam, X); });
+      var Y = obs.map(function(o, i){
+        var r = MVG.normalize([ (o.u-K.cx)/K.fx, (o.v-K.cy)/K.fy, 1 ]);
+        return MVG.scale(r, d[i]);
+      });
+      var Tw = triadRows(pts);       // world triad (rows)
+      var Tc = triadRows(Y);         // camera-frame triad (rows)
+      // C = R W (columns)  ⟹  R = Tcᵀ · Tw
+      var R = matMulG(transposeG(Tc), Tw);
+      var t = MVG.sub(Y[0], mv3(R, pts[0])); // y = R x + t
+      return { R: R, t: t, C: MVG.scale(MVG.matVec(transposeG(R), t), -1) };
+    }
+    function mv3(M, v){ return [M[0][0]*v[0]+M[0][1]*v[1]+M[0][2]*v[2], M[1][0]*v[0]+M[1][1]*v[1]+M[1][2]*v[2], M[2][0]*v[0]+M[2][1]*v[1]+M[2][2]*v[2]]; }
+
+    function update(){
+      var az = parseFloat(azEl.value);
+      document.getElementById('s3-azval').textContent = az.toFixed(2);
+      var cam = camFor(az);
+      var pts = POINTS3D.slice(0, 3);      // the P3P triplet
+      var X4 = POINTS3D[9];                // the disambiguating 4th point
+      var sols = solveP3Pdistances(pts, cam);
+      var traces = [
+        pointsTrace(POINTS3D, COLOR_TEXT, 4),
+        cameraFrustumTrace(TRUE_CAM, COLOR_TEXT), cameraCenterTrace(TRUE_CAM, COLOR_TEXT)
+      ];
+      var best = null, bestErr = Infinity;
+      var cands = sols.map(function(d){
+        var pose = poseFromDepthTriplet(pts, cam, d);
+        var p4 = MVG.project(K, pose, X4);
+        var p4true = MVG.project(K, TRUE_CAM, X4);
+        var err = (p4 && p4true) ? Math.hypot(p4.u-p4true.u, p4.v-p4true.v) : Infinity;
+        return { pose: pose, err: err };
+      });
+      cands.forEach(function(c){ if (isFinite(c.err) && c.err < bestErr){ bestErr = c.err; best = c; } });
+      cands.forEach(function(c, i){
+        var isBest = c === best;
+        traces.push(cameraFrustumTrace(c.pose, CAND_COLORS[i % CAND_COLORS.length]));
+        traces.push(cameraCenterTrace(c.pose, CAND_COLORS[i % CAND_COLORS.length]));
+        if (isBest){
+          var p4 = MVG.project(K, c.pose, X4);
+          if (p4){
+            traces.push({ type:'scatter3d', mode:'markers', x:[X4[0]], y:[X4[1]], z:[X4[2]], marker:{ size:7, color:COLOR_ACCENT2, symbol:'diamond-open' }, hoverinfo:'skip' });
+            traces.push({ type:'scatter3d', mode:'lines', x:[c.pose.C[0],X4[0]], y:[c.pose.C[1],X4[1]], z:[c.pose.C[2],X4[2]], line:{ color:COLOR_ACCENT2, width:2, dash:'dot' }, hoverinfo:'skip' });
+          }
+        }
+      });
+      Plotly.react(div, traces, baseLayout(), { displayModeBar:false, responsive:true });
+      readout.innerHTML =
+        '<div><span class="k">distance-triplet solutions (real roots)</span> = <span class="hi">' + sols.length + '</span> <span style="opacity:.6">(the quartic can have 0&ndash;4)</span></div>' +
+        cands.map(function(c, i){
+          return '<div><span class="k" style="color:' + CAND_COLORS[i % CAND_COLORS.length] + '">&#9679;</span> <span class="k">candidate ' + (i+1) + '</span> reprojects 4th point at <span class="hi">' + (isFinite(c.err) ? c.err.toFixed(1) + ' px' : 'off-frame') + '</span>' + (c === best ? ' <span class="hi">&larr; winner</span>' : '') + '</div>';
+        }).join('') +
+        (best ? '<div><span class="hi">The 4th correspondence picks the physical pose</span> <span style="opacity:.6">— exactly the same disambiguation pattern as H&#8217;s 2 and E&#8217;s 4 candidates.</span></div>' : '<div><span class="hi">No valid distance triplet at this geometry — slide the azimuth.</span></div>');
+    }
+    azEl.addEventListener('input', update);
+    update();
   })();
 
   // ---------- Step 6: PnP + RANSAC demo ----------
   (function(){
     var div = document.getElementById('s6-plot3d');
-    var noiseEl = document.getElementById('s6-noise'), outEl = document.getElementById('s6-out');
+    var canvas = document.getElementById('s6-canvas'), imgCtx = canvas ? canvas.getContext('2d') : null;
+    var IW = canvas ? canvas.width : 0, IH = canvas ? canvas.height : 0;
+    var noiseEl = document.getElementById('s6-noise'), outEl = document.getElementById('s6-out'), tauEl = document.getElementById('s6-tau');
     var base = trueObs();
     var obs = null, outlierMask = null;
 
@@ -594,7 +787,22 @@ permalink: /multi-view-geometry-pnp.html
       });
       document.getElementById('s6-noiseval').textContent = parseFloat(noiseEl.value).toFixed(1) + ' px';
       document.getElementById('s6-outval').textContent = (parseFloat(outEl.value)*100).toFixed(0) + '%';
+      document.getElementById('s6-tauval').textContent = tauEl.value + ' px';
+      drawImage(null);
       render(null);
+    }
+
+    function drawImage(inliers){
+      if (!imgCtx) return;
+      imgCtx.clearRect(0,0,IW,IH);
+      imgCtx.fillStyle = 'rgba(0,0,0,0.06)'; imgCtx.fillRect(0,0,IW,IH);
+      obs.forEach(function(o, i){
+        var col = '#8a8a8a';
+        if (outlierMask[i]) col = '#e08a1e'; // injected outlier draw
+        if (inliers) col = inliers.indexOf(i) >= 0 ? '#2f9e44' : COLOR_ACCENT2;
+        imgCtx.fillStyle = col;
+        imgCtx.beginPath(); imgCtx.arc(IW/2+o[0], IH/2+o[1], 4, 0, 7); imgCtx.fill();
+      });
     }
 
     function countInliers(cam, thresh){
@@ -610,8 +818,9 @@ permalink: /multi-view-geometry-pnp.html
 
     function runRansac(){
       var n = POINTS3D.length;
+      var thresh = parseFloat(tauEl.value);
       var camNaive = dltResection(K, POINTS3D, obs);
-      var bestInliers = [], iters = 250, sampleSize = 6, thresh = 6;
+      var bestInliers = [], iters = 250, sampleSize = 6;
       for (var it=0; it<iters; it++){
         var idxs = [];
         while (idxs.length < sampleSize){
@@ -629,7 +838,7 @@ permalink: /multi-view-geometry-pnp.html
       var refitObs = bestInliers.map(function(i){ return obs[i]; });
       var camRansac = bestInliers.length >= 6 ? dltResection(K, refitPts, refitObs) : camNaive;
       camRansac = refinePoseGN(K, refitPts.length ? refitPts : POINTS3D, refitObs.length ? refitObs : obs, camRansac, 10);
-      return { camNaive: camNaive, camRansac: camRansac, inliers: bestInliers, iters: iters };
+      return { camNaive: camNaive, camRansac: camRansac, inliers: bestInliers, iters: iters, thresh: thresh };
     }
 
     function render(result){
@@ -643,6 +852,7 @@ permalink: /multi-view-geometry-pnp.html
         traces.push(cameraFrustumTrace(result.camRansac, COLOR_ACCENT2), cameraCenterTrace(result.camRansac, COLOR_ACCENT2));
       }
       Plotly.react(div, traces, baseLayout(), { displayModeBar:false, responsive:true });
+      drawImage(result ? result.inliers : null);
 
       if (!result){
         document.getElementById('s6-readout').innerHTML = '<div class="k">Click "Run RANSAC" to resect.</div>';
@@ -650,15 +860,16 @@ permalink: /multi-view-geometry-pnp.html
       }
       var eNaive = poseErrors(TRUE_CAM, result.camNaive), eRansac = poseErrors(TRUE_CAM, result.camRansac);
       document.getElementById('s6-readout').innerHTML =
-        '<div><span class="k">RANSAC</span> ' + result.iters + ' samples of 6, best inlier set <span class="hi">' + result.inliers.length + ' / ' + POINTS3D.length + '</span></div>' +
+        '<div><span class="k">RANSAC</span> ' + result.iters + ' samples of 6, &#964; = ' + result.thresh.toFixed(0) + ' px, best inlier set <span class="hi">' + result.inliers.length + ' / ' + POINTS3D.length + '</span></div>' +
         '<div><span class="k">naive DLT (all points)</span> rotation err <span class="hi">' + eNaive.rotDeg.toFixed(2) + '&deg;</span>, translation err <span class="hi">' + eNaive.transErr.toFixed(3) + '</span></div>' +
         '<div><span class="k">PnP + RANSAC (refined)</span> rotation err <span class="hi">' + eRansac.rotDeg.toFixed(2) + '&deg;</span>, translation err <span class="hi">' + eRansac.transErr.toFixed(3) + '</span></div>';
     }
 
     document.getElementById('s6-resample').addEventListener('click', resample);
     document.getElementById('s6-run').addEventListener('click', function(){ render(runRansac()); });
-    noiseEl.addEventListener('input', function(){ document.getElementById('s6-noiseval').textContent = parseFloat(noiseEl.value).toFixed(1) + ' px'; });
-    outEl.addEventListener('input', function(){ document.getElementById('s6-outval').textContent = (parseFloat(outEl.value)*100).toFixed(0) + '%'; });
+    noiseEl.addEventListener('input', resample);
+    outEl.addEventListener('input', resample);
+    tauEl.addEventListener('input', function(){ document.getElementById('s6-tauval').textContent = tauEl.value + ' px'; });
     resample();
   })();
 

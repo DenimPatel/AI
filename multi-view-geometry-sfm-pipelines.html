@@ -136,6 +136,17 @@ permalink: /multi-view-geometry-sfm-pipelines.html
     <div class="mvg-math">inlier count(i, j) ≥ τ  &nbsp;⟹&nbsp;  keep the pair (i, j) as a real, geometrically-confirmed edge</div>
     <p>This is the step that turns "these two images probably show the same place" into "these two images are related by an actual rigid geometric transform, and here is exactly which matches to trust." The surviving pairs and their inlier correspondences are the only raw material the rest of the pipeline touches — everything below assumes matches have already been verified this way.</p>
     <div class="mvg-warn">⚠️ <span>In real COLMAP-style systems this verification also has to guard against <em>pure rotation</em> or <em>degenerate-planar</em> pairs slipping through as if they were general 3D structure — exactly the epipolar-geometry degeneracies from Part 3. Those pairs aren't discarded outright (a homography fit still confirms they overlap), but they're flagged as unsuitable for the next step.</span></div>
+    <div class="mvg-goal">🎯 <b>Learning goal:</b> the view graph is the map the whole pipeline navigates. Every image pair either survives geometric verification (solid teal edge, thickness ∝ inlier count) or is rejected (faint gray dashed). Drag the verification threshold up and watch edges drop out — past the point where the graph splits into disconnected components, no single reconstruction is even possible, which is exactly why Steps 2&ndash;3 are graph problems.</div>
+    <div class="mvg-demo">
+      <div class="mvg-canvas-wrap" style="flex-basis:100%;">
+        <canvas id="s1-vg" width="720" height="300" style="width:100%; max-width:720px; height:auto; display:block; background:var(--color-neutral-100); border-radius:var(--radius-sm);"></canvas>
+      </div>
+      <div class="mvg-controls">
+        <div class="mvg-field"><label>Verification threshold: min inliers to accept a pair <span class="val" id="s1-vgval"></span></label><input type="range" id="s1-vgthresh" min="5" max="45" step="1" value="18"></div>
+        <div class="mvg-btnrow"><button id="s1-vgnew">New random overlap pattern</button></div>
+        <div class="mvg-readout" id="s1-vgreadout"></div>
+      </div>
+    </div>
   </section>
 
   <section class="mvg-step" id="seedpair">
@@ -198,6 +209,28 @@ permalink: /multi-view-geometry-sfm-pipelines.html
     <p>The incremental loop's core weakness is baked into its structure: every registration step only ever corrects the image and points it's currently touching.</p>
     <p><strong>Drift.</strong> Each PnP solve and each local BA pass has some small residual error. Over a long chain of hundreds or thousands of images, those small errors don't cancel — they accumulate, and the reconstruction can slowly curve away from the true camera path even while every individual step looked fine in isolation.</p>
     <p><strong>Broken loops.</strong> Walk a camera around a building and eventually it comes back to where it started. If drift has accumulated along the way, the incremental reconstruction's "return" doesn't line up with its "start" — the loop doesn't close, leaving a visible seam. Fixing this needs either periodic global BA catching up (expensive, only a partial fix) or explicit <strong>loop-closure detection</strong> that recognizes "this new image is actually revisiting an old one" and adds that constraint directly — the same problem the <a href="{{ '/multi-view-geometry-beyond.html' | relative_url }}">SLAM literature (Part 12)</a> deals with online, in real time.</p>
+    <div class="mvg-goal">&#127919; <b>Learning goal:</b> register 12 cameras one at a time around a physical loop, using only noisy relative-pose "odometry" — exactly the incremental loop above, in plan view. Drift accumulates every step; the walk never ends where it started. Then trigger loop-closure detection: the revisit adds one constraint connecting the last camera back to the first, and a pose-graph relaxation redistributes the accumulated error around the whole loop instead of letting it pile up at the seam. Watch the drift-vs-camera-index curve collapse.</div>
+    <div class="mvg-demo">
+      <div class="mvg-canvas-wrap" style="flex-basis:100%;">
+        <div style="display:flex; gap:14px; flex-wrap:wrap;">
+          <div style="flex:1 1 320px;">
+            <canvas id="s5-drift" width="480" height="380" style="width:100%; height:auto; display:block; background:var(--color-neutral-100); border-radius:var(--radius-sm);"></canvas>
+          </div>
+          <div style="flex:1 1 260px;">
+            <canvas id="s5-driftcurve" width="420" height="380" style="width:100%; height:auto; display:block; background:var(--color-neutral-100); border-radius:var(--radius-sm);"></canvas>
+          </div>
+        </div>
+        <p class="mvg-canvas-hint">Left: top-down camera path. Black dashed = true circle; red = incremental registration with noisy odometry (the seam at the start/end is the broken loop); teal = after loop closure + pose-graph relaxation. Right: per-camera registration error vs. camera index, before (red) and after (teal) closure.</p>
+      </div>
+      <div class="mvg-controls">
+        <div class="mvg-field"><label>Odometry noise per step <span class="val" id="s5-dnoiseval"></span></label><input type="range" id="s5-dnoise" min="0" max="0.15" step="0.005" value="0.04"></div>
+        <div class="mvg-btnrow">
+          <button id="s5-drun" class="mvg-primary">Re-run incremental walk</button>
+          <button id="s5-dclose">Detect loop + relax pose graph</button>
+        </div>
+        <div class="mvg-readout" id="s5-dreadout"></div>
+      </div>
+    </div>
     <p><strong>Degenerate seed pairs.</strong> Since every later camera and point is built relative to the seed pair's frame and scale, a seed pair chosen with too narrow a baseline (Step 2 above) doesn't just produce a bad first triangulation — it can leave the whole reconstruction poorly scaled and numerically unstable from the very first image onward, with no later step able to fully undo it.</p>
   </section>
 
@@ -666,7 +699,24 @@ permalink: /multi-view-geometry-sfm-pipelines.html
     function render(){
       var traces = [ pointTrace3d(state.scene.pts, COLOR_DIVIDER, 4) ];
       var reconIdx = Object.keys(state.reconstructed).map(Number);
-      if (reconIdx.length) traces.push(pointTrace3d(reconIdx.map(function(i){return state.reconstructed[i];}), COLOR_ACCENT2, 6));
+      if (reconIdx.length){
+        // per-point mean reprojection residual -> green-to-red coloring on the reconstructed cloud
+        var ptResid = reconIdx.map(function(pi){
+          var s = 0, n = 0;
+          state.registered.forEach(function(c){
+            if (!state.obs[c][pi]) return;
+            var r = reprojResidual(poseOf(c), state.reconstructed[pi], state.obs[c][pi]);
+            s += Math.hypot(r[0], r[1]); n++;
+          });
+          return n ? s/n : 0;
+        });
+        traces.push({ type:'scatter3d', mode:'markers',
+          x: reconIdx.map(function(i){return state.reconstructed[i][0];}),
+          y: reconIdx.map(function(i){return state.reconstructed[i][1];}),
+          z: reconIdx.map(function(i){return state.reconstructed[i][2];}),
+          marker:{ size:6, color: ptResid, colorscale:'RdYlGn', reversescale:true, showscale:false, line:{width:1, color:'#fff'} },
+          hoverinfo:'skip' });
+      }
       var unregC = [], regC = [];
       for (var c=0;c<NCAMS;c++){ (state.regPose[c] ? regC : unregC).push(state.scene.cams[c].C); }
       if (unregC.length) traces.push(camTrace3d(unregC, '#9b9797'));
@@ -674,11 +724,26 @@ permalink: /multi-view-geometry-sfm-pipelines.html
       Plotly.react(plotDiv, traces, layout3d([-9,9]), { displayModeBar:false, responsive:true });
 
       var err = meanReprojError();
+      var worst = [];
+      if (reconIdx.length){
+        var residList = reconIdx.map(function(pi){
+          var s = 0, n = 0;
+          state.registered.forEach(function(c){
+            if (!state.obs[c][pi]) return;
+            var r = reprojResidual(poseOf(c), state.reconstructed[pi], state.obs[c][pi]);
+            s += Math.hypot(r[0], r[1]); n++;
+          });
+          return { pi: pi, r: n ? s/n : 0 };
+        });
+        residList.sort(function(a,b){ return b.r - a.r; });
+        worst = residList.slice(0,3);
+      }
       document.getElementById('s1-readout').innerHTML =
         '<div><span class="k">phase</span> = <span class="hi">' + state.phase + '</span></div>' +
         '<div><span class="k">cameras registered</span> = ' + state.registered.length + ' / ' + NCAMS + '</div>' +
         '<div><span class="k">points reconstructed</span> = ' + reconIdx.length + ' / ' + NPTS + '</div>' +
-        '<div><span class="k">mean reprojection error</span> = <span class="hi">' + err.toFixed(3) + ' px</span></div>';
+        '<div><span class="k">mean reprojection error</span> = <span class="hi">' + err.toFixed(3) + ' px</span></div>' +
+        (worst.length ? '<div><span class="k">worst points by residual</span> = ' + worst.map(function(w){ return '#' + w.pi + ' (' + w.r.toFixed(2) + ' px)'; }).join(', ') + ' <span style="opacity:.6">(cloud colored green&rarr;red by residual)</span></div>' : '');
       document.getElementById('s1-log').innerHTML = state.log.map(function(l){ return '<div>· ' + l + '</div>'; }).join('');
     }
 
@@ -823,6 +888,253 @@ permalink: /multi-view-geometry-sfm-pipelines.html
 
     st = genScene();
     render();
+  })();
+
+  // ---------- view-graph diagram (Step 1) ----------
+  (function(){
+    var canvas = document.getElementById('s1-vg');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var W = canvas.width, H = canvas.height;
+    var threshEl = document.getElementById('s1-vgthresh');
+    var newBtn = document.getElementById('s1-vgnew');
+    var NIMG = 9;
+
+    var inliers = [];
+    function genInliers(){
+      inliers = [];
+      for (var i=0;i<NIMG;i++) for (var j=i+1;j<NIMG;j++){
+        // neighbors on the ring share many matches; distant pairs share few or none
+        var ringDist = Math.min(j-i, i+NIMG-j);
+        var base = Math.max(0, 52 - ringDist*16 + (Math.random()-0.5)*18);
+        inliers.push({ i:i, j:j, n: Math.max(0, Math.round(base)) });
+      }
+    }
+    function nodePos(i){
+      var ang = -Math.PI/2 + i*2*Math.PI/NIMG;
+      return [ W/2 + Math.cos(ang)*(W*0.36), H/2 + Math.sin(ang)*(H*0.34) ];
+    }
+    function components(accepted){
+      var seen = {}, comp = 0;
+      var adj = {};
+      accepted.forEach(function(e){ (adj[e.i]=adj[e.i]||[]).push(e.j); (adj[e.j]=adj[e.j]||[]).push(e.i); });
+      for (var s=0;s<NIMG;s++){
+        if (seen[s]) continue;
+        comp++;
+        var stack=[s];
+        while (stack.length){
+          var u = stack.pop();
+          if (seen[u]) continue;
+          seen[u]=1;
+          (adj[u]||[]).forEach(function(v){ if (!seen[v]) stack.push(v); });
+        }
+      }
+      return comp;
+    }
+    function draw(){
+      var thresh = parseInt(threshEl.value, 10);
+      ctx.clearRect(0,0,W,H);
+      ctx.fillStyle = 'rgba(0,0,0,0.03)'; ctx.fillRect(0,0,W,H);
+      var accepted = inliers.filter(function(e){ return e.n >= thresh; });
+      var maxN = Math.max.apply(null, inliers.map(function(e){ return e.n; }).concat([1]));
+      inliers.forEach(function(e){
+        var a = nodePos(e.i), b = nodePos(e.j);
+        var ok = e.n >= thresh;
+        ctx.strokeStyle = ok ? COLOR_ACCENT : 'rgba(32,30,29,0.22)';
+        ctx.lineWidth = ok ? 1 + 5*e.n/maxN : 1;
+        ctx.globalAlpha = ok ? 0.85 : 0.6;
+        if (!ok) ctx.setLineDash([4,4]);
+        ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); ctx.stroke();
+        ctx.setLineDash([]); ctx.globalAlpha = 1;
+        if (ok){
+          ctx.fillStyle = COLOR_ACCENT; ctx.font = '9px monospace'; ctx.globalAlpha = 0.75;
+          ctx.fillText(String(e.n), (a[0]+b[0])/2+3, (a[1]+b[1])/2-3);
+          ctx.globalAlpha = 1;
+        }
+      });
+      for (var i=0;i<NIMG;i++){
+        var p = nodePos(i);
+        ctx.fillStyle = COLOR_TEXT;
+        ctx.beginPath(); ctx.arc(p[0], p[1], 15, 0, 7); ctx.fill();
+        ctx.fillStyle = '#fff'; ctx.font = 'bold 11px monospace';
+        ctx.fillText('img' + i, p[0]-12, p[1]+4);
+      }
+      var comp = components(accepted);
+      document.getElementById('s1-vgval').textContent = thresh;
+      document.getElementById('s1-vgreadout').innerHTML =
+        '<div><span class="k">verified pairs</span> = <span class="hi">' + accepted.length + ' / ' + inliers.length + '</span></div>' +
+        '<div><span class="k">connected components</span> = <span class="hi">' + comp + '</span>' +
+        (comp > 1 ? ' <span class="hi" style="color:#c23b3b">&mdash; graph split: no single reconstruction can cover all images</span>' : ' <span class="hi">&mdash; one reconstruction can span every image</span>') + '</div>';
+    }
+    threshEl.addEventListener('input', draw);
+    newBtn.addEventListener('click', function(){ genInliers(); draw(); });
+    genInliers();
+    draw();
+  })();
+
+  // ---------- drift + loop closure demo (Step 5) ----------
+  (function(){
+    var canvas = document.getElementById('s5-drift');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var curveCanvas = document.getElementById('s5-driftcurve'), curveCtx = curveCanvas.getContext('2d');
+    var W = canvas.width, H = canvas.height;
+    var CW = curveCanvas.width, CH = curveCanvas.height;
+    var noiseEl = document.getElementById('s5-dnoise');
+    var NCAM = 12, RADIUS = 3.2;
+
+    var truth = [], drifted = [], corrected = null, odomNoise = 0.04, odomEdges = [];
+
+    function makeTruth(){
+      truth = [];
+      for (var i=0;i<NCAM;i++){
+        var a = i*2*Math.PI/NCAM;
+        truth.push({ x: RADIUS*Math.cos(a), y: RADIUS*Math.sin(a), th: a + Math.PI/2 });
+      }
+    }
+    // 2D odometry: relative transform of node j in node i's frame
+    function relPose(a, b){
+      var dx = b.x-a.x, dy = b.y-a.y;
+      var c = Math.cos(-a.th), s = Math.sin(-a.th);
+      return { x: c*dx - s*dy, y: s*dx + c*dy, th: b.th - a.th };
+    }
+    function compose(a, rel){
+      var c = Math.cos(a.th), s = Math.sin(a.th);
+      return { x: a.x + c*rel.x - s*rel.y, y: a.y + s*rel.x + c*rel.y, th: a.th + rel.th };
+    }
+    function walkLoop(){
+      drifted = [{ x: truth[0].x, y: truth[0].y, th: truth[0].th }];
+      odomEdges = [];
+      for (var i=1;i<NCAM;i++){
+        var rel = relPose(truth[i-1], truth[i]);
+        rel.x += (Math.random()-0.5)*2*odomNoise;
+        rel.y += (Math.random()-0.5)*2*odomNoise;
+        rel.th += (Math.random()-0.5)*2*odomNoise*0.5;
+        odomEdges.push(rel);
+        drifted.push(compose(drifted[i-1], rel));
+      }
+      corrected = null;
+    }
+    // Pose-graph relaxation in SE(2): Gauss-Seidel over edges (sequential odom + loop closure).
+    // Each edge's residual is measured in the tail node's local frame; corrections are rotated
+    // back to world and split (with damping) between the two endpoints — the same structure as
+    // real pose-graph optimizers, minus the sparse linear algebra.
+    function relaxLoop(){
+      var nodes = drifted.map(function(p){ return { x:p.x, y:p.y, th:p.th }; });
+      var lc = relPose(truth[NCAM-1], truth[0]); // loop-closure measurement (the revisit, treated as exact)
+      var edges = [];
+      for (var i=0;i<NCAM-1;i++) edges.push({ a:i, b:i+1, z: odomEdges[i], w: 1 });
+      edges.push({ a:NCAM-1, b:0, z: lc, w: 3 }); // loop closure, more heavily weighted
+      for (var it=0; it<300; it++){
+        edges.forEach(function(e){
+          var A = nodes[e.a], B = nodes[e.b];
+          // current relative pose of B in A's frame vs the measured one
+          var cur = relPose(A, B);
+          var ex = e.z.x - cur.x, ey = e.z.y - cur.y;
+          var eth = e.z.th - cur.th;
+          while (eth > Math.PI) eth -= 2*Math.PI;
+          while (eth < -Math.PI) eth += 2*Math.PI;
+          // rotate the translational residual into world frame, damp, split
+          var ca = Math.cos(A.th), sa = Math.sin(A.th);
+          var exw = ca*ex - sa*ey, eyw = sa*ex + ca*ey;
+          var kb = 0.5 / (1 + e.w);   // moving B toward the measurement
+          var ka = 0.5 * e.w/(1 + e.w); // moving A oppositely
+          B.x += exw*kb; B.y += eyw*kb; B.th += eth*kb;
+          A.x -= exw*ka; A.y -= eyw*ka; A.th -= eth*ka;
+        });
+      }
+      corrected = nodes;
+    }
+    function toPx(p){
+      var sc = Math.min(W, H)*0.38 / (RADIUS*1.5);
+      return [ W/2 + p.x*sc, H/2 - p.y*sc ];
+    }
+    function pathTrace(pts, color, lw, dash){
+      ctx.strokeStyle = color; ctx.lineWidth = lw;
+      if (dash) ctx.setLineDash(dash);
+      ctx.beginPath();
+      pts.forEach(function(p,i){ var q = toPx(p); if (i===0) ctx.moveTo(q[0],q[1]); else ctx.lineTo(q[0],q[1]); });
+      ctx.stroke();
+      ctx.setLineDash([]);
+      pts.forEach(function(p){
+        var q = toPx(p);
+        ctx.save(); ctx.translate(q[0], q[1]); ctx.rotate(-p.th);
+        ctx.strokeStyle = color; ctx.lineWidth = 1.6;
+        ctx.beginPath(); ctx.moveTo(-4,-3); ctx.lineTo(6,0); ctx.lineTo(-4,3); ctx.closePath(); ctx.stroke();
+        ctx.restore();
+      });
+    }
+    function drawPath(){
+      ctx.clearRect(0,0,W,H);
+      ctx.fillStyle = 'rgba(0,0,0,0.03)'; ctx.fillRect(0,0,W,H);
+      pathTrace(truth.concat([truth[0]]), COLOR_TEXT, 1.5, [5,4]);
+      pathTrace(drifted, '#c23b3b', 2);
+      if (corrected) pathTrace(corrected, COLOR_ACCENT, 2.2);
+      // seam marker at the start
+      var q = toPx(truth[0]);
+      ctx.fillStyle = COLOR_TEXT;
+      ctx.beginPath(); ctx.arc(q[0], q[1], 4, 0, 7); ctx.fill();
+    }
+    function drawCurve(){
+      curveCtx.clearRect(0,0,CW,CH);
+      curveCtx.fillStyle = 'rgba(0,0,0,0.03)'; curveCtx.fillRect(0,0,CW,CH);
+      var padL = 44, padB = 26, padT = 14, padR = 12;
+      function errAt(nodes){
+        return nodes.map(function(p, i){
+          var dx = p.x - truth[i].x, dy = p.y - truth[i].y;
+          return Math.hypot(dx, dy);
+        });
+      }
+      var eDrift = errAt(drifted);
+      var eCorr = corrected ? errAt(corrected) : null;
+      var all = eCorr ? eDrift.concat(eCorr) : eDrift.slice();
+      var maxE = Math.max(1e-6, Math.max.apply(null, all));
+      function X(i){ return padL + (i/(NCAM-1))*(CW-padL-padR); }
+      function Y(v){ return CH-padB - (v/maxE)*(CH-padT-padB); }
+      curveCtx.strokeStyle = COLOR_DIVIDER; curveCtx.lineWidth = 1; curveCtx.font = '10px monospace'; curveCtx.fillStyle = COLOR_TEXT;
+      for (var g=0; g<=3; g++){
+        var gy = padT + (g/3)*(CH-padT-padB);
+        curveCtx.beginPath(); curveCtx.moveTo(padL, gy); curveCtx.lineTo(CW-padR, gy); curveCtx.stroke();
+        curveCtx.globalAlpha = 0.7; curveCtx.fillText((maxE*(1-g/3)).toFixed(2), 4, gy+3); curveCtx.globalAlpha = 1;
+      }
+      function series(vals, color){
+        curveCtx.strokeStyle = color; curveCtx.lineWidth = 2.2;
+        curveCtx.beginPath();
+        vals.forEach(function(v,i){ if (i===0) curveCtx.moveTo(X(i), Y(v)); else curveCtx.lineTo(X(i), Y(v)); });
+        curveCtx.stroke();
+      }
+      series(eDrift, '#c23b3b');
+      if (eCorr) series(eCorr, COLOR_ACCENT);
+      curveCtx.fillStyle = '#c23b3b'; curveCtx.fillText('drift per camera (red)', padL+8, padT+12);
+      if (eCorr){ curveCtx.fillStyle = COLOR_ACCENT; curveCtx.fillText('after loop closure (teal)', padL+8, padT+26); }
+      curveCtx.fillStyle = COLOR_TEXT; curveCtx.fillText('camera index', CW/2-30, CH-6);
+    }
+    function updateReadout(){
+      var trueGap = Math.hypot(truth[NCAM-1].x - truth[0].x, truth[NCAM-1].y - truth[0].y);
+      var gap = Math.hypot(drifted[NCAM-1].x - drifted[0].x, drifted[NCAM-1].y - drifted[0].y);
+      var maxDrift = Math.max.apply(null, drifted.map(function(p,i){ return Math.hypot(p.x-truth[i].x, p.y-truth[i].y); }));
+      document.getElementById('s5-dnoiseval').textContent = odomNoise.toFixed(3);
+      document.getElementById('s5-dreadout').innerHTML =
+        '<div><span class="k">loop gap, incremental</span> = <span class="hi" style="color:#c23b3b">' + gap.toFixed(2) + ' units</span> <span class="k">(true edge length ' + trueGap.toFixed(2) + ' &mdash; the gap error is the seam)</span></div>' +
+        '<div><span class="k">max per-camera registration error</span> = <span class="hi" style="color:#c23b3b">' + maxDrift.toFixed(2) + ' units</span></div>' +
+        (corrected
+          ? (function(){
+              var gapC = Math.hypot(corrected[NCAM-1].x - corrected[0].x, corrected[NCAM-1].y - corrected[0].y);
+              var maxC = Math.max.apply(null, corrected.map(function(p,i){ return Math.hypot(p.x-truth[i].x, p.y-truth[i].y); }));
+              return '<div><span class="hi">after pose-graph relaxation</span>: loop gap = <span class="hi">' + gapC.toFixed(2) + ' units</span>, max per-camera error = <span class="hi">' + maxC.toFixed(2) + ' units</span> <span style="opacity:.6">(the loop constraint absorbs the drift instead of the seam)</span></div>';
+            })()
+          : '<div style="opacity:.65">Click &ldquo;Detect loop + relax pose graph&rdquo; to add the revisit constraint and redistribute the drift.</div>');
+    }
+    function runWalk(){
+      odomNoise = parseFloat(noiseEl.value);
+      walkLoop();
+      drawPath(); drawCurve(); updateReadout();
+    }
+    document.getElementById('s5-drun').addEventListener('click', runWalk);
+    document.getElementById('s5-dclose').addEventListener('click', function(){ relaxLoop(); drawPath(); drawCurve(); updateReadout(); });
+    noiseEl.addEventListener('input', runWalk);
+    makeTruth();
+    runWalk();
   })();
 
 })();

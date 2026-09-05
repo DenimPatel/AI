@@ -202,7 +202,11 @@ permalink: /multi-view-geometry.html
     <div class="mvg-demo">
       <div class="mvg-canvas-wrap">
         <div id="s3-plot3d" class="mvg-plot3d"></div>
-        <p class="mvg-canvas-hint">Drag to orbit. The dashed line is the camera's ray through one fixed pixel.</p>
+        <p class="mvg-canvas-hint">Drag to orbit. The dashed line is the camera's ray through one fixed pixel; faint dots mark points at different depths along it.</p>
+      </div>
+      <div class="mvg-canvas-wrap">
+        <canvas id="s3-canvas" width="420" height="320"></canvas>
+        <p class="mvg-canvas-hint">The image plane: every point on that ray lands on the same pixel. The slider moves the 3D point; this image never changes.</p>
       </div>
       <div class="mvg-controls">
         <div class="mvg-field"><label>Depth along the ray <span class="val" id="s3-depthval"></span></label><input type="range" id="s3-depth" min="2" max="12" step="0.05" value="5"></div>
@@ -221,10 +225,12 @@ permalink: /multi-view-geometry.html
     <div class="mvg-math">f<sub>x</sub> (px) = f (mm) / p (mm/px) = f (mm) · image_width (px) / sensor_width (mm)</div>
     <p><strong>Grounding it in a real number.</strong> A typical modern phone's main camera is quoted as "27mm equivalent" — a focal length normalized to a 36mm-wide full-frame sensor, so its FOV is <code>2·atan(36/(2·27)) = 2·atan(0.667) ≈ 67°</code> horizontally, regardless of the phone's actual (much smaller) sensor. Suppose the real sensor is 4000 pixels wide with a 1.4µm pixel pitch — a physical width of <code>4000 · 0.0014mm ≈ 5.6mm</code>. Solving the FOV formula backward for the real focal length gives <code>f = (w/2) / tan(FOV/2) = 2.8 / tan(33.5°) ≈ 4.2mm</code>, and in pixels that's <code>f<sub>x</sub> = 4.2 / 0.0014 ≈ 3000px</code>. So when a paper or a calibration file reports "<var>f<sub>x</sub></var> ≈ 3000" for a 4000px-wide phone photo, that's a completely ordinary, slightly-wide-of-normal phone lens — not a special number. Compare that to Step 2's slider range (150–1200px on a 480px-wide canvas): a canvas that narrow needs proportionally smaller pixel focal lengths to show the same field of view, which is why <code>f<sub>x</sub>=1200</code> there already looks like a telephoto zoom.</p>
     <div class="mvg-demo">
-      <div class="mvg-canvas-wrap" style="flex-basis:100%;">
-        <div class="mvg-readout" id="s5-readout"></div>
+      <div class="mvg-canvas-wrap">
+        <canvas id="s5-canvas" width="480" height="320"></canvas>
+        <p class="mvg-canvas-hint">Side view: rays through the sensor edges define the FOV wedge. The same trigonometry, drawn to scale from the slider values.</p>
       </div>
-      <div class="mvg-controls" style="flex-basis:100%;">
+      <div class="mvg-controls">
+        <div class="mvg-readout" id="s5-readout"></div>
         <div class="mvg-field"><label>Focal length f (mm) <span class="val" id="s5-fval"></span></label><input type="range" id="s5-f" min="1" max="50" step="0.1" value="4.2"></div>
         <div class="mvg-field"><label>Sensor width (mm) <span class="val" id="s5-wval"></span></label><input type="range" id="s5-w" min="2" max="36" step="0.1" value="5.6"></div>
         <div class="mvg-field"><label>Image width (px) <span class="val" id="s5-pxval"></span></label><input type="range" id="s5-px" min="480" max="8000" step="10" value="4000"></div>
@@ -281,6 +287,10 @@ permalink: /multi-view-geometry.html
       <div class="mvg-canvas-wrap">
         <canvas id="s6-canvas" width="480" height="360"></canvas>
         <p class="mvg-canvas-hint">Solid: distorted (what the sensor sees). Dashed, when toggled: recovered via iterative undistortion.</p>
+      </div>
+      <div class="mvg-canvas-wrap">
+        <canvas id="s6-cube" width="480" height="360"></canvas>
+        <p class="mvg-canvas-hint">The same effect on a real scene: the cube projected with the sliders&#8217; distortion. Straight 3D edges (gray dashed = pinhole truth) bend on the sensor — this is why Parts 3&ndash;6 require undistorted points.</p>
       </div>
       <div class="mvg-controls">
         <div class="mvg-field"><label>k&#8321; (radial) <span class="val" id="s6-k1val"></span></label><input type="range" id="s6-k1" min="-0.5" max="0.5" step="0.005" value="-0.18"></div>
@@ -553,17 +563,55 @@ permalink: /multi-view-geometry.html
     var rayFar = pointAtDepth(14);
     var rayTrace = { type:'scatter3d', mode:'lines', x:[cam.C[0],rayFar[0]], y:[cam.C[1],rayFar[1]], z:[cam.C[2],rayFar[2]],
       line:{ color: COLOR_ACCENT, width:2, dash:'dash' }, hoverinfo:'skip' };
-    var data = [ cameraFrustumTrace(cam, COLOR_ACCENT), cameraCenterTrace(cam, COLOR_ACCENT2), rayTrace,
+    // faint sample markers along the ray at fixed depths — all of these project to the same pixel
+    var sampleDepthList = [2,3.5,5,7,9,12];
+    var samplePts = sampleDepthList.map(pointAtDepth);
+    var samplesTrace = { type:'scatter3d', mode:'markers',
+      x:samplePts.map(function(p){return p[0];}), y:samplePts.map(function(p){return p[1];}), z:samplePts.map(function(p){return p[2];}),
+      marker:{ size:3, color: COLOR_ACCENT, opacity:0.45 }, hoverinfo:'skip' };
+    var data = [ cameraFrustumTrace(cam, COLOR_ACCENT), cameraCenterTrace(cam, COLOR_ACCENT2), rayTrace, samplesTrace,
       { type:'scatter3d', mode:'markers', name:'point', x:[0], y:[0], z:[0], marker:{ size:7, color: COLOR_TEXT }, hoverinfo:'skip' } ];
     Plotly.newPlot(div, data, baseLayout(), { displayModeBar:false, responsive:true });
     var ptTraceIdx = data.length - 1;
 
     var slider = document.getElementById('s3-depth');
+    var imgCanvas = document.getElementById('s3-canvas'), imgCtx = imgCanvas ? imgCanvas.getContext('2d') : null;
+    var IW = imgCanvas ? imgCanvas.width : 0, IH = imgCanvas ? imgCanvas.height : 0;
+    function drawImagePlane(p){
+      if (!imgCtx) return;
+      imgCtx.clearRect(0,0,IW,IH);
+      imgCtx.fillStyle = 'rgba(0,0,0,0.05)'; imgCtx.fillRect(0,0,IW,IH);
+      // sensor frame border
+      imgCtx.strokeStyle = COLOR_DIVIDER; imgCtx.lineWidth = 1.5;
+      imgCtx.strokeRect(14, 14, IW-28, IH-28);
+      var cx = IW/2, cy = IH/2;
+      // principal point
+      imgCtx.fillStyle = COLOR_ACCENT2;
+      imgCtx.beginPath(); imgCtx.arc(cx, cy, 3, 0, 7); imgCtx.fill();
+      imgCtx.fillStyle = COLOR_TEXT; imgCtx.font = '11px monospace'; imgCtx.globalAlpha = 0.6;
+      imgCtx.fillText('principal point', cx + 7, cy + 14);
+      imgCtx.globalAlpha = 1;
+      // the fixed pixel: projected point (K has cx=cy=0, so offset from center by fixedPixel)
+      var px = cx + (p ? p.u : fixedPixel[0]), py = cy + (p ? p.v : fixedPixel[1]);
+      // ring showing where every depth lands — draw the projected pixels of all sample depths (they coincide)
+      imgCtx.strokeStyle = COLOR_ACCENT; imgCtx.lineWidth = 2;
+      sampleDepthList.forEach(function(d){
+        var q = MVG.project(K, cam, pointAtDepth(d));
+        if (!q) return;
+        imgCtx.beginPath(); imgCtx.arc(cx + q.u, cy + q.v, 6, 0, 7); imgCtx.stroke();
+      });
+      // current point's pixel: filled marker
+      imgCtx.fillStyle = COLOR_TEXT;
+      imgCtx.beginPath(); imgCtx.arc(px, py, 5, 0, 7); imgCtx.fill();
+      imgCtx.fillStyle = COLOR_TEXT; imgCtx.font = '12px monospace';
+      imgCtx.fillText('(' + (p ? p.u.toFixed(2) : '—') + ', ' + (p ? p.v.toFixed(2) : '—') + ') px', px + 10, py - 10);
+    }
     function update(){
       var depth = parseFloat(slider.value);
       var X = pointAtDepth(depth);
       Plotly.restyle(div, { x:[[X[0]]], y:[[X[1]]], z:[[X[2]]] }, [ptTraceIdx]);
       var p = MVG.project(K, cam, X);
+      drawImagePlane(p);
       document.getElementById('s3-depthval').textContent = depth.toFixed(2);
       document.getElementById('s3-readout').innerHTML =
         '<div><span class="k">3D position</span> = <span class="hi">(' + X.map(function(v){return v.toFixed(2);}).join(', ') + ')</span></div>' +
@@ -579,6 +627,58 @@ permalink: /multi-view-geometry.html
       f: document.getElementById('s5-f'), w: document.getElementById('s5-w'), px: document.getElementById('s5-px')
     };
     if (!els.f) return;
+    var canvas = document.getElementById('s5-canvas'), ctx = canvas ? canvas.getContext('2d') : null;
+    var W = canvas ? canvas.width : 0, H = canvas ? canvas.height : 0;
+
+    function drawCone(f, w, fovRad){
+      if (!ctx) return;
+      ctx.clearRect(0,0,W,H);
+      ctx.fillStyle = 'rgba(0,0,0,0.05)'; ctx.fillRect(0,0,W,H);
+      // scale: fit both f (horizontal extent) and w/2 (vertical) with margin
+      var halfW = w/2, pad = 46;
+      var sc = Math.min((W - pad*2 - 30)/Math.max(f, 0.6), (H - pad*2)/Math.max(halfW, 0.6));
+      // pinhole near left-center; optical axis horizontal
+      var px0 = pad + 20, py0 = H/2;
+      var sx = px0 + f*sc; // sensor plane x
+      function py(mm){ return py0 - mm*sc; }
+      // FOV wedge
+      ctx.fillStyle = COLOR_ACCENT; ctx.globalAlpha = 0.12;
+      ctx.beginPath();
+      ctx.moveTo(px0, py0);
+      ctx.lineTo(sx + (W - sx - 10), py(halfW) - Math.tan(fovRad/2)*(W - sx - 10));
+      ctx.lineTo(sx + (W - sx - 10), py(-halfW) + Math.tan(fovRad/2)*(W - sx - 10));
+      ctx.closePath(); ctx.fill();
+      ctx.globalAlpha = 1;
+      // edge rays continuing past the sensor (the actual FOV extent)
+      ctx.strokeStyle = COLOR_ACCENT; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(px0, py0); ctx.lineTo(W - 10, py(halfW) - Math.tan(fovRad/2)*(W - px0 - 10)); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(px0, py0); ctx.lineTo(W - 10, py(-halfW) + Math.tan(fovRad/2)*(W - px0 - 10)); ctx.stroke();
+      // optical axis
+      ctx.strokeStyle = COLOR_TEXT; ctx.globalAlpha = 0.5; ctx.setLineDash([4,4]);
+      ctx.beginPath(); ctx.moveTo(px0, py0); ctx.lineTo(W - 10, py0); ctx.stroke();
+      ctx.setLineDash([]); ctx.globalAlpha = 1;
+      // sensor plane (vertical line of half-height w/2)
+      ctx.strokeStyle = COLOR_TEXT; ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.moveTo(sx, py(halfW)); ctx.lineTo(sx, py(-halfW)); ctx.stroke();
+      // pinhole
+      ctx.fillStyle = COLOR_ACCENT2;
+      ctx.beginPath(); ctx.arc(px0, py0, 5, 0, 7); ctx.fill();
+      // labels
+      ctx.fillStyle = COLOR_TEXT; ctx.font = '11px monospace';
+      ctx.fillText('pinhole', px0 - 8, py0 + 26);
+      ctx.fillText('sensor', sx - 16, py(halfW) - 10);
+      ctx.fillText('w = ' + w.toFixed(1) + ' mm', sx + 8, py0 - halfW*sc*0.5);
+      ctx.fillText('f = ' + f.toFixed(1) + ' mm', px0 + f*sc*0.45, py0 + 20);
+      // FOV arc label
+      ctx.fillStyle = COLOR_ACCENT; ctx.font = 'bold 12px monospace';
+      ctx.fillText('FOV = ' + (fovRad*180/Math.PI).toFixed(1) + '°', px0 + 12, py0 - 12);
+      // tick marks for the half-angle at the pinhole
+      ctx.strokeStyle = COLOR_TEXT; ctx.globalAlpha = 0.6; ctx.lineWidth = 1;
+      var r = Math.min(f, halfW/Math.tan(fovRad/2))*sc*0.35 + 18;
+      ctx.beginPath(); ctx.arc(px0, py0, r, -fovRad/2, fovRad/2); ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+
     function update(){
       var f = parseFloat(els.f.value), w = parseFloat(els.w.value), pxw = parseFloat(els.px.value);
       var fovRad = 2*Math.atan(w/(2*f));
@@ -592,6 +692,7 @@ permalink: /multi-view-geometry.html
         '<div><span class="k">pixel pitch</span> = ' + (pitch*1000).toFixed(2) + ' &micro;m/px</div>' +
         '<div><span class="k">horizontal FOV</span> = <span class="hi">' + fovDeg.toFixed(1) + '&deg;</span></div>' +
         '<div><span class="k">f<sub>x</sub> (pixels)</span> = <span class="hi">' + fpx.toFixed(0) + ' px</span></div>';
+      drawCone(f, w, fovRad);
     }
     Object.keys(els).forEach(function(k){ els[k].addEventListener('input', update); });
     update();
@@ -649,6 +750,47 @@ permalink: /multi-view-geometry.html
     var showRecovered = false;
     var toggleBtn = document.getElementById('s6-toggle');
 
+    // second canvas: the cube seen through the distorted lens
+    var cubeCanvas = document.getElementById('s6-cube'), cubeCtx = cubeCanvas ? cubeCanvas.getContext('2d') : null;
+    var CW = cubeCanvas ? cubeCanvas.width : 0, CH = cubeCanvas ? cubeCanvas.height : 0;
+    var cam6 = (typeof MVG !== 'undefined') ? MVG.orbitCamera(0.7, 0.32, 6, [0,0,0]) : null;
+    var Kc6 = { fx: 300, fy: 300, cx: CW/2, cy: CH/2 };
+    function projectDistorted(X, k1, k2, p1, p2, straight){
+      var Xc = MVG.worldToCamera(cam6, X);
+      if (Xc[2] <= 1e-6) return null;
+      var nx = Xc[0]/Xc[2], ny = Xc[1]/Xc[2];
+      var out = straight ? [nx, ny] : distort(nx, ny, k1, k2, p1, p2);
+      return { u: Kc6.fx*out[0] + Kc6.cx, v: Kc6.fy*out[1] + Kc6.cy };
+    }
+    function drawCubeDistortion(k1, k2, p1, p2){
+      if (!cubeCtx) return;
+      cubeCtx.clearRect(0,0,CW,CH);
+      cubeCtx.fillStyle = 'rgba(0,0,0,0.05)'; cubeCtx.fillRect(0,0,CW,CH);
+      // straight (pinhole truth) edges: gray dashed
+      cubeCtx.strokeStyle = COLOR_TEXT; cubeCtx.lineWidth = 1.2; cubeCtx.globalAlpha = 0.35; cubeCtx.setLineDash([4,4]);
+      CUBE_EDGES.forEach(function(e){
+        var a = projectDistorted(CUBE_VERTS[e[0]], k1,k2,p1,p2, true);
+        var b = projectDistorted(CUBE_VERTS[e[1]], k1,k2,p1,p2, true);
+        if (!a || !b) return;
+        cubeCtx.beginPath(); cubeCtx.moveTo(a.u, a.v); cubeCtx.lineTo(b.u, b.v); cubeCtx.stroke();
+      });
+      cubeCtx.setLineDash([]); cubeCtx.globalAlpha = 1;
+      // distorted edges: what the sensor actually sees
+      cubeCtx.strokeStyle = COLOR_ACCENT2; cubeCtx.lineWidth = 2.2;
+      CUBE_EDGES.forEach(function(e){
+        var a = projectDistorted(CUBE_VERTS[e[0]], k1,k2,p1,p2, false);
+        var b = projectDistorted(CUBE_VERTS[e[1]], k1,k2,p1,p2, false);
+        if (!a || !b) return;
+        cubeCtx.beginPath(); cubeCtx.moveTo(a.u, a.v); cubeCtx.lineTo(b.u, b.v); cubeCtx.stroke();
+      });
+      // principal point
+      cubeCtx.fillStyle = COLOR_ACCENT;
+      cubeCtx.beginPath(); cubeCtx.arc(Kc6.cx, Kc6.cy, 3, 0, 7); cubeCtx.fill();
+      cubeCtx.fillStyle = COLOR_TEXT; cubeCtx.font = '11px monospace'; cubeCtx.globalAlpha = 0.6;
+      cubeCtx.fillText('gray dashed: true pinhole projection', 10, CH - 10);
+      cubeCtx.globalAlpha = 1;
+    }
+
     function drawGrid(transform, color, dashed){
       ctx.strokeStyle = color; ctx.lineWidth = 1.5;
       ctx.setLineDash(dashed ? [5,4] : []);
@@ -694,6 +836,8 @@ permalink: /multi-view-geometry.html
         (showRecovered
           ? '<div><span class="k">max recovery error</span> = <span class="hi">' + maxErr.toExponential(2) + '</span> (iterative undistort converging back to straight)</div>'
           : '<div><span class="k">recovered grid</span> = hidden — click the button to invert the model</div>');
+
+      drawCubeDistortion(k1, k2, p1, p2);
     }
     Object.keys(els).forEach(function(k){ els[k].addEventListener('input', update); });
     toggleBtn.addEventListener('click', function(){

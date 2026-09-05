@@ -155,6 +155,10 @@ permalink: /multi-view-geometry-projective.html
         <div id="s2-plot3d" class="mvg-plot3d"></div>
         <p class="mvg-canvas-hint">Drag to orbit, scroll to zoom. Gray plane is w = 1 (ordinary image plane); the dashed ray is the equivalence class.</p>
       </div>
+      <div class="mvg-canvas-wrap">
+        <canvas id="s2-canvas2d" width="420" height="360"></canvas>
+        <p class="mvg-canvas-hint">The image plane w = 1: the Euclidean point (x/w, y/w). λ can&#8217;t move it — only w can.</p>
+      </div>
       <div class="mvg-controls">
         <div class="mvg-field"><label>x <span class="val" id="s2-xval"></span></label><input type="range" id="s2-x" min="-3" max="3" step="0.05" value="1.4"></div>
         <div class="mvg-field"><label>y <span class="val" id="s2-yval"></span></label><input type="range" id="s2-y" min="-3" max="3" step="0.05" value="0.8"></div>
@@ -205,6 +209,31 @@ permalink: /multi-view-geometry-projective.html
     <p><strong>Conics.</strong> A conic (ellipse, parabola, circle, pair of lines, ...) is a symmetric 3×3 matrix <code>C</code> with <code>x&#771;ᵀCx&#771; = 0</code>. The <strong>image of the absolute conic</strong> — a specific conic that exists only at infinity and is invisible in any one photo — is exactly what camera calibration (Part 2 of this series) recovers: it's a stand-in for the intrinsic matrix <code>K</code> that doesn't care about camera position at all.</p>
     <p><strong>P³ and camera projection.</strong> Everything above generalizes one dimension up: 3D points are <code>X&#771; = (X, Y, Z, W)</code>, planes are 4-vectors with the same dot-product incidence rule, and the point at infinity in a 3D direction has <code>W = 0</code>. A camera is then literally a linear map <code>P³ → P²</code> — a 3×4 matrix <code>P</code> — and <code>x&#771; = PX&#771;</code> is projective geometry's version of "take a picture." That's the object Part 1 builds concretely as <code>P = K[R|t]</code>.</p>
     <p><strong>The transformation hierarchy.</strong> Not every transform of P² is equally destructive. Euclidean transforms (3 DOF: rotation + translation) preserve lengths and angles; similarity (4 DOF) adds uniform scale; affine (6 DOF) preserves parallelism and ratios along a line but not angles; the full projective group (8 DOF) preserves only incidence and cross-ratio — it can turn a square into any convex quadrilateral. Homography estimation in Part 3 is estimating a general element of this last, most permissive group.</p>
+
+    <div class="mvg-goal">🎯 <b>Learning goal (cross-ratio):</b> a projective map can shrink, stretch, and relocate four collinear points arbitrarily — but the cross-ratio <code>(A,B;C,D)</code> comes out identical on both lines. Drag any point and watch both values track each other exactly.</div>
+    <div class="mvg-demo">
+      <div class="mvg-canvas-wrap mvg-imgplane">
+        <canvas id="s5-canvas" width="480" height="360"></canvas>
+        <p class="mvg-canvas-hint">Top: four draggable collinear points. Bottom: the same four points after the projective remap t&#8242; = 6t/(t+4). Labels travel with the points.</p>
+      </div>
+      <div class="mvg-controls">
+        <div class="mvg-readout" id="s5-readout"></div>
+        <div class="mvg-btnrow"><button id="s5-reset">Reset points</button></div>
+        <p class="mvg-canvas-hint">Directed distances along each line; (A,B;C,D) = (AC/BC)/(AD/BD). Under an affine remap ratios along the line would also survive — under this genuinely projective remap they don&#8217;t, but the cross-ratio still does.</p>
+      </div>
+    </div>
+
+    <div class="mvg-goal">🎯 <b>Learning goal (transformation hierarchy):</b> drag the corners of the dashed unit square into any convex quadrilateral. The demo checks the shape&#8217;s properties and reports the <em>least</em> destructive transform group that can produce it — with the DOF each group has.</div>
+    <div class="mvg-demo">
+      <div class="mvg-canvas-wrap mvg-imgplane">
+        <canvas id="s5b-canvas" width="480" height="360"></canvas>
+        <p class="mvg-canvas-hint">Drag the four orange handles. Classification: square/rotated square = Euclidean (3 DOF), uniformly scaled = similarity (4), parallelogram = affine (6), anything else = projective (8).</p>
+      </div>
+      <div class="mvg-controls">
+        <div class="mvg-readout" id="s5b-readout"></div>
+        <div class="mvg-btnrow"><button id="s5b-reset">Reset to square</button></div>
+      </div>
+    </div>
   </section>
 
   <section class="mvg-step" id="cheatsheet">
@@ -314,6 +343,52 @@ permalink: /multi-view-geometry-projective.html
         '<div><span class="k">Euclidean point from scaled rep.</span> = (' + (scaledPt[0]/scaledPt[2]).toFixed(3) + ', ' + (scaledPt[1]/scaledPt[2]).toFixed(3) + ') <span class="hi">— unchanged by λ</span></div>' +
         '<div><span class="k">independent vector (x, y, w)</span> = (' + x.toFixed(2) + ', ' + y.toFixed(2) + ', ' + w.toFixed(2) + ')</div>' +
         '<div><span class="k">its Euclidean point (x/w, y/w)</span> = <span class="hi">(' + (x/w).toFixed(2) + ', ' + (y/w).toFixed(2) + ')</span>' + (w < 0.08 ? ' <span style="opacity:.6">— racing toward infinity as w→0</span>' : '') + '</div>';
+
+      draw2d(x/w, y/w);
+    }
+
+    // 2D image-plane view of the recovered Euclidean point
+    var c2d = document.getElementById('s2-canvas2d');
+    var ctx2 = c2d ? c2d.getContext('2d') : null;
+    var W2 = c2d ? c2d.width : 0, H2 = c2d ? c2d.height : 0;
+    function draw2d(ex, ey){
+      if (!ctx2) return;
+      ctx2.clearRect(0,0,W2,H2);
+      ctx2.fillStyle = 'rgba(0,0,0,0.04)'; ctx2.fillRect(0,0,W2,H2);
+      var ccx = W2/2, ccy = H2/2, sc = Math.min(W2, H2) / 14;
+      var lim = 6.5;
+      // grid at integers
+      ctx2.strokeStyle = COLOR_DIVIDER; ctx2.lineWidth = 1;
+      for (var g = -7; g <= 7; g++){
+        ctx2.beginPath(); ctx2.moveTo(ccx + g*sc, 0); ctx2.lineTo(ccx + g*sc, H2); ctx2.stroke();
+        ctx2.beginPath(); ctx2.moveTo(0, ccy - g*sc); ctx2.lineTo(W2, ccy - g*sc); ctx2.stroke();
+      }
+      // axes
+      ctx2.strokeStyle = COLOR_TEXT; ctx2.lineWidth = 1.2; ctx2.globalAlpha = 0.5;
+      ctx2.beginPath(); ctx2.moveTo(0,ccy); ctx2.lineTo(W2,ccy); ctx2.moveTo(ccx,0); ctx2.lineTo(ccx,H2); ctx2.stroke();
+      ctx2.globalAlpha = 1;
+      var inLim = Math.abs(ex) <= lim && Math.abs(ey) <= lim;
+      if (inLim){
+        ctx2.fillStyle = COLOR_ACCENT2;
+        ctx2.beginPath(); ctx2.arc(ccx + ex*sc, ccy - ey*sc, 7, 0, 7); ctx2.fill();
+        ctx2.fillStyle = COLOR_TEXT; ctx2.font = '12px monospace';
+        ctx2.fillText('(' + ex.toFixed(2) + ', ' + ey.toFixed(2) + ')', ccx + ex*sc + 10, ccy - ey*sc - 8);
+      } else {
+        // off-view: draw an arrow at the canvas border in the point's direction
+        var len = Math.hypot(ex, ey) || 1;
+        var dx = ex/len, dy = -ey/len;
+        var t = Math.min(
+          Math.abs((ccx - 14) / (dx || 1e-9)),
+          Math.abs((ccy - 14) / (dy || 1e-9))
+        );
+        var ax = ccx + dx*t, ay = ccy + dy*t;
+        ctx2.strokeStyle = COLOR_ACCENT2; ctx2.lineWidth = 2.5;
+        ctx2.beginPath(); ctx2.moveTo(ax - dx*16, ay - dy*16); ctx2.lineTo(ax, ay); ctx2.stroke();
+        ctx2.fillStyle = COLOR_ACCENT2;
+        ctx2.beginPath(); ctx2.arc(ax, ay, 5, 0, 7); ctx2.fill();
+        ctx2.fillStyle = COLOR_TEXT; ctx2.font = '11px monospace';
+        ctx2.fillText('off to infinity → (' + ex.toFixed(1) + ', ' + ey.toFixed(1) + ')', 10, H2 - 10);
+      }
     }
     Object.keys(els).forEach(function(k){ els[k].addEventListener('input', update); });
     update();
@@ -435,6 +510,225 @@ permalink: /multi-view-geometry-projective.html
       if (ang < 0) ang += 180;
       angEl.value = ang.toFixed(0);
       update();
+    });
+    update();
+  })();
+
+  // ---------- Step 5a: cross-ratio demo ----------
+  (function(){
+    var canvas = document.getElementById('s5-canvas');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var W = canvas.width, H = canvas.height;
+    var cx = W/2, cy = H/2, scale = 55;
+
+    function toPx(t, yWorld){ return [cx + t*scale, cy - yWorld*scale]; }
+    function crossRatio(ts){
+      var a = ts[0], b = ts[1], c = ts[2], d = ts[3];
+      var num = (c - a) * (d - b), den = (c - b) * (d - a);
+      return den !== 0 ? num/den : Infinity;
+    }
+    // projective remap of the line parameter (non-affine: denominator depends on t)
+    function remap(t){ return 6*t/(t + 4); }
+
+    var tInit = [-2.2, -0.6, 0.9, 2.4];
+    var ts = tInit.slice();
+    var yTop = 1.4, yBot = -1.4;
+    var labels = ['A','B','C','D'];
+    var colors = [COLOR_ACCENT, '#e08a1e', COLOR_ACCENT2, '#8a5cff'];
+    var dragIdx = -1;
+
+    function drawLine(yWorld, color, lw){
+      var p1 = toPx(-4.3, yWorld), p2 = toPx(4.3, yWorld);
+      ctx.strokeStyle = color; ctx.lineWidth = lw;
+      ctx.beginPath(); ctx.moveTo(p1[0], p1[1]); ctx.lineTo(p2[0], p2[1]); ctx.stroke();
+    }
+
+    function update(){
+      ctx.clearRect(0,0,W,H);
+      ctx.fillStyle = 'rgba(0,0,0,0.04)'; ctx.fillRect(0,0,W,H);
+      ctx.strokeStyle = COLOR_DIVIDER; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(0,cy); ctx.lineTo(W,cy); ctx.stroke();
+
+      drawLine(yTop, COLOR_TEXT, 1.5);
+      drawLine(yBot, COLOR_TEXT, 1.5);
+
+      // tick marks at integer t on the top line
+      ctx.fillStyle = COLOR_TEXT; ctx.globalAlpha = 0.35; ctx.font = '10px monospace';
+      for (var g = -4; g <= 4; g++){
+        var tp = toPx(g, yTop);
+        ctx.fillRect(tp[0]-0.5, tp[1]-4, 1, 8);
+        if (g !== 0) ctx.fillText(String(g), tp[0]-3, tp[1]+14);
+      }
+      ctx.globalAlpha = 1;
+
+      var ts2 = ts.map(remap);
+
+      // correspondence ticks between the two lines
+      ctx.strokeStyle = COLOR_ACCENT; ctx.globalAlpha = 0.4; ctx.lineWidth = 1;
+      for (var i = 0; i < 4; i++){
+        var p1 = toPx(ts[i], yTop), p2 = toPx(ts2[i], yBot);
+        ctx.setLineDash([3,3]);
+        ctx.beginPath(); ctx.moveTo(p1[0], p1[1]); ctx.lineTo(p2[0], p2[1]); ctx.stroke();
+      }
+      ctx.setLineDash([]); ctx.globalAlpha = 1;
+
+      function drawPts(arr, yWorld, r){
+        for (var i = 0; i < 4; i++){
+          var p = toPx(arr[i], yWorld);
+          ctx.fillStyle = colors[i];
+          ctx.beginPath(); ctx.arc(p[0], p[1], r, 0, 7); ctx.fill();
+          ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
+          ctx.fillStyle = colors[i]; ctx.font = 'bold 12px sans-serif';
+          ctx.fillText(labels[i], p[0]+8, p[1]-8);
+        }
+      }
+      drawPts(ts, yTop, 7);
+      drawPts(ts2, yBot, 6);
+
+      ctx.fillStyle = COLOR_TEXT; ctx.globalAlpha = 0.6; ctx.font = '11px sans-serif';
+      ctx.fillText('original line — drag A, B, C, D', 10, toPx(0, yTop)[1] - 60);
+      ctx.fillText('after projective remap', 10, toPx(0, yBot)[1] + 66);
+      ctx.globalAlpha = 1;
+
+      var cr1 = crossRatio(ts), cr2 = crossRatio(ts2);
+      function fmt(v){ return isFinite(v) ? v.toFixed(4) : '∞'; }
+      document.getElementById('s5-readout').innerHTML =
+        '<div><span class="k">cross-ratio on top line</span> (A,B;C,D) = <span class="hi">' + fmt(cr1) + '</span></div>' +
+        '<div><span class="k">cross-ratio after remap</span> (A′,B′;C′,D′) = <span class="hi">' + fmt(cr2) + '</span></div>' +
+        '<div><span class="k">difference</span> = ' + (isFinite(cr1) && isFinite(cr2) ? Math.abs(cr1-cr2).toExponential(2) : '—') + ' <span class="hi">— invariant</span></div>' +
+        '<div><span class="k">simple ratio AC/BC</span> = ' + (isFinite((ts[2]-ts[0])/(ts[2]-ts[1])) ? ((ts[2]-ts[0])/(ts[2]-ts[1])).toFixed(4) : '∞') +
+        ' &nbsp;→&nbsp; after remap = ' + (isFinite((ts2[2]-ts2[0])/(ts2[2]-ts2[1])) ? ((ts2[2]-ts2[0])/(ts2[2]-ts2[1])).toFixed(4) : '∞') + ' <span style="opacity:.6">(NOT preserved)</span></div>';
+    }
+
+    function nearestT(mx, my){
+      // project pointer onto the top line, return t (clamped to visible range)
+      var t = (mx - cx)/scale;
+      var dy = Math.abs(my - toPx(0, yTop)[1]);
+      return { t: Math.max(-4.2, Math.min(4.2, t)), dy: dy };
+    }
+    canvas.addEventListener('pointerdown', function(e){
+      var rect = canvas.getBoundingClientRect();
+      var mx = (e.clientX-rect.left)*(W/rect.width), my = (e.clientY-rect.top)*(H/rect.height);
+      var hit = nearestT(mx, my);
+      if (hit.dy > 40){
+        var best = -1, bestD = 0.4;
+        for (var i = 0; i < 4; i++){ var d = Math.abs(ts[i]-hit.t); if (d < bestD){ bestD = d; best = i; } }
+        if (best >= 0){ dragIdx = best; canvas.setPointerCapture(e.pointerId); }
+      }
+    });
+    canvas.addEventListener('pointermove', function(e){
+      if (dragIdx < 0) return;
+      var rect = canvas.getBoundingClientRect();
+      var mx = (e.clientX-rect.left)*(W/rect.width), my = (e.clientY-rect.top)*(H/rect.height);
+      ts[dragIdx] = nearestT(mx, my).t;
+      update();
+    });
+    canvas.addEventListener('pointerup', function(){ dragIdx = -1; });
+    canvas.addEventListener('pointercancel', function(){ dragIdx = -1; });
+    document.getElementById('s5-reset').addEventListener('click', function(){ ts = tInit.slice(); update(); });
+    update();
+  })();
+
+  // ---------- Step 5b: transformation hierarchy demo ----------
+  (function(){
+    var canvas = document.getElementById('s5b-canvas');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var W = canvas.width, H = canvas.height;
+    var cx = W/2, cy = H/2, scale = 62; // unit = 62px
+
+    function toPx(p){ return [cx + p[0]*scale, cy - p[1]*scale]; }
+    // quad corners corresponding to square corners (-1,-1),(1,-1),(1,1),(-1,1)
+    var quad = [ [-1,-1], [1,-1], [1,1], [-1,1] ];
+    var quadInit = quad.map(function(p){ return p.slice(); });
+    var dragIdx = -1;
+    var SQ = 1.4; // source square half-size for display
+
+    function classify(){
+      // side vectors of the quad in correspondence order
+      var e1 = [ (quad[1][0]-quad[0][0])/2, (quad[1][1]-quad[0][1])/2 ]; // image of x-axis
+      var e2 = [ (quad[3][0]-quad[0][0])/2, (quad[3][1]-quad[0][1])/2 ]; // image of y-axis
+      var n1 = Math.hypot(e1[0], e1[1]), n2 = Math.hypot(e2[0], e2[1]);
+      var dot = e1[0]*e2[0] + e1[1]*e2[1];
+      // parallelogram test: P0 + (P2-P0) should equal P1 + P3 - ... check both diagonals share midpoint
+      var m1 = [(quad[0][0]+quad[2][0])/2, (quad[0][1]+quad[2][1])/2];
+      var m2 = [(quad[1][0]+quad[3][0])/2, (quad[1][1]+quad[3][1])/2];
+      var diag = Math.max(Math.hypot(quad[2][0]-quad[0][0], quad[2][1]-quad[0][1]), 1e-9);
+      var isPara = Math.hypot(m1[0]-m2[0], m1[1]-m2[1]) < 0.02*diag;
+      var isSim = isPara && n1 > 1e-9 && n2 > 1e-9 &&
+        Math.abs(dot)/(n1*n2) < 0.03 && Math.abs(n1-n2)/Math.max(n1,n2) < 0.03;
+      var s = (n1+n2)/2;
+      var isEuclid = isSim && Math.abs(s-1)/1 < 0.05;
+      var result, color;
+      if (isEuclid){ result = 'Euclidean transform (rotation + translation)'; color = '#2a9d5c'; }
+      else if (isSim){ result = 'Similarity transform (Euclidean + uniform scale)'; color = COLOR_ACCENT; }
+      else if (isPara){ result = 'Affine transform (parallelogram — parallelism kept)'; color = '#e08a1e'; }
+      else { result = 'General projective transform (homography)'; color = COLOR_ACCENT2; }
+      var dof = isEuclid ? 3 : isSim ? 4 : isPara ? 6 : 8;
+      return { result: result, color: color, dof: dof, s: s,
+        shear: n1*n2 > 1e-9 ? dot/(n1*n2) : 0, aniso: Math.abs(n1-n2)/Math.max(n1,n2) };
+    }
+
+    function update(){
+      var cls = classify();
+      ctx.clearRect(0,0,W,H);
+      ctx.fillStyle = 'rgba(0,0,0,0.04)'; ctx.fillRect(0,0,W,H);
+      // dashed unit square
+      ctx.strokeStyle = COLOR_TEXT; ctx.globalAlpha = 0.5; ctx.lineWidth = 1.5; ctx.setLineDash([5,4]);
+      var sq = [toPx([-SQ,-SQ]), toPx([SQ,-SQ]), toPx([SQ,SQ]), toPx([-SQ,SQ])];
+      ctx.beginPath();
+      sq.forEach(function(p,i){ i ? ctx.lineTo(p[0],p[1]) : ctx.moveTo(p[0],p[1]); });
+      ctx.closePath(); ctx.stroke();
+      ctx.setLineDash([]); ctx.globalAlpha = 1;
+      // right-angle + axis markers inside the square
+      ctx.fillStyle = COLOR_TEXT; ctx.globalAlpha = 0.55; ctx.font = '11px sans-serif';
+      ctx.fillText('unit square', sq[0][0]+4, sq[0][1]-6);
+      ctx.globalAlpha = 1;
+
+      // quad
+      var qp = quad.map(toPx);
+      ctx.strokeStyle = cls.color; ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      qp.forEach(function(p,i){ i ? ctx.lineTo(p[0],p[1]) : ctx.moveTo(p[0],p[1]); });
+      ctx.closePath(); ctx.stroke();
+      ctx.fillStyle = cls.color; ctx.globalAlpha = 0.08; ctx.fill(); ctx.globalAlpha = 1;
+      // handles
+      qp.forEach(function(p){
+        ctx.fillStyle = '#e08a1e';
+        ctx.beginPath(); ctx.arc(p[0], p[1], 7, 0, 7); ctx.fill();
+        ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
+      });
+
+      document.getElementById('s5b-readout').innerHTML =
+        '<div><span class="k">classification</span> = <span class="hi" style="color:' + cls.color + '">' + cls.result + '</span></div>' +
+        '<div><span class="k">DOF of that group</span> = <span class="hi">' + cls.dof + '</span> &nbsp;<span class="k">(Euclidean 3 · similarity 4 · affine 6 · projective 8)</span></div>' +
+        '<div><span class="k">sides parallel?</span> ' + (cls.dof <= 6 ? '<span class="hi">yes</span>' : 'no — parallelism destroyed') + '</div>' +
+        '<div><span class="k">axis images orthogonal?</span> ' + (cls.dof <= 4 ? '<span class="hi">yes</span>' : 'no (shear sin ≈ ' + Math.abs(cls.shear).toFixed(3) + ')') + '</div>' +
+        '<div><span class="k">axis scale anisotropy</span> = ' + cls.aniso.toFixed(3) + (cls.dof <= 4 ? ' <span class="hi">— uniform</span>' : ' <span style="opacity:.6">— per-axis, angles not kept</span>') + '</div>';
+    }
+
+    canvas.addEventListener('pointerdown', function(e){
+      var rect = canvas.getBoundingClientRect();
+      var mx = (e.clientX-rect.left)*(W/rect.width), my = (e.clientY-rect.top)*(H/rect.height);
+      var best = -1, bestD = 22;
+      quad.forEach(function(p,i){
+        var q = toPx(p); var d = Math.hypot(q[0]-mx, q[1]-my);
+        if (d < bestD){ bestD = d; best = i; }
+      });
+      if (best >= 0){ dragIdx = best; canvas.setPointerCapture(e.pointerId); }
+    });
+    canvas.addEventListener('pointermove', function(e){
+      if (dragIdx < 0) return;
+      var rect = canvas.getBoundingClientRect();
+      var mx = (e.clientX-rect.left)*(W/rect.width), my = (e.clientY-rect.top)*(H/rect.height);
+      quad[dragIdx] = [(mx-cx)/scale, (cy-my)/scale];
+      update();
+    });
+    canvas.addEventListener('pointerup', function(){ dragIdx = -1; });
+    canvas.addEventListener('pointercancel', function(){ dragIdx = -1; });
+    document.getElementById('s5b-reset').addEventListener('click', function(){
+      quad = quadInit.map(function(p){ return p.slice(); }); update();
     });
     update();
   })();

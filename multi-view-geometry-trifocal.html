@@ -214,8 +214,14 @@ permalink: /multi-view-geometry-trifocal.html
       </div>
       <div class="mvg-controls">
         <div class="mvg-field"><label>Depth along ray from camera 1 <span class="val" id="s5-depthval"></span></label><input type="range" id="s5-depth" min="2" max="12" step="0.05" value="6"></div>
-        <div class="mvg-btnrow"><button id="s5-cycle">Cycle transferred edge</button></div>
+        <div class="mvg-field"><label>Pixel noise &#963; (views 1 &amp; 2) <span class="val" id="s5-noiseval"></span></label><input type="range" id="s5-noise" min="0" max="6" step="0.1" value="0"></div>
+        <div class="mvg-btnrow">
+          <button id="s5-cycle">Cycle transferred edge</button>
+          <button id="s5-cycle2">Cycle 2nd transferred line</button>
+          <button id="s5-resample" class="mvg-primary">Resample noise</button>
+        </div>
         <div class="mvg-readout" id="s5-readout"></div>
+        <p class="mvg-canvas-hint">The orange dashed line is a <em>second</em> edge transferred independently through the same tensor; its intersection with the first transferred line is marked in view 3 &mdash; two line transfers composing into a point prediction, the trifocal analog of Part 2&#8217;s two-line epipolar trick.</p>
       </div>
     </div>
     <div class="mvg-warn">⚠️ <span>Still one simplification here: <var>T</var> is assembled from known camera poses (via P&#8242;,P&#8243;), the way this whole series has done for every earlier tensor/matrix. Real trifocal-tensor estimation in an uncalibrated setting instead solves for <var>T</var>'s 27 numbers directly from ≈7 point correspondences seen in all three images — no poses required — the same spirit as the eight-point algorithm for <var>F</var> in Part 2. Once <var>T</var> exists, though, every formula above is used exactly as stated — the transfer step itself is fully real, not faked.</span></div>
@@ -229,6 +235,7 @@ permalink: /multi-view-geometry-trifocal.html
     <p>and the fundamental matrix between views 1 and 2 follows directly from e&#8322; and e&#8323;:</p>
     <div class="mvg-math">F&#8322;&#8321; &#8773; [e&#8322;]&times; &middot; [ T&#8321;e&#8323; &nbsp;|&nbsp; T&#8322;e&#8323; &nbsp;|&nbsp; T&#8323;e&#8323; ]&nbsp;&nbsp;&nbsp;&nbsp;(three columns, each T<sub>i</sub>e&#8323;, stacked into a 3×3 matrix)</div>
     <p>F&#8323;&#8321; (views 1,3) is built the same way with the roles of views 2 and 3 swapped. The upshot: <var>T</var> strictly contains more information than the pair {F&#8322;&#8321;, F&#8323;&#8321;} — it also fixes F&#8323;&#8322; (views 2,3), which the two pairwise fundamental matrices alone leave underdetermined, plus the full point- and line-transfer maps this page has been building.</p>
+    <div class="mvg-goal">&#127919; <b>Seen live in the demo above:</b> the tensor's left-null directions give e&#8322; (drawn on image 2) and its right-null directions give e&#8323; (drawn on image 3), and the readout checks both against the ground-truth epipoles &mdash; the residual e&#8322;&#7488;F&#8322;&#8321;e&#8321;-style agreement is ~0 up to floating point. Drag the noise slider: transfer degrades gracefully while the epipoles stay pinned.</div>
     <p>Add a fourth view and the same elimination trick produces a <strong>quadrifocal tensor</strong> Q — 3<sup>4</sup>=81 components, encoding a four-view point-line-line-line incidence relation the same way <var>T</var> encodes point-line-line. But the hierarchy stops there: any geometric relation among five or more views reduces to combinations of the two-, three-, and four-view tensors (F, T, Q) applied to overlapping subsets — no fundamentally new type of constraint appears past four views. That's why real structure-from-motion systems (Part 6) never build a literal N-focal tensor for N&gt;4; instead they work with pairwise and triplet relations plus bundle adjustment across however many views they have.</p>
   </section>
 
@@ -526,9 +533,92 @@ permalink: /multi-view-geometry-trifocal.html
     }
 
     var pickedPixel = [W/2 + 25, H/2 - 10];
-    var edgeIdx = 0;
+    var edgeIdx = 0, edgeIdx2 = 1;
     var depthEl = document.getElementById('s5-depth');
     var cycleBtn = document.getElementById('s5-cycle');
+    var cycle2Btn = document.getElementById('s5-cycle2');
+    var noiseEl = document.getElementById('s5-noise');
+    var resampleBtn = document.getElementById('s5-resample');
+
+    // deterministic per-observation noise offsets, resampled on demand
+    var nz = null;
+    function resampleNoise(){
+      var s = parseFloat(noiseEl.value);
+      nz = {
+        p1: [gaussianNoise(s), gaussianNoise(s)],
+        p2: [gaussianNoise(s), gaussianNoise(s)],
+        a1: [gaussianNoise(s), gaussianNoise(s)], b1: [gaussianNoise(s), gaussianNoise(s)],
+        a2: [gaussianNoise(s), gaussianNoise(s)], b2: [gaussianNoise(s), gaussianNoise(s)],
+        a1b: [gaussianNoise(s), gaussianNoise(s)], b1b: [gaussianNoise(s), gaussianNoise(s)],
+        a2b: [gaussianNoise(s), gaussianNoise(s)], b2b: [gaussianNoise(s), gaussianNoise(s)]
+      };
+    }
+
+    // left/right null vector of a 3x3 via smallest eigenvector of MᵀM / MMᵀ (symmetric Jacobi)
+    function symEig3(Ain){
+      var a = Ain.map(function(r){ return r.slice(); });
+      var V = [[1,0,0],[0,1,0],[0,0,1]];
+      for (var sweep=0; sweep<50; sweep++){
+        var p=0,q=1,maxv=Math.abs(a[0][1]);
+        if (Math.abs(a[0][2])>maxv){ maxv=Math.abs(a[0][2]); p=0; q=2; }
+        if (Math.abs(a[1][2])>maxv){ maxv=Math.abs(a[1][2]); p=1; q=2; }
+        if (maxv < 1e-13) break;
+        var app=a[p][p], aqq=a[q][q], apq=a[p][q];
+        var phi = 0.5*Math.atan2(2*apq, aqq-app);
+        var c=Math.cos(phi), s=Math.sin(phi);
+        for (var k=0;k<3;k++){ var akp=a[k][p], akq=a[k][q]; a[k][p]=c*akp-s*akq; a[k][q]=s*akp+c*akq; }
+        for (k=0;k<3;k++){ var apk=a[p][k], aqk=a[q][k]; a[p][k]=c*apk-s*aqk; a[q][k]=s*apk+c*aqk; }
+        for (k=0;k<3;k++){ var vkp=V[k][p], vkq=V[k][q]; V[k][p]=c*vkp-s*vkq; V[k][q]=s*vkp+c*vkq; }
+      }
+      var vals=[a[0][0],a[1][1],a[2][2]];
+      var order=[0,1,2].sort(function(i,j){ return vals[i]-vals[j]; }); // ascending
+      var vi = order[0];
+      var v = [V[0][vi], V[1][vi], V[2][vi]];
+      var nn = Math.hypot(v[0],v[1],v[2]) || 1;
+      return v.map(function(x){ return x/nn; });
+    }
+    function leftNull3(M){ return symEig3(matMul3(M, transpose3(M))); }
+    function rightNull3(M){ return symEig3(matMul3(transpose3(M), M)); }
+    // epipoles live in the respective cameras' NORMALIZED coords (T's coordinate system)
+    var e2T = leftNull3(Ti[0]);   // in camera-2 normalized coords
+    var e3T = rightNull3(Ti[0]);  // in camera-3 normalized coords
+    var e2True = (function(){ var v = MVG.matVec(cam2.R, MVG.sub(cam1.C, cam2.C)); var n = Math.hypot(v[0],v[1],v[2]); return [v[0]/n, v[1]/n, v[2]/n]; })();
+    var e3True = (function(){ var v = MVG.matVec(cam3.R, MVG.sub(cam1.C, cam3.C)); var n = Math.hypot(v[0],v[1],v[2]); return [v[0]/n, v[1]/n, v[2]/n]; })();
+
+    function drawEpiMark(ctx, eNorm, color, label){
+      var p = toPixelPoint(eNorm);
+      var lim = 0.5;
+      ctx.save();
+      if (p[0] >= -lim && p[0] <= W+lim && p[1] >= -lim && p[1] <= H+lim){
+        ctx.fillStyle = color;
+        ctx.beginPath(); ctx.arc(p[0], p[1], 5, 0, 7); ctx.fill();
+        ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.2; ctx.stroke();
+        ctx.fillStyle = color; ctx.font = '11px monospace';
+        ctx.fillText(label, p[0]+7, p[1]-6);
+      } else {
+        ctx.fillStyle = color; ctx.font = '10px monospace';
+        ctx.fillText(label + ' off-frame (' + p[0].toFixed(0) + ', ' + p[1].toFixed(0) + ')', 6, H-14);
+      }
+      ctx.restore();
+    }
+
+    function transferEdge(edge, n1a, n1b, n2a, n2b){
+      var Xa = CUBE_VERTS[edge[0]], Xb = CUBE_VERTS[edge[1]];
+      var a1 = MVG.project(K, cam1, Xa), b1 = MVG.project(K, cam1, Xb);
+      var a2 = MVG.project(K, cam2, Xa), b2 = MVG.project(K, cam2, Xb);
+      var a3 = MVG.project(K, cam3, Xa), b3 = MVG.project(K, cam3, Xb);
+      if (!(a1 && b1 && a2 && b2 && a3 && b3)) return null;
+      var x1a = toNormalized([a1.u + n1a[0], a1.v + n1a[1]]);
+      var x1b = toNormalized([b1.u + n1b[0], b1.v + n1b[1]]);
+      var l2n = MVG.cross(toNormalized([a2.u + n2a[0], a2.v + n2a[1]]), toNormalized([b2.u + n2b[0], b2.v + n2b[1]]));
+      var x3a = transferPoint(x1a, l2n), x3b = transferPoint(x1b, l2n);
+      var l3n = MVG.cross(x3a, x3b);
+      var l3px = toPixelLine(l3n);
+      var nrm = Math.hypot(l3px[0], l3px[1]) || 1;
+      var d1 = Math.abs(l3px[0]*a3.u + l3px[1]*a3.v + l3px[2]) / nrm;
+      var d2 = Math.abs(l3px[0]*b3.u + l3px[1]*b3.v + l3px[2]) / nrm;
+      return { line: l3px, err: Math.max(d1, d2) };
+    }
 
     function drawPixelLine(ctx, l, color, dash){
       var a=l[0], b=l[1], c=l[2];
@@ -571,6 +661,7 @@ permalink: /multi-view-geometry-trifocal.html
     function update(){
       var dir = rayDirWorld(pickedPixel);
       var depth = parseFloat(depthEl.value);
+      var noise = parseFloat(noiseEl.value);
       var X = MVG.add(cam1.C, MVG.scale(dir, depth));
 
       var p1 = MVG.project(K, cam1, X), p2 = MVG.project(K, cam2, X), p3 = MVG.project(K, cam3, X);
@@ -579,21 +670,27 @@ permalink: /multi-view-geometry-trifocal.html
       drawCube(ctx2, cam2, edgeIdx);
       var pts3 = drawCube(ctx3, cam3, edgeIdx);
 
-      ctx1.fillStyle = COLOR_ACCENT; ctx1.beginPath(); ctx1.arc(pickedPixel[0], pickedPixel[1], 6, 0, 7); ctx1.fill();
-      if (p2){ ctx2.fillStyle = COLOR_ACCENT; ctx2.beginPath(); ctx2.arc(p2.u, p2.v, 6, 0, 7); ctx2.fill(); }
+      var obs1 = [pickedPixel[0] + nz.p1[0], pickedPixel[1] + nz.p1[1]];
+      ctx1.fillStyle = COLOR_ACCENT; ctx1.beginPath(); ctx1.arc(obs1[0], obs1[1], 6, 0, 7); ctx1.fill();
+      var obs2 = p2 ? [p2.u + nz.p2[0], p2.v + nz.p2[1]] : null;
+      if (obs2){ ctx2.fillStyle = COLOR_ACCENT; ctx2.beginPath(); ctx2.arc(obs2[0], obs2[1], 6, 0, 7); ctx2.fill(); }
+
+      // epipoles straight out of the tensor (Section 5), drawn on views 2 and 3
+      drawEpiMark(ctx2, e2T, '#e08a1e', 'e2 (from T)');
+      drawEpiMark(ctx3, e3T, '#8a5cff', 'e3 (from T)');
 
       var readout = '';
       var fakeErr = null, realErr = null;
 
-      if (p2 && p3){
+      if (obs2 && p3){
         // -- fake method: Part-4 triangulate-then-project, exactly as in the demo above --
         var P1m = projectionMatrix(K, cam1), P2m = projectionMatrix(K, cam2);
-        var Xrec = triangulateLinear(P1m, [pickedPixel[0], pickedPixel[1]], P2m, [p2.u, p2.v]);
+        var Xrec = triangulateLinear(P1m, obs1, P2m, obs2);
         var predFake = MVG.project(K, cam3, Xrec);
 
         // -- real method: build M(x1) from T, transfer through ANY line through x2, no 3D point at all --
-        var x1n = toNormalized(pickedPixel);
-        var x2n = toNormalized([p2.u, p2.v]);
+        var x1n = toNormalized(obs1);
+        var x2n = toNormalized(obs2);
         var l2n = lineThroughVertical(x2n);
         var x3n_pred = transferPoint(x1n, l2n);
         var predReal = toPixelPoint(x3n_pred);
@@ -614,30 +711,43 @@ permalink: /multi-view-geometry-trifocal.html
       ctx3.fillStyle = COLOR_TEXT;
       ctx3.beginPath(); ctx3.arc(p3 ? p3.u : -100, p3 ? p3.v : -100, 4, 0, 7); ctx3.fill();
 
-      // -- line transfer: pick a cube edge, transfer it from views 1&2 into view 3, draw over the real edge --
-      var e = CUBE_EDGES[edgeIdx];
-      var Xa = CUBE_VERTS[e[0]], Xb = CUBE_VERTS[e[1]];
-      var a1 = MVG.project(K, cam1, Xa), b1 = MVG.project(K, cam1, Xb);
-      var a2 = MVG.project(K, cam2, Xa), b2 = MVG.project(K, cam2, Xb);
-      var a3 = MVG.project(K, cam3, Xa), b3 = MVG.project(K, cam3, Xb);
+      // -- line transfer: two cube edges transferred from views 1&2 into view 3 --
+      var t1 = transferEdge(CUBE_EDGES[edgeIdx], nz.a1, nz.b1, nz.a2, nz.b2);
       var lineErrMax = null;
-      if (a1 && b1 && a2 && b2 && a3 && b3){
-        var x1a = toNormalized([a1.u,a1.v]), x1b = toNormalized([b1.u,b1.v]);
-        var l2n_edge = MVG.cross(toNormalized([a2.u,a2.v]), toNormalized([b2.u,b2.v]));
-        var x3a_n = transferPoint(x1a, l2n_edge), x3b_n = transferPoint(x1b, l2n_edge);
-        var l3n = MVG.cross(x3a_n, x3b_n);
-        var l3px = toPixelLine(l3n);
-        drawPixelLine(ctx3, l3px, COLOR_ACCENT, [6,4]);
-        var nrm = Math.hypot(l3px[0], l3px[1]) || 1;
-        var d1 = Math.abs(l3px[0]*a3.u + l3px[1]*a3.v + l3px[2]) / nrm;
-        var d2 = Math.abs(l3px[0]*b3.u + l3px[1]*b3.v + l3px[2]) / nrm;
-        lineErrMax = Math.max(d1, d2);
+      if (t1){
+        drawPixelLine(ctx3, t1.line, COLOR_ACCENT, [6,4]);
+        lineErrMax = t1.err;
       }
       readout += '<div><span class="k">transferred-line distance from true edge</span> = <span class="hi">' + (lineErrMax===null ? '(off-frame)' : lineErrMax.toExponential(2) + ' px') + '</span></div>';
       readout += '<div><span class="k">edge transferred (dashed, view 3)</span> = #' + edgeIdx + ' of ' + CUBE_EDGES.length + '</div>';
 
+      // -- second transferred line + its intersection with the first (point-line composition) --
+      var t2 = transferEdge(CUBE_EDGES[edgeIdx2], nz.a1b, nz.b1b, nz.a2b, nz.b2b);
+      if (t2){
+        drawPixelLine(ctx3, t2.line, '#e08a1e', [3,4]);
+        var inter = MVG.cross(toNormalized3(t1.line), toNormalized3(t2.line));
+        if (Math.abs(inter[2]) > 1e-9){
+          var ip = toPixelPoint(inter);
+          if (ip[0] >= -50 && ip[0] <= W+50 && ip[1] >= -50 && ip[1] <= H+50){
+            ctx3.strokeStyle = COLOR_TEXT; ctx3.lineWidth = 1.8;
+            ctx3.beginPath(); ctx3.arc(ip[0], ip[1], 5, 0, 7); ctx3.stroke();
+          }
+        }
+        readout += '<div><span class="k">2nd line (#' + edgeIdx2 + ') transfer error</span> = <span class="hi">' + t2.err.toExponential(2) + ' px</span> <span style="opacity:.6">(orange; circle = intersection of the two transferred lines)</span></div>';
+      }
+
+      // -- epipoles from T vs ground truth (Section 5's claim, checked numerically) --
+      function crossNorm(a, b){ var c = MVG.cross(a, b); return Math.hypot(c[0], c[1], c[2]); }
+      readout += '<div><span class="k">epipoles from T (Section 5)</span>: &#8214;e&#8322;&#7488;&times;e&#8322;truth&#8214; = <span class="hi">' + crossNorm(e2T, e2True).toExponential(1) + '</span>, &#8214;e&#8323;&#7488;&times;e&#8323;truth&#8214; = <span class="hi">' + crossNorm(e3T, e3True).toExponential(1) + '</span> <span style="opacity:.6">(left/right null spaces of T&#8321; recover the true epipoles)</span></div>';
+
       document.getElementById('s5-depthval').textContent = depth.toFixed(2);
+      document.getElementById('s5-noiseval').textContent = noise.toFixed(1) + ' px';
       document.getElementById('s5-readout').innerHTML = readout;
+    }
+
+    function toNormalized3(lpx){
+      // pixel line -> camera-3 normalized line (inverse of toPixelLine)
+      return [ lpx[0]*K.fx, lpx[1]*K.fy, lpx[0]*K.cx + lpx[1]*K.cy + lpx[2] ];
     }
 
     canvas1.addEventListener('click', function(e){
@@ -646,7 +756,11 @@ permalink: /multi-view-geometry-trifocal.html
       update();
     });
     depthEl.addEventListener('input', update);
+    noiseEl.addEventListener('input', function(){ resampleNoise(); update(); });
     cycleBtn.addEventListener('click', function(){ edgeIdx = (edgeIdx+1) % CUBE_EDGES.length; update(); });
+    cycle2Btn.addEventListener('click', function(){ edgeIdx2 = (edgeIdx2+1) % CUBE_EDGES.length; update(); });
+    resampleBtn.addEventListener('click', function(){ resampleNoise(); update(); });
+    resampleNoise();
     update();
   })();
 

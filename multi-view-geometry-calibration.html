@@ -175,9 +175,13 @@ permalink: /multi-view-geometry-calibration.html
     <div class="mvg-goal">🎯 <b>Learning goal:</b> add checkerboard poses one at a time and watch the recovered <var>K̂</var> converge toward the true <var>K</var> — then try the degenerate preset and watch the same math fail in exactly the way real calibration sessions fail.</div>
     <p>A hidden camera with a known, fixed <var>K</var> is watching a checkerboard. Each button below adds one more pose of that board (a homography <code>H = K[r&#8321; r&#8322; t]</code> built from a real rotation and translation) to the pool. Every time the pool changes, the page builds <var>V</var> from <em>all</em> current poses, solves <code>Vb = 0</code> for <var>ω</var> by Jacobi eigen-decomposition, Cholesky-decomposes to <var>K̂</var>, and reprojects the board corners with the recovered <var>K̂</var> and per-pose extrinsics to report an RMS pixel error.</p>
     <div class="mvg-demo">
+      <div class="mvg-canvas-wrap" style="flex: 1 1 300px;">
+        <div id="s2-plot3d" class="mvg-plot3d" style="height:300px;"></div>
+        <p class="mvg-canvas-hint">The pose pool in 3D (camera frame): the camera is the small pyramid at the origin, each colored grid is one checkerboard pose. Fronto-parallel poses all share one board normal — the geometric reason they&#8217;re degenerate.</p>
+      </div>
       <div class="mvg-canvas-wrap mvg-imgplane">
         <canvas id="s2-canvas" width="480" height="360"></canvas>
-        <p class="mvg-canvas-hint">Each color is one checkerboard pose, projected with the true (hidden) K.</p>
+        <p class="mvg-canvas-hint">What the calibration software sees: detected corners of each pose (dots + grid), with pixel noise and lens distortion applied. H is fitted from these observations by DLT.</p>
       </div>
       <div class="mvg-controls">
         <div class="mvg-btnrow">
@@ -190,10 +194,13 @@ permalink: /multi-view-geometry-calibration.html
           <button id="s2-add-degen" class="mvg-primary">+ Fronto-parallel (degenerate)</button>
           <button id="s2-reset">Reset</button>
         </div>
+        <div class="mvg-field"><label>Corner noise &#963; (px) <span class="val" id="s2-noiseval"></span></label><input type="range" id="s2-noise" min="0" max="2" step="0.05" value="0"></div>
+        <div class="mvg-field"><label>Barrel distortion k&#8321; (true lens) <span class="val" id="s2-k1dval"></span></label><input type="range" id="s2-k1d" min="-0.25" max="0.25" step="0.01" value="0"></div>
         <div class="mvg-readout" id="s2-readout"></div>
       </div>
     </div>
-    <p>Add <b>Tilt A</b>, <b>Tilt B</b>, <b>Tilt C</b> (three genuinely different orientations) and watch <var>K̂</var> lock onto the true <var>K</var> with sub-hundredth-of-a-pixel reprojection error — exactly as the theory predicts once <var>V</var> has full rank. Now hit <b>Reset</b> and instead add several <b>Fronto-parallel</b> poses: the board always faces the camera square-on, only sliding around and spinning in-plane between shots. Every fronto-parallel pose has the same plane normal in the camera's frame, so their <var>v</var> rows keep pointing in nearly the same directions no matter how many you stack — <var>V</var> stays rank-deficient, and the recovered <var>ω</var> is frequently not even positive-definite, so the Cholesky step itself fails outright.</p>
+    <p>Add <b>Tilt A</b>, <b>Tilt B</b>, <b>Tilt C</b> (three genuinely different orientations) and watch <var>K̂</var> lock onto the true <var>K</var>. With zero noise the reprojection error is numerically ~0; drag <b>corner noise</b> up to 1&ndash;2 px and it lands in the realistic 0.1&ndash;1 px band that Step 5's thresholds are about. Now hit <b>Reset</b> and instead add several <b>Fronto-parallel</b> poses: the board always faces the camera square-on, only sliding around and spinning in-plane between shots. Every fronto-parallel pose has the same plane normal in the camera's frame (see the 3D view), so their <var>v</var> rows keep pointing in nearly the same directions no matter how many you stack — <var>V</var> stays rank-deficient, and the recovered <var>ω</var> is frequently not even positive-definite, so the Cholesky step itself fails outright.</p>
+    <p>Try the <b>barrel distortion</b> slider with a few well-posed tilts: a single radial term breaks the projective assumption behind Zhang's linear solve — watch the <b>pinhole-only fit RMS</b> climb well past 1&nbsp;px no matter how many poses you add, with <var>K̂</var> visibly biased. The lab then grid-searches <var>k̂&#8321;</var> (the same reprojection-error objective a joint optimizer refines), undistorts the corners, and re-runs the linear solve — RMS drops back to the noise floor and <var>K̂</var> snaps back toward truth. That pinhole-fails-then-radial-refit sequence is exactly how real calibration pipelines work, one extra parameter at a time.</p>
   </section>
 
   <section class="mvg-step" id="skew">
@@ -280,6 +287,7 @@ permalink: /multi-view-geometry-calibration.html
 </footer>
 
 {% raw %}
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
 <script>
 (function(){
   "use strict";
@@ -372,10 +380,28 @@ permalink: /multi-view-geometry-calibration.html
   }
   function transpose3(A){ return [[A[0][0],A[1][0],A[2][0]],[A[0][1],A[1][1],A[2][1]],[A[0][2],A[1][2],A[2][2]]]; }
 
+  // ---------- PRNG + Gaussian noise ----------
+  function mulberry32(seed){
+    var t = seed >>> 0;
+    return function(){
+      t += 0x6D2B79F5;
+      var r = Math.imul(t ^ (t >>> 15), 1 | t);
+      r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
+      return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function gaussianFrom(rand){
+    var u = 0, v = 0;
+    while (u === 0) u = rand();
+    while (v === 0) v = rand();
+    return Math.sqrt(-2*Math.log(u)) * Math.cos(2*Math.PI*v);
+  }
+
   // ---------- Step 2: the calibration lab ----------
   (function(){
     var canvas = document.getElementById('s2-canvas'), ctx = canvas.getContext('2d');
     var W = canvas.width, H = canvas.height;
+    var plotDiv = document.getElementById('s2-plot3d');
 
     var TRUE_K = makeK(680, 720, 0, W/2, H/2);
     var PALETTE = [COLOR_ACCENT, COLOR_ACCENT2, COLOR_TEXT, '#6a8f2f', '#a15be0', '#c77b1a', '#1f9e8f', '#b23b5a'];
@@ -392,7 +418,62 @@ permalink: /multi-view-geometry-calibration.html
     }
     function makePose(rx,ry,rz,tx,ty,tz,label){
       var R = matMul3(matMul3(Rz(rz),Ry(ry)),Rx(rx));
-      return { R:R, t:[tx,ty,tz], label:label };
+      return { R:R, t:[tx,ty,tz], label:label, seed: (Math.random()*0xffffffff)>>>0 };
+    }
+
+    var noiseEl = document.getElementById('s2-noise');
+    var k1dEl = document.getElementById('s2-k1d');
+
+    // Forward image-formation model per pose: pinhole projection -> radial distortion (normalized
+    // coords, before K) -> Gaussian pixel noise. This is the synthetic "photo" the solver gets.
+    function observe(pose, sigma, k1d){
+      var Hp = computeH(TRUE_K, pose.R, pose.t);
+      var rand = mulberry32(pose.seed);
+      return BOARD.map(function(pt){
+        var v = matVec3(Hp, [pt[0],pt[1],1]);
+        var u = v[0]/v[2], vv = v[1]/v[2];
+        var nx = (u - TRUE_K[0][2])/TRUE_K[0][0], ny = (vv - TRUE_K[1][2])/TRUE_K[1][1];
+        var r2 = nx*nx + ny*ny;
+        var rd = 1 + k1d*r2;
+        var dx = nx*rd, dy = ny*rd;
+        return [
+          TRUE_K[0][0]*dx + TRUE_K[0][2] + gaussianFrom(rand)*sigma,
+          TRUE_K[1][1]*dy + TRUE_K[1][2] + gaussianFrom(rand)*sigma
+        ];
+      });
+    }
+
+    // DLT homography fit with Hartley normalization on both domains.
+    function fitH(pixels){
+      function normalizeT(pts){
+        var mx=0,my=0;
+        pts.forEach(function(p){ mx+=p[0]; my+=p[1]; });
+        mx/=pts.length; my/=pts.length;
+        var d=0;
+        pts.forEach(function(p){ d += Math.hypot(p[0]-mx, p[1]-my); });
+        d = (d/pts.length) || 1;
+        var s = Math.SQRT2/d;
+        return { T:[[s,0,-s*mx],[0,s,-s*my],[0,0,1]], apply:function(p){ return [s*(p[0]-mx), s*(p[1]-my)]; } };
+      }
+      var Tb = normalizeT(BOARD), Tp = normalizeT(pixels);
+      var A = [];
+      for (var i=0;i<BOARD.length;i++){
+        var X = Tb.apply(BOARD[i]), U = Tp.apply(pixels[i]);
+        A.push([0,0,0, -X[0],-X[1],-1, U[1]*X[0], U[1]*X[1], U[1]]);
+        A.push([X[0],X[1],1, 0,0,0, -U[0]*X[0], -U[0]*X[1], -U[0]]);
+      }
+      var AtA = []; for (var r=0;r<9;r++) AtA.push(new Array(9).fill(0));
+      A.forEach(function(row){
+        for (var a=0;a<9;a++) for (var b=0;b<9;b++) AtA[a][b] += row[a]*row[b];
+      });
+      var eig = jacobiEigen(AtA, 9);
+      var minI = 0;
+      eig.values.forEach(function(v,i){ if (Math.abs(v) < Math.abs(eig.values[minI])) minI = i; });
+      var h = [0,1,2,3,4,5,6,7,8].map(function(k){ return eig.vectors[k][minI]; });
+      var Hn = [[h[0],h[1],h[2]],[h[3],h[4],h[5]],[h[6],h[7],h[8]]];
+      var TpInv = invert3(Tp.T), TbInv = invert3(Tb.T);
+      if (!TpInv || !TbInv) return null;
+      return matMul3(matMul3(TpInv, Hn), Tb.T);
     }
 
     var poses = [];
@@ -404,15 +485,19 @@ permalink: /multi-view-geometry-calibration.html
     function normalizeRow(r){ var n=Math.hypot(r[0],r[1],r[2],r[3],r[4],r[5])||1; return r.map(function(x){ return x/n; }); }
     var SOLVABILITY_FLOOR = 1e-10; // ratio (2nd-smallest / largest) of VtV eigenvalues below which the pose set is treated as degenerate
 
-    function solve(){
-      if (poses.length === 0) return { status:'empty' };
+    // One full Zhang pipeline over a set of per-pose pixel observations:
+    // DLT H per pose -> vij rows -> omega -> Cholesky -> Khat -> extrinsics ->
+    // observation-based RMS + linear 1-D radial residual fit.
+    function pipeline(obsList){
+      var fittedH = [];
+      for (var pi=0; pi<poses.length; pi++){
+        var H = fitH(obsList[pi]);
+        if (!H) return { status:'singular', margin:0, solvable:false, poseCount: poses.length };
+        fittedH.push(H);
+      }
 
-      // Each row is normalized to unit length first — standard conditioning for this kind of
-      // homogeneous linear solve (the same idea as Hartley normalization used for the eight-point
-      // algorithm), otherwise the huge natural scale spread of h1,h2,h3 entries swamps the numerics.
       var rows = [];
-      poses.forEach(function(p){
-        var Hp = computeH(TRUE_K, p.R, p.t);
+      fittedH.forEach(function(Hp){
         var h1 = colOf(Hp,0), h2 = colOf(Hp,1);
         rows.push(normalizeRow(vij(h1,h2)));
         rows.push(normalizeRow(vecSub6(vij(h1,h1), vij(h2,h2))));
@@ -429,11 +514,6 @@ permalink: /multi-view-geometry-calibration.html
       var smallIdx = order[0].i;
       var b = [0,1,2,3,4,5].map(function(i2){ return eig.vectors[i2][smallIdx]; });
 
-      // Solvability margin: ratio of the 2nd-smallest eigenvalue of VtV to the largest. The smallest
-      // eigenvalue is the null direction we solve for (~0 by construction); the *next* one tells us
-      // how well-separated that null direction is from real signal. Near the SOLVABILITY_FLOOR or
-      // below means V is effectively rank-deficient — the null space isn't 1-dimensional, so the
-      // "solution" is an arbitrary mix of true and spurious directions.
       var secondSmallest = order[1] ? order[1].v : 0;
       var largest = order[5].v || 1e-30;
       var margin = secondSmallest / largest;
@@ -452,35 +532,95 @@ permalink: /multi-view-geometry-calibration.html
       if (Math.abs(norm) < 1e-9) return { status:'singular', margin: margin, solvable: solvable, poseCount: poses.length };
       var Khat = Kraw.map(function(row){ return row.map(function(v){ return v/norm; }); });
 
-      // Reprojection error: recover per-pose extrinsics from Khat and reproject the board.
+      // RMS reprojection error against the observations themselves (what a real calibrator
+      // minimizes), plus the linear 1-D radial residual fit on top of the pinhole result.
       var Kinv = invert3(Khat);
       var sqErrSum = 0, nPts = 0, badPose = false;
+      var we = 0, ww = 0;
       if (Kinv){
-        poses.forEach(function(p){
-          var Hp = computeH(TRUE_K, p.R, p.t);
-          var h1 = colOf(Hp,0), h2 = colOf(Hp,1), h3 = colOf(Hp,2);
+        for (var pk=0; pk<poses.length; pk++){
+          var h1 = colOf(fittedH[pk],0), h2 = colOf(fittedH[pk],1), h3 = colOf(fittedH[pk],2);
           var kh1 = matVec3(Kinv,h1);
           var lam = normVec(kh1) > 1e-9 ? 1/normVec(kh1) : 0;
-          if (!lam){ badPose = true; return; }
+          if (!lam){ badPose = true; break; }
           var r1 = scaleVec(kh1, lam);
           var r2 = scaleVec(matVec3(Kinv,h2), lam);
           var r3 = cross3(r1,r2);
           var that_ = scaleVec(matVec3(Kinv,h3), lam);
           var Rhat = [[r1[0],r2[0],r3[0]],[r1[1],r2[1],r3[1]],[r1[2],r2[2],r3[2]]];
           var Hhat = computeH(Khat, Rhat, that_);
-          BOARD.forEach(function(pt){
-            var trueP = matVec3(Hp, [pt[0],pt[1],1]);
+          for (var bi=0; bi<BOARD.length; bi++){
+            var pt = BOARD[bi];
             var estP = matVec3(Hhat, [pt[0],pt[1],1]);
-            if (Math.abs(trueP[2]) < 1e-9 || Math.abs(estP[2]) < 1e-9){ badPose = true; return; }
-            var du = trueP[0]/trueP[2] - estP[0]/estP[2];
-            var dv = trueP[1]/trueP[2] - estP[1]/estP[2];
-            sqErrSum += du*du + dv*dv; nPts++;
-          });
-        });
+            if (Math.abs(estP[2]) < 1e-9){ badPose = true; break; }
+            var gu = estP[0]/estP[2], gv = estP[1]/estP[2];
+            var ou = obsList[pk][bi][0], ov = obsList[pk][bi][1];
+            sqErrSum += (ou-gu)*(ou-gu) + (ov-gv)*(ov-gv); nPts++;
+            // radial residual: observed ≈ pinhole-predicted * (1 + k1·r²) in Khat-normalized coords
+            var nx = (gu - Khat[0][2])/Khat[0][0], ny = (gv - Khat[1][2])/Khat[1][1];
+            var ox = (ou - Khat[0][2])/Khat[0][0], oy = (ov - Khat[1][2])/Khat[1][1];
+            var rr = nx*nx + ny*ny;
+            we += nx*rr*(ox-nx) + ny*rr*(oy-ny);
+            ww += (nx*rr)*(nx*rr) + (ny*rr)*(ny*rr);
+          }
+          if (badPose) break;
+        }
       }
       var rms = (nPts > 0 && !badPose) ? Math.sqrt(sqErrSum/nPts) : NaN;
+      var k1est = ww > 1e-14 ? we/ww : NaN;
 
-      return { status:'ok', K: Khat, rms: rms, margin: margin, solvable: solvable, poseCount: poses.length, badPose: badPose };
+      return { status:'ok', K: Khat, rms: rms, k1est: k1est, margin: margin, solvable: solvable, poseCount: poses.length, badPose: badPose };
+    }
+
+    // Invert the forward radial model x_d = x(1 + k1|x|²) per pixel (fixed-point, few iterations),
+    // working in the given K's normalized coordinates.
+    function undistortPixels(obsList, K, k1){
+      return obsList.map(function(obs){
+        return obs.map(function(px){
+          var xd = (px[0]-K[0][2])/K[0][0], yd = (px[1]-K[1][2])/K[1][1];
+          var x = xd, y = yd;
+          for (var it=0; it<6; it++){
+            var r2 = x*x + y*y;
+            x = xd/(1 + k1*r2); y = yd/(1 + k1*r2);
+          }
+          return [ K[0][0]*x + K[0][2], K[1][1]*y + K[1][2] ];
+        });
+      });
+    }
+
+    function solve(sigma, k1d){
+      if (poses.length === 0) return { status:'empty' };
+
+      var obsAll = [];
+      for (var pi=0; pi<poses.length; pi++) obsAll.push(observe(poses[pi], sigma, k1d));
+
+      var pass1 = pipeline(obsAll);
+      if (pass1.status !== 'ok') return pass1;
+
+      // Radial estimation: grid-search k̂1 minimizing the observation-based RMS of the full
+      // pipeline refit on undistorted corners — the same objective a joint optimizer refines,
+      // and self-contained (no ground truth involved). Only worth running when the pinhole
+      // fit leaves a non-trivial residual, i.e. when real distortion is present.
+      var bestK1 = 0, bestRms = pass1.rms;
+      if (isFinite(pass1.rms) && pass1.rms > 0.01){
+        for (var kc = -0.25; kc <= 0.2501; kc += 0.01){
+          if (Math.abs(kc) < 1e-9) continue;
+          var cand = pipeline(undistortPixels(obsAll, pass1.K, kc));
+          if (cand.status === 'ok' && isFinite(cand.rms) && cand.rms < bestRms*0.999){
+            bestRms = cand.rms; bestK1 = kc;
+          }
+        }
+      }
+      if (bestK1 !== 0){
+        var final = pipeline(undistortPixels(obsAll, pass1.K, bestK1));
+        if (final.status === 'ok'){
+          final.k1est = bestK1;
+          final.undistorted = true;
+          final.pinholeRms = pass1.rms;
+          return final;
+        }
+      }
+      return pass1;
     }
 
     function fmtK(K){
@@ -488,17 +628,21 @@ permalink: /multi-view-geometry-calibration.html
              ', s=' + K[0][1].toFixed(2) + ', c<sub>x</sub>=' + K[0][2].toFixed(1) + ', c<sub>y</sub>=' + K[1][2].toFixed(1);
     }
 
-    function draw(){
+    function draw(obsAll){
       ctx.clearRect(0,0,W,H);
       ctx.fillStyle = 'rgba(0,0,0,0.04)'; ctx.fillRect(0,0,W,H);
       poses.forEach(function(p, pi){
-        var Hp = computeH(TRUE_K, p.R, p.t);
-        var pix = BOARD.map(function(pt){
-          var v = matVec3(Hp, [pt[0],pt[1],1]);
-          return [v[0]/v[2], v[1]/v[2]];
-        });
+        var obs = obsAll ? obsAll[pi] : null;
         var color = PALETTE[pi % PALETTE.length];
         ctx.strokeStyle = color; ctx.lineWidth = 1.6;
+        var pix = obs;
+        if (!pix){
+          var Hp = computeH(TRUE_K, p.R, p.t);
+          pix = BOARD.map(function(pt){
+            var v = matVec3(Hp, [pt[0],pt[1],1]);
+            return [v[0]/v[2], v[1]/v[2]];
+          });
+        }
         for (var r=0;r<4;r++){
           ctx.beginPath();
           for (var c=0;c<4;c++){ var pt=pix[idx(r,c)]; if (c===0) ctx.moveTo(pt[0],pt[1]); else ctx.lineTo(pt[0],pt[1]); }
@@ -509,6 +653,11 @@ permalink: /multi-view-geometry-calibration.html
           for (var r2=0;r2<4;r2++){ var pt2=pix[idx(r2,c2)]; if (r2===0) ctx.moveTo(pt2[0],pt2[1]); else ctx.lineTo(pt2[0],pt2[1]); }
           ctx.stroke();
         }
+        for (var k=0;k<16;k++){
+          ctx.fillStyle = color; ctx.globalAlpha = 0.7;
+          ctx.beginPath(); ctx.arc(pix[k][0], pix[k][1], 2.2, 0, 7); ctx.fill();
+          ctx.globalAlpha = 1;
+        }
       });
       if (poses.length === 0){
         ctx.fillStyle = COLOR_TEXT; ctx.globalAlpha = 0.5; ctx.font = '13px sans-serif';
@@ -517,8 +666,58 @@ permalink: /multi-view-geometry-calibration.html
       }
     }
 
+    // 3D pose-pool view (camera frame): frustum at origin, one colored grid per pose.
+    function updatePlot3d(){
+      if (!plotDiv || typeof Plotly === 'undefined') return;
+      var traces = [];
+      // camera frustum at origin, looking along +z
+      var hx = (W/2)/TRUE_K[0][0], hy = (H/2)/TRUE_K[1][1];
+      var rim = [[-hx,-hy,1],[hx,-hy,1],[hx,hy,1],[-hx,hy,1]];
+      var fx=[], fy=[], fz=[];
+      rim.forEach(function(pt){
+        fx.push(0,pt[0],null); fy.push(0,pt[1],null); fz.push(0,pt[2],null);
+      });
+      for (var i=0;i<4;i++){
+        var a=rim[i], b2=rim[(i+1)%4];
+        fx.push(a[0],b2[0],null); fy.push(a[1],b2[1],null); fz.push(a[2],b2[2],null);
+      }
+      traces.push({ type:'scatter3d', mode:'lines', x:fx, y:fy, z:fz, line:{color:COLOR_TEXT, width:4}, hoverinfo:'skip' });
+      poses.slice(0,12).forEach(function(p, pi){
+        var color = PALETTE[pi % PALETTE.length];
+        var lx=[], ly=[], lz=[];
+        function push3(a,b){
+          lx.push(a[0],b[0],null); ly.push(a[1],b[1],null); lz.push(a[2],b[2],null);
+        }
+        function camPt(pt){
+          var Xc = matVec3(p.R, [pt[0],pt[1],0]);
+          return [Xc[0]+p.t[0], Xc[1]+p.t[1], Xc[2]+p.t[2]];
+        }
+        for (var r=0;r<4;r++) for (var c=0;c<3;c++) push3(camPt(BOARD[idx(r,c)]), camPt(BOARD[idx(r,c+1)]));
+        for (var c2=0;c2<4;c2++) for (var r2=0;r2<3;r2++) push3(camPt(BOARD[idx(r2,c2)]), camPt(BOARD[idx(r2+1,c2)]));
+        traces.push({ type:'scatter3d', mode:'lines', x:lx, y:ly, z:lz, line:{color:color, width:5}, hoverinfo:'skip' });
+        // board normal arrow (R^T applied to world z-axis = third row of R)
+        var n = [p.R[2][0], p.R[2][1], p.R[2][2]];
+        var ctr = camPt([0,0]);
+        traces.push({ type:'scatter3d', mode:'lines',
+          x:[ctr[0], ctr[0]+n[0]*0.8], y:[ctr[1], ctr[1]+n[1]*0.8], z:[ctr[2], ctr[2]+n[2]*0.8],
+          line:{color:color, width:3, dash:'dot'}, hoverinfo:'skip' });
+      });
+      Plotly.react(plotDiv, traces, {
+        autosize:true, margin:{l:0,r:0,t:0,b:0}, showlegend:false, paper_bgcolor:'transparent',
+        scene: {
+          xaxis:{ range:[-3.5,3.5], backgroundcolor:'transparent', gridcolor:COLOR_DIVIDER, zerolinecolor:COLOR_DIVIDER, color:COLOR_TEXT, title:'x' },
+          yaxis:{ range:[-3,3], backgroundcolor:'transparent', gridcolor:COLOR_DIVIDER, zerolinecolor:COLOR_DIVIDER, color:COLOR_TEXT, title:'y' },
+          zaxis:{ range:[0,7], backgroundcolor:'transparent', gridcolor:COLOR_DIVIDER, zerolinecolor:COLOR_DIVIDER, color:COLOR_TEXT, title:'z' },
+          aspectmode:'manual', aspectratio:{x:1,y:0.85,z:1}, camera:{ eye:{x:1.3,y:-1.6,z:0.8} }
+        }
+      }, { displayModeBar:false, responsive:true });
+    }
+
     function updateReadout(){
-      var res = solve();
+      var sigma = parseFloat(noiseEl.value), k1d = parseFloat(k1dEl.value);
+      document.getElementById('s2-noiseval').textContent = sigma.toFixed(2);
+      document.getElementById('s2-k1dval').textContent = k1d.toFixed(2);
+      var res = solve(sigma, k1d);
       var lines = [];
       lines.push('<div><span class="k">true K</span> = ' + fmtK(TRUE_K) + '</div>');
       lines.push('<div><span class="k">poses added</span> = ' + poses.length + (poses.length < 3 ? ' <span style="opacity:.6">(need &ge; 3, orientation-diverse)</span>' : '') + '</div>');
@@ -533,11 +732,23 @@ permalink: /multi-view-geometry-calibration.html
         if (res.badPose || !isFinite(res.rms)){
           lines.push('<div class="hi">reprojection error blew up — extrinsics could not be recovered reliably</div>');
         } else {
-          lines.push('<div><span class="k">RMS reprojection error</span> = <span class="hi">' + res.rms.toExponential(2) + ' px</span></div>');
+          if (res.undistorted && isFinite(res.pinholeRms)){
+            lines.push('<div><span class="k">pinhole-only fit RMS</span> = <span class="hi" style="color:' + COLOR_ACCENT2 + '">' + res.pinholeRms.toFixed(3) + ' px</span> &rarr; <span class="hi">after radial refit: ' + res.rms.toFixed(3) + ' px</span> <span style="opacity:.6">(the linear model alone cannot absorb distortion)</span></div>');
+          } else {
+            lines.push('<div><span class="k">RMS reprojection error</span> = <span class="hi">' + res.rms.toFixed(3) + ' px</span>' +
+              (res.rms > 1 ? ' <span style="opacity:.6">(&gt; 1 px — investigate)</span>' : res.rms < 0.5 ? ' <span style="opacity:.6">(&lt; 0.5 px — good)</span>' : '') + '</div>');
+          }
+          if (Math.abs(k1d) > 1e-6){
+            lines.push('<div><span class="k">true k&#8321;</span> = ' + k1d.toFixed(3) + ' &nbsp;<span class="k">estimated k&#770;&#8321;</span> = <span class="hi">' + (isFinite(res.k1est) ? res.k1est.toFixed(3) : '—') + '</span> <span style="opacity:.6">(' + (res.undistorted ? 'grid-minimized RMS over k&#770;&#8321;, refit on undistorted corners — K&#770; recovered with the radial term' : '1-D radial residual fit after the linear solve') + ')</span></div>');
+          }
         }
       }
       document.getElementById('s2-readout').innerHTML = lines.join('');
-      draw();
+
+      // observations for drawing (and solving) — recompute once here
+      var obsAll = poses.map(function(p){ return observe(p, sigma, k1d); });
+      draw(obsAll);
+      updatePlot3d();
     }
 
     document.getElementById('s2-add-a').addEventListener('click', function(){ poses.push(makePose(0.35,-0.28,0.15,-0.4,0.15,4.2,'Tilt A')); updateReadout(); });
@@ -554,6 +765,8 @@ permalink: /multi-view-geometry-calibration.html
       updateReadout();
     });
     document.getElementById('s2-reset').addEventListener('click', function(){ poses = []; updateReadout(); });
+    noiseEl.addEventListener('input', updateReadout);
+    k1dEl.addEventListener('input', updateReadout);
 
     poses.push(makePose(0.35,-0.28,0.15,-0.4,0.15,4.2,'Tilt A'));
     updateReadout();
