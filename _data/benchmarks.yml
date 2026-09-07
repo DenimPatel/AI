@@ -1,0 +1,86 @@
+# Benchmark score progressions. Rendered by /ai/benchmarks/ and the homepage teaser.
+- name: MMLU
+  subtitle: general knowledge
+  note: 57 subjects spanning STEM, humanities, law and medicine, tested zero- or few-shot. Estimated human-expert baseline is ~89.8%. By mid-2024, frontier models had clustered near that ceiling and labs shifted attention to harder evals below.
+  rows:
+  - model: GPT-3
+    released: '2020'
+    score: ~44%
+  - model: GPT-4
+    released: Mar 2023
+    score: ~86%
+  - model: Claude 2
+    released: Jul 2023
+    score: ~79%
+  - model: Gemini Ultra
+    released: Dec 2023
+    score: ~90%
+  - model: Claude 3 Opus
+    released: Mar 2024
+    score: ~87%
+  - model: Llama 3.1 405B
+    released: Jul 2024
+    score: ~88%
+  - model: GPT-4o
+    released: May 2024
+    score: ~89%
+  - model: Claude 3.5 Sonnet
+    released: Jun 2024
+    score: ~89%
+- name: GPQA Diamond
+  subtitle: graduate-level reasoning
+  note: PhD-level science questions in biology, physics and chemistry, written so domain experts can't answer them by searching. A cleaner test of reasoning than of recall.
+  rows:
+  - model: GPT-4
+    released: Mar 2023
+    score: ~35%
+  - model: Claude 3.5 Sonnet
+    released: Jun 2024
+    score: ~59%
+  - model: OpenAI o1
+    released: Sep 2024
+    score: ~78%
+  - model: Claude 3.7 Sonnet
+    released: Feb 2025
+    score: ~78%
+  - model: Claude 4 (Opus)
+    released: May 2025
+    score: ~83%
+  - model: GPT-5
+    released: Aug 2025
+    score: ~85%+
+- name: SWE-bench Verified
+  subtitle: real-world coding
+  note: 'Resolving genuine GitHub issues end to end: read the repo, write the patch, pass the tests. The closest proxy on this page for "can it do a developer''s job," and the benchmark the agentic-coding race has organized around.'
+  rows:
+  - model: Claude 3.5 Sonnet (computer use)
+    released: Oct 2024
+    score: ~49%
+  - model: Claude 3.7 Sonnet
+    released: Feb 2025
+    score: ~63%
+  - model: Claude 4 (Opus / Sonnet)
+    released: May 2025
+    score: ~72–73%
+  - model: GPT-5
+    released: Aug 2025
+    score: ~74%
+  - model: Frontier models per 2026 aggregators
+    released: '2026'
+    score: ~80%+
+- name: ARC-AGI
+  subtitle: abstract generalization
+  note: Visual puzzles solvable by most humans in minutes but historically resistant to pattern-matching by LLMs, since each puzzle is novel rather than drawn from training-adjacent data. Designed specifically to be hard to game.
+  rows:
+  - model: GPT-4
+    released: '2023'
+    score: ~5%
+  - model: Claude 3.5 Sonnet
+    released: '2024'
+    score: ~14%
+  - model: OpenAI o3 (preview, high-compute)
+    released: Dec 2024
+    score: ~76–88%*
+  - model: Frontier models through 2025
+    released: '2025'
+    score: closing on that range, prompting a harder ARC-AGI-2

@@ -1,0 +1,15 @@
+{%- comment -%}
+Field-note listing, generated from the pages themselves. Replaces the 19
+hand-typed <div class="note-row"> rows (with re-typed dates) that used to
+live in robotics/index.md.
+  {% include note-list.html section="robotics" %}
+{%- endcomment -%}
+{%- assign groups = site.data.note_groups[include.section] -%}
+{%- assign notes = site.pages | where: "section", include.section | where_exp: "p", "p.date_label" -%}
+{%- for g in groups %}
+<h3 class="era-heading">{{ g.title }}</h3>
+{%- assign rows = notes | where: "group", g.id | sort: "order" -%}
+{%- for n in rows %}
+<div class="note-row"><a href="{{ n.url | relative_url }}">{{ n.title }}</a><span class="note-date">{{ n.date_label }}</span></div>
+{%- endfor %}
+{%- endfor %}
