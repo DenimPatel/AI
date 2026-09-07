@@ -1,0 +1,15 @@
+# Ordering and headings for the field-note listings on the section hubs.
+# Notes carry `section` and `group` in their front matter; this file decides
+# which groups appear, in what order, under what heading.
+robotics:
+  - id: intro
+    title: "Getting started"
+  - id: ros
+    title: "ROS (Robot Operating System)"
+  - id: navigation
+    title: "Navigation"
+vision:
+  - id: cv
+    title: "Computer vision basics"
+  - id: math
+    title: "Math for geometry"

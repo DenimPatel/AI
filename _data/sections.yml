@@ -1,0 +1,45 @@
+# The three top-level subjects. Drives the global nav (_includes/site-nav.html),
+# the homepage doors, and each section hub page.
+- id: ai
+  title: "AI"
+  url: /ai/
+  kicker: "The record"
+  blurb: "A running record of the field - milestones, product releases, benchmark scores, the labs building it, and what people said at the time - plus a 12-part interactive guide to how a language model is actually trained."
+  pages:
+    - title: "History timeline"
+      url: /ai/timeline/
+      blurb: "Key events in the development of AI as a field, from the Turing Test to AlphaFold."
+    - title: "Product timeline"
+      url: /ai/products/
+      blurb: "The full chronology of significant AI product releases, and the race between closed and open-weight models."
+    - title: "Benchmarks"
+      url: /ai/benchmarks/
+      blurb: "How the frontier has moved on MMLU, GPQA Diamond, SWE-bench Verified and ARC-AGI."
+    - title: "Labs & companies"
+      url: /ai/labs/
+      blurb: "Who is building it - focus areas and defining releases for ten frontier and open-weight labs."
+    - title: "Voices on AI"
+      url: /ai/voices/
+      blurb: "Quotes from scientists, researchers and industry leaders, grouped by perspective."
+    - title: "Key papers"
+      url: /ai/papers/
+      blurb: "An annotated bibliography of the landmark papers, 1943 to today, each with a link to the original."
+  series:
+    - llm_training
+
+- id: vision
+  title: "Vision & Geometry"
+  url: /vision/
+  kicker: "Interactive guides"
+  blurb: "Two long interactive guides built around running examples you can drag: the geometry that turns images into 3D structure, and the nonlinear least-squares machinery that makes it converge. Plus the background notes that lead into them."
+  series:
+    - multi_view_geometry
+    - nonlinear_optimization
+  notes_path: /vision/notes/
+  notes_blurb: "Background notes on OpenCV basics, linear algebra and quaternions - the on-ramp to both guides."
+
+- id: robotics
+  title: "Robotics"
+  url: /robotics/
+  kicker: "Field notes"
+  blurb: "Notes and tutorials on ROS and robot navigation, migrated from the Robotics At Once blog."
