@@ -15,6 +15,7 @@ redirect_from:
 <title>{{ page.title }} · {{ site.title }}</title>
 <meta name="description" content="{{ page.description }}">
 <link rel="stylesheet" href="{{ '/assets/css/styles.css' | relative_url }}">
+{% include favicon.html %}
 {% include llm-head.html %}
 <style>
   .mem-stack { display: flex; flex-direction: column; border-radius: var(--radius-sm); overflow: hidden; height: 34px; }

@@ -15,6 +15,7 @@ redirect_from:
 <title>{{ page.title }} · {{ site.title }}</title>
 <meta name="description" content="{{ page.description }}">
 <link rel="stylesheet" href="{{ '/assets/css/styles.css' | relative_url }}">
+{% include favicon.html %}
 {% include llm-head.html %}
 <style>
   .llmt-list-item { display:flex; justify-content:space-between; padding:6px 10px; border-radius: var(--radius-sm); font-size:13px; margin-bottom:4px; }
