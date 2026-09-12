@@ -1,0 +1,126 @@
+# The annotated bibliography of landmark AI papers. Rendered by /ai/papers/.
+# Follows the same data/page split as _data/products.yml + ai/products.md.
+- era: "1950s-1960s"
+  title: "Computing Machinery and Intelligence"
+  authors: "Turing"
+  year: 1950
+  url: "https://www.cs.princeton.edu/~chazelle/courses/BIB/turing-intelligence.pdf"
+  points:
+    - "Introduced the Turing Test and fundamental questions about machine intelligence"
+    - "First serious discussion of whether machines can think"
+- era: "1950s-1960s"
+  title: "A Logical Calculus of Ideas Immanent in Nervous Activity"
+  authors: "McCulloch & Pitts"
+  year: 1943
+  url: "https://www.cs.cmu.edu/~./epxing/Class/10715/reading/McCulloch.and.Pitts.pdf"
+  points:
+    - "Laid groundwork for neural networks and computational theory of mind"
+    - "Showed how simple neural networks could compute logical functions"
+- era: "1970s-1980s"
+  title: "A Framework for Representing Knowledge"
+  authors: "Minsky"
+  year: 1974
+  url: "https://courses.media.mit.edu/2004spring/mas966/Minsky%201974%20Framework%20for%20knowledge.pdf"
+  points:
+    - "Introduced frames as a way to represent knowledge"
+    - "Influenced modern knowledge representation systems"
+- era: "1970s-1980s"
+  title: "Learning representations by back-propagating errors"
+  authors: "Rumelhart, Hinton & Williams"
+  year: 1986
+  url: "https://www.cs.utoronto.ca/~hinton/absps/naturebp.pdf"
+  points:
+    - "Popularized backpropagation for training neural networks"
+    - "Enabled practical training of deep neural networks"
+- era: "1990s-2000s"
+  title: "Long Short-Term Memory"
+  authors: "Hochreiter & Schmidhuber"
+  year: 1997
+  url: "https://deeplearning.cs.cmu.edu/S23/document/readings/LSTM.pdf"
+  points:
+    - "Introduced LSTM networks"
+    - "Solved the vanishing gradient problem for recurrent neural networks"
+- era: "1990s-2000s"
+  title: "Gradient-Based Learning Applied to Document Recognition"
+  authors: "LeCun et al."
+  year: 1998
+  url: "http://vision.stanford.edu/cs598_spring07/papers/Lecun98.pdf"
+  points:
+    - "Introduced ConvNets and the LeNet architecture"
+    - "Pioneered deep learning for computer vision"
+- era: "2010s"
+  title: "ImageNet Classification with Deep Convolutional Neural Networks"
+  authors: "Krizhevsky et al."
+  year: 2012
+  url: "https://proceedings.neurips.cc/paper_files/paper/2012/file/c399862d3b9d6b76c8436e924a68c45b-Paper.pdf"
+  points:
+    - "AlexNet paper that sparked the deep learning revolution"
+    - "Demonstrated the power of deep CNNs trained on large datasets"
+- era: "2010s"
+  title: "Attention Is All You Need"
+  authors: "Vaswani et al."
+  year: 2017
+  url: "https://arxiv.org/pdf/1706.03762"
+  points:
+    - "Introduced the Transformer architecture"
+    - "Foundation for modern language models like GPT and BERT"
+- era: "2018-2020"
+  title: "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding"
+  authors: "Devlin et al."
+  year: 2018
+  url: "https://arxiv.org/pdf/1810.04805"
+  points:
+    - "Introduced bidirectional context for language understanding"
+    - "Set new standards for NLP tasks"
+- era: "2018-2020"
+  title: "Language Models are Few-Shot Learners"
+  authors: "Brown et al."
+  year: 2020
+  aka: "GPT-3 paper"
+  url: "https://arxiv.org/pdf/2005.14165"
+  points:
+    - "Demonstrated emergent abilities in large language models"
+    - "Showed scaling effects on model capabilities"
+    - "Introduced few-shot learning through prompting"
+- era: "2018-2020"
+  title: "High-Resolution Image Synthesis with Latent Diffusion Models"
+  authors: "Rombach et al."
+  year: 2022
+  aka: "Stable Diffusion paper"
+  url: "https://arxiv.org/pdf/2112.10752"
+  points:
+    - "Made efficient image generation possible on consumer hardware"
+    - "Advanced the field of text-to-image generation"
+- era: "2021-2023"
+  title: "Constitutional AI: Harmlessness from AI Feedback"
+  authors: "Yuntao et al."
+  year: 2022
+  url: "https://arxiv.org/pdf/2212.08073"
+  points:
+    - "Introduced methods for aligning AI systems with human values"
+    - "Proposed frameworks for AI safety"
+- era: "2021-2023"
+  title: "PaLM: Scaling Language Modeling with Pathways"
+  authors: "Chowdhery et al."
+  year: 2022
+  url: "https://arxiv.org/pdf/2204.02311"
+  points:
+    - "Advanced scaling laws for language models"
+    - "Demonstrated breakthrough capabilities in reasoning and code generation"
+- era: "2021-2023"
+  title: "Training language models to follow instructions with human feedback"
+  authors: "Long et al."
+  year: 2022
+  aka: "InstructGPT paper"
+  url: "https://arxiv.org/pdf/2203.02155"
+  points:
+    - "Pioneered instruction tuning using human feedback (RLHF)"
+    - "Improved model alignment with human intent"
+- era: "2021-2023"
+  title: "LLaMA: Open and Efficient Foundation Language Models"
+  authors: "Touvron et al."
+  year: 2023
+  url: "https://arxiv.org/pdf/2302.13971"
+  points:
+    - "Demonstrated efficient training of powerful open-source language models"
+    - "Sparked widespread development of open LLMs"
