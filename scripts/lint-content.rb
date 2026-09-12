@@ -196,6 +196,7 @@ SERIES_PART_COUNT = SERIES.transform_values { |v| v.is_a?(Array) ? v.length : 0 
 # LLM training guide" or "13-part multi-view geometry guide".
 SERIES_NAME_HINTS = {
   'llm_training' => /llm[\s-]*training/i,
+  'llm_serving' => /llm[\s-]*serving/i,
   'multi_view_geometry' => /multi[\s-]*view[\s-]*geometry/i,
   'nonlinear_optimization' => /nonlinear[\s-]*optimization/i
 }.freeze

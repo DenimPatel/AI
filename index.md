@@ -1,14 +1,17 @@
 ---
 layout: home
 title: Home
-description: A running record of artificial intelligence — milestones, products, benchmarks and voices — alongside interactive guides to LLM training, multi-view geometry, nonlinear optimization and robotics.
+permalink: /
+section: ""
+description: A running record of artificial intelligence — milestones, products, benchmarks and voices — alongside interactive guides to LLM training and serving, multi-view geometry, nonlinear optimization and robotics.
 ---
 
 {%- assign notes = site.pages | where_exp: "p", "p.date_label" -%}
 {%- assign llm = site.data.series.llm_training.parts | size -%}
+{%- assign serving = site.data.series.llm_serving.parts | size -%}
 {%- assign mvg = site.data.series.multi_view_geometry.parts | size -%}
 {%- assign nlo = site.data.series.nonlinear_optimization.parts | size -%}
-{%- assign guideparts = llm | plus: mvg | plus: nlo -%}
+{%- assign guideparts = llm | plus: serving | plus: mvg | plus: nlo -%}
 
 <section class="hero">
   <h1>A running record<br>of artificial intelligence.</h1>
@@ -67,9 +70,9 @@ description: A running record of artificial intelligence — milestones, product
 <section class="section">
   <span class="section-kicker">Interactive guides</span>
   <h2 class="section-title">Built from scratch, step by step</h2>
-  <p class="section-lede">Three long-form guides. Every part is interactive — you drag the cameras, run the training loop, and watch the solver converge.</p>
+  <p class="section-lede">Four long-form guides. Every part is interactive — you drag the cameras, run the training loop, and watch the solver converge.</p>
   <div class="card-grid card-grid--tight" style="margin-bottom: 24px;">
-    {%- assign guide_ids = "llm_training,multi_view_geometry,nonlinear_optimization" | split: "," %}
+    {%- assign guide_ids = "llm_training,llm_serving,multi_view_geometry,nonlinear_optimization" | split: "," %}
     {%- for sid in guide_ids %}
     {%- assign s = site.data.series[sid] %}
     <a class="card" href="{{ s.hub | relative_url }}" style="text-decoration:none; color:inherit;">

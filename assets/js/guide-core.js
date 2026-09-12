@@ -42,7 +42,169 @@
     var ro = (typeof ResizeObserver !== 'undefined') ? new ResizeObserver(resize) : null;
     if (ro) ro.observe(canvas); else window.addEventListener('resize', resize);
     resize();
+    // Remember the logical coordinate system so hitTest() can map pointer events
+    // back into it (setupCanvas applies a DPR + CSS-scale transform, so raw
+    // offsetX is in backing-store pixels, not logical units).
+    canvas.__gLogW = logicalW;
+    canvas.__gLogH = logicalH;
     return { ctx: ctx, resize: resize };
+  }
+
+  // Map a pointer/mouse event to logical canvas coordinates. `canvas` must be one
+  // passed through setupCanvas (which records __gLogW/__gLogH).
+  function hitTest(canvas, ev) {
+    var rect = canvas.getBoundingClientRect();
+    var logW = canvas.__gLogW || rect.width || 1;
+    var logH = canvas.__gLogH || rect.height || 1;
+    var clientX = ev.clientX != null ? ev.clientX : (ev.touches && ev.touches[0] ? ev.touches[0].clientX : 0);
+    var clientY = ev.clientY != null ? ev.clientY : (ev.touches && ev.touches[0] ? ev.touches[0].clientY : 0);
+    return {
+      x: (clientX - rect.left) * (logW / (rect.width || logW)),
+      y: (clientY - rect.top) * (logH / (rect.height || logH))
+    };
+  }
+
+  // Numerically-stable softmax (copied from llm-guide.js so a stochastic demo can
+  // sample deterministically from a seeded RNG).
+  function softmax(xs, temperature) {
+    temperature = temperature || 1.0;
+    var scaled = xs.map(function (x) { return x / temperature; });
+    var max = Math.max.apply(null, scaled);
+    var exps = scaled.map(function (x) { return Math.exp(x - max); });
+    var sum = exps.reduce(function (a, b) { return a + b; }, 0);
+    return exps.map(function (e) { return e / sum; });
+  }
+
+  // Deterministic 32-bit LCG (copied from llm-guide.js). Every stochastic demo in
+  // the serving series must use this, never Math.random(), so a reload is stable.
+  function seededRandom(seed) {
+    var s = seed >>> 0;
+    return function () {
+      s = (s * 1664525 + 1013904223) >>> 0;
+      return s / 4294967296;
+    };
+  }
+
+  function fmtBytes(n, digits) {
+    digits = digits == null ? 1 : digits;
+    var abs = Math.abs(n);
+    var units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
+    var i = 0;
+    while (abs >= 1024 && i < units.length - 1) { abs /= 1024; n /= 1024; i++; }
+    return (i === 0 ? Math.round(n) : n.toFixed(digits)) + ' ' + units[i];
+  }
+
+  function fmtNum(n, digits) {
+    digits = digits == null ? 0 : digits;
+    return n.toFixed(digits).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+
+  function fmtMs(ms) {
+    if (ms == null) return '—';
+    if (ms < 1) return (ms * 1000).toFixed(0) + ' µs';
+    if (ms < 1000) return (ms < 10 ? ms.toFixed(2) : ms.toFixed(0)) + ' ms';
+    if (ms < 60000) return (ms / 1000).toFixed(2) + ' s';
+    var m = Math.floor(ms / 60000), s = Math.round((ms % 60000) / 1000);
+    return m + 'm ' + s + 's';
+  }
+
+  // Horizontal stacked bars, one row per entry. rows: [{label, segments:[{value,color,name}]}].
+  // Used by every memory/latency breakdown. Returns {scale, barH, padL} so callers can
+  // draw a capacity line or a legend on top of the same geometry.
+  function drawStacked(ctx, W, H, rows, opts) {
+    opts = opts || {};
+    var c = colors();
+    ctx.clearRect(0, 0, W, H);
+    if (!rows || !rows.length) return { scale: 1, barH: 0, padL: 0 };
+    var padL = opts.padL != null ? opts.padL : 110, padR = opts.padR != null ? opts.padR : 16;
+    var padT = opts.padT != null ? opts.padT : 10, padB = opts.padB != null ? opts.padB : 24;
+    var gap = opts.gap != null ? opts.gap : 12;
+    var totals = rows.map(function (r) {
+      return r.segments.reduce(function (a, s) { return a + Math.max(0, s.value); }, 0);
+    });
+    var maxTotal = opts.maxTotal != null ? opts.maxTotal : Math.max.apply(null, totals) || 1;
+    var plotW = W - padL - padR;
+    var barH = Math.max(6, (H - padT - padB - gap * (rows.length - 1)) / rows.length);
+    ctx.font = (opts.fontSize || 12) + 'px ' + c.font;
+    var palette = opts.palette || [c.accent, c.accent2, c.accent400, c.accent700, '#c9a227', '#7a5c9e', '#5f8a3a', '#b0552d'];
+    rows.forEach(function (r, i) {
+      var y = padT + i * (barH + gap);
+      var x = padL;
+      r.segments.forEach(function (s, j) {
+        var w = plotW * (Math.max(0, s.value) / maxTotal);
+        ctx.fillStyle = s.color || palette[j % palette.length];
+        ctx.fillRect(x, y, w, barH);
+        if (opts.showSegmentLabels && w > 34) {
+          ctx.fillStyle = opts.segmentLabelColor || '#fff';
+          ctx.textAlign = 'center';
+          ctx.fillText(fmtBytes(s.value), x + w / 2, y + barH * 0.68);
+        }
+        x += w;
+      });
+      ctx.fillStyle = c.text;
+      ctx.textAlign = 'right';
+      ctx.fillText(r.label, padL - 8, y + barH * 0.72);
+    });
+    ctx.textAlign = 'right';
+    ctx.fillStyle = c.text;
+    ctx.font = '11px ' + c.font;
+    if (opts.axisLabel) {
+      ctx.textAlign = 'center';
+      ctx.fillText(opts.axisLabel, padL + plotW / 2, H - 4);
+    }
+    return { scale: plotW / maxTotal, barH: barH, padL: padL, padT: padT };
+  }
+
+  // Heatmap for expert loads, attention masks and block tables. `matrix` is a 2D
+  // array of numbers (rows x cols). opts: {min, max, colorLow, colorHigh, rowLabels, colLabels}.
+  function drawHeatmap(ctx, W, H, matrix, opts) {
+    opts = opts || {};
+    var c = colors();
+    ctx.clearRect(0, 0, W, H);
+    if (!matrix || !matrix.length) return;
+    var rows = matrix.length, cols = matrix[0].length;
+    var padL = opts.padL != null ? opts.padL : (opts.rowLabels ? 54 : 4);
+    var padB = opts.padB != null ? opts.padB : (opts.colLabels ? 26 : 4);
+    var padT = opts.padT != null ? opts.padT : 6, padR = 6;
+    var cellW = (W - padL - padR) / cols, cellH = (H - padT - padB) / rows;
+    var vals = [];
+    matrix.forEach(function (row) { row.forEach(function (v) { vals.push(v); }); });
+    var min = opts.min != null ? opts.min : Math.min.apply(null, vals);
+    var max = opts.max != null ? opts.max : Math.max.apply(null, vals) || 1;
+    var lo = opts.colorLow || [235, 244, 248], hi = opts.colorHigh || [0, 136, 176];
+    function color(v) {
+      var t = (max === min) ? 0 : (v - min) / (max - min);
+      t = Math.max(0, Math.min(1, t));
+      return 'rgb(' + Math.round(lo[0] + (hi[0] - lo[0]) * t) + ',' +
+        Math.round(lo[1] + (hi[1] - lo[1]) * t) + ',' + Math.round(lo[2] + (hi[2] - lo[2]) * t) + ')';
+    }
+    for (var r = 0; r < rows; r++) {
+      for (var q = 0; q < cols; q++) {
+        ctx.fillStyle = color(matrix[r][q]);
+        ctx.fillRect(padL + q * cellW, padT + r * cellH, Math.max(1, cellW + 0.5), Math.max(1, cellH + 0.5));
+      }
+    }
+    ctx.fillStyle = c.text;
+    ctx.font = (opts.fontSize || 10) + 'px ' + c.font;
+    if (opts.rowLabels) {
+      ctx.textAlign = 'right';
+      for (var i = 0; i < rows; i++) {
+        if (rows <= 24 || i % Math.ceil(rows / 24) === 0) {
+          ctx.fillText(opts.rowLabels[i] != null ? opts.rowLabels[i] : i,
+            padL - 6, padT + i * cellH + cellH * 0.7);
+        }
+      }
+    }
+    if (opts.colLabels) {
+      ctx.textAlign = 'center';
+      for (var k = 0; k < cols; k++) {
+        if (cols <= 24 || k % Math.ceil(cols / 24) === 0) {
+          ctx.fillText(opts.colLabels[k] != null ? opts.colLabels[k] : k,
+            padL + k * cellW + cellW / 2, H - padB + 14);
+        }
+      }
+    }
+    return { cellW: cellW, cellH: cellH, padL: padL, padT: padT };
   }
 
   // Horizontal bar chart. data: [{label, value}], sorted by caller if desired.
@@ -168,8 +330,10 @@
   }
 
   global.Guide = {
-    css: css, colors: colors, setupCanvas: setupCanvas,
-    drawBars: drawBars, drawLines: drawLines,
+    css: css, colors: colors, setupCanvas: setupCanvas, hitTest: hitTest,
+    drawBars: drawBars, drawLines: drawLines, drawStacked: drawStacked, drawHeatmap: drawHeatmap,
+    softmax: softmax, seededRandom: seededRandom,
+    fmtBytes: fmtBytes, fmtNum: fmtNum, fmtMs: fmtMs,
     loop: loop, bindSliders: bindSliders
   };
 })(window);

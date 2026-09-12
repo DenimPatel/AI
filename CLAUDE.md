@@ -9,7 +9,7 @@ framework, no npm, no build step beyond Jekyll. There are no automated tests, bu
 (`.github/workflows/ci.yml`) runs a build, an internal link check, and a content linter on
 every push and PR — see Commands below. A separate monthly job checks external links too.
 
-Content is roughly 250,000 words across ~60 pages, and the great majority of it is three
+Content is roughly 250,000 words across ~60 pages, and the great majority of it is four
 long interactive guides made of hand-written `<canvas>` and vanilla JS. Treat those guide
 pages as the crown jewels: they are fragile, they are not covered by any test, and a change
 you cannot see rendered is a change you cannot verify.
@@ -124,8 +124,8 @@ YAML and silently broke their meta descriptions. Quote every string value.
 ## Assets
 
 `assets/css/styles.css` is the whole design system; `llm-guide.css` and `llm-guide.js` are
-LLM-series only. The three JSON files under `assets/data/` are fetched at runtime by the LLM
-guide. There are no local images — **all 31 raster images are hotlinked to
+LLM-series only. The four JSON files under `assets/data/` are fetched at runtime by the LLM
+guides. There are no local images — **all 31 raster images are hotlinked to
 `roboticswithdenim.wordpress.com`** and will disappear if that blog goes down.
 
 The multi-view-geometry and nonlinear-optimization pages each carry a large inline `<style>`
@@ -166,7 +166,10 @@ functions look like an obvious match. Likewise `llm-guide.css`/`llm-guide.js` st
 are; the 16 LLM-training pages keep using `window.LLMG`, not `window.Guide`/`window.GuideMath`.
 The guide kit exists so a genuinely new guide page is cheap to start, not to unify what
 already ships. `vision/guide-kit-demo/` is a small demo series proving the kit renders —
-not real content, kept as a working example and a build-time smoke test.
+not real content, kept as a working example and a build-time smoke test. The LLM Serving
+series (`_data/series/llm_serving.yml`, `/ai/llm-serving/`) is the guide kit's first real
+consumer: it adds generic helpers to `guide-core.js` (stacked bars, heatmaps, formatting,
+hit-testing) and its own `assets/js/serving-sim.js` on top.
 
 ## Conventions
 
