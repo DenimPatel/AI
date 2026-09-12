@@ -4,3 +4,6 @@ _site/
 Gemfile.lock
 vendor/
 .bundle/
+
+# macOS
+.DS_Store
