@@ -24,7 +24,7 @@ permalink: /llm-training-reasoning.html
 <main>
 <div class="wrap llmt">
   <section class="page-header">
-    <span class="section-kicker">Interactive guide · Part 9 of 12</span>
+    <span class="section-kicker">Interactive guide · Part 9 of 15</span>
     <h1>Reasoning &amp; RL with Verifiable Rewards</h1>
     <p>Part 8 covered alignment with human preferences. A parallel, more recent development trains models to be better at tasks with an <em>automatically checkable</em> answer — math, code, precise instruction-following — using reinforcement learning where the reward comes from a verifier function, not a learned reward model. This is the biggest change to post-training since RLHF itself, and it's what powers "thinking" models that write out long chains of reasoning before answering.</p>
   </section>
@@ -81,6 +81,26 @@ permalink: /llm-training-reasoning.html
     </div>
   </section>
 
+  <section class="llmt-step" id="olmorl">
+    <div class="llmt-step-head"><span class="llmt-step-num">5</span><h2>From GRPO to OLMoRL — and RL from base</h2></div>
+    <p class="llmt-eyebrow">The 2025 upgrades</p>
+    <p>GRPO as introduced above is now the starting point, not the final word. OLMoRL builds on it with ideas from <strong>DAPO</strong> and <strong>Dr.GRPO</strong>, and each change fixes a concrete failure of vanilla GRPO. In one line: filter the zero-signal groups, refill the batch, normalize the loss by tokens, drop the KL term, clip asymmetrically, correct for engine mismatch, and stop dividing by the group's standard deviation. Part 15 opens each one up with demos.</p>
+    <ul class="llmt-refs">
+      <li><b>Zero-gradient filtering</b> — drop groups whose rewards are all identical (no advantage, no gradient).</li>
+      <li><b>Active sampling</b> — keep pulling prompt–completion pairs from the result queue so filtering doesn't shrink the batch over training.</li>
+      <li><b>Token-level loss</b> — normalize by total batch tokens, not per sample, removing a length bias.</li>
+      <li><b>No KL loss</b> — less-restricted updates without observed over-optimization.</li>
+      <li><b>Clip-higher</b> — asymmetric clipping lets probability rise more than it falls.</li>
+      <li><b>Truncated importance sampling</b> — correct the log-prob gap between the vLLM inference engine and the trainer.</li>
+      <li><b>No std normalization</b> — advantage becomes <span class="lc-note">r − mean(r)</span>, removing the difficulty bias that inflates near-saturated prompts.</li>
+    </ul>
+    <p><b>Verifiers go multi-domain.</b> Tulu 3 and early RLVR mostly rewarded math. OLMo 3 expands to four domains, each with its own checker: <b>math</b> (SymPy answer equivalence), <b>code</b> (test-case execution on AWS Lambda, so verification never blocks the trainer), <b>instruction following</b> (constraint checkers, all-or-nothing), and <b>chat</b> (an LM judge, with or without a reference answer). This is what turns RLVR from a math trick into a general post-training stage.</p>
+    <p><b>Difficulty filtering is where the sample efficiency comes from.</b> For each prompt, sample eight rollouts from the starting checkpoint and discard prompts the model already solves more than <strong>62.5%</strong> of the time. Those prompts produce near-zero advantage and waste compute; keeping only the hard-but-solvable middle makes each RL step count. (The 32B run then relies on active sampling instead of offline filtering.)</p>
+    <p><b>RL-Zero</b> applies all of this directly to the midtrained base model, with no SFT or DPO warm start. Two findings generalize: <em>simple</em> prompt templates beat standard chat templates when the base model never saw special tokens, and the choice of midtraining data determines whether RL learns to reason longer — a base with too little reasoning data plateaus instead of growing its response length. Because RL-Zero starts from a fully open pipeline, it also enables a clean contamination test: train with <strong>spurious random rewards</strong>. If benchmark performance rises, the eval leaked into pretraining; OLMo 3's flat curve is evidence it didn't. Part 15 walks through both the difficulty filter and the spurious-reward control.</p>
+    <div class="llmt-warn">⚠️ <span><b>Multi-objective RL is harder than single-domain RL.</b> A model trained on math alone reaches a higher math reward than one trained on math + code + instruction + chat. But the single-domain model overfits and generalizes worse. The mixed run is the better benchmark for real assistants — and the reason OLMo 3's final RL mix is roughly balanced across domains.</span></div>
+    <div class="llmt-goal">📌 <span><b>Cross-links:</b> Part 15 has the OLMoRL objective, the domain-verifier zoo, the difficulty-filter histogram, and the async RL systems that make long-chain-of-thought training practical.</span></div>
+  </section>
+
   <section class="llmt-step" id="cheatsheet">
     <div class="llmt-step-head"><span class="llmt-step-num">✓</span><h2>Cheat sheet</h2></div>
     <p class="llmt-eyebrow">Recap</p>
@@ -93,6 +113,14 @@ permalink: /llm-training-reasoning.html
         <tr><td>GRPO</td><td>Advantage from a sampled group's own mean/std — no value model</td></tr>
         <tr><td>pass@k</td><td>P(at least one of k samples correct) = 1−(1−p)ᵏ</td></tr>
         <tr><td>Majority voting</td><td>Sample k, answer with the most common output — usable without a verifier at inference</td></tr>
+        <tr><td>Zero-gradient filtering</td><td>Drop groups with identical rewards — no advantage means no gradient</td></tr>
+        <tr><td>Active sampling</td><td>Resample prompts until the batch is full of non-zero-gradient completions</td></tr>
+        <tr><td>Clip-higher / token-level loss</td><td>Asymmetric clipping and total-token normalization (DAPO-style GRPO upgrades)</td></tr>
+        <tr><td>No std normalization</td><td>Advantage = reward − group mean; avoids difficulty bias (Dr.GRPO)</td></tr>
+        <tr><td>Multi-domain verifiers</td><td>SymPy math, test-case code, IF constraint checks, LM-judge chat</td></tr>
+        <tr><td>Difficulty filtering</td><td>Remove prompts solved &gt;62.5% of 8 rollouts to keep only learnable signal</td></tr>
+        <tr><td>RL-Zero</td><td>RLVR directly from the base model, no SFT/DPO warm start</td></tr>
+        <tr><td>Spurious-reward control</td><td>Random rewards should not improve benchmarks; if they do, data is contaminated</td></tr>
       </tbody>
     </table>
     </div>

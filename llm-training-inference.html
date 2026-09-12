@@ -26,7 +26,7 @@ permalink: /llm-training-inference.html
 <main>
 <div class="wrap llmt">
   <section class="page-header">
-    <span class="section-kicker">Interactive guide · Part 11 of 12</span>
+    <span class="section-kicker">Interactive guide · Part 11 of 15</span>
     <h1>Inference, Serving &amp; Efficiency</h1>
     <p>Training produces a fixed set of weights. Everything from here is about the very different problem of running that fixed function fast, cheaply, and for many users at once — which turns out to have its own rich set of mechanisms, none of them touched by training itself.</p>
   </section>
@@ -137,6 +137,30 @@ permalink: /llm-training-inference.html
       <div class="llmt-card"><b>RAG (retrieval-augmented generation)</b> — before generation starts, a retrieval system (often the same embedding idea from Part 2, at a much larger scale) finds relevant documents and prepends them to the prompt, so the model can answer from up-to-date or private text it never saw in pretraining.</div>
       <div class="llmt-card"><b>Beam search</b> — instead of sampling one path, keep the top-B partial sequences by cumulative probability at every step; used less often for open-ended chat (where diverse, sampled text feels better) than for tasks with a single correct answer, like translation.</div>
     </div>
+  </section>
+
+  <section class="llmt-step" id="rl-serving">
+    <div class="llmt-step-head"><span class="llmt-step-num">7</span><h2>Serving at scale: inference for RL</h2></div>
+    <p class="llmt-eyebrow">Why the biggest serving customer is training</p>
+    <p>The largest recent consumer of inference is not a chatbot endpoint — it's reinforcement learning. Generating long chains of thought means rollouts up to 32K tokens (mean ≈ 14,628 for a reasoning model), and the learner spends roughly <strong>75% of its time waiting for data</strong>. In OLMo 3's 32B run, 8 H100 nodes trained while 20 generated rollouts (5× the inference compute); the 7B run used 2 training and 7 inference nodes (14×). Every serving technique from this page therefore shows up directly inside the RL system — and in fact the fixes are the same continuous-batching and scheduling machinery, adapted to a workload where sequences are highly variable in length and the "requests" are policy samples.</p>
+    <div class="llmt-demo" style="flex-direction:column;">
+      <div class="llmt-canvas-wrap" style="flex:1 1 100%;">
+        <canvas id="rl-throughput" width="640" height="240"></canvas>
+        <p class="llmt-canvas-hint">OLMoRL training throughput as each serving/systems improvement is added. MBU = memory-bandwidth utilization; MFU = model FLOPs utilization.</p>
+      </div>
+    </div>
+    <div style="overflow-x:auto; margin:14px 0;">
+    <table class="llmt-cheat">
+      <thead><tr><th>Change</th><th>Why it matters</th></tr></thead>
+      <tbody>
+        <tr><td>Continuous batching</td><td>Rollouts have wildly different lengths. Static batching wastes ≈54% of slot-steps waiting for the longest one (mean 14,628 vs max 32,768 tokens); continuous batching backfills freed slots immediately.</td></tr>
+        <tr><td>Active sampling</td><td>Instead of DAPO's fixed 3× oversampling, pull completed prompt–completion pairs continuously from a result queue — stable batch size and loss even as filtering drops easy prompts.</td></tr>
+        <tr><td>Inflight weight updates</td><td>Push updated policy weights to the inference workers without pausing generation or invalidating the KV cache. Up to 4× faster than stopping to sync.</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p>Stacked together, these took training throughput from <strong>881 to 2,949 tokens/second</strong> and memory-bandwidth utilization from <strong>12.9% to 43.2%</strong>. The lesson generalizes: once long-context generation is in the loop, RL is an inference-systems problem first and an optimization problem second.</p>
+    <div class="llmt-goal">📌 <span><b>Cross-link:</b> <a href="{% endraw %}{{ '/llm-training-posttraining-scale.html' | relative_url }}{% raw %}">Part 15</a> shows the full OLMoRL recipe and the batching timeline this section summarizes.</span></div>
   </section>
 
   <section class="llmt-step" id="cheatsheet">
@@ -401,6 +425,20 @@ permalink: /llm-training-inference.html
       });
     });
     render(32);
+  })();
+
+  // ---- RL training throughput ----
+  (function(){
+    var canvas = document.getElementById('rl-throughput'), ctx = canvas.getContext('2d');
+    var W = canvas.width, H = canvas.height;
+    var rows = [
+      { label:'OLMo 2 baseline', v:881, mbu:12.9 },
+      { label:'+ continuous batching', v:975, mbu:14.3 },
+      { label:'+ better threading', v:1358, mbu:19.9 },
+      { label:'+ inflight updates', v:2949, mbu:43.2 }
+    ];
+    var data = rows.map(function(r){ return { label:r.label, value:r.v, valueLabel:r.v+' tok/s · MBU '+r.mbu+'%' }; });
+    G.drawBars(ctx, W, H, data, { maxV:3200 });
   })();
 
 })();

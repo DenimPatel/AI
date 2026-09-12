@@ -20,7 +20,7 @@ permalink: /llm-training-evaluation.html
 <main>
 <div class="wrap llmt">
   <section class="page-header">
-    <span class="section-kicker">Interactive guide · Part 10 of 12</span>
+    <span class="section-kicker">Interactive guide · Part 10 of 15</span>
     <h1>Evaluation</h1>
     <p>"OLMo 2 scores 63.7 on MMLU" sounds like a simple fact. It hides several protocol choices — how each answer choice is scored, how many examples the model sees first, who or what is judging open-ended output — each of which can move the number by several points without changing the model at all. This part makes those choices visible.</p>
   </section>
@@ -113,6 +113,80 @@ permalink: /llm-training-evaluation.html
       <div class="llmt-card"><b>OLMES</b> — Ai2's own standardized evaluation suite, built specifically to fix apples-to-oranges comparisons: fixed prompt formats, fixed few-shot counts, and documented scoring conventions per task, so numbers from different papers are actually comparable.</div>
     </div>
     <p>See the site's <a href="/benchmarks.html">benchmarks page</a> for how these numbers get tracked over time across the industry.</p>
+  </section>
+
+  <section class="llmt-step" id="suite">
+    <div class="llmt-step-head"><span class="llmt-step-num">7</span><h2>Inside OLMo 3's evaluation suite</h2></div>
+    <p class="llmt-eyebrow">Tasks, clusters, and signal</p>
+    <p>OLMo 3 grew Ai2's base evaluation suite from <strong>11 tasks in OLMo 2 to 43 tasks</strong>. That expansion is not just "more benchmarks" — it is a deliberate design with three ideas behind it.</p>
+    <p><b>Task clustering.</b> Thirty or forty benchmarks over-weight whatever they all share. To see the structure, the team took per-task correctness from 70 models across ~23,000 benchmark results and ran agglomerative (Ward) clustering. Tasks that models pass and fail together land in the same cluster, revealing the underlying capabilities.</p>
+    <div class="llmt-demo">
+      <div class="llmt-canvas-wrap">
+        <canvas id="clust-canvas" width="560" height="300"></canvas>
+        <p class="llmt-canvas-hint">Schematic dendrogram of benchmark tasks (Ward-style). Slide the cut height to choose how coarse the capability clusters are.</p>
+      </div>
+      <div class="llmt-controls">
+        <div class="llmt-field"><label>Merge-distance cut <span class="val" id="clust-cut-val">0.80</span></label>
+          <input type="range" id="clust-cut" min="0.1" max="2" step="0.05" value="0.8"></div>
+        <div class="llmt-readout" id="clust-readout"></div>
+      </div>
+    </div>
+    <p><b>Signal-to-noise by averaging a cluster.</b> A single benchmark is a noisy estimate. Averaging the tasks inside a cluster cancels independent noise, so the cluster mean is a more reliable readout than any single task — provided the tasks aren't so correlated that they all move together.</p>
+    <div class="llmt-demo">
+      <div class="llmt-canvas-wrap">
+        <canvas id="snr-canvas" width="520" height="250"></canvas>
+        <p class="llmt-canvas-hint">SNR of a cluster average versus the number of tasks, for different inter-task correlations ρ.</p>
+      </div>
+      <div class="llmt-controls">
+        <div class="llmt-field"><label>Tasks in cluster <span class="val" id="snr-n-val">6</span></label>
+          <input type="range" id="snr-n" min="1" max="20" step="1" value="6"></div>
+        <div class="llmt-field"><label>Inter-task correlation ρ <span class="val" id="snr-rho-val">0.30</span></label>
+          <input type="range" id="snr-rho" min="0" max="0.95" step="0.05" value="0.3"></div>
+        <div class="llmt-readout" id="snr-readout"></div>
+      </div>
+    </div>
+    <p><b>Base Easy validates the pipeline; Base Main measures the model.</b> The full 43-task suite is hard and noisy for a base model mid-run. So OLMo 3 also defines a small <em>Base Easy</em> suite (bits-per-byte on easier tasks) that runs quickly and correlates strongly with the harder Base Main average. Developers use it to confirm a training recipe is on track before paying for the full evaluation.</p>
+    <div class="llmt-demo">
+      <div class="llmt-canvas-wrap">
+        <canvas id="easymain-canvas" width="520" height="250"></canvas>
+        <p class="llmt-canvas-hint">Base Easy (bits-per-byte) versus Base Main average across checkpoints. Lower BPB should mean higher Main accuracy.</p>
+      </div>
+      <div class="llmt-readout" id="easymain-readout"></div>
+    </div>
+    <div class="llmt-goal">💡 <span><b>Held-out tasks:</b> a handful of benchmarks — MMLU Pro, DeepMind Math, LBPP, and BigBench Hard — are deliberately excluded from model-development decisions and kept as a clean held-out check on the final model.</span></div>
+  </section>
+
+  <section class="llmt-step" id="variance">
+    <div class="llmt-step-head"><span class="llmt-step-num">8</span><h2>Noise, variance, and contamination</h2></div>
+    <p class="llmt-eyebrow">Reading a number honestly</p>
+    <p><b>Sampling temperature and top-p are protocol choices.</b> For pass@k on code, OLMo 3 swept temperature and nucleus sampling across five models and settled on <strong>temperature 0.6</strong>. The number you report is only comparable to another number reported under the same sampling settings.</p>
+    <p><b>Match k to how the model will be trained.</b> OLMo 3 reports code pass@k with <strong>k = 16</strong>, the same group size its GRPO uses. That makes pass@16 an empirical upper bound on what RL on that prompt set could achieve, and it is large enough to capture variance without exploding cost.</p>
+    <p><b>Know which benchmarks are noisy.</b> Repeating runs lets you bucket tasks by stability. The very stable tasks (MATH, MMLU, PopQA) are safe to compare within a point; the high-variance tasks (GPQA, IFEval) need wider error bars before you claim a win.</p>
+    <div style="overflow-x:auto; margin:10px 0 16px;">
+    <table class="llmt-cheat">
+      <thead><tr><th>Stability</th><th>Benchmarks (std. dev. across runs)</th></tr></thead>
+      <tbody>
+        <tr><td>High variance</td><td>GPQA (1.48), AlpacaEval 3 (1.24), IFEval (0.88)</td></tr>
+        <tr><td>Moderate</td><td>ZebraLogic (0.56), Omega (0.56), AIME 24 Avg@32 (0.54), HumanEvalPlus (0.46), AgiEval (0.43), BigBenchHard (0.39)</td></tr>
+        <tr><td>Very stable</td><td>LiveCodeBench Avg@10 (0.29), MBPPPlus (0.27), MATH (0.25), MMLU (0.22), PopQA (0.16)</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p><b>Contamination and overestimation diverge.</b> As Part 4 covered, a highly contaminated benchmark is not automatically an inflated one. The table below is repeated here because it is the single best argument for <em>measuring</em> overestimation directly instead of assuming high overlap means a fake score.</p>
+    <div style="overflow-x:auto; margin:10px 0 16px;">
+    <table class="llmt-cheat">
+      <thead><tr><th>Benchmark</th><th>% contaminated</th><th>Perf. overestimation</th></tr></thead>
+      <tbody>
+        <tr><td>DROP (generative)</td><td>66.87%</td><td><span class="k">+13.99</span></td></tr>
+        <tr><td>GSM-Symbolic</td><td>0.00%</td><td>+5.54</td></tr>
+        <tr><td>Codex HumanEval @16</td><td>7.07%</td><td>+3.54</td></tr>
+        <tr><td>SQuAD</td><td>83.24%</td><td>+1.70</td></tr>
+        <tr><td>GSM8K</td><td>84.99%</td><td>+1.61 (decontaminated perf. higher)</td></tr>
+        <tr><td>Minerva</td><td>45.17%</td><td>−1.95</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="llmt-goal">📌 <span><b>Cross-links:</b> the decontamination method and the full table are in <a href="{% endraw %}{{ '/llm-training-data.html' | relative_url }}{% raw %}">Part 4</a>; the spurious-reward contamination test for RL is in <a href="{% endraw %}{{ '/llm-training-posttraining-scale.html' | relative_url }}{% raw %}">Part 15</a>; and the pass@k estimator on this page is the same one used to measure code RL.</span></div>
   </section>
 
   <section class="llmt-step" id="refs">
@@ -289,6 +363,112 @@ permalink: /llm-training-evaluation.html
     }
     [nS,cS,kS].forEach(function(el){el.addEventListener('input',render);});
     render();
+  })();
+
+  // ---- Task-cluster dendrogram (schematic) ----
+  (function(){
+    var canvas = document.getElementById('clust-canvas'), ctx = canvas.getContext('2d');
+    var slider = document.getElementById('clust-cut'), val = document.getElementById('clust-cut-val');
+    var readout = document.getElementById('clust-readout');
+    var W = canvas.width, H = canvas.height;
+    var leaves = ['MMLU','GPQA','ARC','HellaSwag','GSM8K','MATH','HumanEval','MBPP'];
+    var merges = [
+      { l:0, r:1, h:0.4 }, { l:8, r:2, h:0.7 }, { l:9, r:3, h:1.0 },
+      { l:4, r:5, h:0.5 }, { l:6, r:7, h:0.6 }, { l:11, r:12, h:1.2 }, { l:10, r:13, h:1.8 }
+    ];
+    var nodes = leaves.map(function(name,i){ return { x:i, y:0, name:name }; });
+    merges.forEach(function(m){
+      nodes.push({ x:(nodes[m.l].x+nodes[m.r].x)/2, y:m.h });
+    });
+    var palette = [c.accent, c.accent2, '#3aa66a', '#c98a00'];
+    function clustersAt(cut){
+      var parent = {}; for (var i=0;i<8;i++) parent[i]=i;
+      function find(a){ while (parent[a]!==a){ parent[a]=parent[parent[a]]; a=parent[a]; } return a; }
+      merges.forEach(function(m){ if (m.h<=cut){ var a=find(m.l), b=find(m.r); if (a!==b) parent[a]=b; } });
+      var out = {};
+      for (i=0;i<8;i++){ var r=find(i); (out[r]=out[r]||[]).push(i); }
+      return Object.keys(out).map(function(k){ return out[k]; });
+    }
+    function render(){
+      var cut = parseFloat(slider.value); val.textContent = cut.toFixed(2);
+      var cls = clustersAt(cut); var colorOf = {};
+      cls.forEach(function(g,gi){ g.forEach(function(i){ colorOf[i]=palette[gi%palette.length]; }); });
+      ctx.clearRect(0,0,W,H);
+      var padL=80, padR=20, padT=20, padB=70;
+      var plotW=W-padL-padR, plotH=H-padT-padB, maxH=2.0;
+      function X(x){ return padL + (x+0.5)/8*plotW; }
+      function Y(y){ return padT + plotH - (y/maxH)*plotH; }
+      merges.forEach(function(m){
+        var left=nodes[m.l], right=nodes[m.r];
+        ctx.strokeStyle=c.divider; ctx.lineWidth=1.5;
+        ctx.beginPath(); ctx.moveTo(X(left.x),Y(left.y)); ctx.lineTo(X(left.x),Y(m.h)); ctx.lineTo(X(right.x),Y(m.h)); ctx.lineTo(X(right.x),Y(right.y)); ctx.stroke();
+      });
+      nodes.slice(0,8).forEach(function(n,i){
+        ctx.fillStyle=colorOf[i]; ctx.beginPath(); ctx.arc(X(n.x),Y(0),4,0,2*Math.PI); ctx.fill();
+        ctx.save(); ctx.translate(X(n.x),Y(0)+8); ctx.rotate(-Math.PI/3); ctx.textAlign='right'; ctx.font='10px '+c.font; ctx.fillStyle=c.text;
+        ctx.fillText(leaves[i],0,0); ctx.restore();
+      });
+      ctx.strokeStyle=c.accent2; ctx.setLineDash([4,4]);
+      ctx.beginPath(); ctx.moveTo(padL,Y(cut)); ctx.lineTo(W-padR,Y(cut)); ctx.stroke(); ctx.setLineDash([]);
+      ctx.font='10px '+c.font; ctx.fillStyle=c.text; ctx.textAlign='left';
+      ctx.fillText('merge distance (Ward) →', padL, H-8);
+      readout.innerHTML = '<span class="k">clusters at this cut:</span> '+cls.length+'<br>' +
+        cls.map(function(g,gi){ return '<span style="color:'+palette[gi%palette.length]+'">●</span> '+g.map(function(i){return leaves[i];}).join(', '); }).join('<br>');
+    }
+    slider.addEventListener('input', render);
+    render();
+  })();
+
+  // ---- Cluster SNR ----
+  (function(){
+    var canvas = document.getElementById('snr-canvas'), ctx = canvas.getContext('2d');
+    var slider = document.getElementById('snr-rho'), val = document.getElementById('snr-rho-val');
+    var nS = document.getElementById('snr-n'), nV = document.getElementById('snr-n-val');
+    var readout = document.getElementById('snr-readout');
+    var W = canvas.width, H = canvas.height;
+    var rhos = [
+      { r:0, color:c.accent, label:'ρ=0 (independent)' },
+      { r:0.3, color:'#3aa66a', label:'ρ=0.3' },
+      { r:0.6, color:'#c98a00', label:'ρ=0.6' },
+      { r:0.9, color:c.accent2, label:'ρ=0.9' }
+    ];
+    function snr(n,rho){ return Math.sqrt(n/(1+(n-1)*rho)); }
+    function render(){
+      var rho=parseFloat(slider.value), n=parseInt(nS.value,10);
+      val.textContent=rho.toFixed(2); nV.textContent=n;
+      var series=rhos.map(function(x){ var pts=[]; for (var i=1;i<=20;i++) pts.push({x:i,y:snr(i,x.r)}); return {points:pts,color:x.color}; });
+      var ax = G.drawLines(ctx, W, H, series, [1,20], [1,4.5], { xLabel:'tasks averaged in the cluster', yLabel:'SNR multiplier' });
+      var mx=ax.px(n), my=ax.py(snr(n,rho));
+      ctx.fillStyle=c.text; ctx.beginPath(); ctx.arc(mx,my,5,0,2*Math.PI); ctx.fill();
+      ctx.font='10.5px '+c.font; ctx.textAlign='left';
+      rhos.forEach(function(x,i){ ctx.fillStyle=x.color; ctx.fillText('▬ '+x.label, ax.padL+8, ax.padT+14+i*13); });
+      readout.innerHTML = '<span class="k">SNR multiplier at n='+n+':</span> <span class="hi">'+snr(n,rho).toFixed(2)+'×</span> (ρ='+rho.toFixed(2)+')<br>' +
+        '<span style="opacity:0.65">independent tasks average noise away fastest; correlated tasks still help, with diminishing returns.</span>';
+    }
+    slider.addEventListener('input', render); nS.addEventListener('input', render);
+    render();
+  })();
+
+  // ---- Base Easy vs Base Main ----
+  (function(){
+    var canvas = document.getElementById('easymain-canvas'), ctx = canvas.getContext('2d');
+    var readout = document.getElementById('easymain-readout');
+    var W = canvas.width, H = canvas.height;
+    var rng = G.seededRandom(3);
+    var pts = [];
+    for (var i=0;i<28;i++){
+      var bpb = 0.74 + 0.32*rng();
+      var acc = 12 + 62/(1+Math.exp((bpb-0.9)*22)) + 4*(rng()-0.5);
+      pts.push({ x:bpb, y:Math.max(5,Math.min(80,acc)) });
+    }
+    var n=pts.length, sx=0,sy=0,sxx=0,sxy=0,syy=0;
+    pts.forEach(function(p){ sx+=p.x; sy+=p.y; sxx+=p.x*p.x; sxy+=p.x*p.y; syy+=p.y*p.y; });
+    var slope=(n*sxy-sx*sy)/(n*sxx-sx*sx), intercept=(sy-slope*sx)/n;
+    var r=(n*sxy-sx*sy)/Math.sqrt((n*sxx-sx*sx)*(n*syy-sy*sy));
+    var ax = G.drawLines(ctx, W, H, [{ points:[{x:0.72,y:slope*0.72+intercept},{x:1.07,y:slope*1.07+intercept}], color:c.accent }], [0.72,1.07], [0,85], { xLabel:'Base Easy (BPB, lower is better)', yLabel:'Base Main average' });
+    pts.forEach(function(p){ ctx.fillStyle=c.accent2; ctx.beginPath(); ctx.arc(ax.px(p.x),ax.py(p.y),3.5,0,2*Math.PI); ctx.fill(); });
+    readout.innerHTML = '<span class="k">Pearson r:</span> <span class="hi">'+r.toFixed(3)+'</span> over '+n+' checkpoints<br>' +
+      '<span style="opacity:0.65">Base Easy is cheap and tracks Base Main rank, so it validates a recipe before the full suite is worth running.</span>';
   })();
 
 })();
