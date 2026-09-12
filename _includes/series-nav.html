@@ -1,0 +1,14 @@
+{%- comment -%}
+Series pill nav. Usage:
+  {% include series-nav.html series=site.data.series.multi_view_geometry %}
+Replaces the nav block that used to be copy-pasted into every part of a series.
+{%- endcomment -%}
+<nav class="nav nav--series" aria-label="{{ include.series.title }} parts">
+  <a href="{{ include.series.hub | relative_url }}"{% if page.url == include.series.hub %} aria-current="page"{% endif %}>Contents</a>
+  {%- for part in include.series.parts %}
+  <a href="{{ part.permalink | relative_url }}"{% if page.url == part.permalink or page.permalink == part.permalink %} aria-current="page"{% endif %}>{{ part.short }}</a>
+  {%- endfor %}
+  {%- for extra in include.series.appendix %}
+  <a href="{{ extra.permalink | relative_url }}"{% if page.url == extra.permalink or page.permalink == extra.permalink %} aria-current="page"{% endif %}>{{ extra.short }}</a>
+  {%- endfor %}
+</nav>

@@ -1,0 +1,269 @@
+# AI product releases. Rendered by /ai/products/ and the homepage teaser.
+# `weights: open|closed|mixed` replaces the tag chips that used to be hand-written
+# inline in both index.md and product_timeline.md.
+- date: '2011'
+  era: Early Foundations (2010-2015)
+  text: IBM Watson wins Jeopardy!
+- date: '2011'
+  era: Early Foundations (2010-2015)
+  text: Apple releases Siri
+- date: '2012'
+  era: Early Foundations (2010-2015)
+  text: Google's deep learning algorithm learns to recognize cats in YouTube videos
+- date: '2014'
+  era: Early Foundations (2010-2015)
+  text: Amazon releases Alexa
+- date: '2014'
+  era: Early Foundations (2010-2015)
+  text: DeepMind's AlphaGo begins development
+- date: '2015'
+  era: Early Foundations (2010-2015)
+  text: Microsoft releases Cortana
+- date: '2016'
+  era: Rise of Modern AI (2016-2019)
+  text: Google releases TensorFlow to the public
+- date: '2016'
+  era: Rise of Modern AI (2016-2019)
+  text: AlphaGo defeats Lee Sedol at Go
+- date: '2017'
+  era: Rise of Modern AI (2016-2019)
+  text: Google introduces Transformer architecture
+- date: '2018'
+  era: Rise of Modern AI (2016-2019)
+  text: Google releases BERT
+- date: '2018'
+  era: Rise of Modern AI (2016-2019)
+  text: OpenAI releases GPT-1
+- date: '2019'
+  era: Rise of Modern AI (2016-2019)
+  text: Google launches ALBERT
+- date: '2019'
+  era: Rise of Modern AI (2016-2019)
+  text: OpenAI releases GPT-2
+- date: '2020'
+  era: Language Model Revolution (2020-2022)
+  text: OpenAI releases GPT-3
+- date: '2020'
+  era: Language Model Revolution (2020-2022)
+  text: Google releases T5
+- date: '2021'
+  era: Language Model Revolution (2020-2022)
+  text: Google introduces LaMDA
+- date: '2021'
+  era: Language Model Revolution (2020-2022)
+  text: DeepMind releases AlphaFold 2
+- date: '2022'
+  era: Language Model Revolution (2020-2022)
+  text: OpenAI releases DALL-E 2
+- date: '2022'
+  era: Language Model Revolution (2020-2022)
+  text: Google releases PaLM
+- date: '2022'
+  era: Language Model Revolution (2020-2022)
+  text: Stability AI releases Stable Diffusion
+- date: '2022'
+  era: Language Model Revolution (2020-2022)
+  text: Meta releases OPT-175B
+- date: 2023 Jan
+  era: AI Goes Mainstream (2023)
+  text: Microsoft invests heavily in OpenAI
+- date: 2023 Feb
+  era: AI Goes Mainstream (2023)
+  text: Google announces Bard
+- date: 2023 Mar
+  era: AI Goes Mainstream (2023)
+  weights: closed
+  text: OpenAI releases GPT-4
+- date: 2023 Mar
+  era: AI Goes Mainstream (2023)
+  weights: closed
+  text: Anthropic releases Claude
+- date: 2023 Jul
+  era: AI Goes Mainstream (2023)
+  weights: open
+  text: Meta releases Llama 2 — first widely-licensed open-weight model to seriously rival a closed frontier model
+- date: 2023 Aug
+  era: AI Goes Mainstream (2023)
+  weights: open
+  text: Stability AI releases SDXL
+- date: 2023 Nov
+  era: AI Goes Mainstream (2023)
+  weights: closed
+  text: OpenAI releases GPT-4 Turbo
+- date: 2023 Dec
+  era: AI Goes Mainstream (2023)
+  weights: closed
+  text: Google releases Gemini
+- date: 2024 Jan
+  era: Open Models Enter the Frontier Race (2024)
+  weights: closed
+  text: Google releases Gemini Ultra
+- date: 2024 Feb
+  era: Open Models Enter the Frontier Race (2024)
+  weights: open
+  text: Google releases Gemma (2B, 7B) — lightweight open models distilled from Gemini research
+- date: 2024 Mar
+  era: Open Models Enter the Frontier Race (2024)
+  weights: open
+  text: xAI open-sources the Grok-1 weights
+- date: 2024 Mar
+  era: Open Models Enter the Frontier Race (2024)
+  weights: mixed
+  text: Mistral releases Mixtral 8x22B and the closed Mistral Large
+- date: 2024 Mar
+  era: Open Models Enter the Frontier Race (2024)
+  weights: closed
+  text: OpenAI releases Sora
+- date: 2024 Mar
+  era: Open Models Enter the Frontier Race (2024)
+  weights: closed
+  text: Anthropic releases the Claude 3 family (Haiku, Sonnet, Opus)
+- date: 2024 Mar
+  era: Open Models Enter the Frontier Race (2024)
+  weights: closed
+  text: Cognition Labs launches Devin, marketed as the "first AI software engineer" — an early sign coding agents, not just chat models, were becoming the next battleground
+- date: 2024 Apr
+  era: Open Models Enter the Frontier Race (2024)
+  weights: open
+  text: Meta releases Llama 3 (8B, 70B)
+- date: 2024 May
+  era: Open Models Enter the Frontier Race (2024)
+  weights: closed
+  text: OpenAI releases GPT-4o
+- date: 2024 Jun
+  era: Open Models Enter the Frontier Race (2024)
+  weights: closed
+  text: Anthropic releases Claude 3.5 Sonnet
+- date: 2024 Jul
+  era: Open Models Enter the Frontier Race (2024)
+  weights: open
+  text: Meta releases Llama 3.1 405B — the first open-weight model to benchmark competitively against GPT-4o and Claude 3.5 Sonnet
+- date: 2024 Aug
+  era: Open Models Enter the Frontier Race (2024)
+  weights: closed
+  text: xAI releases Grok-2
+- date: 2024 Sep
+  era: Open Models Enter the Frontier Race (2024)
+  weights: open
+  text: Alibaba releases Qwen2.5
+- date: 2024 Sep
+  era: Open Models Enter the Frontier Race (2024)
+  weights: closed
+  text: OpenAI releases o1-preview / o1-mini — the first mainstream "reasoning" model, trading extra inference-time compute for accuracy
+- date: 2024 Oct
+  era: Open Models Enter the Frontier Race (2024)
+  weights: closed
+  text: Anthropic releases an upgraded Claude 3.5 Sonnet and Claude 3.5 Haiku, with computer-use capability
+- date: 2024 Dec
+  era: Open Models Enter the Frontier Race (2024)
+  weights: open
+  text: DeepSeek releases DeepSeek-V3 — a frontier-class model trained for a small fraction of the cost of comparable Western models
+- date: 2024 Dec
+  era: Open Models Enter the Frontier Race (2024)
+  weights: closed
+  text: OpenAI releases the full o1; Google releases Gemini 2.0 Flash
+- date: 2024 Dec
+  era: Open Models Enter the Frontier Race (2024)
+  weights: open
+  text: Meta releases Llama 3.3 70B
+- date: 2025 Jan
+  era: The Open-Weight Shock & Reasoning Race (2025)
+  weights: open
+  text: DeepSeek releases R1 — matches OpenAI's o1 on reasoning benchmarks at a small fraction of the training/inference cost, triggering a major AI/chip stock selloff (the "DeepSeek moment") and proving open models could match closed reasoning models
+- date: 2025 Jan
+  era: The Open-Weight Shock & Reasoning Race (2025)
+  weights: closed
+  text: OpenAI releases o3-mini
+- date: 2025 Feb
+  era: The Open-Weight Shock & Reasoning Race (2025)
+  weights: closed
+  text: Anthropic launches **Claude Code** as a research preview — an agentic command-line tool that lets Claude read, edit, run, and commit code directly in a developer's terminal
+- date: 2025 Feb
+  era: The Open-Weight Shock & Reasoning Race (2025)
+  weights: closed
+  text: Anthropic releases Claude 3.7 Sonnet — a hybrid model with switchable "extended thinking"
+- date: 2025 Feb
+  era: The Open-Weight Shock & Reasoning Race (2025)
+  weights: closed
+  text: xAI releases Grok-3
+- date: 2025 Mar
+  era: The Open-Weight Shock & Reasoning Race (2025)
+  weights: mixed
+  text: Google releases Gemma 3 and Gemini 2.5 Pro; OpenAI ships Codex CLI/agent tooling to compete with Claude Code
+- date: 2025 Apr
+  era: The Open-Weight Shock & Reasoning Race (2025)
+  weights: mixed
+  text: Meta releases Llama 4 (Scout, Maverick); OpenAI releases o3 and o4-mini
+- date: 2025 May
+  era: The Open-Weight Shock & Reasoning Race (2025)
+  weights: closed
+  text: Anthropic releases the Claude 4 family (Opus 4, Sonnet 4) alongside the **general availability of Claude Code** — Claude Code goes on to grow more than 10x in usage within three months
+- date: 2025 Jul
+  era: The Open-Weight Shock & Reasoning Race (2025)
+  weights: closed
+  text: xAI releases Grok 4
+- date: 2025 Aug
+  era: The Open-Weight Shock & Reasoning Race (2025)
+  weights: closed
+  text: OpenAI releases GPT-5 — unifies the reasoning and non-reasoning model lines into a single system for the first time
+- date: 2025 Sep
+  era: The Open-Weight Shock & Reasoning Race (2025)
+  weights: open
+  text: DeepSeek releases V3.1 Terminus and V3.2
+- date: '2025'
+  era: The Open-Weight Shock & Reasoning Race (2025)
+  weights: mixed
+  text: Alibaba releases the Qwen3 family, alongside continued open releases from Mistral and Z.ai's GLM; Cursor's AI-native IDE becomes the fastest-growing SaaS product ever recorded, reaching roughly $2B ARR in about 28 months
+- date: 2025 Nov
+  era: The Open-Weight Shock & Reasoning Race (2025)
+  weights: closed
+  text: Google releases Gemini 3; xAI releases Grok 4.1
+- date: 2025 Nov
+  era: The Open-Weight Shock & Reasoning Race (2025)
+  weights: open
+  text: An open-source personal AI agent launches under the name Clawdbot (soon renamed Moltbot, then **OpenClaw**) — an MIT-licensed, local-first agent that lives in chat apps like WhatsApp, Slack, and Telegram and can browse the web, manage files, and run commands on its own schedule
+- date: 2025 Nov–Dec
+  era: The Open-Weight Shock & Reasoning Race (2025)
+  weights: closed
+  text: OpenAI ships fast follow-ups GPT-5.1 and GPT-5.2
+- date: 2026 Jan
+  era: Frontier Consolidation (2026)
+  text: OpenClaw crosses 100,000 GitHub stars within its first week under its new name — one of the fastest-growing open-source projects ever, outpacing the early growth of Docker, Kubernetes, and React
+- date: 2026 Feb
+  era: Frontier Consolidation (2026)
+  weights: closed
+  text: OpenClaw surpasses 214,000 GitHub stars; Anthropic reports Claude Code's run-rate revenue has climbed past $2.5 billion
+- date: '2026'
+  era: Frontier Consolidation (2026)
+  weights: open
+  text: New Qwen generations (Qwen 3.5, 3.6) ship under the permissive Apache 2.0 license; Google shifts Gemma 4 to Apache 2.0 as well
+- date: 2026 Jun
+  era: Frontier Consolidation (2026)
+  weights: closed
+  text: Anthropic publicly releases **Claude Fable 5** — the first public model from its more powerful "Mythos" family, state-of-the-art on most capability benchmarks, shipped with safety classifiers that block high-risk cyber/bio/chem requests
+- date: 2026 Jun
+  era: Frontier Consolidation (2026)
+  text: Days after Fable 5's release, the US government briefly restricts its export over cybersecurity jailbreak concerns; Anthropic redeploys it globally days later with strengthened safeguards
+- date: 2026 Jul
+  era: Frontier Consolidation (2026)
+  weights: open
+  text: DeepSeek releases V4 — MIT-licensed, with ultra-long context as a default
+- date: 2026 Jul
+  era: Frontier Consolidation (2026)
+  weights: closed
+  text: Anthropic releases Claude Opus 5, topping both the Intelligence and Agentic indexes on Artificial Analysis
+- date: 2026 Jul–Aug
+  era: Frontier Consolidation (2026)
+  weights: closed
+  text: OpenAI's GPT-5.6 reaches general availability
+- date: 2026 Aug
+  era: Frontier Consolidation (2026)
+  weights: mixed
+  text: Google releases Gemini 3.7 Flash; Z.ai releases GLM-5.3
+- date: 2026 Aug
+  era: Frontier Consolidation (2026)
+  weights: closed
+  text: xAI ships Grok 4.6
+- date: 2026 Aug
+  era: Frontier Consolidation (2026)
+  text: Independent surveys put Claude Code at 39% adoption among professional developers worldwide (47% in the US), up from 18% in January — the fastest-growing of the major coding agents, ahead of OpenAI's Codex

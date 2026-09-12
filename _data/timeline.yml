@@ -1,0 +1,44 @@
+# AI history milestones. Rendered by /ai/timeline/ and the homepage teaser.
+# `era` groups rows under a heading; add a row here and the counters update themselves.
+- year: 1950
+  era: Foundations · 1950–1958
+  text: Alan Turing introduces the <strong>Turing Test</strong>, proposing a machine's ability to exhibit intelligent behavior equivalent to, or indistinguishable from, that of a human.
+- year: 1956
+  era: Foundations · 1950–1958
+  text: The <strong>Dartmouth Conference</strong>, organized by John McCarthy, Marvin Minsky, Nathaniel Rochester, and Claude Shannon, officially marks the birth of AI as a field of study.
+- year: 1958
+  era: Foundations · 1950–1958
+  text: John McCarthy develops the <strong>Lisp</strong> programming language, which becomes the dominant language for AI research.
+- year: 1966
+  era: Language &amp; winters · 1966–1987
+  text: <strong>ELIZA</strong>, an early natural language processing program, is created by Joseph Weizenbaum, simulating conversation through pattern matching.
+- year: 1973
+  era: Language &amp; winters · 1966–1987
+  text: The "<strong>AI Winter</strong>" begins, as funding for AI research declines due to unmet expectations and difficulties in solving complex problems.
+- year: 1980
+  era: Language &amp; winters · 1966–1987
+  text: Rise of expert systems in the corporate world, such as <strong>MYCIN</strong>, designed to diagnose infectious diseases and recommend treatment.
+- year: 1987
+  era: Language &amp; winters · 1966–1987
+  text: The "<strong>Second AI Winter</strong>" occurs, as interest and funding for AI declines again due to the limitations of early AI systems and a saturated market for expert systems.
+- year: 1997
+  era: Games &amp; deep learning · 1997–2012
+  text: IBM's <strong>Deep Blue</strong> defeats world chess champion Garry Kasparov, marking a major achievement in AI's ability to handle complex, strategic games.
+- year: 2006
+  era: Games &amp; deep learning · 1997–2012
+  text: Geoffrey Hinton and his team at the University of Toronto demonstrate the power of <strong>deep learning</strong>, reviving interest in neural networks.
+- year: 2011
+  era: Games &amp; deep learning · 1997–2012
+  text: IBM <strong>Watson</strong> wins the quiz show <em>Jeopardy!</em>, showcasing advancements in natural language processing and AI's ability to interpret unstructured data.
+- year: 2012
+  era: Games &amp; deep learning · 1997–2012
+  text: <strong>AlexNet</strong>, a deep convolutional neural network developed by Alex Krizhevsky, wins the ImageNet competition, leading to breakthroughs in image recognition.
+- year: 2016
+  era: Generative breakthroughs · 2016–2022
+  text: Google DeepMind's <strong>AlphaGo</strong> defeats world Go champion Lee Sedol, an achievement due to the complexity of the game and the use of reinforcement learning.
+- year: 2020
+  era: Generative breakthroughs · 2016–2022
+  text: OpenAI's <strong>GPT-3</strong>, a language model with 175 billion parameters, demonstrates state-of-the-art performance in various natural language processing tasks.
+- year: 2022
+  era: Generative breakthroughs · 2016–2022
+  text: DeepMind's <strong>AlphaFold</strong> predicts the 3D structures of almost all known proteins, solving a 50-year-old challenge in biology.

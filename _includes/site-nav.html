@@ -1,0 +1,13 @@
+{%- comment -%}
+Single global nav for every page type: layout-driven markdown pages, robotics
+articles, and the standalone interactive guide HTML files. Pages mark their
+subject with `section: ai|vision|robotics` in front matter.
+{%- endcomment -%}
+<nav class="nav">
+  <a class="nav-brand" href="{{ '/' | relative_url }}">AI /</a>
+  <a href="{{ '/' | relative_url }}"{% if page.layout == 'home' %} aria-current="page"{% endif %}>Home</a>
+  {%- for s in site.data.sections %}
+  <a href="{{ s.url | relative_url }}"{% if page.section == s.id %} aria-current="page"{% endif %}>{{ s.title }}</a>
+  {%- endfor %}
+  <a href="{{ '/about/' | relative_url }}"{% if page.url == '/about/' %} aria-current="page"{% endif %}>About</a>
+</nav>

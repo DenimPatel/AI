@@ -1,0 +1,32 @@
+{%- comment -%}
+Sequential prev/next footer for a series part. Usage:
+  {% include series-prevnext.html series=site.data.series.llm_training %}
+The part list has always been in _data; this is the block that finally reads it.
+{%- endcomment -%}
+{%- assign items = include.series.parts -%}
+{%- if include.series.appendix -%}{%- assign items = items | concat: include.series.appendix -%}{%- endif -%}
+{%- assign cur = -1 -%}
+{%- for it in items -%}
+  {%- if it.permalink == page.url or it.permalink == page.permalink -%}{%- assign cur = forloop.index0 -%}{%- endif -%}
+{%- endfor -%}
+{%- if cur >= 0 -%}
+{%- assign previdx = cur | minus: 1 -%}
+{%- assign nextidx = cur | plus: 1 -%}
+<nav class="series-prevnext" aria-label="Series navigation">
+  <div class="series-prevnext-side">
+  {%- if cur > 0 -%}
+    {%- assign prev = items[previdx] -%}
+    <a href="{{ prev.permalink | relative_url }}"><span class="series-prevnext-label">&larr; Previous</span><span class="series-prevnext-title">{{ prev.short }} &middot; {{ prev.title }}</span></a>
+  {%- endif -%}
+  </div>
+  <div class="series-prevnext-side series-prevnext-side--end">
+  {%- assign total = items | size -%}
+  {%- if nextidx < total -%}
+    {%- assign next = items[nextidx] -%}
+    <a href="{{ next.permalink | relative_url }}"><span class="series-prevnext-label">Next &rarr;</span><span class="series-prevnext-title">{{ next.short }} &middot; {{ next.title }}</span></a>
+  {%- else -%}
+    <a href="{{ include.series.hub | relative_url }}"><span class="series-prevnext-label">Back to</span><span class="series-prevnext-title">Series contents</span></a>
+  {%- endif -%}
+  </div>
+</nav>
+{%- endif -%}

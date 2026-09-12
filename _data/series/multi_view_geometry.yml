@@ -1,0 +1,83 @@
+# One source of truth for the Multi-View Geometry guide's part list.
+# Part numbers live here only - page descriptions must not restate them.
+hub: /vision/multi-view-geometry/
+title: Multi-View Geometry, Interactively
+parts:
+  - num: 0
+    title: "Projective geometry & homogeneous coordinates"
+    short: "Part 0"
+    permalink: /vision/multi-view-geometry/projective/
+    legacy: /multi-view-geometry-projective.html
+    blurb: "The projective plane, homogeneous coordinates, the congruence symbol, and the point/line duality every later part depends on."
+  - num: 1
+    title: "The pinhole camera"
+    short: "Part 1"
+    permalink: /vision/multi-view-geometry/pinhole-camera/
+    legacy: /multi-view-geometry.html
+    blurb: "Perspective projection, focal length and field of view, coordinate-convention traps, lens distortion, and the general projective camera P."
+  - num: 2
+    title: "Camera calibration"
+    short: "Part 2"
+    permalink: /vision/multi-view-geometry/calibration/
+    legacy: /multi-view-geometry-calibration.html
+    blurb: "How you actually get K: Zhang's method, checkerboard capture, the image of the absolute conic, skew, and what a good reprojection error looks like."
+  - num: 3
+    title: "Epipolar geometry"
+    short: "Part 3"
+    permalink: /vision/multi-view-geometry/epipolar/
+    legacy: /multi-view-geometry-epipolar.html
+    blurb: "The epipolar constraint, essential and fundamental matrices, and why matching points between two images collapses to a 1D search along a line."
+  - num: 4
+    title: "Robust estimation: RANSAC"
+    short: "Part 4"
+    permalink: /vision/multi-view-geometry/ransac/
+    legacy: /multi-view-geometry-ransac.html
+    blurb: "Outlier rejection with RANSAC and its descendants (MSAC, LO-RANSAC, MAGSAC), minimal samples, the iteration-count formula, and Sampson vs. algebraic error."
+  - num: 5
+    title: "Stereo rectification & disparity"
+    short: "Part 5"
+    permalink: /vision/multi-view-geometry/stereo/
+    legacy: /multi-view-geometry-stereo.html
+    blurb: "Rectifying an image pair so epipolar lines become horizontal scanlines, block matching and SGBM, disparity maps, and Z = fB/d."
+  - num: 6
+    title: "Homography"
+    short: "Part 6"
+    permalink: /vision/multi-view-geometry/homography/
+    legacy: /multi-view-geometry-homography.html
+    blurb: "The planar homography, the pure-rotation special case, DLT estimation, and why it silently breaks once points leave the plane."
+  - num: 7
+    title: "Triangulation & recovering pose"
+    short: "Part 7"
+    permalink: /vision/multi-view-geometry/triangulation/
+    legacy: /multi-view-geometry-triangulation.html
+    blurb: "Recovering relative camera pose from the essential matrix, and triangulating 3D points from two known views, linear vs. nonlinear."
+  - num: 8
+    title: "PnP: camera resection"
+    short: "Part 8"
+    permalink: /vision/multi-view-geometry/pnp/
+    legacy: /multi-view-geometry-pnp.html
+    blurb: "Recovering absolute camera pose from 2D-3D correspondences: DLT resection, P3P, EPnP, and PnP+RANSAC, the way every new camera enters a reconstruction."
+  - num: 9
+    title: "Three views and the trifocal tensor"
+    short: "Part 9"
+    permalink: /vision/multi-view-geometry/trifocal/
+    legacy: /multi-view-geometry-trifocal.html
+    blurb: "Why a third camera view is fully predictable from the first two, and the trifocal tensor that captures three-view geometry directly."
+  - num: 10
+    title: "Bundle adjustment & structure from motion"
+    short: "Part 10"
+    permalink: /vision/multi-view-geometry/sfm/
+    legacy: /multi-view-geometry-sfm.html
+    blurb: "The reprojection-error cost over every camera and every point, why it connects straight back to Gauss-Newton and Levenberg-Marquardt, and a toy SfM demo you run yourself."
+  - num: 11
+    title: "SfM pipelines"
+    short: "Part 11"
+    permalink: /vision/multi-view-geometry/sfm-pipelines/
+    legacy: /multi-view-geometry-sfm-pipelines.html
+    blurb: "Incremental structure-from-motion (COLMAP-style) versus global SfM, self-calibration, and the stratified projective to affine to metric upgrade."
+  - num: 12
+    title: "Beyond multi-view geometry"
+    short: "Part 12"
+    permalink: /vision/multi-view-geometry/beyond/
+    legacy: /multi-view-geometry-beyond.html
+    blurb: "Where the field goes next: SLAM, dense multi-view stereo, and the learned successors (NeRF, 3D Gaussian Splatting, DUSt3R/VGGT), framed as the same geometry in new representations."

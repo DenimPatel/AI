@@ -1,0 +1,51 @@
+# Labs and companies. Rendered by /ai/labs/ and the homepage teaser.
+- name: OpenAI
+  group: Frontier labs
+  meta: San Francisco · Founded 2015
+  focus: GPT series, ChatGPT, and the o-series reasoning models that kicked off the "thinking" era.
+  defining: GPT-4 (2023)
+- name: Anthropic
+  group: Frontier labs
+  meta: San Francisco · Founded 2021
+  focus: Claude family and Claude Code, built on Constitutional AI and a safety-first research agenda.
+  defining: Claude Code (2025)
+- name: Google DeepMind
+  group: Frontier labs
+  meta: London &amp; Mountain View · Merged 2023
+  focus: Gemini, AlphaGo, and AlphaFold — the deepest bench in both language and scientific AI.
+  defining: AlphaFold (2022)
+- name: xAI
+  group: Frontier labs
+  meta: San Francisco · Founded 2023
+  focus: The Grok family, developed and shipped fast, with tight integration into X (Twitter).
+  defining: Grok 4 (2025)
+- name: Meta AI
+  group: Open-weight challengers
+  meta: Menlo Park · FAIR founded 2013
+  focus: The Llama family and PyTorch — the biggest single force behind open-weight models rivaling closed frontier ones.
+  defining: Llama 3.1 405B (2024)
+- name: Mistral AI
+  group: Open-weight challengers
+  meta: Paris · Founded 2023
+  focus: Europe's leading open-weight lab, pairing permissively-licensed models with a competitive closed line.
+  defining: Mixtral 8x22B (2024)
+- name: DeepSeek
+  group: Open-weight challengers
+  meta: Hangzhou · Founded 2023
+  focus: Frontier-class reasoning models trained at a fraction of the cost of comparable Western models.
+  defining: R1 (2025) — the "DeepSeek moment"
+- name: Qwen (Alibaba)
+  group: Open-weight challengers
+  meta: Hangzhou · Alibaba Cloud
+  focus: One of the most active open-weight release cadences of any lab, spanning tiny to frontier-scale models.
+  defining: Qwen3 family (2025)
+- name: Stability AI
+  group: Open-weight challengers
+  meta: London · Founded 2019
+  focus: Open image-generation models that put text-to-image in reach of consumer hardware.
+  defining: Stable Diffusion (2022)
+- name: Z.ai (GLM)
+  group: Open-weight challengers
+  meta: Beijing · Zhipu AI
+  focus: The GLM family, shipped open-weight and iterated quickly alongside China's other open labs.
+  defining: GLM-5.3 (2026)

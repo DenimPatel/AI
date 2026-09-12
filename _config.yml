@@ -1,6 +1,37 @@
 title: AI
 description: Informational website for all of AI
+
+url: https://denimpatel.github.io
+baseurl: /AI
+
+# The github-pages gem injects jekyll-theme-primer by default; every layout
+# here is local, so disable it rather than ship an unused theme stylesheet.
+theme: null
+
 markdown: kramdown
 kramdown:
   input: GFM
   syntax_highlighter: rouge
+
+plugins:
+  - jekyll-redirect-from
+  - jekyll-sitemap
+
+exclude:
+  - README.md
+  - CLAUDE.md
+  - Gemfile
+  - Gemfile.lock
+  - vendor
+
+defaults:
+  - scope:
+      path: "robotics"
+      type: pages
+    values:
+      layout: robotics-article
+  - scope:
+      path: "vision/notes"
+      type: pages
+    values:
+      layout: robotics-article
