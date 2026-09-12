@@ -5,8 +5,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## What this is
 
 A Jekyll site published by GitHub Pages at https://denimpatel.github.io/AI/. No JavaScript
-framework, no npm, no build step beyond Jekyll. There are no tests and no CI — verification
-is a clean build plus a link check (below).
+framework, no npm, no build step beyond Jekyll. There are no automated tests, but CI
+(`.github/workflows/ci.yml`) runs a build, an internal link check, and a content linter on
+every push and PR — see Commands below. A separate monthly job checks external links too.
 
 Content is roughly 250,000 words across ~60 pages, and the great majority of it is three
 long interactive guides made of hand-written `<canvas>` and vanilla JS. Treat those guide
@@ -25,7 +26,19 @@ bundle exec jekyll serve               # local preview at http://localhost:4000/
 # link check — run before and after any move; the failure count must not increase
 bundle exec htmlproofer _site --disable-external --swap-urls '^/AI:' \
   --ignore-empty-alt --no-enforce-https
+
+# content linter — warn-only on files that existed before your change, fails only on
+# new/changed files (diffed against origin/main); see scripts/lint-content.rb for the
+# full rule list (front-matter completeness/quoting, part numbers, stale "N-part"
+# counters, series permalink round-trips, bare hrefs, {% raw %} leaks, redirect_from
+# coverage of series `legacy` URLs).
+ruby scripts/lint-content.rb
 ```
+
+CI (`.github/workflows/ci.yml`) runs all three of the above on every push and PR — this is
+the same command set to run locally before committing. `.github/workflows/link-check.yml`
+runs monthly with external link checking turned on (`--disable-external` dropped), since
+the 31 hotlinked images have no local fallback.
 
 `--safe` matches the GitHub Pages sandbox and rejects non-whitelisted plugins, so always
 build with it. `--swap-urls '^/AI:'` strips the `baseurl` so html-proofer can resolve links
@@ -53,7 +66,8 @@ The homepage counters are computed from these files. **Never hardcode a count** 
 previous hardcoded "85 releases" had drifted from the actual 73.
 
 **Part numbers live only in `_data/series/*.yml`.** Do not restate them in a page's
-`description`; five descriptions previously carried numbers that contradicted the nav.
+`description` or `title`; five descriptions previously carried numbers that contradicted
+the nav. `scripts/lint-content.rb` checks both for new/changed pages.
 
 To add a part to a guide: add the entry to the series YAML *and* create the page. The nav,
 the prev/next block, the hub card grid, and the homepage counter all follow automatically.
@@ -119,6 +133,40 @@ block. These look duplicated but are not: pages deliberately override shared sel
 per-page values (`.mvg-plot3d` height varies 320/340/380/420px across pages), and only 32
 rules are byte-identical across all 13 MVG files. Extracting them to a shared stylesheet
 reorders the cascade for a small payoff — this was considered and rejected.
+
+## Adding new content
+
+Use the scaffolding scripts rather than copy-pasting an existing page — each writes from a
+template in `_templates/`, leaves `REPLACE_*` placeholders, and never edits an existing file
+(`scripts/new-series.sh` is the one exception: it rewrites `_data/sections.yml` through a
+YAML round-trip to register the new series, which can reformat comments/quoting elsewhere
+in the file — diff it before committing).
+
+- `scripts/new-part.sh <series_id> <slug>` — appends a part to `_data/series/<series_id>.yml`
+  and writes the page from `_templates/guide-part.html`.
+- `scripts/new-note.sh <section> <group> <slug>` — writes a field note from
+  `_templates/note.md`.
+- `scripts/new-series.sh <section> <series_id>` — creates a new `_data/series/<id>.yml`, a
+  hub page (`layout: series-hub`), and registers it under `_data/sections.yml`.
+
+### The guide kit
+
+`_includes/guide-head.html`, `_includes/guide-footer.html`, `assets/css/guide.css`,
+`assets/js/guide-core.js`, `assets/js/guide-math.js` and `assets/js/guide-plot3d.js` are a
+subject-neutral version of the pattern the LLM Training series already uses
+(`_includes/llm-head.html`, `assets/css/llm-guide.css`, `assets/js/llm-guide.js`) — canvas
+setup, bar/line charts, an animation loop, slider binding, the vector/matrix math and the
+Plotly cube scene that the vision guides re-derive per page. `_templates/guide-part.html`
+wires a new page to it.
+
+**This is additive only.** The 19 existing multi-view-geometry and nonlinear-optimization
+pages keep their own inline `<style>` blocks and per-page scripts exactly as they are —
+don't migrate them to the guide kit opportunistically, even though the classes and
+functions look like an obvious match. Likewise `llm-guide.css`/`llm-guide.js` stay as they
+are; the 16 LLM-training pages keep using `window.LLMG`, not `window.Guide`/`window.GuideMath`.
+The guide kit exists so a genuinely new guide page is cheap to start, not to unify what
+already ships. `vision/guide-kit-demo/` is a small demo series proving the kit renders —
+not real content, kept as a working example and a build-time smoke test.
 
 ## Conventions
 

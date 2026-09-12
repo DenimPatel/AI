@@ -1,5 +1,23 @@
 # The three top-level subjects. Drives the global nav (_includes/site-nav.html),
-# the homepage doors, and each section hub page.
+# the homepage doors, and each section hub page (_layouts/section-hub.html).
+#
+# Contract - one entry per section, keys:
+#   id        (required) matches page front-matter `section:` values for this subject.
+#   title     (required) the section's display name.
+#   url       (required) the section hub's own permalink.
+#   kicker    (required) short label shown above the h1 on the hub.
+#   blurb     (required) the hub's lede paragraph.
+#   pages     (optional) a list of {title, url, blurb} hand-authored pages to card-grid
+#             at the top of the hub (e.g. the /ai/ record pages). Omit if the section has
+#             none.
+#   series    (optional) a list of series ids (matching _data/series/<id>.yml filenames)
+#             to render as card grids, each followed by an "Open the N-part guide" button.
+#             Omit if the section has no interactive guides.
+#   notes_path / notes_blurb (optional, must be given together) - when set, the hub
+#             renders a "Background notes" heading with this blurb, followed by
+#             {% include note-list.html section=<id> %} (the field-note listing for
+#             this section, grouped/ordered by _data/note_groups.yml). Omit both if the
+#             section has no field notes.
 - id: ai
   title: "AI"
   url: /ai/
@@ -35,6 +53,7 @@
   series:
     - multi_view_geometry
     - nonlinear_optimization
+    - guide_kit_demo
   notes_path: /vision/notes/
   notes_blurb: "Background notes on OpenCV basics, linear algebra and quaternions - the on-ramp to both guides."
 
@@ -43,3 +62,5 @@
   url: /robotics/
   kicker: "Field notes"
   blurb: "Notes and tutorials on ROS and robot navigation, migrated from the Robotics At Once blog."
+  notes_path: /robotics/
+  notes_blurb: "Notes and tutorials on ROS and robot navigation, migrated from the Robotics At Once blog."
