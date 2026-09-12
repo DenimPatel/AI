@@ -1,0 +1,33 @@
+name: Monthly link check
+
+# The site hotlinks all 31 raster images to roboticswithdenim.wordpress.com — a single
+# point of failure with no local fallback. This runs htmlproofer with external checking
+# ON (unlike the fast internal-only check in ci.yml) so a dead upstream image or an
+# external link rot gets noticed even though nothing in this repo changed.
+on:
+  schedule:
+    - cron: '0 6 1 * *'  # 06:00 UTC on the 1st of each month
+  workflow_dispatch: {}
+
+env:
+  LANG: C.UTF-8
+  LC_ALL: C.UTF-8
+
+jobs:
+  link-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+
+      - name: Build site
+        run: bundle exec jekyll build --safe --trace
+
+      - name: Check all links, including external
+        run: |
+          bundle exec htmlproofer _site --swap-urls '^/AI:' \
+            --ignore-empty-alt --no-enforce-https
