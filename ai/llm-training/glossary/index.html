@@ -1,6 +1,6 @@
 ---
 title: "LLM Training, Interactively — Glossary & Numbers to Know"
-description: "Every bolded term across the 12-part LLM training guide, linked back to where it's introduced, plus a quick-reference card of typical model sizes, token budgets, and costs."
+description: "Every bolded term across the 15-part LLM training guide, linked back to where it's introduced, plus a quick-reference card of typical model sizes, token budgets, and costs."
 permalink: "/ai/llm-training/glossary/"
 section: "ai"
 series: "llm_training"
@@ -59,6 +59,15 @@ redirect_from:
       <div class="cell"><div class="label">Dolma v1.6 web share</div><div class="value">74.6% Common Crawl</div></div>
       <div class="cell"><div class="label">SFT vs. pretraining learning rate</div><div class="value">~100× smaller</div></div>
       <div class="cell"><div class="label">C = 6ND</div><div class="value">FLOPs ≈ 6 × params × tokens</div></div>
+      <div class="cell"><div class="label">OLMo 3 context window</div><div class="value">8,192 → 65,536</div></div>
+      <div class="cell"><div class="label">Extension token budget</div><div class="value">50B (7B) / 100B (32B)</div></div>
+      <div class="cell"><div class="label">Midtraining mix</div><div class="value">100B tokens (Dolmino 2)</div></div>
+      <div class="cell"><div class="label">OLMES base eval tasks</div><div class="value">43 (was 11)</div></div>
+      <div class="cell"><div class="label">GRPO group size / pass@k</div><div class="value">k = 16</div></div>
+      <div class="cell"><div class="label">OLMoRL throughput</div><div class="value">2,949 tok/s (MBU 43.2%)</div></div>
+      <div class="cell"><div class="label">Preference dataset peak</div><div class="value">~75–100K pairs</div></div>
+      <div class="cell"><div class="label">RL-Zero difficulty cutoff</div><div class="value">62.5% pass rate</div></div>
+      <div class="cell"><div class="label">SimFC trajectories</div><div class="value">200K / 42.6K functions</div></div>
     </div>
   </section>
 
@@ -112,6 +121,37 @@ redirect_from:
       <div class="gloss-item"><dt>Prompt injection vs. jailbreaking <a href="{{ '/ai/llm-training/guardrails/' | relative_url }}#taxonomy">Part 12</a></dt><dd>Third-party content hijacking the model's instructions, vs. the user themselves trying to bypass safety training.</dd></div>
       <div class="gloss-item"><dt>Defense in depth <a href="{{ '/ai/llm-training/guardrails/' | relative_url }}#layers">Part 12</a></dt><dd>Layering independent guard mechanisms (input guard, system prompt, model, output guard) so no single failure is fatal.</dd></div>
       <div class="gloss-item"><dt>Model card <a href="{{ '/ai/llm-training/guardrails/' | relative_url }}#deploy">Part 12</a></dt><dd>Standardized documentation of a model's training data, intended uses, limitations, and eval results at release.</dd></div>
+      <div class="gloss-item"><dt>Long-context extension <a href="{{ '/ai/llm-training/long-context/' | relative_url }}#why">Part 13</a></dt><dd>A dedicated late stage that grows the model's context window after pretraining/midtraining (OLMo 3: 8,192 → 65,536).</dd></div>
+      <div class="gloss-item"><dt>YaRN <a href="{{ '/ai/llm-training/long-context/' | relative_url }}#rope">Part 13</a></dt><dd>Per-frequency RoPE interpolation plus attention temperature; OLMo 3 applies it to full-attention layers only.</dd></div>
+      <div class="gloss-item"><dt>Position interpolation <a href="{{ '/ai/llm-training/long-context/' | relative_url }}#rope">Part 13</a></dt><dd>Dividing positions by s = L'/L so a long sequence fits the pretrained positional range.</dd></div>
+      <div class="gloss-item"><dt>RoPE base-frequency scaling <a href="{{ '/ai/llm-training/long-context/' | relative_url }}#rope">Part 13</a></dt><dd>Raising RoPE's base θ so long distances don't wrap past what the model learned.</dd></div>
+      <div class="gloss-item"><dt>Best-fit document packing <a href="{{ '/ai/llm-training/long-context/' | relative_url }}#packing">Part 13</a></dt><dd>Binning whole documents into fixed-length sequences to minimize splits and padding.</dd></div>
+      <div class="gloss-item"><dt>Intra-document masking <a href="{{ '/ai/llm-training/long-context/' | relative_url }}#packing">Part 13</a></dt><dd>A block-diagonal mask preventing packed documents from attending across their boundaries.</dd></div>
+      <div class="gloss-item"><dt>RULER <a href="{{ '/ai/llm-training/long-context/' | relative_url }}#results">Part 13</a></dt><dd>Synthetic long-context dev suite (needle-in-a-haystack variants and aggregation tasks).</dd></div>
+      <div class="gloss-item"><dt>HELMET <a href="{{ '/ai/llm-training/long-context/' | relative_url }}#results">Part 13</a></dt><dd>Broad held-out long-context suite covering retrieval, in-context learning, and summarization.</dd></div>
+      <div class="gloss-item"><dt>LongPPL <a href="{{ '/ai/llm-training/long-context/' | relative_url }}#data">Part 13</a></dt><dd>Long-range-dependency proxy based on perplexity changes under more context; tested but not used in the final OLMo 3 filter.</dd></div>
+      <div class="gloss-item"><dt>gzip compressibility filter <a href="{{ '/ai/llm-training/long-context/' | relative_url }}#data">Part 13</a></dt><dd>Discard the most- and least-compressible 20% of long documents.</dd></div>
+      <div class="gloss-item"><dt>Synthetic aggregation (CWE / REX) <a href="{{ '/ai/llm-training/long-context/' | relative_url }}#data">Part 13</a></dt><dd>Generated tasks — count a unigram exactly (CWE) or rewrite an aggregation into a vignette (REX) — answerable only from the full window.</dd></div>
+      <div class="gloss-item"><dt>Function calling / tool use <a href="{{ '/ai/llm-training/tools-agents/' | relative_url }}#format">Part 14</a></dt><dd>The model emits a structured call, a runtime executes it, and the result returns to the context.</dd></div>
+      <div class="gloss-item"><dt>Environment role <a href="{{ '/ai/llm-training/tools-agents/' | relative_url }}#format">Part 14</a></dt><dd>A dedicated message role carrying tool outputs back to the model.</dd></div>
+      <div class="gloss-item"><dt>MCP <a href="{{ '/ai/llm-training/tools-agents/' | relative_url }}#environments">Part 14</a></dt><dd>Model Context Protocol — the standard transport connecting agents to tools and servers.</dd></div>
+      <div class="gloss-item"><dt>SimFC <a href="{{ '/ai/llm-training/tools-agents/' | relative_url }}#environments">Part 14</a></dt><dd>LLM-simulated function-calling trajectories: 200K examples across 42.6K unique functions.</dd></div>
+      <div class="gloss-item"><dt>BFCL <a href="{{ '/ai/llm-training/tools-agents/' | relative_url }}#eval">Part 14</a></dt><dd>Berkeley Function Calling Leaderboard — intrinsic function-choice and argument-correctness benchmark.</dd></div>
+      <div class="gloss-item"><dt>Delta learning <a href="{{ '/ai/llm-training/posttraining-scale/' | relative_url }}#delta">Part 15</a></dt><dd>Preference signal comes from the chosen-minus-rejected contrast, not the chosen response's absolute quality.</dd></div>
+      <div class="gloss-item"><dt>Length bias <a href="{{ '/ai/llm-training/posttraining-scale/' | relative_url }}#pitfalls">Part 15</a></dt><dd>Preference data's tendency to favor longer responses; countered by capping the chosen–rejected length difference.</dd></div>
+      <div class="gloss-item"><dt>Multi-turn preference <a href="{{ '/ai/llm-training/posttraining-scale/' | relative_url }}#pitfalls">Part 15</a></dt><dd>Preference pairs over synthetic conversations, varying only the final turn so the ranking is unambiguous.</dd></div>
+      <div class="gloss-item"><dt>Zero-gradient filtering <a href="{{ '/ai/llm-training/posttraining-scale/' | relative_url }}#grpo">Part 15</a></dt><dd>Dropping groups whose rewards are identical, since they produce no advantage and no gradient.</dd></div>
+      <div class="gloss-item"><dt>Active sampling <a href="{{ '/ai/llm-training/posttraining-scale/' | relative_url }}#grpo">Part 15</a></dt><dd>Resampling prompts after filtering to keep a full batch of non-zero-gradient completions.</dd></div>
+      <div class="gloss-item"><dt>Token-level loss <a href="{{ '/ai/llm-training/posttraining-scale/' | relative_url }}#grpo">Part 15</a></dt><dd>Normalizing the RL loss by total tokens across the batch rather than per sample, removing length bias.</dd></div>
+      <div class="gloss-item"><dt>Clip-higher <a href="{{ '/ai/llm-training/posttraining-scale/' | relative_url }}#grpo">Part 15</a></dt><dd>Setting the upper PPO/GRPO clip bound above the lower one so probabilities can rise more than fall.</dd></div>
+      <div class="gloss-item"><dt>Truncated importance sampling <a href="{{ '/ai/llm-training/posttraining-scale/' | relative_url }}#grpo">Part 15</a></dt><dd>Correcting the log-probability gap between the inference engine and the trainer.</dd></div>
+      <div class="gloss-item"><dt>No std normalization <a href="{{ '/ai/llm-training/posttraining-scale/' | relative_url }}#grpo">Part 15</a></dt><dd>Advantage = reward − group mean (no division by std), avoiding a difficulty bias toward near-saturated prompts.</dd></div>
+      <div class="gloss-item"><dt>Offline difficulty filtering <a href="{{ '/ai/llm-training/posttraining-scale/' | relative_url }}#rlzero">Part 15</a></dt><dd>Removing prompts the model solves more than 62.5% of the time across 8 rollouts.</dd></div>
+      <div class="gloss-item"><dt>Spurious rewards <a href="{{ '/ai/llm-training/posttraining-scale/' | relative_url }}#rlzero">Part 15</a></dt><dd>Random signal-free rewards used as a contamination control: if benchmarks improve, eval data leaked in.</dd></div>
+      <div class="gloss-item"><dt>Model souping / merging <a href="{{ '/ai/llm-training/pretraining/' | relative_url }}#anneal">Parts 5, 13</a></dt><dd>Averaging weights from independently trained checkpoints; used for both midtraining and long-context checkpoints.</dd></div>
+      <div class="gloss-item"><dt>Microanneal <a href="{{ '/ai/llm-training/pretraining/' | relative_url }}#anneal">Part 5</a></dt><dd>A 5–10B-token anneal used to cheaply test a candidate dataset's midtraining impact.</dd></div>
+      <div class="gloss-item"><dt>Integration test <a href="{{ '/ai/llm-training/pretraining/' | relative_url }}#anneal">Part 5</a></dt><dd>A full 100B-token midtraining run on a candidate mix, plus SFT, to judge combined data sources.</dd></div>
+      <div class="gloss-item"><dt>Fill-in-the-middle (FIM) <a href="{{ '/ai/llm-training/data/' | relative_url }}#synthetic">Part 4</a></dt><dd>Training on prefix + suffix → concealed middle, teaching code infilling; OLMo 3 applies it to 50% of code documents.</dd></div>
     </dl>
   </section>
 

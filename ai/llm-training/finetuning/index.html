@@ -34,7 +34,7 @@ redirect_from:
 <main>
 <div class="wrap llmt">
   <section class="page-header">
-    <span class="section-kicker">Interactive guide · Part 7 of 12</span>
+    <span class="section-kicker">Interactive guide · Part 7 of 15</span>
     <h1>Supervised Fine-Tuning &amp; PEFT</h1>
     <p>A base model straight out of pretraining is a very good <em>text completer</em>, not an assistant. Ask it a question and it may just continue the pattern — writing more questions, or drifting into unrelated text — because that's the most statistically plausible continuation of internet-style text. <strong>Supervised fine-tuning (SFT)</strong> is the (comparatively small, but behaviorally huge) second training stage that reshapes this into "answer directly, follow instructions, stop when done." This part also covers how to do that fine-tuning cheaply, with LoRA.</p>
   </section>
@@ -127,6 +127,26 @@ redirect_from:
     <div class="llmt-step-head"><span class="llmt-step-num">5</span><h2>What SFT changes, and the risk of forgetting</h2></div>
     <p class="llmt-eyebrow">Scope</p>
     <p>SFT's effect is mostly on <em>behavior and format</em>, not the underlying knowledge set during pretraining on vastly more data. Two related risks: over-training on a narrow SFT set can cause the model to overfit to surface patterns (a fixed response length, a signature phrase); and fine-tuning too aggressively on a narrow domain can cause <strong>catastrophic forgetting</strong>, where capabilities the base model had — general knowledge, other task types — measurably degrade, sometimes called the <strong>alignment tax</strong> when the specific capability lost is general-purpose quality traded for narrower instruction-following. LoRA's frozen base weights are one structural mitigation: since most of the network is literally untouched, broad pretrained knowledge is mechanically harder to overwrite than with full fine-tuning.</p>
+  </section>
+
+  <section class="llmt-step" id="specialized">
+    <div class="llmt-step-head"><span class="llmt-step-num">6</span><h2>Specialized SFT: tools and the reasoning-first warm start</h2></div>
+    <p class="llmt-eyebrow">OLMo 3 Instruct</p>
+    <p>SFT is not one homogeneous stage. OLMo 3 trains two different assistants from the same base, and each adds its own SFT flavor. <b>Function-calling SFT</b> teaches the model to emit structured tool calls: the training mix combines real trajectories executed against MCP servers (the Asta Scientific Corpus and Serper) with the much larger LLM-simulated <em>SimFC</em> dataset. The single most important lesson from that work is that the <em>format</em> has to be unified across every dataset — OpenAPI tool specs, pythonic code-block calls wrapped in XML tags, a dedicated environment role, and (for Instruct) tool-specific special tokens. Mixing conventions is a direct cause of unreliable tool use. Part 14 has the full format and the evaluation harness.</p>
+    <p><b>The reasoning-first warm start</b> is the other notable choice. Rather than teaching instruction-following from the base model directly, OLMo 3 initializes the Instruct SFT stage from the already-trained <em>Think</em> SFT checkpoint. The instruction model then learns to suppress the thinking traces and answer concisely, but it inherits the reasoning skill underneath. The gain is broad and real, without making responses longer:</p>
+    <div style="overflow-x:auto; margin:10px 0 16px;">
+    <table class="llmt-cheat">
+      <thead><tr><th>Instruct SFT starting point</th><th>Avg.</th><th>GPQA</th><th>MATH</th><th>GSM8K</th><th>OMEGA</th><th>MBPP</th><th>IFEval</th></tr></thead>
+      <tbody>
+        <tr><td>No thinking SFT first</td><td>44.5</td><td>29.7</td><td>60.3</td><td>87.6</td><td>8.6</td><td>54.1</td><td>81.0</td></tr>
+        <tr><td>With thinking SFT first (OLMo 3)</td><td><span class="hi">47.8</span></td><td>34.4</td><td>65.9</td><td>91.1</td><td>12.2</td><td>57.1</td><td>84.7</td></tr>
+        <tr><td>Gain</td><td>+3.3</td><td>+4.7</td><td>+5.6</td><td>+3.5</td><td>+3.6</td><td>+3.0</td><td>+3.7</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p class="llmt-source">Source: OLMo 3 report, arXiv:2512.13961v2, Table 13 (intermediate OLMo 3 Instruct 7B).</p>
+    <div class="llmt-warn">⚠️ <span><b>The special-token caution, revisited.</b> Chat special tokens like <span class="llmt-special">&lt;|im_start|&gt;</span> must be introduced at SFT, not midtraining. Part 5 showed that including them in midtraining data makes the base model emit them at inference and collapses GSM8K from 49.43 to 0. OLMo 3's Think stage therefore avoided special tokens entirely, while Instruct deliberately adds them (including tool tokens) because the SFT data and inference harness are built around them. Timing is everything.</span></div>
+    <div class="llmt-goal">📌 <span><b>Cross-links:</b> the tool-use data and format live in Part 14; the Thinking-then-Instruct pipeline and its preference stages are Part 15; the special-token finding is Part 5.</span></div>
   </section>
 
   <section class="llmt-step" id="cheatsheet">

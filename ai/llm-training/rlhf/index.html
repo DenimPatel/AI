@@ -36,7 +36,7 @@ redirect_from:
 <main>
 <div class="wrap llmt">
   <section class="page-header">
-    <span class="section-kicker">Interactive guide · Part 8 of 12</span>
+    <span class="section-kicker">Interactive guide · Part 8 of 15</span>
     <h1>Alignment: RLHF, Reward Models, and DPO</h1>
     <p>SFT teaches a model to produce <em>a</em> plausible response in the right format. It has no mechanism for the much more common real situation: two responses are both reasonable, but one is clearly better. That comparative judgment is what <strong>alignment</strong> is built to train on, using human (or model) preferences rather than single correct answers — and it comes with its own failure mode, reward hacking, that this part now makes concrete rather than just naming.</p>
   </section>
@@ -148,6 +148,18 @@ redirect_from:
     <div class="llmt-goal">💡 <span><b>OLMo's actual recipe:</b> Ai2's Tulu 3 post-training pipeline combines SFT, then DPO on preference data, then RLVR (Part 9) — a concrete, published example of mixing these techniques rather than treating them as mutually exclusive.</span></div>
   </section>
 
+  <section class="llmt-step" id="pitfalls">
+    <div class="llmt-step-head"><span class="llmt-step-num">6</span><h2>Preference-tuning at scale: delta, size, length, and turns</h2></div>
+    <p class="llmt-eyebrow">OLMo 3's preference stage</p>
+    <p>OLMo 3 turns preference tuning from a nicety into a capability stage, and in doing so surfaces four lessons that apply to any DPO run.</p>
+    <p><b>1 · Delta Learning — the contrast is the signal.</b> On a strong SFT checkpoint, continuing to imitate better responses from a larger model can <em>hurt</em>: OLMo 3's dev checkpoint dropped from <span class="lc-note">70.3 → 64.5</span> when supervised on Qwen3-32B thinking traces. Pairing those same strong completions (chosen) with deliberately weak ones from Qwen3-0.6B (rejected) and running DPO instead lifted the average to <span class="lc-note">72.9</span>. The quality of a preference pair depends on the gap between the two responses, not on the chosen response alone.</p>
+    <p><b>2 · Dataset size is a U-shape.</b> Preference performance does <em>not</em> improve monotonically with more pairs. AlpacaEval and ZebraLogic peak around <strong>75–100K</strong> pairs and then decline, while AIME is still improving at that budget. Early stopping matters, and the best size depends on the downstream task — so size is swept as a hyperparameter rather than fixed.</p>
+    <p><b>3 · Watch the length bias.</b> Chosen responses are systematically longer than rejected ones; at the 80th percentile the difference is <span class="lc-note">538 tokens</span> for GPT-judged pairs and <span class="lc-note">564</span> for delta-heuristic pairs. Models learn verbosity along with quality. OLMo 3 filters chat and multi-turn pairs to a <strong>100-token</strong> chosen-minus-rejected difference, accepting slightly lower length-sensitive benchmark scores for much more usable output.</p>
+    <p><b>4 · Teach multi-turn coherence explicitly.</b> Single-turn pairs say nothing about staying on topic across turns. OLMo 3 synthesizes multi-turn conversations two ways — <em>self-talk</em> (the model generates follow-ups) and <em>synthetic-context</em> (related independent questions become earlier turns) — and varies only the final turn, so there is no ambiguity about which turn the preference applies to.</p>
+    <p>Finally, <b>combine complementary signals</b>: delta-learning heuristic pairs and delta-aware GPT-judged pairs produce different spreads of gains, and using both beats either alone. The GPT-judged pipeline had to be redesigned to <em>maximize</em> the delta (force weaker models into the candidate pool, pick the worst response as rejected) — improving the judge or the generator pool alone did nothing.</p>
+    <div class="llmt-goal">📌 <span><b>Go deeper:</b> Part 15 shows the Delta Learning numbers, the DPO size sweep, and how the length-controlled DPO checkpoint becomes a better starting point for RL.</span></div>
+  </section>
+
   <section class="llmt-step" id="cheatsheet">
     <div class="llmt-step-head"><span class="llmt-step-num">✓</span><h2>Cheat sheet</h2></div>
     <p class="llmt-eyebrow">Recap</p>
@@ -159,6 +171,10 @@ redirect_from:
         <tr><td>Needs an RL loop?</td><td>Yes (PPO, clipped objective)</td><td>No — direct supervised-style loss</td></tr>
         <tr><td>Models held in memory</td><td>Policy + reward model + frozen reference</td><td>Policy + frozen reference (or none, for SimPO/ORPO)</td></tr>
         <tr><td>Main risk</td><td>Reward hacking against the reward model</td><td>Less flexible for reward signals beyond static preference pairs</td></tr>
+        <tr><td>Delta Learning</td><td colspan="2">Pair a strong chosen response with a deliberately weak rejected one; the contrast, not the chosen quality, carries the signal.</td></tr>
+        <tr><td>Dataset size</td><td colspan="2">U-shaped: peaks around 75–100K pairs for some evals while others keep rising — sweep size and early-stop.</td></tr>
+        <tr><td>Length bias</td><td colspan="2">Chosen responses skew long; cap the chosen-minus-rejected difference (OLMo 3 uses 100 tokens).</td></tr>
+        <tr><td>Multi-turn preferences</td><td colspan="2">Synthesize conversations and vary only the final turn so the ranking is unambiguous.</td></tr>
       </tbody>
     </table>
     </div>

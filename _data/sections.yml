@@ -4,7 +4,7 @@
   title: "AI"
   url: /ai/
   kicker: "The record"
-  blurb: "A running record of the field - milestones, product releases, benchmark scores, the labs building it, and what people said at the time - plus a 12-part interactive guide to how a language model is actually trained."
+  blurb: "A running record of the field - milestones, product releases, benchmark scores, the labs building it, and what people said at the time - plus a 15-part interactive guide to how a language model is actually trained."
   pages:
     - title: "History timeline"
       url: /ai/timeline/

@@ -76,6 +76,24 @@ parts:
     permalink: /ai/llm-training/guardrails/
     legacy: /llm-training-guardrails.html
     blurb: "Refusal training, layered defenses, and staged release."
+  - num: 13
+    title: "Long-context & context extension"
+    short: "Part 13"
+    permalink: /ai/llm-training/long-context/
+    legacy: /llm-training-long-context.html
+    blurb: "Stretching RoPE, long-context data, best-fit packing, and why extension is its own late stage."
+  - num: 14
+    title: "Tool use, function calling & agents"
+    short: "Part 14"
+    permalink: /ai/llm-training/tools-agents/
+    legacy: /llm-training-tools-agents.html
+    blurb: "OpenAPI tool specs, environment roles, real vs simulated trajectories, and how tool use is evaluated."
+  - num: 15
+    title: "Post-training at scale"
+    short: "Part 15"
+    permalink: /ai/llm-training/posttraining-scale/
+    legacy: /llm-training-posttraining-scale.html
+    blurb: "The three-stage recipe, delta learning, upgraded GRPO, domain verifiers, and RL systems."
 appendix:
   - title: "Glossary & numbers to know"
     short: "Glossary"

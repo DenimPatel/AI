@@ -30,7 +30,7 @@ redirect_from:
 <main>
 <div class="wrap llmt">
   <section class="page-header">
-    <span class="section-kicker">Interactive guide · Part 5 of 12</span>
+    <span class="section-kicker">Interactive guide · Part 5 of 15</span>
     <h1>Pretraining: the Training Loop</h1>
     <p>With a cleaned, trillion-token dataset from Part 4 and the transformer block from Part 3, pretraining is the process that turns them into a base model: the network is shown token sequences over and over, scored on how well it predicts the next token, and nudged to do slightly better each time — repeated for hundreds of thousands of steps across thousands of GPUs. This part builds the actual training loop, including one you can step through yourself, and checks each piece against what Ai2 published for OLMo.</p>
   </section>
@@ -100,10 +100,24 @@ redirect_from:
   </section>
 
   <section class="llmt-step" id="anneal">
-    <div class="llmt-step-head"><span class="llmt-step-num">5</span><h2>Mid-training: the high-quality anneal</h2></div>
-    <p class="llmt-eyebrow">A stage between pretraining and fine-tuning</p>
-    <p>Most of pretraining runs on the full, broad data mixture from Part 4. OLMo 2's recipe adds a distinct final stage: <strong>Dolmino</strong>, a smaller, heavily curated high-quality data mixture (more math, more instruction-like text, more carefully filtered web text), mixed in during a learning-rate decay ("anneal") at the very end of pretraining. This measurably improves downstream benchmark performance beyond what continuing on the original mixture would. Ai2 also uses <strong>checkpoint souping</strong> here — averaging the weights of several independently-annealed checkpoints together — which often outperforms any single one of them.</p>
-    <div class="llmt-goal">💡 <span>This stage sits right at the seam between Part 5 (pretraining) and Part 7 (supervised fine-tuning): it's still next-token prediction on unlabeled text, not instruction-formatted data, but the mixture is deliberately closer to what the model will be fine-tuned on next.</span></div>
+    <div class="llmt-step-head"><span class="llmt-step-num">5</span><h2>Mid-training: OLMo 3's stage 2</h2></div>
+    <p class="llmt-eyebrow">A distinct stage between pretraining and fine-tuning</p>
+    <p>OLMo 2 introduced the anneal; OLMo 3 turns it into a full, measured stage. After roughly 5.9T tokens of pretraining, the model trains on <strong>Dolmino Mix 2</strong> — 100B high-quality tokens blending top-quality web and PDF data with synthetic math and code, QA, instruction data, and thinking traces. The goal isn't only a lower loss: midtraining deliberately lays the groundwork for post-training, so the base model already contains the raw material that SFT and RL will later sharpen.</p>
+    <p><b>Microanneals</b> are the fast loop: sample 5B tokens of a candidate source, mix with 5B web tokens, anneal, and compare against a web-only baseline. They let a team test dozens of datasets in parallel and decide what deserves a slot in the mix. <b>Integration tests</b> are the slow loop: a full 100B-token anneal of the whole candidate mixture, followed by SFT, to see whether a dataset still helps <em>next to everything else</em>. OLMo 3 ran five rounds; the average base score climbed <span class="lc-note">49.7 → 50.7 → 53.1</span> from the first candidate mix to the last, and the gain carried through to post-SFT evals.</p>
+    <div class="llmt-demo">
+      <div class="llmt-canvas-wrap">
+        <canvas id="p5-anneal" width="560" height="260"></canvas>
+        <p class="llmt-canvas-hint">Compute spent testing candidate datasets. A microanneal is ~10× cheaper per dataset; a full integration test costs far more but reveals interactions.</p>
+      </div>
+      <div class="llmt-controls">
+        <div class="llmt-field"><label>Candidate datasets to evaluate <span class="val" id="anneal-n-val">8</span></label>
+          <input type="range" id="anneal-n" min="1" max="20" step="1" value="8"></div>
+        <div class="llmt-readout" id="p5-anneal-readout"></div>
+      </div>
+    </div>
+    <p>Midtraining also exposes hard <b>domain tradeoffs</b>. An exploratory math/code/thinking-heavy mix raised Math (57.3 → 60.8) and Code (31.2 → 35.6) but cost MCQA-STEM (66.4 → 62.5) and GenQA (73.1 → 65.9); a GenQA-heavy mix did the reverse. There is no free lunch, which is precisely why the mix is chosen by integration tests rather than a single benchmark. And there is a formatting trap: including <strong>chat special tokens</strong> (<span class="lc-note">&lt;|im_start|&gt;</span>) in midtraining data makes the base model <em>emit</em> them at inference. GSM8K collapsed from 49.43 to 0 with special tokens, versus 46.02 with a plain chat template — so OLMo 3 strips both from midtraining and leaves them for SFT.</p>
+    <p><b>Model souping</b> closes the stage. Merging two independent 32B midtraining runs (different seeds) added roughly 1 point on MCQA-STEM, 0.4 on GenQA, 2.9/1.6 on Math versus the two runs, ~1 on MMLU, and 5/2 on GSM-Symbolic — enough that the merged checkpoint became the final 32B midtrained model. The 7B saw no such gain and stayed a single run.</p>
+    <div class="llmt-goal">💡 <span><b>Where this feeds:</b> the long-context extension of Part 13 starts from this midtrained checkpoint, and the whole post-training recipe of Part 15 consumes it. Midtraining is the hinge between the base model and everything that makes it an assistant.</span></div>
   </section>
 
   <section class="llmt-step" id="checkpoints">
@@ -135,7 +149,11 @@ redirect_from:
         <tr><td>Gradient accumulation</td><td>Simulates a larger batch than fits in memory by summing several micro-batch gradients</td></tr>
         <tr><td>Sequence packing</td><td>Concatenates documents to fill training sequences without padding waste</td></tr>
         <tr><td>Gradient clipping</td><td>Caps gradient norm to prevent a single bad batch from destabilizing training</td></tr>
-        <tr><td>Mid-training anneal</td><td>Late-training shift to a smaller, higher-quality data mixture (OLMo 2's Dolmino)</td></tr>
+        <tr><td>Mid-training anneal</td><td>Late-training shift to a smaller, higher-quality data mixture (OLMo 2's Dolmino, OLMo 3's Dolmino Mix 2)</td></tr>
+        <tr><td>Microanneal</td><td>~10B-token test of one candidate dataset against a web-only baseline, run in parallel across many candidates</td></tr>
+        <tr><td>Integration test</td><td>Full 100B-token midtraining run on a candidate mix plus SFT, revealing how sources interact</td></tr>
+        <tr><td>Model souping</td><td>Averaging weights of independent runs; OLMo 3 used it for the 32B midtrained and long-context checkpoints</td></tr>
+        <tr><td>Special tokens at midtraining</td><td>Chat tokens make the base model emit them at inference (GSM8K 49.43 → 0); leave them for SFT</td></tr>
         <tr><td>Checkpoints</td><td>Snapshots of the model at intervals through training, enabling inspection of how capability develops</td></tr>
       </tbody>
     </table>
@@ -374,6 +392,36 @@ redirect_from:
     }
     stepEl.addEventListener('input', draw);
     draw();
+  })();
+
+  // ---- Section 5b: microanneal vs integration test cost ----
+  (function(){
+    var slider = document.getElementById('anneal-n'), val = document.getElementById('anneal-n-val');
+    var canvas = document.getElementById('p5-anneal'), ctx = canvas.getContext('2d');
+    var readout = document.getElementById('p5-anneal-readout');
+    var W = canvas.width, H = canvas.height;
+    function render(){
+      var n = parseInt(slider.value,10); val.textContent = n;
+      ctx.clearRect(0,0,W,H);
+      var micro = n*10, integ = n*100;
+      var maxV = Math.max(micro, integ);
+      var padL=190, padR=70, padT=30, padB=20;
+      var plotW = W-padL-padR, plotH = H-padT-padB;
+      var bars = [{label:'Microanneals (10B each)', v:micro, color:c.accent}, {label:'Integration tests (100B each)', v:integ, color:c.accent2}];
+      var barH = plotH/bars.length - 20;
+      bars.forEach(function(b,i){
+        var y = padT + i*(barH+20);
+        ctx.fillStyle=b.color; ctx.fillRect(padL, y, plotW*b.v/maxV, barH);
+        ctx.fillStyle=c.text; ctx.font='12px '+c.font; ctx.textAlign='right';
+        ctx.fillText(b.label, padL-8, y+barH*0.7);
+        ctx.textAlign='left';
+        ctx.fillText((b.v/1000).toFixed(1)+'T tokens', padL+plotW*b.v/maxV+6, y+barH*0.7);
+      });
+      readout.innerHTML = '<span class="k">microanneal budget:</span> '+(micro/1000).toFixed(1)+'T tokens &nbsp; <span class="k">integration budget:</span> '+(integ/1000).toFixed(1)+'T<br>'+
+        '<span style="opacity:0.65">Microanneals screen breadth cheaply; a few integration tests confirm what survives the full mix.</span>';
+    }
+    slider.addEventListener('input', render);
+    render();
   })();
 
 })();

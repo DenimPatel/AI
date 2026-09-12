@@ -1,6 +1,6 @@
 ---
 title: "LLM Training, Interactively — Series Hub"
-description: The full map of the 12-part interactive LLM training guide — a clickable pipeline from raw web text to a deployed, guarded assistant, plus a routing table for jumping in wherever you already know the basics.
+description: The full map of the 15-part interactive LLM training guide — a clickable pipeline from raw web text to a deployed, guarded assistant, plus a routing table for jumping in wherever you already know the basics.
 permalink: /ai/llm-training/
 section: ai
 series: llm_training
@@ -48,75 +48,94 @@ redirect_from:
   <section class="page-header">
     <span class="section-kicker">Interactive guide · Series hub</span>
     <h1>LLM Training, Interactively</h1>
-    <p>Twelve parts, one pipeline: raw web text becomes a corpus, a corpus trains a base model, a base model becomes an assistant, an assistant is aligned and hardened, and the result is served to actual users. Every stage below is a real, interactive part of the series — not a static description.</p>
+    <p>Fifteen parts, one pipeline: raw web text becomes a corpus, a corpus trains a base model, a base model becomes an assistant, an assistant is aligned and hardened, and the result is served to actual users. Every stage below is a real, interactive part of the series — not a static description.</p>
   </section>
   <div class="stats-rule" style="border-top-color: var(--color-divider); margin-bottom: 24px;"></div>
 
   <section class="llmt-step" style="border-top:none; padding-top:0;">
     <h2 style="margin-top:0;">The pipeline</h2>
     <p>Click any stage to jump to its part.</p>
-    <svg class="hub-pipeline" viewBox="0 0 1160 260" role="img" aria-label="LLM training pipeline diagram">
-      <!-- connecting line -->
-      <line x1="60" y1="130" x2="1100" y2="130" stroke="var(--color-divider)" stroke-width="2"/>
-      <!-- stages -->
-      <a href="{{ '/ai/llm-training/data/' | relative_url }}"><g class="stage" transform="translate(20,80)">
-        <rect width="150" height="100" rx="4"/>
-        <text x="75" y="30" text-anchor="middle" class="stage-title">Raw web →</text>
-        <text x="75" y="46" text-anchor="middle" class="stage-title">corpus</text>
-        <text x="75" y="66" text-anchor="middle" class="stage-meta">Part 4</text>
-        <text x="75" y="80" text-anchor="middle" class="stage-meta">~200TB → 3T tokens</text>
+    <svg class="hub-pipeline" viewBox="0 0 1180 340" role="img" aria-label="LLM training pipeline diagram">
+      <defs>
+        <marker id="hub-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 z" fill="var(--color-divider)"/>
+        </marker>
+      </defs>
+      <!-- connecting lines -->
+      <line x1="20" y1="92" x2="1150" y2="92" stroke="var(--color-divider)" stroke-width="2"/>
+      <line x1="20" y1="252" x2="1150" y2="252" stroke="var(--color-divider)" stroke-width="2"/>
+      <polyline points="1045,144 1045,176 125,176 125,198" fill="none" stroke="var(--color-divider)" stroke-width="2" marker-end="url(#hub-arrow)"/>
+      <!-- row 1 -->
+      <a href="{{ '/ai/llm-training/data/' | relative_url }}"><g class="stage" transform="translate(20,40)">
+        <rect width="210" height="104" rx="4"/>
+        <text x="105" y="32" text-anchor="middle" class="stage-title">Raw web → corpus</text>
+        <text x="105" y="52" text-anchor="middle" class="stage-meta">Part 4</text>
+        <text x="105" y="72" text-anchor="middle" class="stage-meta">~200TB → 3T tokens</text>
       </g></a>
-      <a href="{{ '/ai/llm-training/pretraining/' | relative_url }}"><g class="stage" transform="translate(190,80)">
-        <rect width="150" height="100" rx="4"/>
-        <text x="75" y="30" text-anchor="middle" class="stage-title">Pretraining</text>
-        <text x="75" y="46" text-anchor="middle" class="stage-title">(base model)</text>
-        <text x="75" y="66" text-anchor="middle" class="stage-meta">Parts 3, 5, 6</text>
-        <text x="75" y="80" text-anchor="middle" class="stage-meta">Weeks–months, 1000s of GPUs</text>
+      <a href="{{ '/ai/llm-training/pretraining/' | relative_url }}"><g class="stage" transform="translate(250,40)">
+        <rect width="210" height="104" rx="4"/>
+        <text x="105" y="32" text-anchor="middle" class="stage-title">Pretraining (base model)</text>
+        <text x="105" y="52" text-anchor="middle" class="stage-meta">Parts 3, 5, 6</text>
+        <text x="105" y="72" text-anchor="middle" class="stage-meta">Weeks–months, 1000s of GPUs</text>
       </g></a>
-      <a href="{{ '/ai/llm-training/pretraining/' | relative_url }}#anneal"><g class="stage" transform="translate(360,80)">
-        <rect width="150" height="100" rx="4"/>
-        <text x="75" y="30" text-anchor="middle" class="stage-title">Mid-training</text>
-        <text x="75" y="46" text-anchor="middle" class="stage-title">(anneal)</text>
-        <text x="75" y="66" text-anchor="middle" class="stage-meta">Part 5</text>
-        <text x="75" y="80" text-anchor="middle" class="stage-meta">Hours–days</text>
+      <a href="{{ '/ai/llm-training/pretraining/' | relative_url }}#anneal"><g class="stage" transform="translate(480,40)">
+        <rect width="210" height="104" rx="4"/>
+        <text x="105" y="32" text-anchor="middle" class="stage-title">Mid-training (anneal)</text>
+        <text x="105" y="52" text-anchor="middle" class="stage-meta">Part 5</text>
+        <text x="105" y="72" text-anchor="middle" class="stage-meta">Hours–days</text>
       </g></a>
-      <a href="{{ '/ai/llm-training/finetuning/' | relative_url }}"><g class="stage" transform="translate(530,80)">
-        <rect width="150" height="100" rx="4"/>
-        <text x="75" y="30" text-anchor="middle" class="stage-title">SFT</text>
-        <text x="75" y="46" text-anchor="middle" class="stage-title">(instruction tuning)</text>
-        <text x="75" y="66" text-anchor="middle" class="stage-meta">Part 7</text>
-        <text x="75" y="80" text-anchor="middle" class="stage-meta">Thousands–millions of examples</text>
+      <a href="{{ '/ai/llm-training/long-context/' | relative_url }}"><g class="stage" transform="translate(710,40)">
+        <rect width="210" height="104" rx="4"/>
+        <text x="105" y="32" text-anchor="middle" class="stage-title">Long-context extension</text>
+        <text x="105" y="52" text-anchor="middle" class="stage-meta">Part 13</text>
+        <text x="105" y="72" text-anchor="middle" class="stage-meta">8K → 65K, RoPE stretch</text>
       </g></a>
-      <a href="{{ '/ai/llm-training/rlhf/' | relative_url }}"><g class="stage" transform="translate(700,80)">
-        <rect width="150" height="100" rx="4"/>
-        <text x="75" y="30" text-anchor="middle" class="stage-title">Alignment</text>
-        <text x="75" y="46" text-anchor="middle" class="stage-title">+ RL (Parts 8–9)</text>
-        <text x="75" y="66" text-anchor="middle" class="stage-meta">DPO / PPO / GRPO</text>
-        <text x="75" y="80" text-anchor="middle" class="stage-meta">Preference + verifiable data</text>
+      <a href="{{ '/ai/llm-training/finetuning/' | relative_url }}"><g class="stage" transform="translate(940,40)">
+        <rect width="210" height="104" rx="4"/>
+        <text x="105" y="32" text-anchor="middle" class="stage-title">SFT (instruction tuning)</text>
+        <text x="105" y="52" text-anchor="middle" class="stage-meta">Part 7</text>
+        <text x="105" y="72" text-anchor="middle" class="stage-meta">Thousands–millions of examples</text>
       </g></a>
-      <a href="{{ '/ai/llm-training/evaluation/' | relative_url }}"><g class="stage" transform="translate(870,80)">
-        <rect width="150" height="100" rx="4"/>
-        <text x="75" y="30" text-anchor="middle" class="stage-title">Evaluation</text>
-        <text x="75" y="46" text-anchor="middle" class="stage-title">+ guardrails</text>
-        <text x="75" y="66" text-anchor="middle" class="stage-meta">Parts 10, 12</text>
-        <text x="75" y="80" text-anchor="middle" class="stage-meta">Ongoing, incl. post-release</text>
+      <!-- row 2 -->
+      <a href="{{ '/ai/llm-training/rlhf/' | relative_url }}"><g class="stage" transform="translate(20,200)">
+        <rect width="210" height="104" rx="4"/>
+        <text x="105" y="32" text-anchor="middle" class="stage-title">Alignment + RL</text>
+        <text x="105" y="52" text-anchor="middle" class="stage-meta">Parts 8–9</text>
+        <text x="105" y="72" text-anchor="middle" class="stage-meta">DPO / PPO / GRPO</text>
       </g></a>
-      <a href="{{ '/ai/llm-training/inference/' | relative_url }}"><g class="stage" transform="translate(1040,80)">
-        <rect width="110" height="100" rx="4"/>
-        <text x="55" y="30" text-anchor="middle" class="stage-title">Serving</text>
-        <text x="55" y="46" text-anchor="middle" class="stage-title">(inference)</text>
-        <text x="55" y="66" text-anchor="middle" class="stage-meta">Part 11</text>
-        <text x="55" y="80" text-anchor="middle" class="stage-meta">Milliseconds/token</text>
+      <a href="{{ '/ai/llm-training/posttraining-scale/' | relative_url }}"><g class="stage" transform="translate(250,200)">
+        <rect width="210" height="104" rx="4"/>
+        <text x="105" y="32" text-anchor="middle" class="stage-title">Post-training at scale</text>
+        <text x="105" y="52" text-anchor="middle" class="stage-meta">Part 15</text>
+        <text x="105" y="72" text-anchor="middle" class="stage-meta">Delta learning, upgraded GRPO</text>
+      </g></a>
+      <a href="{{ '/ai/llm-training/tools-agents/' | relative_url }}"><g class="stage" transform="translate(480,200)">
+        <rect width="210" height="104" rx="4"/>
+        <text x="105" y="32" text-anchor="middle" class="stage-title">Tool use &amp; agents</text>
+        <text x="105" y="52" text-anchor="middle" class="stage-meta">Part 14</text>
+        <text x="105" y="72" text-anchor="middle" class="stage-meta">Function calling, MCP</text>
+      </g></a>
+      <a href="{{ '/ai/llm-training/evaluation/' | relative_url }}"><g class="stage" transform="translate(710,200)">
+        <rect width="210" height="104" rx="4"/>
+        <text x="105" y="32" text-anchor="middle" class="stage-title">Evaluation + guardrails</text>
+        <text x="105" y="52" text-anchor="middle" class="stage-meta">Parts 10, 12</text>
+        <text x="105" y="72" text-anchor="middle" class="stage-meta">Ongoing, incl. post-release</text>
+      </g></a>
+      <a href="{{ '/ai/llm-training/inference/' | relative_url }}"><g class="stage" transform="translate(940,200)">
+        <rect width="210" height="104" rx="4"/>
+        <text x="105" y="32" text-anchor="middle" class="stage-title">Serving (inference)</text>
+        <text x="105" y="52" text-anchor="middle" class="stage-meta">Part 11</text>
+        <text x="105" y="72" text-anchor="middle" class="stage-meta">Milliseconds/token</text>
       </g></a>
     </svg>
   </section>
 
   <section class="llmt-step">
-    <h2 style="margin-top:0;">All 12 parts</h2>
+    <h2 style="margin-top:0;">All 15 parts</h2>
     <div class="hub-grid">
       {% for part in site.data.series.llm_training.parts %}
       <a class="hub-card" href="{{ part.permalink | relative_url }}">
-        <span class="num">Part {{ part.num }} of 12</span>
+        <span class="num">Part {{ part.num }} of 15</span>
         <h3>{{ part.title }}</h3>
         <p>{{ part.blurb }}</p>
       </a>
@@ -141,6 +160,9 @@ redirect_from:
         <tr><td>Know SFT/RLHF, want reasoning-model RL specifically</td><td><a href="{{ '/ai/llm-training/reasoning/' | relative_url }}">Part 9 — Reasoning &amp; RLVR</a></td></tr>
         <tr><td>Just want to know how to read a benchmark number</td><td><a href="{{ '/ai/llm-training/evaluation/' | relative_url }}">Part 10 — Evaluation</a></td></tr>
         <tr><td>Care about running models cheaply, not training them</td><td><a href="{{ '/ai/llm-training/inference/' | relative_url }}">Part 11 — Inference, serving &amp; efficiency</a></td></tr>
+        <tr><td>Have a base model but it only knows a few thousand tokens</td><td><a href="{{ '/ai/llm-training/long-context/' | relative_url }}">Part 13 — Long-context &amp; context extension</a></td></tr>
+        <tr><td>Want to build tool-calling agents or MCP integrations</td><td><a href="{{ '/ai/llm-training/tools-agents/' | relative_url }}">Part 14 — Tool use, function calling &amp; agents</a></td></tr>
+        <tr><td>Want the full frontier post-training recipe end to end</td><td><a href="{{ '/ai/llm-training/posttraining-scale/' | relative_url }}">Part 15 — Post-training at scale</a></td></tr>
       </tbody>
     </table>
   </section>

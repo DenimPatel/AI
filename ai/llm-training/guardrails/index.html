@@ -36,7 +36,7 @@ redirect_from:
 <main>
 <div class="wrap llmt">
   <section class="page-header">
-    <span class="section-kicker">Interactive guide · Part 12 of 12</span>
+    <span class="section-kicker">Interactive guide · Part 12 of 15</span>
     <h1>Guardrails, Safety &amp; Deployment</h1>
     <p>Alignment in Part 8 shapes the model's own behavior through training. This final stage adds the layer on top: explicit safety training, adversarial testing, and runtime guardrails — the difference between a model that behaves well in a lab and a system that holds up once millions of people, some of them deliberately trying to break it, start using it.</p>
   </section>
@@ -121,6 +121,31 @@ redirect_from:
     <div class="llmt-goal">💡 <span><b>Model cards</b> (a norm OLMo and most major labs follow) document a model's training data, intended uses, known limitations, and evaluation results at release time — the release-time counterpart to publishing the training recipe itself.</span></div>
   </section>
 
+  <section class="llmt-step" id="safety-eval">
+    <div class="llmt-step-head"><span class="llmt-step-num">7</span><h2>The safety evaluation suite</h2></div>
+    <p class="llmt-eyebrow">Measuring refusal, not vibes</p>
+    <p>Safety claims need their own benchmarks, separate from capability ones. OLMo 3 reports a suite split into six <strong>development</strong> evaluations used during training and four <strong>held-out</strong> evaluations reserved for final reporting. No single benchmark is sufficient: a model that refuses everything would ace the harm tests and fail the over-refusal ones, so the suite deliberately includes both directions.</p>
+    <div style="overflow-x:auto; margin:12px 0 18px;">
+    <table class="llmt-cheat">
+      <thead><tr><th>Benchmark</th><th>What it measures</th><th>Metric</th><th>OLMo 3 7B Instruct</th></tr></thead>
+      <tbody>
+        <tr><td>HarmBench</td><td>Refusal of 320 diverse harmful prompts (cyber, bio, harassment, …)</td><td>Refusal accuracy (1 − ASR)</td><td>94.9</td></tr>
+        <tr><td>DoAnythingNow (DAN)</td><td>Robustness to the DAN jailbreak template</td><td>Refusal accuracy</td><td>75.2</td></tr>
+        <tr><td>XSTest</td><td><em>Over-refusal</em>: safe prompts that look unsafe</td><td>Accuracy</td><td>93.2</td></tr>
+        <tr><td>WildGuard-Test</td><td>Prompt harm, response harm, refusal on 749 adversarial prompts</td><td>Safety label</td><td>99.6</td></tr>
+        <tr><td>WildJailbreak-Test</td><td>Adversarial jailbreaks, split harmful / benign</td><td>Refusal (harmful) + non-refusal (benign)</td><td>69.1 / 98.0</td></tr>
+        <tr><td>TrustLLM-JailbreakTrigger</td><td>13 jailbreak attack families, 400 prompts</td><td>Refusal accuracy</td><td>79.2</td></tr>
+        <tr><td>Toxigen <span class="lc-note">(held out)</span></td><td>Compliance with requests for toxic text across demographic groups</td><td>Toxicity (inverted)</td><td>100.0</td></tr>
+        <tr><td>StrongReject <span class="lc-note">(held out)</span></td><td>37 real-world jailbreak techniques</td><td>Weighted 1–5 safety score</td><td>88.1</td></tr>
+        <tr><td>WMDP <span class="lc-note">(held out)</span></td><td>Dual-use bio/chem/cyber knowledge (many-choice)</td><td>Inverted accuracy</td><td>45.5</td></tr>
+        <tr><td>BBQ <span class="lc-note">(held out)</span></td><td>Social bias across age, gender, race, religion, …</td><td>Accuracy (and bias scores)</td><td>79.0</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p><b>Normalization is part of the measurement.</b> Different benchmarks report different things — some score refusal, some score correctness, some score toxicity — so OLMo 3 normalizes every metric so that <em>higher is always safer</em>: refusal accuracy (1 − attack success rate) for HarmBench, DAN, WildGuard, TrustLLM, Toxigen, and StrongReject; plain accuracy for XSTest and BBQ; the combination of harmful-query refusals and benign-query non-refusals for WildJailbreak; and inverted accuracy for WMDP. Without that unification, averaging the suite would be meaningless. The whole suite is sampled at temperature 0.7 and top-p 0.95, and the aggregate safety score for OLMo 3 7B Instruct is <strong>87.6</strong>.</p>
+    <div class="llmt-warn">⚠️ <span><b>Watch what moves and what doesn't.</b> Across the three post-training stages, different safety benchmarks move in opposite directions: HarmBench improves from 87.7 (SFT) to 94.9 (final) while DAN drops from 90.0 to 75.2, and WildJailbreak (harmful) falls from 80.9 to 69.1 while its benign non-refusal rises to 98.0. Safety is not a single scalar, and "more refusal" is not the same as "safer".</span></div>
+  </section>
+
   <section class="llmt-step" id="cheatsheet">
     <div class="llmt-step-head"><span class="llmt-step-num">✓</span><h2>Full-series cheat sheet</h2></div>
     <p class="llmt-eyebrow">The whole pipeline, one row per phase</p>
@@ -149,6 +174,8 @@ redirect_from:
       <li>Ganguli et al., <a href="https://arxiv.org/abs/2209.07858">"Red Teaming Language Models to Reduce Harms"</a> (2022).</li>
       <li>Mitchell et al., <a href="https://arxiv.org/abs/1810.03993">"Model Cards for Model Reporting"</a> (2018).</li>
       <li>Greshake et al., <a href="https://arxiv.org/abs/2302.12173">"Not what you've signed up for: Compromising Real-World LLM-Integrated Applications with Indirect Prompt Injection"</a> (2023).</li>
+      <li>Mazeika et al., <a href="https://arxiv.org/abs/2402.04249">"HarmBench"</a> (2024); Röttger et al., <a href="https://arxiv.org/abs/2308.01263">"XSTest"</a> (2023); Han et al., <a href="https://arxiv.org/abs/2402.16459">"WildGuard"</a> (2024).</li>
+      <li>Jiang et al., <a href="https://arxiv.org/abs/2403.00867">"WildTeaming / WildJailbreak"</a> (2024); Souly et al., <a href="https://arxiv.org/abs/2402.10260">"StrongReject"</a> (2024); Li et al., <a href="https://arxiv.org/abs/2403.03218">"WMDP"</a> (2024).</li>
       <li>Lambert et al. (Ai2), <a href="https://arxiv.org/abs/2411.15124">"Tulu 3"</a> — OLMo's safety training approach.</li>
       <li>This site's own <a href="/ai/benchmarks/">benchmarks page</a>.</li>
     </ul>
@@ -156,8 +183,8 @@ redirect_from:
 {% endraw %}
 
   <div class="llmt-next">
-    <span>That's the full pipeline, start to finish. Back to the beginning, or explore the other interactive guides on this site.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/llm-training/' | relative_url }}">Back to the series hub →</a>
+    <span>Guardrails are one axis of capability. The next three parts cover the frontier concerns that decide whether a model can actually be used: how far its context reaches, whether it can call tools, and the full post-training recipe behind a frontier assistant.</span>
+    <a class="btn btn-secondary" href="{{ '/ai/llm-training/long-context/' | relative_url }}">Continue: long-context &amp; context extension →</a>
   </div>
 </div>
 
