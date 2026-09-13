@@ -2,6 +2,8 @@
 # Part numbers live here only — page descriptions/titles must not restate them.
 # The optional `acts:` list groups the pill nav under act labels (see
 # _includes/series-nav.html); parts carry an `act:` key matching one of these ids.
+# `appendix:` (spelled `appendix:` below, matching the other series) holds the
+# reference card so the linter's part-count check sees 22 parts, not 23.
 hub: /math/linear-algebra/
 title: Linear Algebra, Interactively
 acts:
@@ -14,3 +16,14 @@ acts:
   - id: applied
     label: "IV · Applied"
 parts:
+  - num: 1
+    act: foundations
+    title: "What a vector is (three answers)"
+    short: "Part 1"
+    permalink: /math/linear-algebra/vectors/
+    blurb: "An arrow, a list of numbers, and an abstract object you can add and scale — and why they are the same thing."
+appendix:
+  - title: "Glossary and identities to know"
+    short: "Reference"
+    permalink: /math/linear-algebra/glossary/
+    blurb: "Every term in the series linked back to where it is introduced, plus a cheat sheet of decompositions and identities."

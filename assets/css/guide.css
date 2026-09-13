@@ -102,6 +102,30 @@
   background: var(--color-surface); border-radius: var(--radius-md); padding: 14px 16px;
 }
 .g-source { font-size: 11.5px; opacity: 0.6; margin-top: 4px; }
+
+/* — live/typeset matrices — generic bracketed CSS grid, updated in place by
+   LinAlg.setMatrix. Static equations should use KaTeX (.g-math.g-katex) instead;
+   re-running renderMathInElement every frame is a jank source. — */
+.g-matrix { display: inline-flex; align-items: center; gap: 8px; vertical-align: middle; }
+.g-matrix-wrap { display: inline-flex; align-items: stretch; vertical-align: middle; }
+.g-bracket {
+  font-family: var(--font-mono); font-size: 2.6em; font-weight: 300; line-height: 1;
+  display: flex; align-items: center; transform: scaleX(0.6); user-select: none; opacity: 0.85;
+}
+.g-matrix-grid {
+  display: inline-grid; grid-template-columns: repeat(var(--g-matrix-cols, 3), minmax(1.7em, auto));
+  align-items: center; justify-items: end; gap: 4px 16px; padding: 2px 8px;
+}
+.g-matrix-cell { font-family: var(--font-mono); font-size: 13.5px; white-space: nowrap; }
+.g-matrix-cell--hi { color: var(--color-accent-700); font-weight: 600; }
+.g-matrix-cell.g-matrix-label { font-family: var(--font-body); font-size: 11px; opacity: 0.6; justify-self: start; }
+.g-matrix-label-out { font-family: var(--font-body); font-size: 13.5px; }
+.g-matrix-input-cell {
+  width: 4.6em; font-family: var(--font-mono); font-size: 13px; text-align: right;
+  padding: 3px 5px; border: 1px solid var(--color-divider); border-radius: var(--radius-sm);
+  background: var(--color-bg); color: var(--color-text);
+}
+.g-matrix-input-cell:focus { border-color: var(--color-accent-500); outline: none; }
 @media (max-width: 640px) {
   .g-eyebrow { margin-left: 0; }
   .g-step-head { flex-wrap: wrap; }
