@@ -199,7 +199,12 @@ SERIES_NAME_HINTS = {
   'llm_serving' => /llm[\s-]*serving/i,
   'multi_view_geometry' => /multi[\s-]*view[\s-]*geometry/i,
   'nonlinear_optimization' => /nonlinear[\s-]*optimization/i,
-  'linear_algebra' => /linear[\s-]*algebra/i
+  'linear_algebra' => /linear[\s-]*algebra/i,
+  # The two calculus series share the word "calculus", so their hints are
+  # deliberately disjoint: only the full volume titles match. "N-part calculus"
+  # on its own is intentionally left unpoliced rather than mis-attributed.
+  'calculus' => /calculus,\s*interactively/i,
+  'calculus_in_motion' => /calculus\s+in\s+motion/i
 }.freeze
 
 Find.find('.') do |path|
