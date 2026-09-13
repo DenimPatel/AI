@@ -1,5 +1,6 @@
 ---
 title: "Linear Algebra"
+description: "The best linear algebra resources in one place, plus a pointer to the site's interactive series."
 date_label: "April 21, 2019"
 date: 2019-04-21
 category: "Linear Algebra"
@@ -16,6 +17,8 @@ Linear Algebra is always the must have tool for any engineers into the bucket. B
 In this blog post I am sharing you the best resources available on the internet till date. Some of them are tutorials, courses, blogs and even YouTube videos.
 
 My goal here is not to scare you by providing the massive resource list from picking everything from the internet but delivering what is best. You can use any of the mentioned reference material as per your convenience.
+
+**Update:** there is now a full interactive series built on this list — <a href="{{ '/math/linear-algebra/' | relative_url }}">Linear Algebra, Interactively</a> — which works through the checklist below one draggable picture at a time, starting from <a href="{{ '/math/linear-algebra/vectors/' | relative_url }}">what a vector is</a>. Use this page for the source links; use the series to actually learn the material.
 
 Here's the list you are looking for:
 

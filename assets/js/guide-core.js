@@ -329,9 +329,104 @@
     });
   }
 
+  // Arrow from (x0,y0) to (x1,y1) with a filled head and an optional label.
+  // opts: {color, width=2, head=9, dashed, label, labelColor, labelOffset}.
+  function drawArrow(ctx, x0, y0, x1, y1, opts) {
+    opts = opts || {};
+    var c = colors();
+    var color = opts.color || c.accent;
+    var dx = x1 - x0, dy = y1 - y0;
+    var len = Math.hypot(dx, dy);
+    if (len < 0.5) return;
+    var head = Math.min(opts.head || 9, len * 0.6);
+    var ux = dx / len, uy = dy / len;
+    var bx = x1 - ux * head, by = y1 - uy * head;
+    ctx.save();
+    ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = opts.width || 2;
+    ctx.lineCap = 'round';
+    if (opts.dashed) ctx.setLineDash([6, 5]);
+    ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(bx, by); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(bx - uy * head * 0.45, by + ux * head * 0.45);
+    ctx.lineTo(bx + uy * head * 0.45, by - ux * head * 0.45);
+    ctx.closePath(); ctx.fill();
+    if (opts.label) {
+      var off = opts.labelOffset || 12;
+      ctx.fillStyle = opts.labelColor || c.text;
+      ctx.font = '12px ' + c.font;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(opts.label, x1 + ux * off, y1 + uy * off);
+      ctx.textAlign = 'start'; ctx.textBaseline = 'alphabetic';
+    }
+    ctx.restore();
+  }
+
+  // Pointer-drag manager over Guide.hitTest. getHandles() returns the current
+  // handles in *logical canvas coordinates*: [{x, y, r, id}]. onDrag(id, x, y, ev)
+  // fires on pointermove; the canvas cursor is set to grab/grabbing. Returns
+  // {destroy()}. Pages that need a plane's world coordinates convert inside
+  // onDrag via plane.wx/wy.
+  function dragHandles(canvas, getHandles, onDrag, opts) {
+    opts = opts || {};
+    var activeId = null;
+
+    function findHandle(ev) {
+      var p = hitTest(canvas, ev);
+      var hs = getHandles() || [];
+      var best = null, bestD = Infinity;
+      for (var i = 0; i < hs.length; i++) {
+        var h = hs[i];
+        var d = Math.hypot(p.x - h.x, p.y - h.y);
+        var r = h.r == null ? 12 : h.r;
+        if (d <= r && d < bestD) { best = h; bestD = d; }
+      }
+      return best;
+    }
+
+    function down(ev) {
+      var h = findHandle(ev);
+      if (!h) return;
+      activeId = h.id;
+      canvas.style.cursor = 'grabbing';
+      if (ev.preventDefault) ev.preventDefault();
+      window.addEventListener('pointermove', move);
+      window.addEventListener('pointerup', up);
+      if (opts.onStart) opts.onStart(h.id, ev);
+    }
+    function move(ev) {
+      if (activeId == null) return;
+      var p = hitTest(canvas, ev);
+      if (onDrag) onDrag(activeId, p.x, p.y, ev);
+      if (ev.preventDefault) ev.preventDefault();
+    }
+    function up(ev) {
+      if (activeId == null) return;
+      var id = activeId; activeId = null;
+      canvas.style.cursor = opts.cursor || 'grab';
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+      if (opts.onEnd) opts.onEnd(id, ev);
+    }
+
+    canvas.addEventListener('pointerdown', down);
+    canvas.style.touchAction = 'none';
+    canvas.style.cursor = opts.cursor || 'grab';
+
+    return {
+      destroy: function () {
+        canvas.removeEventListener('pointerdown', down);
+        window.removeEventListener('pointermove', move);
+        window.removeEventListener('pointerup', up);
+      }
+    };
+  }
+
   global.Guide = {
     css: css, colors: colors, setupCanvas: setupCanvas, hitTest: hitTest,
     drawBars: drawBars, drawLines: drawLines, drawStacked: drawStacked, drawHeatmap: drawHeatmap,
+    drawArrow: drawArrow, dragHandles: dragHandles,
     softmax: softmax, seededRandom: seededRandom,
     fmtBytes: fmtBytes, fmtNum: fmtNum, fmtMs: fmtMs,
     loop: loop, bindSliders: bindSliders
