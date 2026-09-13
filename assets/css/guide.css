@@ -40,6 +40,14 @@
   line-height: 1.7;
 }
 .g-math.g-katex { font-family: var(--font-body); font-size: 15px; overflow-x: auto; }
+/* Keep wide display math and tables from forcing page-level horizontal scroll on
+   narrow screens: each scrolls inside its own box instead. `.katex-display` catches
+   bare `$$…$$` that is not inside a `.g-math`; `.g-table-wrap` is the opt-in wrapper
+   for a wide `g-cheat` table. */
+.katex-display { max-width: 100%; overflow-x: auto; overflow-y: hidden; }
+.katex { max-width: 100%; }
+.g-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.g-demo > *, .g-grid2 > *, .g-grid3 > * { min-width: 0; }
 .g-demo {
   display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;
   background: var(--color-surface); border-radius: var(--radius-md); padding: 18px;

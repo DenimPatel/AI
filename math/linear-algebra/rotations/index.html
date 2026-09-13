@@ -98,6 +98,7 @@ series: "linear_algebra"
     <p>Notice that no cube ever becomes non-rigid here &mdash; every value of the three sliders still produces a perfectly good rotation, because the product of rotations is always a rotation. What breaks is the ability to move smoothly through orientations using the three angles as coordinates. Near the lock, a small change in roll and a small change in yaw produce almost the same motion, so a controller that differentiates with respect to the angles sees a nearly singular Jacobian and commands enormous, jittery corrections. The cure is to leave Euler angles for anything that has to be interpolated, differentiated or optimised, and use the axis-angle or quaternion coordinates instead.</p>
     <p>It helps to see the singularity as a rank statement rather than a drawing. The derivative of the orientation with respect to the three angles is a <var>3&times;3</var> matrix built from the three instantaneous rotation axes; when two of those axes become parallel, two of its columns become parallel too, and the matrix drops rank. At that point the map from angle-space to <var>SO(3)</var> is locally two-to-one in one direction, which is why an inverse-kinematics or attitude solver stalls. Every three-angle convention has such points &mdash; changing the order or the axis set only moves them around, it never removes them, because three numbers cannot smoothly parametrise a curved three-dimensional set without at least one fold.</p>
     <h3 style="margin-top:22px;">Four ways to name the same orientation</h3>
+    <div class="g-table-wrap">
     <table class="g-cheat">
       <thead><tr><th>Coordinates</th><th>Size</th><th>Strength</th><th>Where it fails</th></tr></thead>
       <tbody>
@@ -107,6 +108,7 @@ series: "linear_algebra"
         <tr><td>Unit quaternion</td><td>4 numbers, 1 constraint</td><td>No singularity; slerp is the geodesic and is cheap</td><td>Double cover: <var>q</var> and <var>&minus;q</var> are the same rotation, so signs must be normalised</td></tr>
       </tbody>
     </table>
+    </div>
     <p>As a rule of thumb: store the state as a matrix or a quaternion, expose Euler angles only at the user interface, and do every increment, derivative and interpolation in the tangent space with an exponential and a logarithm.</p>
   </section>
 

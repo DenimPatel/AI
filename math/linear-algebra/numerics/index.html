@@ -108,6 +108,7 @@ series: "linear_algebra"
         <div class="g-readout" id="nu-cost-readout"></div>
       </div>
     </div>
+    <div class="g-table-wrap">
     <table class="g-cheat" style="margin-top:18px;">
       <thead><tr><th>Decomposition</th><th>Use it when</th><th>Leading cost</th><th>Watch out for</th></tr></thead>
       <tbody>
@@ -118,6 +119,7 @@ series: "linear_algebra"
         <tr><td>SVD</td><td>Conditioning, rank, pseudoinverse, low-rank approximation &mdash; when the singular values are wanted</td><td><var>~12n<sup>3</sup></var></td><td>The most robust and the most expensive; use one-sided iteration near singularity, never <var>eig(A<sup>ᵀ</sup>A)</var>.</td></tr>
       </tbody>
     </table>
+    </div>
     <p class="nu-note">Costs are leading-order flop counts for dense square matrices and the constants vary with the implementation; the ordering, not the third digit, is the thing to remember.</p>
   </section>
 
