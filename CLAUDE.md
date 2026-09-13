@@ -9,7 +9,7 @@ framework, no npm, no build step beyond Jekyll. There are no automated tests, bu
 (`.github/workflows/ci.yml`) runs a build, an internal link check, and a content linter on
 every push and PR — see Commands below. A separate monthly job checks external links too.
 
-Content is roughly 250,000 words across ~60 pages, and the great majority of it is four
+Content is roughly 250,000 words across ~60 pages, and the great majority of it is five
 long interactive guides made of hand-written `<canvas>` and vanilla JS. Treat those guide
 pages as the crown jewels: they are fragile, they are not covered by any test, and a change
 you cannot see rendered is a change you cannot verify.
@@ -57,7 +57,7 @@ the thing you want to change is generated:
 
 | File | Owns |
 |---|---|
-| `_data/sections.yml` | The three subjects (`ai`, `vision`, `robotics`) — drives the global nav, the homepage doors, and every section hub |
+| `_data/sections.yml` | The four subjects (`ai`, `vision`, `robotics`, `math`) — drives the global nav, the homepage doors, and every section hub |
 | `_data/series/*.yml` | Each guide's ordered part list: numbering, titles, permalinks, blurbs, and the `legacy` URL each part redirects from |
 | `_data/note_groups.yml` | Grouping and ordering of the field-note listings |
 | `_data/{timeline,products,benchmarks,labs,quotes}.yml` | The AI record content, rendered by both `/ai/<page>/` and the homepage teaser |
@@ -77,7 +77,8 @@ the prev/next block, the hub card grid, and the homepage counter all follow auto
 1. **Markdown + layout** (`ai/*.md`, `about.md`, hub pages). Uses `_layouts/page.html`,
    `section-hub.html` or `series-hub.html`. Normal Jekyll.
 2. **Standalone interactive guides** (`ai/llm-training/*/index.html`,
-   `vision/{multi-view-geometry,nonlinear-optimization}/*/index.html`). These have **no
+   `vision/{multi-view-geometry,nonlinear-optimization}/*/index.html`,
+   `math/linear-algebra/*/index.html`). These have **no
    `layout:`** — each is a complete `<!DOCTYPE html>` document with its own `<head>` and its
    own page-specific `<style>` block. They pull in shared chrome explicitly:
    ```liquid
@@ -170,6 +171,16 @@ not real content, kept as a working example and a build-time smoke test. The LLM
 series (`_data/series/llm_serving.yml`, `/ai/llm-serving/`) is the guide kit's first real
 consumer: it adds generic helpers to `guide-core.js` (stacked bars, heatmaps, formatting,
 hit-testing) and its own `assets/js/serving-sim.js` on top.
+
+The Linear Algebra series (`_data/series/linear_algebra.yml`, `/math/linear-algebra/`) is
+the guide kit's second real consumer and its first user of `guide-plot3d.js`. It adds two
+small generic helpers to `guide-core.js` (`drawArrow`, `dragHandles`) plus matrix
+typesetting classes to `guide.css` (`.g-matrix*`), and its own `assets/js/linalg-viz.js`
+(`window.LinAlg`) on top: an N-dimensional matrix library (LU, QR, SVD, pseudoinverse,
+eigen) and a reusable 2D cartesian `plane` widget that most of its demos are built from.
+The same split rule applies — generic primitives to the kit, domain-shaped code to the
+series file. `LinAlg.mat.svd` is one-sided Jacobi, not `eig(AᵀA)`, because the latter
+squares the condition number and Part 19 deliberately constructs near-singular matrices.
 
 ## Conventions
 

@@ -198,7 +198,8 @@ SERIES_NAME_HINTS = {
   'llm_training' => /llm[\s-]*training/i,
   'llm_serving' => /llm[\s-]*serving/i,
   'multi_view_geometry' => /multi[\s-]*view[\s-]*geometry/i,
-  'nonlinear_optimization' => /nonlinear[\s-]*optimization/i
+  'nonlinear_optimization' => /nonlinear[\s-]*optimization/i,
+  'linear_algebra' => /linear[\s-]*algebra/i
 }.freeze
 
 Find.find('.') do |path|

@@ -3,7 +3,7 @@ layout: home
 title: Home
 permalink: /
 section: ""
-description: A running record of artificial intelligence — milestones, products, benchmarks and voices — alongside interactive guides to LLM training and serving, multi-view geometry, nonlinear optimization and robotics.
+description: A running record of artificial intelligence — milestones, products, benchmarks and voices — alongside interactive guides to LLM training and serving, multi-view geometry, nonlinear optimization, linear algebra and robotics.
 ---
 
 {%- assign notes = site.pages | where_exp: "p", "p.date_label" -%}
@@ -11,7 +11,8 @@ description: A running record of artificial intelligence — milestones, product
 {%- assign serving = site.data.series.llm_serving.parts | size -%}
 {%- assign mvg = site.data.series.multi_view_geometry.parts | size -%}
 {%- assign nlo = site.data.series.nonlinear_optimization.parts | size -%}
-{%- assign guideparts = llm | plus: serving | plus: mvg | plus: nlo -%}
+{%- assign linalg = site.data.series.linear_algebra.parts | size -%}
+{%- assign guideparts = llm | plus: serving | plus: mvg | plus: nlo | plus: linalg -%}
 
 <section class="hero">
   <h1>A running record<br>of artificial intelligence.</h1>
@@ -43,7 +44,7 @@ description: A running record of artificial intelligence — milestones, product
 </section>
 
 <section class="section">
-  <span class="section-kicker">Three ways in</span>
+  <span class="section-kicker">Four ways in</span>
   <h2 class="section-title">Start here</h2>
   <div class="card-grid" style="margin-bottom: 8px;">
     {%- for s in site.data.sections %}
@@ -70,9 +71,9 @@ description: A running record of artificial intelligence — milestones, product
 <section class="section">
   <span class="section-kicker">Interactive guides</span>
   <h2 class="section-title">Built from scratch, step by step</h2>
-  <p class="section-lede">Four long-form guides. Every part is interactive — you drag the cameras, run the training loop, and watch the solver converge.</p>
+  <p class="section-lede">Five long-form guides. Every part is interactive — you drag the cameras, run the training loop, and watch the solver converge.</p>
   <div class="card-grid card-grid--tight" style="margin-bottom: 24px;">
-    {%- assign guide_ids = "llm_training,llm_serving,multi_view_geometry,nonlinear_optimization" | split: "," %}
+    {%- assign guide_ids = "llm_training,llm_serving,multi_view_geometry,nonlinear_optimization,linear_algebra" | split: "," %}
     {%- for sid in guide_ids %}
     {%- assign s = site.data.series[sid] %}
     <a class="card" href="{{ s.hub | relative_url }}" style="text-decoration:none; color:inherit;">

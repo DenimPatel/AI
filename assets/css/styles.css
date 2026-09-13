@@ -195,6 +195,16 @@ main { display: block; }
 .nav--series a[aria-current='page'] {
   background: var(--color-accent); color: #fff;
 }
+/* Optional act grouping (only when the series YAML declares `acts:`). The group
+   is presentational: display:contents lets its children sit directly in the
+   pill row, so an ungrouped series renders exactly as before. */
+.nav--series-group { display: contents; }
+.nav--series-act {
+  font-family: var(--font-heading); font-weight: 600; font-size: 11px;
+  letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap;
+  align-self: center; margin-left: 6px;
+  color: color-mix(in srgb, var(--color-text) 52%, transparent);
+}
 
 /* — prev/next footer for a series part — */
 .series-prevnext {

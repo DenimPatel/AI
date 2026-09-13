@@ -1,4 +1,4 @@
-# The three top-level subjects. Drives the global nav (_includes/site-nav.html),
+# The four top-level subjects. Drives the global nav (_includes/site-nav.html),
 # the homepage doors, and each section hub page (_layouts/section-hub.html).
 #
 # Contract - one entry per section, keys:
@@ -65,3 +65,11 @@
   blurb: "Notes and tutorials on ROS and robot navigation, migrated from the Robotics At Once blog."
   notes_path: /robotics/
   notes_blurb: "Notes and tutorials on ROS and robot navigation, migrated from the Robotics At Once blog."
+
+- id: math
+  title: "Math"
+  url: /math/
+  kicker: "Foundations"
+  blurb: "The machinery every other subject assumes, built from pictures first: an interactive guide to linear algebra that starts at what a vector is and ends at attention matrices, Gauss-Newton and SO(3)."
+  series:
+    - linear_algebra

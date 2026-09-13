@@ -1,0 +1,16 @@
+# One source of truth for the Linear Algebra guide's part list.
+# Part numbers live here only — page descriptions/titles must not restate them.
+# The optional `acts:` list groups the pill nav under act labels (see
+# _includes/series-nav.html); parts carry an `act:` key matching one of these ids.
+hub: /math/linear-algebra/
+title: Linear Algebra, Interactively
+acts:
+  - id: foundations
+    label: "I · Foundations"
+  - id: inner
+    label: "II · Inner products"
+  - id: eigen
+    label: "III · Eigen & SVD"
+  - id: applied
+    label: "IV · Applied"
+parts:
