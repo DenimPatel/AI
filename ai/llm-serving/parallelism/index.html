@@ -152,6 +152,7 @@ series: "llm_serving"
       </div>
     </div>
     <p>The shape of that cloud is the whole lesson. The best throughput usually comes from <strong>small TP (2–8), modest PP, and as much DP as fits</strong> — because DP is free and TP's all-reduce is not. When a single request must be fast, TP grows until the weight read fits the latency budget, and it stops at the node boundary. PP appears only when a model is too large for one node even with TP=8, and then only when continuous batching supplies enough microbatches to keep the bubble under a few percent. EP replaces TP for sparse layers and is the reason rack-scale domains exist.</p>
+    <div style="overflow-x:auto;">
     <table class="g-cheat">
       <thead><tr><th>Axis</th><th>Splits</th><th>Collective</th><th>Use it when</th></tr></thead>
       <tbody>
@@ -163,10 +164,12 @@ series: "llm_serving"
         <tr><td>CP</td><td>Sequence tokens</td><td>Ring point-to-point</td><td>One sequence exceeds a device's KV budget</td></tr>
       </tbody>
     </table>
+    </div>
   </section>
 
   <section class="g-step">
     <h2>Cheat sheet</h2>
+    <div style="overflow-x:auto;">
     <table class="g-cheat">
       <thead><tr><th>Concept</th><th>What to remember</th></tr></thead>
       <tbody>
@@ -179,6 +182,7 @@ series: "llm_serving"
         <tr><td>Wide EP</td><td>EP32 prefill / EP144 decode for DeepSeek-V3, only on a rack-scale domain</td></tr>
       </tbody>
     </table>
+    </div>
   </section>
 
   <section class="g-step">
