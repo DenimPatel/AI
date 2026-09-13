@@ -169,6 +169,12 @@ series: "calculus"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">8</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>The gradient is the derivative when the input is a vector. Next, let the output be a vector too, and the derivative becomes a matrix.</span>
     <a class="btn btn-secondary" href="{{ '/math/calculus/jacobian-hessian/' | relative_url }}">Next: The derivative as a matrix →</a>
@@ -179,7 +185,9 @@ series: "calculus"
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/calc-viz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -658,6 +666,51 @@ series: "calculus"
     atEnd4 = false;
     draw4();
   });
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'grad-directional-max',
+      kind: 'choice',
+      prompt: 'The directional derivative D_u f = ∇f·u is maximized when...',
+      options: [
+        { label: 'u points in the same direction as ∇f, giving D_u f = |∇f|.', correct: true },
+        { label: 'u is perpendicular to ∇f.', correct: false },
+        { label: 'u points opposite to ∇f.', correct: false }
+      ],
+      explanation: 'By Cauchy–Schwarz, D_u f = |∇f|cos φ ≤ |∇f|, with equality exactly when φ=0 — that is, when u and ∇f point the same way, which is the equality case that makes the gradient the steepest-ascent direction.'
+    },
+    {
+      id: 'grad-perpendicular-proof',
+      kind: 'choice',
+      prompt: 'Given a level set f(r(t))=c for all t, differentiating both sides with the chain rule shows...',
+      options: [
+        { label: '∇f·r′(t)=0, so the gradient is perpendicular to the tangent of the level curve.', correct: true },
+        { label: '∇f is always equal to r′(t).', correct: false },
+        { label: 'The chain rule does not apply because c is a constant.', correct: false }
+      ],
+      explanation: 'The left side becomes ∇f·r′(t) by the chain rule, and the right side (a constant) has derivative zero, so ∇f·r′(t)=0 — and a vector that dot-products to zero with every tangent direction is by definition normal to the curve.'
+    },
+    {
+      id: 'grad-max-directional-value',
+      kind: 'numeric',
+      prompt: 'If |∇f(p)| = 5, what is the maximum possible directional derivative D_u f(p) over all unit vectors u?',
+      answer: 5,
+      tolerance: 0.01,
+      explanation: 'The maximum of D_u f = |∇f|cos φ over unit u is |∇f| itself, achieved when u points along ∇f.'
+    },
+    {
+      id: 'grad-dot-product',
+      kind: 'numeric',
+      prompt: 'At a point p, ∇f(p) = (3, 4). What is the directional derivative in the direction u = (1, 0) (due east)?',
+      answer: 3,
+      tolerance: 0.01,
+      explanation: 'D_u f = ∇f·u = (3)(1) + (4)(0) = 3 — the directional derivative reads off just the first partial when you walk purely along the x-axis.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

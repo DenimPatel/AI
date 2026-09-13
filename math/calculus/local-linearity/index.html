@@ -139,6 +139,12 @@ series: "calculus"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">8</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>Zooming gave us a slope. The next part makes the "getting closer" in that zoom exact, with limits and epsilon-delta.</span>
     <a class="btn btn-secondary" href="{{ '/math/calculus/limits/' | relative_url }}">Next: Limits, made concrete →</a>
@@ -149,7 +155,9 @@ series: "calculus"
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/calc-viz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -405,6 +413,54 @@ series: "calculus"
       '<div><span class="k">gap secant − tangent</span> ' + Math.abs(sec.slope - L.slope).toFixed(5) + ' m/s</div>';
   }
   Guide.bindSliders([D4.a, D4.h], drawDeriv);
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'll-tangent',
+      kind: 'choice',
+      prompt: 'As you zoom in on the curve around a point <var>a</var>, the piece of curve inside the window flattens toward...',
+      options: [
+        { label: 'The tangent line at a — the straight line through (a, s(a)) with slope s′(a).', correct: true },
+        { label: 'The x-axis, regardless of where a is.', correct: false },
+        { label: 'A random secant line that depends on the zoom level.', correct: false }
+      ],
+      explanation: 'That is exactly what "locally linear" means: the curve does not approach just any line, it approaches the one specific line whose slope is the derivative at a.'
+    },
+    {
+      id: 'll-error-order',
+      kind: 'choice',
+      prompt: 'The zoom demo tracks (curve − tangent error) / w² rather than the error alone. Why divide by w² instead of by w?',
+      options: [
+        { label: 'For a smooth curve the max gap shrinks like w², so dividing by w² leaves a bounded number, roughly ½|s″(a)|.', correct: true },
+        { label: 'w² is a rough approximation of the derivative itself.', correct: false },
+        { label: 'Dividing by w² is just a convention with no particular meaning.', correct: false }
+      ],
+      explanation: 'The error term is ½ s″(a)h² + O(h³), so dividing by h² (the demo’s w) cancels the leading order and leaves a number that settles near the constant ½|s″(a)| instead of vanishing or blowing up.'
+    },
+    {
+      id: 'll-corner',
+      kind: 'choice',
+      prompt: 'The corner |t−1.6| is continuous at t=1.6, but the linearity meter never drives its misfit to zero, however far you zoom. Why?',
+      options: [
+        { label: 'The two sides of the corner have different constant slopes, so no single line fits both as a fraction of the window shrinks.', correct: true },
+        { label: 'Because the function is actually discontinuous at t=1.6.', correct: false },
+        { label: 'Because 1.6 cannot be represented exactly in floating point.', correct: false }
+      ],
+      explanation: 'A corner keeps slope −1 on one side and +1 on the other at every scale, so the best-fit line always misses by a fixed fraction of the window — that fixed misfit is precisely the signature of a missing derivative.'
+    },
+    {
+      id: 'll-half-spp',
+      kind: 'numeric',
+      prompt: 'The robot’s position is s(t) = t³/3 − 1.5t² + 2t, so s″(t) = 2t − 3. The quadratic error term in local linearity is ½|s″(a)|. What is ½|s″(0)|?',
+      answer: 1.5,
+      tolerance: 0.01,
+      explanation: 's″(0) = 2(0) − 3 = −3, so |s″(0)| = 3 and ½ · 3 = 1.5 — exactly the constant the zoom demo’s error/w² ratio settles on at a = 0.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

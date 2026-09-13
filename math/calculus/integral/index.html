@@ -153,6 +153,12 @@ series: "calculus"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">8</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>Once an integral is an accumulated area, the natural question is how that area changes — and the answer is the original function.</span>
     <a class="btn btn-secondary" href="{{ '/math/calculus/ftc/' | relative_url }}">Next: The Fundamental Theorem →</a>
@@ -163,7 +169,9 @@ series: "calculus"
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/calc-viz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -471,6 +479,51 @@ series: "calculus"
     el('acc-verdict').innerHTML = 'A\u2032(x) = v(x): the slope of the accumulated area equals the height of the curve.';
   }
   Guide.bindSliders([D4.x], draw4);
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'int-signed-vs-total',
+      kind: 'choice',
+      prompt: 'Between t=1 and t=2, the robot\'s velocity v(t)=t\u00b2\u22123t+2 is negative. What does this strip contribute to the definite integral \u222bv dt versus the odometer \u222b|v| dt?',
+      options: [
+        { label: 'It subtracts from the signed integral (net displacement), but still adds positively to the odometer (total distance).', correct: true },
+        { label: 'It subtracts from both the signed integral and the odometer equally.', correct: false },
+        { label: 'It contributes nothing to either, since direction doesn\'t matter for integrals.', correct: false }
+      ],
+      explanation: 'A negative-velocity strip has v(t)\u00b7\u0394x < 0, so it cancels part of the net displacement; but |v(t)|\u00b7\u0394x is still positive, so the odometer \u2014 which integrates speed, not signed velocity \u2014 keeps climbing regardless of direction.'
+    },
+    {
+      id: 'int-rule-independence',
+      kind: 'choice',
+      prompt: 'As the mesh width \u2016\u0394x\u2016\u21920, why do left, right, midpoint and trapezoid sums all converge to the same value?',
+      options: [
+        { label: 'The difference between any two rules is bounded by how much f moves across one shrinking strip, and that difference vanishes as the strip width goes to zero.', correct: true },
+        { label: 'All four rules secretly use the same sample point once the limit is taken.', correct: false },
+        { label: 'Only midpoint and trapezoid actually converge; left and right diverge.', correct: false }
+      ],
+      explanation: 'Each rule just samples f at a different point within a strip, and as strips shrink the height of f varies less and less across a strip, so the rules\' disagreement is squeezed to zero along with the mesh.'
+    },
+    {
+      id: 'int-net-displacement',
+      kind: 'numeric',
+      prompt: 'Using the closed-form antiderivative F(t)=t\u00b3/3\u22121.5t\u00b2+2t, what is the net displacement \u222b\u2080\u00b3 v(t) dt = F(3)\u2212F(0)?',
+      answer: 1.5,
+      tolerance: 0.01,
+      explanation: 'F(3) = 27/3 \u2212 1.5(9) + 2(3) = 9 \u2212 13.5 + 6 = 1.5, and F(0) = 0, so the net displacement is 1.5 m \u2014 less than the total distance travelled, because the robot backs up between t=1 and t=2.'
+    },
+    {
+      id: 'int-velocity-1-5',
+      kind: 'numeric',
+      prompt: 'The robot\'s velocity is v(t)=t\u00b2\u22123t+2. What is v(1.5), the velocity at the midpoint of the reversal interval [1,2]?',
+      answer: -0.25,
+      tolerance: 0.01,
+      explanation: 'v(1.5) = 1.5\u00b2 \u2212 3(1.5) + 2 = 2.25 \u2212 4.5 + 2 = \u22120.25 m/s \u2014 negative, confirming the robot is backing up in the middle of that interval.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

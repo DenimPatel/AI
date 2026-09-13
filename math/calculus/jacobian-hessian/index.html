@@ -190,6 +190,12 @@ series: "calculus"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">9</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>The Jacobian and Hessian are the raw material; the last part assembles them into the local quadratic model and the matrix second-derivative test.</span>
     <a class="btn btn-secondary" href="{{ '/math/calculus/multivariable-taylor/' | relative_url }}">Next: Multivariable Taylor &amp; critical points →</a>
@@ -201,8 +207,10 @@ series: "calculus"
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/guide-math.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/calc-viz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/guide-plot3d.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -579,6 +587,51 @@ series: "calculus"
       draw5();
     });
   });
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'jh-singular-config',
+      kind: 'choice',
+      prompt: 'The arm\'s Jacobian determinant is det J = L1·L2·sin θ2. At which configurations does the arm become singular (lose rank)?',
+      options: [
+        { label: 'θ2 = 0 (fully extended) or θ2 = π (fully folded), where sin θ2 = 0.', correct: true },
+        { label: 'θ1 = 0, regardless of θ2.', correct: false },
+        { label: 'Any configuration where L1 equals L2.', correct: false }
+      ],
+      explanation: 'det J vanishes exactly when sin θ2 = 0, which happens at θ2 = 0 or π — the two configurations where the arm is a straight line and the Jacobian\'s columns become parallel.'
+    },
+    {
+      id: 'jh-hessian-eig-classify',
+      kind: 'choice',
+      prompt: 'At a critical point, the Hessian has eigenvalues λ1=3 and λ2=−2. What kind of critical point is this?',
+      options: [
+        { label: 'A saddle point, since the eigenvalues have opposite signs.', correct: true },
+        { label: 'A local minimum.', correct: false },
+        { label: 'A local maximum.', correct: false }
+      ],
+      explanation: 'Both positive means a bowl (minimum), both negative a cap (maximum), and mixed signs — one positive, one negative — means the surface curves up in one eigen-direction and down in the other: a saddle.'
+    },
+    {
+      id: 'jh-det-j-value',
+      kind: 'numeric',
+      prompt: 'The two-link arm has L1=1.6 m and L2=1.2 m. At θ2 = π/2 (90°), what is det J = L1·L2·sin(θ2)?',
+      answer: 1.92,
+      tolerance: 0.01,
+      explanation: 'det J = 1.6 · 1.2 · sin(90°) = 1.92 · 1 = 1.92 — the arm is comfortably full rank at a right-angle elbow.'
+    },
+    {
+      id: 'jh-det-h-value',
+      kind: 'numeric',
+      prompt: 'For the quadratic form q(x,y)=ax²+2bxy+cy² with H=[[a,b],[b,c]], if a=1, b=0.8, c=1, what is det H = ac−b²?',
+      answer: 0.36,
+      tolerance: 0.01,
+      explanation: 'det H = (1)(1) − (0.8)² = 1 − 0.64 = 0.36 — positive, and since a>0 too, this H is positive definite (a bowl).'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

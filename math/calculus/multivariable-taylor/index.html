@@ -147,6 +147,12 @@ series: "calculus"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">8</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>That completes the differential half of the volume. Volume II picks the story up where a landscape becomes a trajectory.</span>
     <a class="btn btn-secondary" href="{{ '/math/calculus-in-motion/' | relative_url }}">Continue: Calculus in Motion →</a>
@@ -159,7 +165,9 @@ series: "calculus"
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/calc-viz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/guide-math.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/guide-plot3d.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -478,6 +486,51 @@ series: "calculus"
       '<div><span class="k">contraction rate (\u03ba\u22121)/(\u03ba+1)</span> ' + ((k - 1) / (k + 1)).toFixed(3) + '</div>';
   }
   Guide.bindSliders([s4k], function () { s4.kappa = parseFloat(s4k.value); draw4(); });
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'mvt-second-deriv-test',
+      kind: 'choice',
+      prompt: 'At a critical point, D = fxx·fyy − fxy² > 0 and fxx > 0. What kind of point is this?',
+      options: [
+        { label: 'A local minimum.', correct: true },
+        { label: 'A local maximum.', correct: false },
+        { label: 'A saddle point.', correct: false }
+      ],
+      explanation: 'D > 0 means the two eigenvalues of H share a sign (their product is positive); fxx > 0 pins that shared sign as positive, so both eigenvalues are positive and the point curves up in every direction — a bowl.'
+    },
+    {
+      id: 'mvt-newton-one-step',
+      kind: 'choice',
+      prompt: 'On a purely quadratic landscape, Newton\'s step p = −H⁻¹g reaches the minimum in how many steps, regardless of the condition number κ?',
+      options: [
+        { label: 'Exactly one step, since Newton\'s method divides each direction by its own curvature and is unmoved by conditioning.', correct: true },
+        { label: 'The same number of steps as gradient descent needs.', correct: false },
+        { label: 'It never converges once κ is large.', correct: false }
+      ],
+      explanation: 'On an exact quadratic the local model is the function itself, so solving g + HΔ = 0 lands exactly on the minimizer in one move — unlike gradient descent, whose contraction rate ((κ−1)/(κ+1))ᵏ depends heavily on κ.'
+    },
+    {
+      id: 'mvt-f-at-min',
+      kind: 'numeric',
+      prompt: 'The running landscape is f(x,y) = x³/3 − x + y³/3 − y. At the critical point (1,1), compute f(1,1).',
+      answer: -1.3333,
+      tolerance: 0.01,
+      explanation: 'f(1,1) = (1/3 − 1) + (1/3 − 1) = −2/3 − 2/3 = −4/3 ≈ −1.3333.'
+    },
+    {
+      id: 'mvt-contraction-rate',
+      kind: 'numeric',
+      prompt: 'For the conditioning demo f(x,y)=½(κx²+y²) with κ=20, gradient descent\'s contraction rate per step is (κ−1)/(κ+1). What is this value?',
+      answer: 0.905,
+      tolerance: 0.01,
+      explanation: '(20−1)/(20+1) = 19/21 ≈ 0.905 — close to 1, which is why steepest descent crawls and zig-zags when the landscape is this poorly conditioned.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

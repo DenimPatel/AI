@@ -159,6 +159,12 @@ series: "calculus"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">8</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>Integration is done. The next part lifts every idea so far from one variable to several, and surfaces replace curves.</span>
     <a class="btn btn-secondary" href="{{ '/math/calculus/multivariable/' | relative_url }}">Next: Functions of several variables →</a>
@@ -169,7 +175,9 @@ series: "calculus"
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/calc-viz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -460,6 +468,51 @@ series: "calculus"
       draw4();
     });
   });
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'itech-sub-why-works',
+      kind: 'choice',
+      prompt: 'For ∫2x·cos(x²) dx, the substitution u=x² works because...',
+      options: [
+        { label: 'g′(x)=2x is exactly the factor already present in the integrand alongside the composition cos(g(x)).', correct: true },
+        { label: 'Any substitution works for any integrand.', correct: false },
+        { label: '2x happens to be the antiderivative of cos(x²).', correct: false }
+      ],
+      explanation: 'Substitution runs the chain rule backwards: it only collapses ∫f(g(x))g′(x)dx into ∫f(u)du when the integrand is literally a composition times its inner function\'s derivative, which is exactly the pattern 2x·cos(x²) has with g(x)=x².'
+    },
+    {
+      id: 'itech-simpson-order',
+      kind: 'choice',
+      prompt: 'Simpson\'s rule has error O(h⁴), while trapezoid has O(h²). If you double the number of intervals n (halving h), by roughly what factor does Simpson\'s error shrink, compared to trapezoid\'s?',
+      options: [
+        { label: 'Simpson\'s error shrinks by about 16×, versus about 4× for trapezoid.', correct: true },
+        { label: 'Both shrink by the same factor, 2×.', correct: false },
+        { label: 'Simpson\'s error stays roughly constant while trapezoid\'s shrinks.', correct: false }
+      ],
+      explanation: 'Halving h means (1/2)⁴=1/16 for an O(h⁴) rule and (1/2)²=1/4 for an O(h²) rule — Simpson\'s higher order is exactly why it is the default choice for smooth integrands.'
+    },
+    {
+      id: 'itech-sub-value',
+      kind: 'numeric',
+      prompt: 'Using the substitution u=x², ∫₀ᵇ 2x·cos(x²) dx = sin(b²) exactly. What is the value of this integral when b=1?',
+      answer: 0.8415,
+      tolerance: 0.001,
+      explanation: 'sin(b²) at b=1 is sin(1) ≈ 0.8415, matching what the x-plane and u-plane panels compute independently.'
+    },
+    {
+      id: 'itech-parts-rectangle',
+      kind: 'numeric',
+      prompt: 'For integration by parts, ∫u dv + ∫v du = [uv], on the curve u=v². At vₐ=1 and v_b=2, [uv] = u_b·v_b − uₐ·vₐ = v_b³ − vₐ³. What is this value?',
+      answer: 7,
+      tolerance: 0.01,
+      explanation: '[uv] = 2³ − 1³ = 8 − 1 = 7 — the rectangle\'s area difference that the two shaded strips (∫u dv and ∫v du) exactly add up to.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

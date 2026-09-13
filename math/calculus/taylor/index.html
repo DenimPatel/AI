@@ -169,6 +169,12 @@ series: "calculus"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">9</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>The local model is now complete: match value and derivatives, and you can approximate or solve. The next part reverses the question and asks how a curve accumulates area.</span>
     <a class="btn btn-secondary" href="{{ '/math/calculus/integral/' | relative_url }}">Next: The integral as accumulation →</a>
@@ -179,7 +185,9 @@ series: "calculus"
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/calc-viz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -602,6 +610,51 @@ series: "calculus"
     el('ba-legend').innerHTML = legend;
   }
   Guide.bindSliders([D5.n, D5.cap], draw5);
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'taylor-cubic-exact',
+      kind: 'choice',
+      prompt: 'The robot\'s position s(t) is a cubic polynomial. What happens to its Taylor polynomial once the order n reaches 3?',
+      options: [
+        { label: 'The remainder becomes exactly zero — the Taylor polynomial reproduces s(t) exactly everywhere, not just near a.', correct: true },
+        { label: 'The polynomial still only approximates s locally, just more tightly.', correct: false },
+        { label: 'Higher-order terms start growing without bound.', correct: false }
+      ],
+      explanation: 'The remainder Rₙ(h) depends on the (n+1)-th derivative, and a cubic\'s fourth derivative is identically zero, so once n ≥ 3 the Lagrange remainder vanishes and the "approximation" is exact for every t.'
+    },
+    {
+      id: 'taylor-radius-complex-pole',
+      kind: 'choice',
+      prompt: 'The Taylor series for 1/(1+x²) about x=0 converges only for |x|<1, even though the function itself has no singularity anywhere on the real line. Why does the radius stop at 1?',
+      options: [
+        { label: 'Because the function has poles at x = ±i in the complex plane, at distance 1 from the center.', correct: true },
+        { label: 'Because the Taylor coefficients are irrational numbers.', correct: false },
+        { label: 'Because floating-point arithmetic breaks down past x = 1.', correct: false }
+      ],
+      explanation: 'A Taylor series\'s radius of convergence is the distance from the center to the nearest singularity in the complex plane, and 1/(1+x²) blows up at x = ±i, which sit exactly distance 1 from the origin.'
+    },
+    {
+      id: 'taylor-newton-step',
+      kind: 'numeric',
+      prompt: 'Newton\'s method on f(x) = x² − 1 starts at x₀ = 2. Using x_{k+1} = x_k − f(x_k)/f′(x_k), what is x₁?',
+      answer: 1.25,
+      tolerance: 0.001,
+      explanation: 'f(2)=3, f′(2)=4, so x₁ = 2 − 3/4 = 1.25 — the same value the Babylonian iteration (x₀ + 1/x₀)/2 = (2+0.5)/2 gives.'
+    },
+    {
+      id: 'taylor-coefficient-c2',
+      kind: 'numeric',
+      prompt: 'The order-2 Taylor polynomial of s(t) about a=0 is p₂(t)=c₀+c₁t+c₂t², with cₖ=s^(k)(0)/k!. Given s″(0) = −3, what is c₂?',
+      answer: -1.5,
+      tolerance: 0.01,
+      explanation: 'c₂ = s″(0)/2! = −3/2 = −1.5, matching the general rule that cₖ collects the k-th derivative scaled by 1/k!.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

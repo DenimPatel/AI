@@ -163,6 +163,12 @@ series: "calculus"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">9</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>Now that a slope exists, the next part builds a toolbox for computing slopes without taking a limit every time.</span>
     <a class="btn btn-secondary" href="{{ '/math/calculus/rules/' | relative_url }}">Next: A toolbox of derivatives →</a>
@@ -173,7 +179,9 @@ series: "calculus"
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/calc-viz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -453,6 +461,51 @@ series: "calculus"
 
   // Force an initial paint for the button-only demo.
   draw4();
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'deriv-secant-meaning',
+      kind: 'choice',
+      prompt: 'The secant line through times a and b on the position curve has slope Δs/Δt. What does this slope represent?',
+      options: [
+        { label: 'The average velocity over the interval [a, b].', correct: true },
+        { label: 'The instantaneous velocity at the single time a.', correct: false },
+        { label: 'The robot\'s acceleration over the interval.', correct: false }
+      ],
+      explanation: 'The secant slope answers "what constant speed would cover the same ground in the same time" — it says nothing about the speed at any single instant until h shrinks to zero and it becomes the tangent slope.'
+    },
+    {
+      id: 'deriv-corner-vs-smooth',
+      kind: 'choice',
+      prompt: 'Both the corner |t−1.6| and the smooth cubic s(t) are continuous at t=1.6. What distinguishes them?',
+      options: [
+        { label: 'Only the smooth curve has matching left and right secant slopes as h→0, so only it is differentiable there.', correct: true },
+        { label: 'The corner isn\'t actually continuous at t=1.6.', correct: false },
+        { label: 'Continuity always implies differentiability, so both must be differentiable.', correct: false }
+      ],
+      explanation: 'Differentiable implies continuous, but not the reverse — the corner is continuous yet its one-sided slopes (−1 and +1) never converge to a common value, so the limit that defines the derivative does not exist.'
+    },
+    {
+      id: 'deriv-velocity-t0',
+      kind: 'numeric',
+      prompt: 'Using the closed form s′(t) = t² − 3t + 2, what is the robot\'s velocity at t = 0 (in m/s)?',
+      answer: 2,
+      tolerance: 0.01,
+      explanation: 'Plug in t = 0: 0² − 3(0) + 2 = 2 m/s.'
+    },
+    {
+      id: 'deriv-quad-coeff',
+      kind: 'numeric',
+      prompt: 'The linear-approximation error is ½s″(a)h² + …, with s″(t) = 2t − 3. What is ½s″(a) when a = 2?',
+      answer: 0.5,
+      tolerance: 0.01,
+      explanation: 's″(2) = 2(2) − 3 = 1, so ½ · 1 = 0.5 — the constant the error/h² ratio in the demo settles on at a = 2.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}
