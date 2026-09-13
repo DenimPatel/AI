@@ -182,6 +182,31 @@ The same split rule applies — generic primitives to the kit, domain-shaped cod
 series file. `LinAlg.mat.svd` is one-sided Jacobi, not `eig(AᵀA)`, because the latter
 squares the condition number and Part 19 deliberately constructs near-singular matrices.
 
+`assets/js/guide-quiz.js` (`window.GuideQuiz`) adds a "check your understanding" quiz
+section every `/math/` part page ends with, right before `.g-next`. It is generic — the UI,
+scoring and progress-tracking are identical across every series — so it sits at the kit
+level alongside `guide-core.js`, not inside a per-series file. Two question kinds only:
+`choice` (one correct option out of a list, revealed instantly on click) and `numeric` (a
+value checked against `answer` within `tolerance` or `relativeTolerance`, default `1e-6`).
+Each page authors its own `QUIZ_QUESTIONS` array inline, next to the demo it tests — quiz
+content is page-specific prose, like the cheat-sheet and further-reading list, not
+structural data, so it does not live in `_data/`. Progress is one versioned localStorage
+key (`guide:quiz:v1`), read/written defensively for private-mode browsers, and drives the
+page's own "X/Y answered" badge — there is no cross-page rollup. A page wires it up with:
+```liquid
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
+{% raw %}<script>
+var QUIZ_QUESTIONS = [ /* {id, kind:'choice'|'numeric', prompt, options|answer, ...} */ ];
+GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
+</script>{% endraw %}
+```
+`window.__GUIDE_PAGE_ID__` is emitted from a plain (non-`raw`) script tag specifically so
+no line inside the `{% raw %}` block ever needs to combine `{{` with `relative_url` — lint
+rule 7 doesn't come into play. `_templates/guide-part.html` scaffolds an empty quiz section
+by default (`GuideQuiz` renders "coming soon" for an empty array), so every new part gets
+the slot; fill in real questions before shipping the page.
+
 ## Conventions
 
 - The `theme:` key is explicitly `null`. The `github-pages` gem injects
