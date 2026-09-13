@@ -175,6 +175,12 @@ series: "calculus_in_motion"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">9</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>That closes the volume: from a slope at a point to the best of all possible paths. The routing table maps every idea back onto the pages that use it.</span>
     <a class="btn btn-secondary" href="{{ '/math/calculus-in-motion/' | relative_url }}">Back to the series contents →</a>
@@ -186,6 +192,8 @@ series: "calculus_in_motion"
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/calc-viz.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -645,6 +653,54 @@ series: "calculus_in_motion"
       '<div><span class="k">error \u00b7 n\u00b2</span> ' + fmt(err * n * n, 4) + ' (nearly constant \u2014 second order)</div>';
   }
   Guide.bindSliders([dcN], draw5);
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'var-boundary-conditions',
+      kind: 'choice',
+      prompt: 'The minimum-jerk quintic \u03c3(\u03c4) = 10\u03c4\u00b3 \u2212 15\u03c4\u2074 + 6\u03c4\u2075 is chosen over, say, a straight constant-speed line, because it uniquely satisfies which boundary conditions at both \u03c4 = 0 and \u03c4 = 1?',
+      options: [
+        { label: 'Zero velocity AND zero acceleration (\u03c3\u2032 = \u03c3\u2033 = 0), not just zero velocity.', correct: true },
+        { label: 'Zero position only.', correct: false },
+        { label: 'Zero jerk at every instant along the whole path.', correct: false }
+      ],
+      explanation: 'The page is explicit that "from rest" means zero velocity and zero acceleration at both ends \u2014 many curves satisfy just zero velocity, but the quintic is the unique degree-5 polynomial that also has zero acceleration at both endpoints.'
+    },
+    {
+      id: 'var-straight-line-jerk',
+      kind: 'choice',
+      prompt: 'The straight, constant-speed line has zero acceleration throughout its interior, yet its jerk cost is orders of magnitude larger than the minimum-jerk quintic\'s. Why?',
+      options: [
+        { label: 'All of its roughness is concentrated in two instantaneous jumps in velocity at the start and stop, which the finite-difference jerk calculation registers as huge spikes.', correct: true },
+        { label: 'The straight line has nonzero curvature, which the quintic avoids.', correct: false },
+        { label: 'It travels a longer total distance than the quintic between the same two points.', correct: false }
+      ],
+      explanation: 'A constant-speed line starts and stops instantaneously \u2014 infinite acceleration compressed into a single instant at each end \u2014 while the quintic spreads that same necessary change in velocity smoothly over the whole duration, which is exactly what "least jerk" rewards.'
+    },
+    {
+      id: 'var-boundary-term-vanish',
+      kind: 'choice',
+      prompt: 'In deriving the Euler\u2013Lagrange equation, the boundary term [\u2202L/\u2202y\u2032 \u00b7 \u03b7]\u1d43\u1d47 from integration by parts must vanish. Why does it vanish?',
+      options: [
+        { label: 'Because \u03b7 is required to be zero at both endpoints (\u03b7(a) = \u03b7(b) = 0), so the path\'s endpoints stay fixed under the perturbation.', correct: true },
+        { label: 'Because \u2202L/\u2202y\u2032 is always zero for any Lagrangian.', correct: false },
+        { label: 'Because the perturbation size \u03b5 is taken to be zero.', correct: false }
+      ],
+      explanation: 'An admissible variation y_\u03b5 = y + \u03b5\u03b7 must keep the endpoints A and B fixed, which forces \u03b7(a) = \u03b7(b) = 0 \u2014 and that is exactly what kills the boundary term, leaving only the integral condition that becomes the Euler\u2013Lagrange equation.'
+    },
+    {
+      id: 'var-mj-cost',
+      kind: 'numeric',
+      prompt: 'The minimum-jerk cost is J = 720\u2016B \u2212 A\u2016\u00b2 / T\u2075. If the chord length \u2016B \u2212 A\u2016 = 2 m and the duration T = 1 s, what is J?',
+      answer: 2880,
+      tolerance: 1,
+      explanation: 'J = 720 \u00d7 2\u00b2 / 1\u2075 = 720 \u00d7 4 = 2880. The T\u2075 in the denominator is why doubling the duration of a reach makes it dramatically cheaper \u2014 a factor of 2\u2075 = 32 cheaper for the same chord length.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

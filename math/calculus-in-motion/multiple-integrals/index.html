@@ -182,6 +182,12 @@ series: "calculus_in_motion"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">9</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>The reachable set was a fixed region. The next part asks where a quantity touches a constraint — and turns tangency into an equation.</span>
     <a class="btn btn-secondary" href="{{ '/math/calculus-in-motion/lagrange/' | relative_url }}">Next: Lagrange multipliers &amp; KKT →</a>
@@ -193,6 +199,8 @@ series: "calculus_in_motion"
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/calc-viz.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -648,6 +656,48 @@ series: "calculus_in_motion"
       draw5();
     });
   });
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'mi-annulus-area',
+      kind: 'numeric',
+      prompt: 'The arm\'s reachable set is the annulus with inner radius 0.6 m and outer radius 2.0 m. Using area = π(R_out² − R_in²), what is the annulus\'s area (in m², 4 significant figures)?',
+      answer: 11.4354,
+      tolerance: 0.01,
+      explanation: 'π(2.0² − 0.6²) = π(4 − 0.36) = π(3.64) ≈ 11.4354 m² — this is the plain geometric area, before you weight it by the density ρ(x,y) = 1 + 0.4(x²+y²) to get a mass.'
+    },
+    {
+      id: 'mi-polar-cell',
+      kind: 'numeric',
+      prompt: 'The polar area element is dA = r dr dθ. At radius r = 2.5, for a cell with Δr = 0.1 and Δθ = 0.05 rad, what is the approximate cell area r·Δr·Δθ?',
+      answer: 0.0125,
+      tolerance: 0.0005,
+      explanation: '2.5 × 0.1 × 0.05 = 0.0125. The same Δr and Δθ produce a bigger cell the farther out you go — that growing factor of r is exactly why dA ≠ dr dθ.'
+    },
+    {
+      id: 'mi-cylinder-volume',
+      kind: 'numeric',
+      prompt: 'For a cylinder of radius R = 1.6 m and height H = 2 m, what is its exact volume πR²H (to 3 significant figures)?',
+      answer: 16.085,
+      tolerance: 0.02,
+      explanation: 'π × 1.6² × 2 = π × 2.56 × 2 = π × 5.12 ≈ 16.085 m³. Drop the Jacobian factor r from the cylindrical volume element and the naive sum instead converges to 2πRH — the wrong number, with the wrong units.'
+    },
+    {
+      id: 'mi-fubini',
+      kind: 'choice',
+      prompt: 'Fubini\'s theorem says that swapping the order of integration on a double integral over a rectangle:',
+      options: [
+        { label: 'Gives the same total, since both orders sum exactly the same cells, only in a different sequence.', correct: true },
+        { label: 'Changes the answer, because x and y play different roles.', correct: false },
+        { label: 'Only agrees in the limit of infinitely many cells, never for a finite grid.', correct: false }
+      ],
+      explanation: 'Column-first and row-first sums visit the same set of cells, just in different orders — addition doesn\'t care about order, so the two iterated integrals (and even their partial sums, cell for cell) end up equal.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

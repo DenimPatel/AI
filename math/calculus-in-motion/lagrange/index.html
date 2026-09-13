@@ -167,6 +167,12 @@ series: "calculus_in_motion"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">9</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>The stationarity conditions we just wrote are equations in vectors of partials. The next part turns those into matrix algebra.</span>
     <a class="btn btn-secondary" href="{{ '/math/calculus-in-motion/matrix-calculus/' | relative_url }}">Next: Matrix calculus →</a>
@@ -179,6 +185,8 @@ series: "calculus_in_motion"
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/calc-viz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/guide-plot3d.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -651,6 +659,51 @@ series: "calculus_in_motion"
       : 'slide &mu; toward &lambda; = ' + lam.toFixed(3) + ' and the two optima merge.';
   }
   Guide.bindSliders([D5.mu], draw5);
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'lg-objective-value',
+      kind: 'numeric',
+      prompt: 'The objective (joint effort) is f(\u03b8\u2081, \u03b8\u2082) = \u03b8\u2081\u00b2 + \u03b8\u2082\u00b2. What is f at the point (3, 4)?',
+      answer: 25,
+      tolerance: 0.01,
+      explanation: 'f(3, 4) = 3\u00b2 + 4\u00b2 = 9 + 16 = 25. The level sets of this f are circles centred at the origin, which is why the objective\'s unconstrained minimum sits at the rest pose (0, 0).'
+    },
+    {
+      id: 'lg-default-radius',
+      kind: 'numeric',
+      prompt: 'The default reach constraint has level c = 1.70, so the constraint circle has radius r = \u221ac. What is r (to 3 decimal places)?',
+      answer: 1.304,
+      tolerance: 0.01,
+      explanation: '\u221a1.70 \u2248 1.304. Sliding the level c changes this radius, and every point on that circle satisfies g(x) = c \u2014 the "reach exactly this far" requirement.'
+    },
+    {
+      id: 'lg-shadow-price',
+      kind: 'choice',
+      prompt: 'The multiplier \u03bb is called the "shadow price" because:',
+      options: [
+        { label: 'df*/dc = \u03bb, so it is the marginal change in the optimal objective value per unit change in the constraint level c.', correct: true },
+        { label: 'It is always equal to the objective value at the optimum.', correct: false },
+        { label: 'It measures the distance from the unconstrained minimum to the constrained optimum.', correct: false }
+      ],
+      explanation: 'Without re-solving anything, \u03bb tells you how much the least achievable effort would change if the reach target moved a little \u2014 in the arm, the extra joint effort bought by one more unit of reach.'
+    },
+    {
+      id: 'lg-complementary-slackness',
+      kind: 'choice',
+      prompt: 'The complementary slackness condition \u03bb\u00b7g(x*) = 0 in the KKT conditions means that:',
+      options: [
+        { label: 'Either the constraint is active (g = 0) or the multiplier is zero (\u03bb = 0) \u2014 or both.', correct: true },
+        { label: 'Both \u03bb and g(x*) must always be zero simultaneously.', correct: false },
+        { label: 'The constraint can never be active at the optimum.', correct: false }
+      ],
+      explanation: 'It is the switch that lets one condition cover both cases: when the constraint is inactive (interior optimum) it charges no price, so \u03bb = 0; when it is active (on the boundary) it may charge a positive price, but then g(x*) itself is 0.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

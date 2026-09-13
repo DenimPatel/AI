@@ -188,6 +188,12 @@ series: "calculus_in_motion"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">9</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>A curl-free field has a potential, but how do we measure curl at a point? The next part drops a shrinking paddlewheel into the field and reads its spin.</span>
     <a class="btn btn-secondary" href="{{ '/math/calculus-in-motion/div-curl/' | relative_url }}">Next: Divergence and curl →</a>
@@ -199,6 +205,8 @@ series: "calculus_in_motion"
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/calc-viz.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -725,6 +733,51 @@ series: "calculus_in_motion"
   draw3();
   draw4();
   draw5();
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'li-gradient-theorem',
+      kind: 'numeric',
+      prompt: 'The gradient theorem says ∫_A^B ∇φ·dr = φ(B) − φ(A). For φ(x, y) = x² + y², A = (−1, 0) and B = (2, 3), what is φ(B) − φ(A)?',
+      answer: 12,
+      tolerance: 0.01,
+      explanation: 'φ(B) = 2² + 3² = 13 and φ(A) = (−1)² + 0² = 1, so the difference is 13 − 1 = 12 — whatever path you drag between A and B, the line integral of ∇φ along it comes out to exactly this number.'
+    },
+    {
+      id: 'li-conservative-meaning',
+      kind: 'choice',
+      prompt: 'A field is called conservative when the work ∫_C F·dr between two points:',
+      options: [
+        { label: 'Depends only on the two endpoints, never on which path C joins them.', correct: true },
+        { label: 'Is always zero, regardless of the endpoints.', correct: false },
+        { label: 'Depends on the path, but not on the field.', correct: false }
+      ],
+      explanation: 'That path-independence is the defining property, and it\'s equivalent to the closed-loop integral vanishing and to the existence of a potential φ with F = ∇φ.'
+    },
+    {
+      id: 'li-loop-circulation',
+      kind: 'numeric',
+      prompt: 'For the rotational field F = (−y, x), the closed-loop circulation equals twice the enclosed area: ∮F·dr = 2·area. If a loop encloses an area of 3.5, what is ∮F·dr?',
+      answer: 7,
+      tolerance: 0.05,
+      explanation: '2 × 3.5 = 7. This is why deforming the loop in the demo while keeping the rotational field selected always changes the readout together with the shaded area — the two are locked by that factor of 2.'
+    },
+    {
+      id: 'li-curl-test',
+      kind: 'choice',
+      prompt: 'On a simply-connected domain, which local condition on F = (P, Q) is equivalent to F being conservative?',
+      options: [
+        { label: 'curl F = ∂Q/∂x − ∂P/∂y = 0', correct: true },
+        { label: 'div F = ∂P/∂x + ∂Q/∂y = 0', correct: false },
+        { label: '|F| is constant everywhere', correct: false }
+      ],
+      explanation: 'Zero curl is the local, one-computation test for path-independence — it\'s the same statement as ∮F·dr = 0 for every closed loop, just turned into a derivative you can check at a single point.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}
