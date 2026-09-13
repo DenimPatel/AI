@@ -58,6 +58,30 @@ parts:
     short: "Part 7"
     permalink: /math/linear-algebra/rank-subspaces/
     blurb: "Column space, null space, row space and left null space — the four subspaces that rank ties together."
+  - num: 8
+    act: inner
+    title: "Dot product, projection, duality"
+    short: "Part 8"
+    permalink: /math/linear-algebra/dot-product/
+    blurb: "Projection, cosine similarity, and the duality that a 1×n matrix is really a vector in disguise."
+  - num: 9
+    act: inner
+    title: "Orthonormal bases and Gram–Schmidt"
+    short: "Part 9"
+    permalink: /math/linear-algebra/orthogonality/
+    blurb: "Turning any set of vectors into a perpendicular one, and why QR is what you actually compute."
+  - num: 10
+    act: inner
+    title: "Least squares is a projection"
+    short: "Part 10"
+    permalink: /math/linear-algebra/least-squares/
+    blurb: "When Ax = b has no solution, the best you can do is project b onto the column space."
+  - num: 11
+    act: inner
+    title: "Cross product and skew-symmetric matrices"
+    short: "Part 11"
+    permalink: /math/linear-algebra/cross-product/
+    blurb: "The area of a parallelogram, the normal to a plane, and the matrix form of the cross product."
 appendix:
   - title: "Glossary and identities to know"
     short: "Reference"

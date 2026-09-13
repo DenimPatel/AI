@@ -534,8 +534,9 @@
     function span(v1, v2, o) {
       o = o || {};
       var c = colors();
-      var cross = v1[0] * v2[1] - v1[1] * v2[0];
+      if (!v1) return { collinear: true };
       var n1 = vnorm(v1), n2 = v2 ? vnorm(v2) : 0;
+      var cross = v2 ? (v1[0] * v2[1] - v1[1] * v2[0]) : 0;
       var collinear = !v2 || Math.abs(cross) < 1e-6 * Math.max(1e-9, n1 * n2);
       var diag = Math.max(plotW, plotH);
       ctx.save();
