@@ -1,4 +1,4 @@
-# The three top-level subjects. Drives the global nav (_includes/site-nav.html),
+# The four top-level subjects. Drives the global nav (_includes/site-nav.html),
 # the homepage doors, and each section hub page (_layouts/section-hub.html).
 #
 # Contract - one entry per section, keys:
@@ -65,3 +65,12 @@
   blurb: "Notes and tutorials on ROS and robot navigation, migrated from the Robotics At Once blog."
   notes_path: /robotics/
   notes_blurb: "Notes and tutorials on ROS and robot navigation, migrated from the Robotics At Once blog."
+
+- id: math
+  title: "Mathematics"
+  url: /math/
+  kicker: "The on-ramp"
+  blurb: "The calculus the rest of the site assumes and never teaches: two interactive volumes that build single-variable and multivariable calculus from local linearity up to the machinery the AI, vision and robotics guides consume — gradients, Jacobians, backprop, optimizers, ODEs and Lie-group updates."
+  series:
+    - calculus
+    - calculus_in_motion
