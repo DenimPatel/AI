@@ -82,6 +82,48 @@ parts:
     short: "Part 11"
     permalink: /math/linear-algebra/cross-product/
     blurb: "The area of a parallelogram, the normal to a plane, and the matrix form of the cross product."
+  - num: 12
+    act: eigen
+    title: "Same map, different coordinates"
+    short: "Part 12"
+    permalink: /math/linear-algebra/change-of-basis/
+    blurb: "The same linear map looks different in every basis; P⁻¹AP is the change of costume."
+  - num: 13
+    act: eigen
+    title: "The arrows that don't turn"
+    short: "Part 13"
+    permalink: /math/linear-algebra/eigenvectors/
+    blurb: "Sweep a vector around a circle: almost all of them turn, except the special directions that only stretch."
+  - num: 14
+    act: eigen
+    title: "Matrix powers and dynamical systems"
+    short: "Part 14"
+    permalink: /math/linear-algebra/diagonalization/
+    blurb: "Iterating x ← Ax, and why the eigenvalue magnitude decides whether a system settles, cycles or explodes."
+  - num: 15
+    act: eigen
+    title: "Symmetric matrices and quadratic forms"
+    short: "Part 15"
+    permalink: /math/linear-algebra/symmetric/
+    blurb: "Matrices you can rotate to face you: real eigenvalues, orthogonal eigenvectors, and xᵀAx as a shape."
+  - num: 16
+    act: eigen
+    title: "Every matrix maps a circle to an ellipse"
+    short: "Part 16"
+    permalink: /math/linear-algebra/svd/
+    blurb: "Every matrix is a rotation, a stretch, and another rotation — the geometry behind everything in Act IV."
+  - num: 17
+    act: eigen
+    title: "Low-rank approximation and PCA"
+    short: "Part 17"
+    permalink: /math/linear-algebra/low-rank-pca/
+    blurb: "Keeping only the biggest singular values, and what PCA really does to a point cloud."
+  - num: 18
+    act: eigen
+    title: "The complete picture of Ax = b"
+    short: "Part 18"
+    permalink: /math/linear-algebra/pseudoinverse/
+    blurb: "One widget for every shape of Ax = b: unique, least-squares, least-norm, and the big picture that unifies them."
 appendix:
   - title: "Glossary and identities to know"
     short: "Reference"
