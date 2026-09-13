@@ -68,19 +68,50 @@
     return { type: 'scatter3d', mode: 'markers', x: [cam.C[0]], y: [cam.C[1]], z: [cam.C[2]], marker: { size: 5, color: color }, hoverinfo: 'skip' };
   }
 
+  // Resolve an axis range from the several shapes callers use:
+  //   undefined                    -> fallback
+  //   [min, max]                   -> same range on every axis
+  //   [[x0,x1],[y0,y1],[z0,z1]]    -> one per axis, in x/y/z order
+  //   {x:[x0,x1], y:..., z:...}    -> one per axis by name
+  function axisRange(spec, which, fallback) {
+    if (!spec) return fallback;
+    var idx = which === 'x' ? 0 : which === 'y' ? 1 : 2;
+    if (Array.isArray(spec)) {
+      if (spec.length === 2 && typeof spec[0] === 'number' && typeof spec[1] === 'number') return spec;
+      return spec[idx] || fallback;
+    }
+    if (typeof spec === 'object' && spec[which]) return spec[which];
+    return fallback;
+  }
+
   // Base Plotly 3D scene layout, theme-aware via the site's --color-* tokens.
-  // opts.range overrides the default [-6,6] cube axis range.
+  // The cube default ([-6,6] on all axes, aspectmode 'cube') is preserved for the
+  // existing vision scenes. For a z = f(x,y) surface, pass a per-axis range and
+  // let the aspect follow the data, e.g.:
+  //   GuidePlot3D.baseLayout({ range: {x:[-3,3], y:[-3,3], z:[-1,5]},
+  //                            aspectmode: 'data' })
+  // opts: {range, aspectmode, aspect:{x,y,z}, eye, colors}
   function baseLayout(opts) {
     opts = opts || {};
-    var range = opts.range || [-6, 6];
+    // Resolve theme colours at call time so a runtime theme switch is picked up
+    // (the module-level constants are only a fallback).
+    var c = opts.colors || {};
+    var text = c.text || css('--color-text') || COLOR_TEXT;
+    var divider = c.divider || css('--color-divider') || COLOR_DIVIDER;
+    var rx = axisRange(opts.range, 'x', [-6, 6]);
+    var ry = axisRange(opts.range, 'y', [-6, 6]);
+    var rz = axisRange(opts.range, 'z', [-6, 6]);
+    var scene = {
+      xaxis: { range: rx, backgroundcolor: 'transparent', gridcolor: divider, zerolinecolor: divider, color: text, title: opts.xTitle || 'x' },
+      yaxis: { range: ry, backgroundcolor: 'transparent', gridcolor: divider, zerolinecolor: divider, color: text, title: opts.yTitle || 'y' },
+      zaxis: { range: rz, backgroundcolor: 'transparent', gridcolor: divider, zerolinecolor: divider, color: text, title: opts.zTitle || 'z' },
+      aspectmode: opts.aspectmode || 'cube',
+      camera: { eye: opts.eye || { x: 1.4, y: -1.4, z: 1.0 } }
+    };
+    if (opts.aspect) scene.aspectratio = opts.aspect;
     return {
       autosize: true, margin: { l: 0, r: 0, t: 0, b: 0 }, showlegend: false, paper_bgcolor: 'transparent',
-      scene: {
-        xaxis: { range: range, backgroundcolor: 'transparent', gridcolor: COLOR_DIVIDER, zerolinecolor: COLOR_DIVIDER, color: COLOR_TEXT, title: 'x' },
-        yaxis: { range: range, backgroundcolor: 'transparent', gridcolor: COLOR_DIVIDER, zerolinecolor: COLOR_DIVIDER, color: COLOR_TEXT, title: 'y' },
-        zaxis: { range: range, backgroundcolor: 'transparent', gridcolor: COLOR_DIVIDER, zerolinecolor: COLOR_DIVIDER, color: COLOR_TEXT, title: 'z' },
-        aspectmode: 'cube', camera: { eye: opts.eye || { x: 1.4, y: -1.4, z: 1.0 } }
-      }
+      scene: scene
     };
   }
 
