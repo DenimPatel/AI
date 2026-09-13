@@ -202,6 +202,12 @@ series: "linear_algebra"
     </table>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">7</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>Every composition has a single number attached to it that measures how much it stretches area &mdash; and whether it flips the plane over.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/determinant/' | relative_url }}">Next: The determinant: signed area →</a>
@@ -213,7 +219,9 @@ series: "linear_algebra"
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/guide-math.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/linalg-viz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -425,6 +433,57 @@ series: "linear_algebra"
     drawD();
   });
   drawD();
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'composition-order',
+      kind: 'choice',
+      prompt: 'In the product <var>AB</var>, which matrix acts on the input vector first?',
+      options: [
+        { label: 'B &mdash; the rightmost factor acts first.', correct: true },
+        { label: 'A &mdash; matrices always apply in the order they are written, left to right.', correct: false },
+        { label: 'Both act on the input at the same time.', correct: false }
+      ],
+      explanation: 'The defining equation is (AB)x = A(Bx): B touches x first, and A acts on whatever B produced. Reading a product left to right and assuming the leftmost factor acts first composes the maps backwards.'
+    },
+    {
+      id: 'composition-noncommute',
+      kind: 'choice',
+      prompt: 'Rotating a shape and then shearing it leaves a different picture than shearing it and then rotating it. What does this say about AB versus BA in general?',
+      options: [
+        { label: 'They are usually different matrices &mdash; matrix multiplication is not commutative.', correct: true },
+        { label: 'They are always equal, since both describe the same two transformations.', correct: false },
+        { label: 'AB = BA as long as both matrices happen to be invertible.', correct: false }
+      ],
+      explanation: 'Order matters because composition describes a sequence of moves. The only everyday exceptions are special cases &mdash; one factor is the identity, one is a plain scaling, or the two share the same eigenvectors &mdash; not merely being invertible.'
+    },
+    {
+      id: 'composition-associativity',
+      kind: 'choice',
+      prompt: '(AB)C and A(BC) both apply the same three maps &mdash; C, then B, then A &mdash; just grouped differently. How do the two results compare?',
+      options: [
+        { label: 'They are identical &mdash; associativity lets you group a chain however is cheapest to compute.', correct: true },
+        { label: 'They usually differ, because grouping matters as much as the order of the factors.', correct: false },
+        { label: 'They are equal only when C happens to be the identity matrix.', correct: false }
+      ],
+      explanation: 'Regrouping the brackets never reorders the maps; C then B then A is still C then B then A either way, so (AB)C = A(BC) exactly. This is what lets a long chain of matrices be multiplied in whatever grouping is cheapest.'
+    },
+    {
+      id: 'composition-scalar-exception',
+      kind: 'choice',
+      prompt: 'The page names one family of matrices that commutes with every other matrix. Which family is it?',
+      options: [
+        { label: 'Scalar matrices &mdash; a uniform scale can be applied before or after any other map without changing the result.', correct: true },
+        { label: 'Rotation matrices, since rotations never distort area.', correct: false },
+        { label: 'Shear matrices, since a shear only moves one axis.', correct: false }
+      ],
+      explanation: 'A scalar stretches every direction equally, so it does not matter when it is applied: k(AB) = (kA)B = A(kB). That is why scalar factors can be pulled out of a product freely, unlike general matrices.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

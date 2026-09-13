@@ -173,6 +173,12 @@ series: "linear_algebra"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">8</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>Elimination hides two subspaces in plain sight: the inputs that land on zero, and the outputs that are reachable at all. Naming them is the next step.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/rank-subspaces/' | relative_url }}">Next: Rank, null space, and the four subspaces →</a>
@@ -184,8 +190,10 @@ series: "linear_algebra"
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/guide-math.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/linalg-viz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/guide-plot3d.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -391,6 +399,51 @@ series: "linear_algebra"
     });
   });
   renderCase('point');
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'systems-elimination-multiplier',
+      kind: 'numeric',
+      prompt: 'In the elimination stepper, the first pivot is 2 (the top-left entry of A). Row 2 begins with a 4 in that column. What multiplier f does elimination use to clear that entry (f = row-2 entry &divide; pivot)?',
+      answer: 2,
+      tolerance: 0.001,
+      explanation: 'The row operation is R2 ← R2 − f·R1, with f = 4/2 = 2. Subtracting twice row 1 from row 2 zeroes out the leading entry without changing the solution.'
+    },
+    {
+      id: 'systems-planes-dof',
+      kind: 'numeric',
+      prompt: 'A system has 3 equations in 3 unknowns. Elimination finds only 2 nonzero pivots (rank 2), and the system is consistent. Using dimension = n &minus; r with n = 3, what is the dimension of the solution set?',
+      answer: 1,
+      tolerance: 0,
+      explanation: 'A dimension of 1 means the solutions form a line, not a single point — exactly the "share a line" case, where the three planes all pass through one common line instead of meeting at an isolated point.'
+    },
+    {
+      id: 'systems-consistent-unique',
+      kind: 'choice',
+      prompt: 'Three planes intersect at exactly one point. What does this say about elimination on that system?',
+      options: [
+        { label: 'Every column produces a pivot — no free variables, so the solution is unique.', correct: true },
+        { label: 'One pivot must come out zero, giving an underdetermined system.', correct: false },
+        { label: 'The equations must be inconsistent with each other.', correct: false }
+      ],
+      explanation: 'A single common point means the three row directions are genuinely independent, so elimination produces three nonzero pivots and back-substitution determines every unknown exactly.'
+    },
+    {
+      id: 'systems-pivoting-purpose',
+      kind: 'choice',
+      prompt: 'Why does the elimination stepper search each column for the largest available entry before eliminating (partial pivoting), instead of just using whatever sits on the diagonal?',
+      options: [
+        { label: 'A tiny pivot divides through the rest of the row and amplifies any rounding error already present, so a larger pivot keeps the computation stable.', correct: true },
+        { label: 'It is required to make the matrix’s determinant nonzero.', correct: false },
+        { label: 'It changes which solution the system has, making it more accurate.', correct: false }
+      ],
+      explanation: 'Partial pivoting does not change the answer — it keeps the multipliers small so rounding error does not blow up during elimination, which is why a real numerical library always searches for the largest available pivot first.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

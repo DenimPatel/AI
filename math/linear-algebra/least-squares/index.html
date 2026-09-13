@@ -163,6 +163,12 @@ series: "linear_algebra"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">8</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>A projection needs a direction, and in three dimensions one operation builds a perpendicular out of nothing.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/cross-product/' | relative_url }}">Next: Cross product and skew-symmetric matrices →</a>
@@ -174,7 +180,9 @@ series: "linear_algebra"
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/guide-math.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/linalg-viz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -422,6 +430,51 @@ series: "linear_algebra"
     drawC();
   });
   drawC();
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'least-squares-pythagoras',
+      kind: 'numeric',
+      prompt: 'The page states <var>&#8214;b&#8214;&sup2; = &#8214;Ax&#8214;&sup2; + &#8214;b &minus; Ax&#8214;&sup2;</var>, since the fitted vector and the residual are perpendicular. If <var>&#8214;b&#8214; = 5</var> and the residual <var>&#8214;b &minus; Ax&#8214; = 3</var>, what is <var>&#8214;Ax&#8214;</var>?',
+      answer: 4,
+      tolerance: 0.001,
+      explanation: 'By the Pythagorean split, ‖Ax‖² = ‖b‖² − ‖b − Ax‖² = 25 − 9 = 16, so ‖Ax‖ = 4. This is the same 3-4-5 right triangle formed by b, its projection, and the perpendicular residual.'
+    },
+    {
+      id: 'least-squares-single-column',
+      kind: 'numeric',
+      prompt: 'In the single-column projection demo, the projection scalar is <var>x = (a&middot;b) / (a&middot;a)</var>. If <var>a&middot;b = 12</var> and <var>a&middot;a = 4</var>, what is <var>x</var>?',
+      answer: 3,
+      tolerance: 0.001,
+      explanation: 'x = 12 / 4 = 3. This scalar is exactly the normal-equation solution for a single-column A, where AᵀA is the 1×1 number a·a and Aᵀb is a·b.'
+    },
+    {
+      id: 'least-squares-residual-orthogonal',
+      kind: 'choice',
+      prompt: 'The normal equation <var>A&#7488;A x = A&#7488;b</var> comes from setting <var>A&#7488;(b &minus; Ax) = 0</var>. What does that condition mean geometrically?',
+      options: [
+        { label: 'The residual is orthogonal to every column of A — perpendicular to the whole column space.', correct: true },
+        { label: 'The residual has zero length, meaning b was reachable exactly.', correct: false },
+        { label: 'A must be square and invertible for the equation to make sense.', correct: false }
+      ],
+      explanation: 'Dotting the residual with every column and getting zero is exactly the statement that the leftover error is perpendicular to everything A can produce — the closest-point condition that defines a projection, not a claim that the residual vanishes.'
+    },
+    {
+      id: 'least-squares-overdetermined',
+      kind: 'choice',
+      prompt: 'The page distinguishes overdetermined and underdetermined systems. Which term describes the line-fitting demo, with seven data points and two unknowns (slope, intercept)?',
+      options: [
+        { label: 'Overdetermined — more equations than unknowns, so b typically lies outside the column space and there is no exact solution.', correct: true },
+        { label: 'Underdetermined — fewer equations than unknowns, so infinitely many exact solutions exist.', correct: false },
+        { label: 'Exactly determined — a square system with one unique exact solution.', correct: false }
+      ],
+      explanation: 'Seven equations and only two unknowns is the classic overdetermined case: unless the seven points happen to be exactly collinear, no line passes through all of them, so least squares finds the closest compromise instead of an exact solution.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}
