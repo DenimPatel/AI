@@ -70,6 +70,6 @@
   title: "Math"
   url: /math/
   kicker: "Foundations"
-  blurb: "The machinery every other subject assumes, built from pictures first: an interactive guide to linear algebra that starts at what a vector is and ends at attention matrices, Gauss-Newton and SO(3)."
+  blurb: "The machinery every other subject assumes, built from pictures first: a 22-part interactive guide to linear algebra that starts at what a vector is and ends at attention matrices, Gauss-Newton and SO(3)."
   series:
     - linear_algebra
