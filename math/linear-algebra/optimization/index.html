@@ -151,6 +151,12 @@ series: "linear_algebra"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">7</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>The last act has one more stop: the matrices a transformer actually multiplies.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/ml-ai/' | relative_url }}">Next: Linear algebra in ML and AI →</a>
@@ -162,7 +168,9 @@ series: "linear_algebra"
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/guide-math.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/linalg-viz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -308,6 +316,51 @@ series: "linear_algebra"
   Guide.bindSliders([el('sparse-n')], drawC);
 
   drawA();
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'opt-gauss-newton-drop',
+      kind: 'choice',
+      prompt: 'The true Hessian is <var>H = J&#7488;J + &Sigma;ᵢ rᵢ&nabla;&sup2;rᵢ</var>. Why does Gauss&ndash;Newton throw away the second sum?',
+      options: [
+        { label: 'JᵀJ is guaranteed symmetric positive semidefinite and free to form, while the dropped term needs every residual’s second derivative and can make H indefinite.', correct: true },
+        { label: 'The second sum is always exactly zero for any nonlinear least-squares problem.', correct: false },
+        { label: 'Dropping it is only valid for linear residuals, so Gauss–Newton cannot be used on genuinely nonlinear problems.', correct: false }
+      ],
+      explanation: 'JᵀJ costs nothing extra beyond the Jacobian you already computed, and it is always PSD. The discarded term requires second derivatives of every residual and can make the true Hessian indefinite. Near a good fit the residuals are small, so the dropped term is small too and the approximation is excellent — which is exactly why the method works well close to a solution.'
+    },
+    {
+      id: 'opt-sparsity-payoff',
+      kind: 'choice',
+      prompt: 'Why does sparsity make pose graphs with a million variables solvable?',
+      options: [
+        { label: 'Each measurement touches only a couple of parameter blocks, so the nonzero count in JᵀJ grows proportional to the number of measurements rather than the square of the number of parameters.', correct: true },
+        { label: 'Sparse matrices always have a smaller condition number than dense ones, so the linear solve converges faster.', correct: false },
+        { label: 'Sparsity lets you skip forming JᵀJ altogether and solve Jδ = −r directly instead.', correct: false }
+      ],
+      explanation: 'A bundle-adjustment measurement touches only a handful of parameter blocks, so a Jacobian row has few nonzeros and JᵀJ inherits the same sparse structure — a block for every parameter, and an off-diagonal block only where two parameters share a measurement. That keeps the nonzero count proportional to N rather than N², which is what makes sparse Cholesky or QR affordable at scale.'
+    },
+    {
+      id: 'opt-sparse-nonzeros',
+      kind: 'numeric',
+      prompt: 'The sparsity demo defaults to <var>N = 18</var> pose nodes in a chain, with nonzeros in <var>J&#7488;J</var> counted as <var>N + 2(N &minus; 1)</var>. How many nonzero entries does that give?',
+      answer: 52,
+      tolerance: 0,
+      explanation: 'N + 2(N − 1) = 18 + 2(17) = 18 + 34 = 52. Each node contributes one diagonal entry, and each of the 17 links in the chain contributes one nonzero above and one below the diagonal — the classic block-tridiagonal pattern.'
+    },
+    {
+      id: 'opt-sparse-density',
+      kind: 'numeric',
+      prompt: 'With those same 52 nonzeros in an 18×18 matrix (324 total entries), what density does the readout report, as a percentage?',
+      answer: 16.05,
+      tolerance: 0.1,
+      explanation: '52 / 324 ≈ 0.1605, or about 16.05%. Because the nonzero count grows linearly in N while the dense square grows as N², that density keeps shrinking as the chain gets longer — the whole reason a million-variable pose graph stays tractable.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

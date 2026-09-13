@@ -175,6 +175,12 @@ series: "linear_algebra"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">8</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>That is the series. Every idea in it &mdash; span, rank, projection, eigenvector, SVD &mdash; is now something a model computes, in a loop, billions of times.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/glossary/' | relative_url }}">Reference: Glossary and identities →</a>
@@ -186,7 +192,9 @@ series: "linear_algebra"
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/guide-math.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/linalg-viz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -410,6 +418,54 @@ series: "linear_algebra"
   setupE = Guide.setupCanvas(el('emb-canvas'), 640, 240, renderEmb);
   Guide.bindSliders([el('emb-sel')], function (s) { embSel = parseInt(s.value, 10); renderEmb(); });
   renderEmb();
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'mlai-qkv-roles',
+      kind: 'choice',
+      prompt: 'In an attention head, what do the query, key and value projections mean?',
+      options: [
+        { label: 'A query is what a token is looking for, a key is what a token advertises, and a value is what a token hands over if it is chosen.', correct: true },
+        { label: 'Query, key and value are three different ways of measuring a token’s embedding length.', correct: false },
+        { label: 'The query and key are identical by construction, and only the value projection is actually learned.', correct: false }
+      ],
+      explanation: 'Q = XW_Q, K = XW_K and V = XW_V are three separately learned projections of the same embeddings. The scoring rule between a query and a key is the fixed dot product, but what each token projects itself to as "looking for" versus "advertising" versus "handing over" is chosen entirely by training.'
+    },
+    {
+      id: 'mlai-sqrt-d',
+      kind: 'choice',
+      prompt: 'Why does the attention score divide by <var>&radic;d</var>, as in <var>S = QK&#7488;/&radic;d</var>?',
+      options: [
+        { label: 'It is bookkeeping, not geometry — as the embedding dimension grows, dot products typically grow too, and dividing keeps the numbers from blowing up before the softmax.', correct: true },
+        { label: 'It converts the dot product into a true cosine similarity between −1 and 1.', correct: false },
+        { label: 'It is required to keep Q and K orthogonal to each other.', correct: false }
+      ],
+      explanation: 'The page is explicit that the division by √d "is bookkeeping, not geometry." A larger embedding dimension d tends to produce larger raw dot products, and dividing by √d keeps the scores in a stable range so the softmax does not saturate before training even starts.'
+    },
+    {
+      id: 'mlai-cosine-meaning',
+      kind: 'choice',
+      prompt: 'When people say a language model represents "similar meaning" as nearly parallel embeddings, which quantity are they pointing at?',
+      options: [
+        { label: 'The angle between the two embedding vectors (their cosine similarity) — not their individual lengths or the distance between their tips.', correct: true },
+        { label: 'The Euclidean distance between the two embedding vectors.', correct: false },
+        { label: 'Which one of the two vectors has the larger norm.', correct: false }
+      ],
+      explanation: 'Cosine similarity is u·v / (‖u‖‖v‖), which throws the lengths away by construction and measures only the angle. That is deliberate: a token cannot become "more important" merely by having a long embedding, only by pointing in a direction the query is looking for.'
+    },
+    {
+      id: 'mlai-lora-params',
+      kind: 'numeric',
+      prompt: 'The LoRA demo updates an 8&times;8 weight (<var>d_in = d_out = 8</var>) with a rank-<var>r</var> = 3 correction, storing <var>r(d_in + d_out)</var> numbers instead of <var>d_in&middot;d_out</var>. How many numbers does the low-rank update store at r = 3?',
+      answer: 48,
+      tolerance: 0,
+      explanation: 'r(d_in + d_out) = 3 × (8 + 8) = 3 × 16 = 48, versus the full 8 × 8 = 64 parameters of the dense weight. The saving grows sharply for larger matrices, which is why LoRA is practical on weight matrices with thousands of rows and columns even at a small rank.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

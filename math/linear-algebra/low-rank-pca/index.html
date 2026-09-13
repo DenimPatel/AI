@@ -137,6 +137,12 @@ series: "linear_algebra"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">7</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>Keeping the largest singular values is how you compress; inverting <em>all</em> of them, carefully, is how you solve every version of <var>Ax = b</var>.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/pseudoinverse/' | relative_url }}">Next: The complete picture of Ax = b →</a>
@@ -148,7 +154,9 @@ series: "linear_algebra"
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/guide-math.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/linalg-viz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -470,6 +478,51 @@ series: "linear_algebra"
   var setupEv = Guide.setupCanvas(el('ev-canvas'), 640, 280, drawSpectrum);
   evCtx = setupEv.ctx;
   drawSpectrum();
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'lrpca-eckart-young',
+      kind: 'choice',
+      prompt: 'Why does nobody have to search for the best rank-<var>k</var> approximation of a matrix?',
+      options: [
+        { label: 'The Eckart–Young theorem guarantees the truncated SVD, keeping the k largest singular values, is optimal — no other rank-k matrix is closer in the Frobenius norm.', correct: true },
+        { label: 'Any rank-k matrix built from k columns of A is equally close, so the choice does not matter.', correct: false },
+        { label: 'Truncating the smallest singular values only works for images, not for general matrices.', correct: false }
+      ],
+      explanation: 'Eckart–Young says the rank-k truncation A_k built from the k largest singular triples minimises ‖A − A_k‖_F among all rank-k matrices, and the leftover error is exactly the energy in the discarded singular values, Σ_{i>k} σᵢ². That is why "read the singular values, keep the biggest, stop" is provably optimal rather than a heuristic.'
+    },
+    {
+      id: 'lrpca-pca-svd',
+      kind: 'choice',
+      prompt: 'What is the relationship between PCA and the SVD, according to this part?',
+      options: [
+        { label: 'PCA is the SVD of a centered data matrix: the principal directions are the top right singular vectors, and explained variance is the squared singular value divided by the total.', correct: true },
+        { label: 'PCA and the SVD are unrelated techniques that happen to produce similar-looking plots.', correct: false },
+        { label: 'PCA uses the left singular vectors U, while the SVD only concerns the right singular vectors V.', correct: false }
+      ],
+      explanation: 'Stack centered data points as the rows of X and run X = UΣVᵀ. The covariance matrix C = XᵀX/n works out to V(Σ²/n)Vᵀ, so its eigenvectors are the columns of V and its eigenvalues are σᵢ²/n — the principal components are exactly the top right singular vectors.'
+    },
+    {
+      id: 'lrpca-storage-k8',
+      kind: 'numeric',
+      prompt: 'The image demo starts at rank <var>k = 8</var> on a <var>64&times;64</var> image. Storing the truncated factors costs <var>k(m + n)</var> numbers. How many numbers is that at k = 8?',
+      answer: 1024,
+      tolerance: 1,
+      explanation: 'k(m + n) = 8 × (64 + 64) = 8 × 128 = 1024, versus mn = 64 × 64 = 4096 for the full matrix — a real saving even at this small rank, and the reason the readout reports a compression ratio.'
+    },
+    {
+      id: 'lrpca-compression-ratio',
+      kind: 'numeric',
+      prompt: 'Using those same numbers — a full 64&times;64 matrix (4096 entries) against the rank-8 factors (1024 numbers) — what compression ratio does the readout report, mn divided by k(m+n)?',
+      answer: 4,
+      tolerance: 0.05,
+      explanation: '4096 / 1024 = 4, a 4× compression at k = 8. The ratio grows as k shrinks (the factors cost less) and shrinks toward 1 as k approaches the full rank, since at that point the truncation reconstructs the original exactly and buys nothing.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

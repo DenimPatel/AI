@@ -221,6 +221,12 @@ series: "linear_algebra"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">8</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>One matrix now answers every shape of the question &mdash; but the same answer can be steady or wild depending on how close the columns are to dependent.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/numerics/' | relative_url }}">Next: Conditioning, stability, and cost →</a>
@@ -232,7 +238,9 @@ series: "linear_algebra"
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/guide-math.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/linalg-viz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -592,6 +600,51 @@ series: "linear_algebra"
   // first paint
   el('pi-row').classList.add('active');
   applyPreset('tall');
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'pinv-cutoff',
+      kind: 'choice',
+      prompt: 'What does <var>A&#8314;</var> do with a singular value that falls below the numerical cutoff?',
+      options: [
+        { label: 'It sets that direction to zero rather than reciprocating it, since dividing by a near-zero number would produce a meaninglessly huge answer.', correct: true },
+        { label: 'It reciprocates it like any other singular value, accepting whatever large number results.', correct: false },
+        { label: 'It rounds the singular value up to the cutoff before reciprocating.', correct: false }
+      ],
+      explanation: 'The pseudoinverse formula reciprocates every singular value above the cutoff and sets the rest to zero. Reciprocating a value near the numerical floor would produce an enormous, meaningless answer, so Σ⁺ deliberately discards those directions instead of amplifying noise.'
+    },
+    {
+      id: 'pinv-wide-case',
+      kind: 'choice',
+      prompt: 'A wide, consistent system (more unknowns than equations, and b is reachable) has infinitely many exact solutions. Which one does <var>x&#770; = A&#8314;b</var> return?',
+      options: [
+        { label: 'The smallest one — the exact solution with the least norm, since A⁺ never adds a null-space component to its answer.', correct: true },
+        { label: 'The first one a solver happens to find by elimination.', correct: false },
+        { label: 'The one with the largest norm, to make the residual as small as possible.', correct: false }
+      ],
+      explanation: 'A⁺ builds its answer entirely from the row space and never adds a null-space component, and staying inside the row space is exactly what makes a solution have the smallest possible norm. Every other exact solution differs from x̂ by some vector in the null space, which can only make the norm larger.'
+    },
+    {
+      id: 'pinv-square-solve',
+      kind: 'numeric',
+      prompt: 'The square preset is <var>A = [[2, 1], [1, 3]]</var>, <var>b = (1, 2)</var>. Solving <var>A&#770;x = b</var> exactly gives <var>x&#770; = (0.2, 0.6)</var>. What is the first component of <var>x&#770;</var>?',
+      answer: 0.2,
+      tolerance: 0.01,
+      explanation: '2x + y = 1 and x + 3y = 2 give x = 0.2, y = 0.6 (check: 2(0.2)+0.6 = 1, 0.2+3(0.6) = 2). Since A is square and invertible here, A⁺b agrees exactly with the ordinary solve(A, b), and the residual is zero.'
+    },
+    {
+      id: 'pinv-filter-factor',
+      kind: 'numeric',
+      prompt: 'The damped pseudoinverse replaces each singular value <var>&sigma;</var> with the filter factor <var>&sigma;/(&sigma;&sup2; + &lambda;&sup2;)</var>. For <var>&sigma; = 3</var> and damping <var>&lambda; = 1</var>, what is the filter factor?',
+      answer: 0.3,
+      tolerance: 0.005,
+      explanation: 'σ/(σ² + λ²) = 3/(9 + 1) = 3/10 = 0.3. Compare this to the exact reciprocal 1/3 ≈ 0.333 at λ = 0 — the damping pulls the factor down slightly, trading a little residual for a solution that stays bounded near a near-singular direction.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}
