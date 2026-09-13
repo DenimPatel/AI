@@ -169,6 +169,12 @@ series: "calculus"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">8</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>Next, the tangent line stops being a picture and becomes a method: linearise, iterate, and Newton's method falls out.</span>
     <a class="btn btn-secondary" href="{{ '/math/calculus/taylor/' | relative_url }}">Next: Linear approximation, Newton, Taylor →</a>
@@ -179,7 +185,9 @@ series: "calculus"
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/calc-viz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -678,6 +686,51 @@ series: "calculus"
   // Force initial paints for the button-driven scenarios once sliders exist.
   applyCurve('ellipse', false);
   applyScen('area');
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'implicit-gradient-normal',
+      kind: 'choice',
+      prompt: 'Differentiating F(x(t), y(t)) = c with respect to t gives Fx·x′ + Fy·y′ = 0. What does this tell you about ∇F and the curve\'s tangent direction?',
+      options: [
+        { label: '∇F is perpendicular (normal) to the tangent, since their dot product is zero.', correct: true },
+        { label: '∇F is parallel to the tangent direction.', correct: false },
+        { label: '∇F has zero magnitude everywhere on the level curve.', correct: false }
+      ],
+      explanation: 'The equation is exactly ∇F · (x′, y′) = 0, and (x′, y′) is the tangent velocity — a vector orthogonal to every tangent of a level curve is by definition normal to that curve.'
+    },
+    {
+      id: 'implicit-folium-not-function',
+      kind: 'choice',
+      prompt: 'For the folium of Descartes x³ + y³ − 3xy = 0, why can it not be written as a single function y = f(x)?',
+      options: [
+        { label: 'The loop has two points at the same x-value for some x, so no single output y can correspond to each x.', correct: true },
+        { label: 'The equation is not differentiable anywhere on the curve.', correct: false },
+        { label: 'F_y is never zero on the curve, so implicit differentiation fails.', correct: false }
+      ],
+      explanation: 'A function assigns exactly one y to each x; the folium\'s loop doubles back on itself, giving two y-values for some x, which is precisely why implicit differentiation is necessary rather than merely convenient.'
+    },
+    {
+      id: 'implicit-circle-slope',
+      kind: 'numeric',
+      prompt: 'On the circle x² + y² = r² with r = 2, at the point (x, y) = (1, √3), what is the slope dy/dx = −x/y?',
+      answer: -0.577,
+      tolerance: 0.01,
+      explanation: 'dy/dx = −x/y = −1/√3 ≈ −0.577. (Check: 1² + (√3)² = 1 + 3 = 4 = 2², so the point genuinely lies on the circle.)'
+    },
+    {
+      id: 'implicit-ladder-rate',
+      kind: 'numeric',
+      prompt: 'For the sliding ladder x² + y² = L² with L = 5 m, at the moment x = 3 m (so y = 4 m) the foot is sliding out at dx/dt = 1 m/s. Using dy/dt = −(x/y)·dx/dt, what is dy/dt (in m/s)?',
+      answer: -0.75,
+      tolerance: 0.01,
+      explanation: 'dy/dt = −(3/4)(1) = −0.75 m/s: the top of the ladder slides down at 0.75 m/s at exactly that instant.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

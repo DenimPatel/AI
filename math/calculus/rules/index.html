@@ -173,6 +173,12 @@ series: "calculus"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">9</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>This toolbox handles every single operation except composition. The next part is the one rule that composes all of these, and the reason a network can be trained at all.</span>
     <a class="btn btn-secondary" href="{{ '/math/calculus/chain-rule/' | relative_url }}">Next: The chain rule →</a>
@@ -183,7 +189,9 @@ series: "calculus"
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/calc-viz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -417,6 +425,51 @@ series: "calculus"
       draw5();
     });
   });
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'rules-product-corner',
+      kind: 'choice',
+      prompt: 'In the growing-rectangle picture, Δ(uv) = v·Δu + u·Δv + Δu·Δv. Why does the Δu·Δv corner vanish in the limit while the two strips survive?',
+      options: [
+        { label: 'The corner is a product of two small quantities (second order), so it shrinks faster than the strips, which are each proportional to only one small step (first order).', correct: true },
+        { label: 'The corner is always exactly zero, no matter the values of Δu and Δv.', correct: false },
+        { label: 'The strips vanish too, just more slowly than the corner.', correct: false }
+      ],
+      explanation: 'Dividing by Δt, the two strip terms stay proportional to a single small step and survive the limit, while the corner term is proportional to a product of two small steps and is discarded — that is exactly why the product rule has two terms.'
+    },
+    {
+      id: 'rules-quotient-order',
+      kind: 'choice',
+      prompt: 'For f(x) = u/v, the quotient-rule numerator is u′v − uv′. What happens if you swap the order to uv′ − u′v?',
+      options: [
+        { label: 'You get the negative of the correct derivative — the order of subtraction matters.', correct: true },
+        { label: 'You get exactly the same answer, since subtraction is commutative.', correct: false },
+        { label: 'You get the reciprocal rule instead of the quotient rule.', correct: false }
+      ],
+      explanation: 'Subtraction is not commutative: swapping u′v and uv′ flips the sign of the whole numerator, which is why the mnemonic "low d-high minus high d-low" fixes the order deliberately.'
+    },
+    {
+      id: 'rules-power-value',
+      kind: 'numeric',
+      prompt: 'Using the power rule d/dx xⁿ = n·xⁿ⁻¹ with n = 2.5, what is the derivative of f(x) = x^2.5 at x = 1?',
+      answer: 2.5,
+      tolerance: 0.01,
+      explanation: 'n·x^(n−1) at x=1 is 2.5 · 1^1.5 = 2.5 · 1 = 2.5, since any power of 1 is 1.'
+    },
+    {
+      id: 'rules-quotient-value',
+      kind: 'numeric',
+      prompt: 'For f(x) = x/(1+x²), the quotient rule gives f′(x) = (1−x²)/(1+x²)². What is f′(2)?',
+      answer: -0.12,
+      tolerance: 0.001,
+      explanation: 'f′(2) = (1 − 4)/(1 + 4)² = −3/25 = −0.12.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

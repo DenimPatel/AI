@@ -149,6 +149,12 @@ series: "calculus"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">8</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>Now that an antiderivative evaluates an integral, the next part builds the techniques for finding one when guessing is not enough.</span>
     <a class="btn btn-secondary" href="{{ '/math/calculus/integration-techniques/' | relative_url }}">Next: Substitution, parts, and going numeric →</a>
@@ -159,7 +165,9 @@ series: "calculus"
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/calc-viz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -480,6 +488,51 @@ series: "calculus"
       '<div><span class="k">difference</span> ' + Math.abs(integ - rise).toExponential(1) + ' m</div>';
   }
   Guide.bindSliders([D4.a, D4.b], draw4);
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'ftc-part1-argument',
+      kind: 'choice',
+      prompt: 'Part 1 of the Fundamental Theorem says A′(x)=f(x), where A(x)=∫ₐˣ f(t)dt. What is the geometric argument?',
+      options: [
+        { label: 'Nudging x by dx adds a thin strip of area ≈ f(x)·dx, so the incremental rate (A(x+dx)−A(x))/dx approaches f(x).', correct: true },
+        { label: 'A(x) is always equal to f(x) times some fixed constant.', correct: false },
+        { label: 'The area under any curve has a derivative of zero.', correct: false }
+      ],
+      explanation: 'The new area gained by moving the endpoint from x to x+dx is nearly a rectangle of height f(x) and width dx, so dividing that increment by dx and letting dx→0 gives exactly f(x).'
+    },
+    {
+      id: 'ftc-part2-why',
+      kind: 'choice',
+      prompt: 'Part 2 of the Fundamental Theorem converts computing an integral into finding any antiderivative and subtracting endpoints. Why does this matter practically?',
+      options: [
+        { label: 'It replaces an infinite limiting process (Riemann sums) with a finite subtraction, whenever a closed-form antiderivative is known.', correct: true },
+        { label: 'It proves that every definite integral equals zero.', correct: false },
+        { label: 'It shows integrals only exist for polynomial integrands.', correct: false }
+      ],
+      explanation: 'Part 1 shows A(x)=∫ₐˣf is one antiderivative; Part 2 says any antiderivative F works and F(b)−F(a) gives the integral, sidestepping the strip-by-strip accumulation entirely whenever F is known in closed form.'
+    },
+    {
+      id: 'ftc-accumulated-distance',
+      kind: 'numeric',
+      prompt: 'Using F(t)=t³ as the antiderivative of f(t)=3t², what is the accumulated distance A(x)=∫₀ˣ 3t² dt at x=1.2?',
+      answer: 1.728,
+      tolerance: 0.01,
+      explanation: 'A(1.2) = F(1.2) − F(0) = 1.2³ − 0 = 1.728 m.'
+    },
+    {
+      id: 'ftc-speed-at-1-5',
+      kind: 'numeric',
+      prompt: 'For f(t)=3t², what is the instantaneous speed f(x) at x=1.5 s?',
+      answer: 6.75,
+      tolerance: 0.01,
+      explanation: 'f(1.5) = 3 · (1.5)² = 3 · 2.25 = 6.75 m/s.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}
