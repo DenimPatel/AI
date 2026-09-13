@@ -152,6 +152,12 @@ series: "calculus"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">8</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>Now that rates can be chained, the next part differentiates equations you cannot solve and connects rates that a constraint ties together.</span>
     <a class="btn btn-secondary" href="{{ '/math/calculus/implicit/' | relative_url }}">Next: Implicit differentiation &amp; related rates →</a>
@@ -162,7 +168,9 @@ series: "calculus"
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/calc-viz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -557,6 +565,57 @@ series: "calculus"
       draw4();
     }
   });
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'chain-exact-identity',
+      kind: 'choice',
+      prompt: 'The identity Δy/Δt = (Δy/Δu)·(Δu/Δt) is exact for any nonzero finite steps, before any limit is taken. Why?',
+      options: [
+        { label: 'Because Δu cancels algebraically like an ordinary fraction — it is just arithmetic.', correct: true },
+        { label: 'Because calculus guarantees it, but only once the limit is taken.', correct: false },
+        { label: 'Because Δu is always equal to Δt for a composed function.', correct: false }
+      ],
+      explanation: 'The cancellation (Δy/Δu)(Δu/Δt) = Δy/Δt holds for any nonzero Δu and Δt purely by fraction arithmetic — the limit is only needed afterward, to turn each factor into a derivative.'
+    },
+    {
+      id: 'chain-instruction',
+      kind: 'choice',
+      prompt: 'To differentiate a composition f(g(x)), the chain rule instruction is...',
+      options: [
+        { label: 'Differentiate the outer function at the inner value, then multiply by the inner function\'s derivative.', correct: true },
+        { label: 'Differentiate the inner function first, then evaluate the outer function at that result.', correct: false },
+        { label: 'Multiply f′(x) by g′(x) without composing anything.', correct: false }
+      ],
+      explanation: '(f∘g)′(x) = f′(g(x))·g′(x): the outer derivative is evaluated at g(x), the inner value — not at x — and that is the step most often skipped by mistake.'
+    },
+    {
+      id: 'chain-units-ratio',
+      kind: 'choice',
+      prompt: 'In the gear-train example, dv/dωₑ = (dv/dωw)(dωw/dωe) = 2πr · (1/R). What happens to the output rate if you double the gear ratio R?',
+      options: [
+        { label: 'The output rate halves, since 1/R is halved.', correct: true },
+        { label: 'The output rate doubles.', correct: false },
+        { label: 'The output rate is unaffected, since only r matters.', correct: false }
+      ],
+      explanation: 'The gearbox factor dωw/dωe = 1/R appears as one of the two multiplied rates, so doubling R halves that factor and therefore halves the whole product.'
+    },
+    {
+      id: 'chain-outward-in',
+      kind: 'choice',
+      prompt: 'The three-stage chain dy/dt = (dy/du₂)(du₂/du₁)(du₁/dt) is swept "outward-in" to build a running product. What does this sweep foreshadow?',
+      options: [
+        { label: 'Backpropagation, which multiplies local derivatives along a path from the output back to the input.', correct: true },
+        { label: 'Integration by substitution.', correct: false },
+        { label: 'Newton\'s method for finding roots.', correct: false }
+      ],
+      explanation: 'Backpropagation is exactly this idea run on a wider graph: each edge carries a local derivative, and the gradient with respect to any input is the product of the factors along the path from that input out to the output.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

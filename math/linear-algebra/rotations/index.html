@@ -160,6 +160,12 @@ series: "linear_algebra"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">8</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>Coordinates on a manifold let us move without leaving it; the next part takes the derivative of that motion, gradient by gradient.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/optimization/' | relative_url }}">Next: Jacobians, Hessians and Gauss–Newton →</a>
@@ -171,8 +177,10 @@ series: "linear_algebra"
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/guide-math.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/linalg-viz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/guide-plot3d.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -393,6 +401,51 @@ series: "linear_algebra"
     renderC();
   });
   renderC();
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'rot-so3-definition',
+      kind: 'choice',
+      prompt: 'Which pair of conditions makes a matrix <var>R</var> a proper rotation, an element of <var>SO(3)</var>?',
+      options: [
+        { label: '<var>R&#7488;R = I</var> (orthogonal — preserves length and angle) and <var>det R = +1</var> (no mirror flip).', correct: true },
+        { label: '<var>R&#7488;R = I</var> and <var>det R = &minus;1</var>.', correct: false },
+        { label: 'Every entry of R is between &minus;1 and 1.', correct: false }
+      ],
+      explanation: 'Orthogonality (RᵀR = I) alone only guarantees |det R| = 1, so it allows both proper rotations and mirror reflections. Requiring det R = +1 specifically picks out the rotations a rigid body can actually perform — the −1 case preserves lengths but turns a right hand into a left hand.'
+    },
+    {
+      id: 'rot-average-fails',
+      kind: 'choice',
+      prompt: 'Why can you not interpolate between two rotations by averaging their matrices entrywise, <var>(1&minus;t)R&#8320; + tR&#8321;</var>?',
+      options: [
+        { label: 'The entrywise average is generally not orthogonal at all — its determinant drops below 1 and its columns stop being perpendicular, so the result is not a rotation.', correct: true },
+        { label: 'The average is always a valid rotation, just a slower one than the geodesic.', correct: false },
+        { label: 'Entrywise averaging only fails when the two rotations share the same axis.', correct: false }
+      ],
+      explanation: 'The set of rotations is curved, not flat, so a straight-line chord through the interior of SO(3) leaves the set. The demo shows this directly: the averaged matrix has determinant less than one and columns that are no longer orthonormal, so the "cube" it draws shears and shrinks instead of turning rigidly.'
+    },
+    {
+      id: 'rot-quaternion-half-angle',
+      kind: 'numeric',
+      prompt: 'A quaternion is built as <var>q = (cos(&theta;/2), sin(&theta;/2)&nbsp;&#251;)</var>. For a spin angle <var>&theta; = 180&deg;</var>, what is the scalar part, <var>cos(&theta;/2)</var>?',
+      answer: 0,
+      tolerance: 0.001,
+      explanation: 'cos(180°/2) = cos(90°) = 0. The half-angle is not a trick: applying q twice composes the rotation twice, which is exactly why it is θ/2 rather than θ that appears inside the quaternion.'
+    },
+    {
+      id: 'rot-gimbal-lock-pitch',
+      kind: 'numeric',
+      prompt: 'In the yaw–pitch–roll convention, gimbal lock happens exactly when <var>|cos&nbsp;&beta;| = 0</var>, where <var>&beta;</var> is the pitch. At what pitch angle, in degrees (between 0 and 90), does this occur?',
+      answer: 90,
+      tolerance: 0,
+      explanation: 'cos β = 0 at β = 90°, where the roll axis swings around to line up exactly with the world yaw axis. At that pitch, two of the three Euler sliders turn the body about the same line, so one degree of freedom is lost — the mapping from angles to rotations drops rank.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

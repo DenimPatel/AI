@@ -181,6 +181,12 @@ series: "linear_algebra"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">8</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>A cross product is a matrix in disguise, and so is every linear map &mdash; change the basis and the same transformation wears a different matrix.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/change-of-basis/' | relative_url }}">Next: Same map, different coordinates →</a>
@@ -192,8 +198,10 @@ series: "linear_algebra"
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/guide-math.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/linalg-viz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/guide-plot3d.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -400,6 +408,54 @@ series: "linear_algebra"
     drawC();
   });
   drawC();
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'cross-product-perpendicular',
+      kind: 'choice',
+      prompt: 'Why is <b>a</b>&middot;(<b>a</b>&times;<b>b</b>) always exactly zero?',
+      options: [
+        { label: 'It equals a 3×3 determinant with two identical rows (a appears twice), and such a determinant is always zero.', correct: true },
+        { label: 'Because a and b are always perpendicular to begin with.', correct: false },
+        { label: 'Because the cross product only exists when a and b are unit vectors.', correct: false }
+      ],
+      explanation: 'Dotting a×b with a builds a determinant whose top two rows are a and b and whose bottom row is a again — two equal rows force the determinant to vanish, which is the algebraic reason the cross product is perpendicular to both inputs.'
+    },
+    {
+      id: 'cross-product-antisymmetry',
+      kind: 'choice',
+      prompt: 'Swapping the order to <b>b</b>&times;<b>a</b> instead of <b>a</b>&times;<b>b</b> changes the result how?',
+      options: [
+        { label: 'It reverses the direction (negates the vector) while keeping the same length.', correct: true },
+        { label: 'It doubles the length of the resulting vector.', correct: false },
+        { label: 'It has no effect — the cross product is commutative.', correct: false }
+      ],
+      explanation: 'a×b = −b×a. The parallelogram spanned by the two vectors is unchanged, so the area (the length) is the same, but reversing the order flips which way the normal faces.'
+    },
+    {
+      id: 'cross-product-skew-matrix',
+      kind: 'choice',
+      prompt: 'The matrix <b>[a]<sub>&times;</sub></b> is described as skew-symmetric. What does that mean algebraically?',
+      options: [
+        { label: 'Its transpose equals its own negative: [a]×ᵀ = −[a]×.', correct: true },
+        { label: 'Its transpose equals itself: [a]×ᵀ = [a]×.', correct: false },
+        { label: 'It has no zero entries anywhere.', correct: false }
+      ],
+      explanation: 'Skew-symmetric means zero on the diagonal with every off-diagonal entry the negative of its mirror image across the diagonal — exactly what makes the transpose the negative of the original matrix.'
+    },
+    {
+      id: 'cross-product-area',
+      kind: 'numeric',
+      prompt: 'Two vectors have <var>|a| = 3</var> and <var>|b| = 4</var>, with a 90&deg; angle between them. Using <var>&#8214;a&times;b&#8214; = |a||b|sin&theta;</var>, what is the area of the parallelogram they span?',
+      answer: 12,
+      tolerance: 0.001,
+      explanation: 'sin 90° = 1, so ‖a×b‖ = 3 × 4 × 1 = 12. At a right angle the parallelogram is a rectangle, and the cross product’s length is exactly its area.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

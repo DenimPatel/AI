@@ -185,6 +185,12 @@ series: "calculus_in_motion"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">9</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>A density is a function you integrate, and a derivative is a slope you follow. The next part joins the two: an equation relating a function to its own derivative, solved one small step at a time.</span>
     <a class="btn btn-secondary" href="{{ '/math/calculus-in-motion/odes/' | relative_url }}">Next: Differential equations →</a>
@@ -196,6 +202,8 @@ series: "calculus_in_motion"
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/calc-viz.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -557,6 +565,48 @@ series: "calculus_in_motion"
       '<div><span class="k">gap</span> ' + Math.abs(closed - mc).toFixed(4) + ' &nbsp; <span class="k">note</span> KL &ge; 0, and equals 0 only when q = p.</div>';
   }
   Guide.bindSliders([D5.m1, D5.s1, D5.m2, D5.s2], draw5);
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'prob-standard-density',
+      kind: 'numeric',
+      prompt: 'For a standard Gaussian, what is the density value at x = 0, p(0) = 1/√(2π)?',
+      answer: 0.39894,
+      tolerance: 0.001,
+      explanation: '1/√(2π) ≈ 1/2.5066 ≈ 0.3989. It is a number greater than 1 for narrower Gaussians precisely because a density is probability per unit length, not a probability itself — only its integral over an interval is a probability.'
+    },
+    {
+      id: 'prob-affine-variance',
+      kind: 'choice',
+      prompt: 'For Y = μ + σZ with Z ~ N(0, 1), what is Var(Y)?',
+      options: [
+        { label: 'σ²', correct: true },
+        { label: 'σ', correct: false },
+        { label: 'σ² + μ²', correct: false }
+      ],
+      explanation: 'Var(Y) = σ²Var(Z) = σ² × 1 = σ², since scaling by σ scales the spread by σ and squares in the variance; shifting by μ moves the mean but doesn\'t change the spread at all.'
+    },
+    {
+      id: 'prob-cov-formula',
+      kind: 'numeric',
+      prompt: 'For the map y = exp(z), the change-of-variables formula gives p_Y(y) = p_Z(z)/|g′(z)|. At the demo\'s default probe z₀ = 0.8, p_Z(0.8) ≈ 0.2897 and |g′(0.8)| = e^0.8 ≈ 2.2255. What is p_Y at y₀ = e^0.8 (to 3 decimal places)?',
+      answer: 0.130,
+      tolerance: 0.005,
+      explanation: '0.2897 / 2.2255 ≈ 0.130. The map stretches space near z = 0.8 (its derivative there is bigger than 1), so the density there gets thinned out relative to p_Z — exactly the mechanism the change-of-variables formula quantifies.'
+    },
+    {
+      id: 'prob-kl-closed-form',
+      kind: 'numeric',
+      prompt: 'Using D_KL(q‖p) = log(σ₂/σ₁) + (σ₁² + (μ₁−μ₂)²)/(2σ₂²) − 1/2 with the demo\'s defaults q = N(0, 1) and p = N(0.8, 1.44) (so σ₂ = 1.2), what is D_KL(q‖p) (to 3 decimal places)?',
+      answer: 0.252,
+      tolerance: 0.005,
+      explanation: 'log(1.2) + (1 + 0.8²)/(2×1.44) − 0.5 = 0.1823 + 1.64/2.88 − 0.5 ≈ 0.1823 + 0.5694 − 0.5 ≈ 0.252. KL is never negative, and it is 0 only when q and p are the same distribution.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

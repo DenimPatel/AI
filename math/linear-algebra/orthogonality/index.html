@@ -168,6 +168,12 @@ series: "linear_algebra"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">8</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>Perpendicular axes make projection easy &mdash; and projection is the answer to the system that has no solution.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/least-squares/' | relative_url }}">Next: Least squares is a projection →</a>
@@ -179,7 +185,9 @@ series: "linear_algebra"
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/guide-math.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/linalg-viz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -413,6 +421,57 @@ series: "linear_algebra"
     drawC();
   });
   drawC();
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'orthogonality-gram-schmidt-step',
+      kind: 'choice',
+      prompt: 'Gram&ndash;Schmidt processes a third vector that happens to already lie in the span of the first two (already fixed as <var>q&#8321;, q&#8322;</var>). What happens?',
+      options: [
+        { label: 'The residual after subtracting both projections has length zero — the vector carried no new direction.', correct: true },
+        { label: 'The process fails and cannot continue.', correct: false },
+        { label: 'The vector becomes q₃ unchanged, since it is already orthogonal.', correct: false }
+      ],
+      explanation: 'Subtracting the shadows on q₁ and q₂ removes everything the vector had in common with the fixed directions. If it was already in their span, nothing is left over, and Gram–Schmidt reports that by name rather than failing.'
+    },
+    {
+      id: 'orthogonality-coordinates',
+      kind: 'choice',
+      prompt: 'Why does reading coordinates in an orthonormal basis need no elimination or matrix inversion, unlike a skewed basis?',
+      options: [
+        { label: 'Each coordinate is just a dot product of the vector with one axis, since the axes don’t lean on each other.', correct: true },
+        { label: 'Orthonormal bases only exist in two dimensions, where coordinates are trivial.', correct: false },
+        { label: 'Orthonormal vectors are always equal to the standard basis vectors.', correct: false }
+      ],
+      explanation: 'In a skewed basis every coordinate depends on solving a system, because the axes are not independent measurements. In an orthonormal basis, each axis answers for its own direction alone, so the coordinate is a single dot product.'
+    },
+    {
+      id: 'orthogonality-orthogonal-matrix-inverse',
+      kind: 'choice',
+      prompt: 'For a square matrix Q with orthonormal columns, <var>Q&#7488;Q = I</var>. What does this say about <var>Q&#8315;&#185;</var>?',
+      options: [
+        { label: 'Q⁻¹ = Qᵀ — the inverse is just the transpose.', correct: true },
+        { label: 'Q has no inverse, since QᵀQ = I means Q is singular.', correct: false },
+        { label: 'Q⁻¹ = Q, so Q equals its own inverse.', correct: false }
+      ],
+      explanation: 'Since the columns are independent, Q is invertible, and QᵀQ = I forces Q⁻¹ = Qᵀ. Finding coordinates in an orthonormal basis is therefore literally multiplying by the transpose.'
+    },
+    {
+      id: 'orthogonality-qr-zero-diagonal',
+      kind: 'choice',
+      prompt: 'In the factorization <var>A = QR</var>, what does a zero on the diagonal of R mean?',
+      options: [
+        { label: 'That column of A carried no new direction — the columns of A were dependent.', correct: true },
+        { label: 'Q failed to be orthonormal.', correct: false },
+        { label: 'A must be the zero matrix.', correct: false }
+      ],
+      explanation: 'The diagonal entries of R are the lengths of the residuals from Gram–Schmidt. A zero means that residual vanished, which is the same as saying the corresponding original column was already in the span of the earlier ones.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

@@ -179,6 +179,12 @@ series: "linear_algebra"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">8</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>Not every matrix has perpendicular eigenvectors &mdash; but symmetric ones always do, and that is what makes their powers predictable.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/symmetric/' | relative_url }}">Next: Symmetric matrices and quadratic forms →</a>
@@ -190,7 +196,9 @@ series: "linear_algebra"
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/guide-math.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/linalg-viz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -497,6 +505,51 @@ series: "linear_algebra"
     drawC();
   });
   drawC();
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'diag-explode',
+      kind: 'choice',
+      prompt: 'A matrix has one eigenvalue with <var>|&lambda;| = 1.3</var> and another with <var>|&lambda;| = 0.4</var>. What happens to a generic orbit <var>x<sub>k</sub> = A<sup>k</sup>x<sub>0</sub></var> as <var>k</var> grows?',
+      options: [
+        { label: 'It explodes, racing outward along the eigen-direction whose eigenvalue has magnitude greater than one.', correct: true },
+        { label: 'It settles to the origin, because the smaller eigenvalue eventually dominates.', correct: false },
+        { label: 'It cycles forever, neither growing nor shrinking.', correct: false }
+      ],
+      explanation: 'Each term in x_n = c₁λ₁ⁿv₁ + c₂λ₂ⁿv₂ grows or shrinks by its own eigenvalue to the n-th power. Any |λ| > 1 makes its term grow without bound, and that term eventually swamps the shrinking one — so the orbit explodes along the direction of the larger-magnitude eigenvalue, exactly the "Explode" preset in the first demo.'
+    },
+    {
+      id: 'diag-defective',
+      kind: 'choice',
+      prompt: 'A 2×2 matrix has a repeated eigenvalue but only one independent eigenvector. What does the page call this, and what goes wrong with <var>A = PDP&#8315;&#185;</var>?',
+      options: [
+        { label: 'The matrix is called defective; P cannot be built with two independent columns, so it has no inverse and this diagonalization shortcut fails.', correct: true },
+        { label: 'Nothing goes wrong — you can still build P from the one eigenvector twice.', correct: false },
+        { label: 'The matrix becomes symmetric, which fixes the problem automatically.', correct: false }
+      ],
+      explanation: 'Diagonalization needs as many independent eigenvectors as dimensions. A matrix missing one is defective: P cannot be inverted, so A = PDP⁻¹ is unavailable and you would need the more general Jordan form instead.'
+    },
+    {
+      id: 'diag-power-b',
+      kind: 'numeric',
+      prompt: 'The powers demo uses <var>B = [[2, 1], [1, 2]]</var>, whose eigenvalues are 1 and 3. With the power slider set to <var>n = 4</var>, what is the larger eigenvalue raised to that power, <var>&lambda;<sub>max</sub><sup>n</sup></var>?',
+      answer: 81,
+      tolerance: 0.5,
+      explanation: 'The larger eigenvalue is 3, and 3⁴ = 81. Because A = PDP⁻¹, Aⁿ = PDⁿP⁻¹ needs only the diagonal entries raised to the n-th power — the eigenvector frame P and P⁻¹ never change with n.'
+    },
+    {
+      id: 'diag-stability-boundary',
+      kind: 'numeric',
+      prompt: 'Per the stability table, an orbit settles to the origin when every eigenvalue magnitude is below a threshold and explodes when any eigenvalue magnitude is above it. What is that threshold value of <var>|&lambda;|</var>?',
+      answer: 1,
+      tolerance: 0,
+      explanation: 'The magnitude one is the dividing line: below it a term A^k shrinks to zero, above it a term grows without bound. Exactly at |λ| = 1 the term neither grows nor decays, which is the boundary case in the cheat sheet (a steady state, a period-two bounce, or a pure rotation on an invariant ellipse).'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

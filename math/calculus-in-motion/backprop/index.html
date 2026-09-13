@@ -171,6 +171,12 @@ series: "calculus_in_motion"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">9</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/3 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>Backprop gives the gradient. The next part asks how to use it — and why some directions slow a solver to a crawl.</span>
     <a class="btn btn-secondary" href="{{ '/math/calculus-in-motion/optimizers/' | relative_url }}">Next: Curvature and convergence →</a>
@@ -182,6 +188,8 @@ series: "calculus_in_motion"
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/calc-viz.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -506,6 +514,40 @@ series: "calculus_in_motion"
     el('cost-verdict').innerHTML = '<span class="ok">' + Guide.fmtNum(N) + '\u00d7</span> fewer evaluations for the same gradient, and the ratio grows with the model.';
   }
   Guide.bindSliders([D5.n], draw5);
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'bp-forward-z1',
+      kind: 'numeric',
+      prompt: 'Using the graph\'s default parameters (x = 0.8, w\u2081 = 1.4, b\u2081 = \u22120.5), what is z\u2081 = w\u2081x + b\u2081?',
+      answer: 0.62,
+      tolerance: 0.01,
+      explanation: '1.4 \u00d7 0.8 + (\u22120.5) = 1.12 \u2212 0.5 = 0.62. Since z\u2081 > 0, the ReLU is open here (a\u2081 = z\u2081), which matters for the backward pass because the ReLU\'s local derivative is 1 rather than 0.'
+    },
+    {
+      id: 'bp-adjoint-z2',
+      kind: 'numeric',
+      prompt: 'Continuing forward from z\u2081 = 0.62 with w\u2082 = \u22120.9, b\u2082 = 0.2, the pre-loss value is z\u2082 = w\u2082a\u2081 + b\u2082 = \u22120.358. With target t = 0.5 and L = (z\u2082 \u2212 t)\u00b2, what is the adjoint z\u0304\u2082 = \u2202L/\u2202z\u2082 = 2(z\u2082 \u2212 t)?',
+      answer: -1.716,
+      tolerance: 0.01,
+      explanation: '2 \u00d7 (\u22120.358 \u2212 0.5) = 2 \u00d7 (\u22120.858) = \u22121.716. This is the first adjoint computed in the backward sweep \u2014 the output\'s own adjoint is always 1, so this is the local derivative of the loss times that 1.'
+    },
+    {
+      id: 'bp-reverse-cost',
+      kind: 'choice',
+      prompt: 'Backpropagation computes the gradient of a scalar loss with respect to N parameters using roughly how many forward/backward passes, compared to 2N passes for central finite differences?',
+      options: [
+        { label: 'About 2 total \u2014 one forward pass, one backward pass, independent of N.', correct: true },
+        { label: 'Also about 2N \u2014 the same cost as finite differences.', correct: false },
+        { label: 'About N\u00b2 \u2014 it scales worse than finite differences.', correct: false }
+      ],
+      explanation: 'This is the asymmetry that makes deep learning possible: each node\'s adjoint is computed once and reused by all of its parents, so one forward pass plus one backward pass yields every parameter\'s gradient at once, regardless of how many parameters there are.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

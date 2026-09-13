@@ -164,6 +164,12 @@ series: "calculus"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">9</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>With the limit pinned down, the next part uses it to build a slope — and turns the difference quotient into the derivative.</span>
     <a class="btn btn-secondary" href="{{ '/math/calculus/derivative/' | relative_url }}">Next: The derivative →</a>
@@ -174,7 +180,9 @@ series: "calculus"
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/calc-viz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -501,6 +509,57 @@ series: "calculus"
     setRange(D4.a, x.toFixed(2));
     draw4();
   });
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'lim-quantifier-order',
+      kind: 'choice',
+      prompt: 'In the ε–δ game, who picks first?',
+      options: [
+        { label: 'You (the adversary) name a tolerance ε first; the function must then produce a δ that works.', correct: true },
+        { label: 'The function picks δ first, then you name ε.', correct: false },
+        { label: 'Both are chosen at the same time, independently.', correct: false }
+      ],
+      explanation: 'The order of the quantifiers is the content of the definition: δ is chosen after ε and is allowed to depend on it, never the other way around.'
+    },
+    {
+      id: 'lim-strict-ineq',
+      kind: 'choice',
+      prompt: 'Why does the definition use 0 < |t − a| < δ rather than just |t − a| < δ?',
+      options: [
+        { label: 'To exclude t = a itself, since a limit is about the approach and never about the value at a.', correct: true },
+        { label: 'It is a stylistic convention with no mathematical effect.', correct: false },
+        { label: 'To make δ smaller than it would otherwise need to be.', correct: false }
+      ],
+      explanation: 'A limit can exist even where the function is undefined at a, or disagree with f(a) at a removable hole — the strict inequality is what lets the definition ignore the point a entirely.'
+    },
+    {
+      id: 'lim-sin-1-x',
+      kind: 'choice',
+      prompt: 'Along the sequence xₙ = 1/(π/2 + 2πn), sin(1/xₙ) = 1 for every n; along x′ₙ = 1/(3π/2 + 2πn), sin(1/x′ₙ) = −1 for every n. Both sequences approach 0. What does this show?',
+      options: [
+        { label: 'The limit of sin(1/x) at 0 does not exist, because different approach paths give different limiting values.', correct: true },
+        { label: 'The limit of sin(1/x) at 0 is exactly 0.', correct: false },
+        { label: 'sin(1/x) is discontinuous at every real number.', correct: false }
+      ],
+      explanation: '"Closer" along one chosen path is not the same as "close" for every x in a window — that is exactly the gap the ε–δ definition closes, since it demands one δ that works for every point in the window, not just a convenient sequence.'
+    },
+    {
+      id: 'lim-removable-hole',
+      kind: 'choice',
+      prompt: 'A function has a removable hole at x = 1: f is undefined there, but limₓ→1 f(x) = 2 exists. Which of the three continuity conditions fails first?',
+      options: [
+        { label: 'Condition 1 — f(1) is defined — fails, since f(1) does not exist at all.', correct: true },
+        { label: 'Condition 2 — the limit exists — fails.', correct: false },
+        { label: 'Condition 3 — the limit equals f(1) — fails.', correct: false }
+      ],
+      explanation: 'The three checks are applied in order: definedness, then existence of the limit, then equality. A removable hole passes checks 2 (the limit is 2) but fails check 1 immediately, since there is no f(1) to compare against.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

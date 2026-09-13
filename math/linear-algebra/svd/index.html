@@ -191,6 +191,12 @@ series: "linear_algebra"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">8</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>Keep only the biggest singular values and the ellipse becomes a good sketch of the data. That is low-rank approximation, and next it becomes PCA.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/low-rank-pca/' | relative_url }}">Next: Low-rank approximation and PCA →</a>
@@ -202,7 +208,9 @@ series: "linear_algebra"
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/guide-math.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/linalg-viz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -456,6 +464,51 @@ series: "linear_algebra"
     drawD();
   });
   drawD();
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'svd-order',
+      kind: 'choice',
+      prompt: 'In <var>A = U&Sigma;Vᵀ</var>, applying <var>A</var> to a vector <var>x</var> means multiplying by the three factors in what order?',
+      options: [
+        { label: 'Vᵀ first (rotate), then Σ (stretch), then U (rotate) — right-to-left, as matrix multiplication always applies.', correct: true },
+        { label: 'U first, then Σ, then Vᵀ — left-to-right, in reading order.', correct: false },
+        { label: 'Σ first, since the stretching is what matters most.', correct: false }
+      ],
+      explanation: 'Matrix multiplication applies the rightmost factor first: Vᵀ rotates the singular directions onto the coordinate axes, Σ stretches along those axes, and U rotates the result to its final orientation. Reading left-to-right and assuming U acts first is the single most common way to get the picture backwards.'
+    },
+    {
+      id: 'svd-rank-collapse',
+      kind: 'choice',
+      prompt: 'You drag the collapse slider in the third demo until σ₂ hits zero. What does that tell you about the matrix?',
+      options: [
+        { label: 'The matrix has rank 1: its columns have become parallel, its determinant is 0, and it can no longer be inverted.', correct: true },
+        { label: 'The matrix is now the identity matrix.', correct: false },
+        { label: 'Nothing changes structurally — only the ellipse\'s drawing gets thinner.', correct: false }
+      ],
+      explanation: 'The number of nonzero singular values is the rank. When σ₂ → 0, the ellipse flattens into a segment because the image has lost a dimension — the two columns become parallel, and the direction paired with the vanishing singular value (v₂) is a genuine direction the matrix squashes to nothing.'
+    },
+    {
+      id: 'svd-condition',
+      kind: 'numeric',
+      prompt: 'A matrix has singular values σ₁ = 8 and σ₂ = 2. What is its condition number κ = σ₁/σ₂?',
+      answer: 4,
+      tolerance: 0.001,
+      explanation: 'κ measures how unevenly the matrix stretches space. Here it stretches one direction 4× more than the other — mild by SVD standards, but the ratio climbing without bound is exactly what happens as the ellipse in the demo flattens toward a segment.'
+    },
+    {
+      id: 'svd-ata-eigen',
+      kind: 'numeric',
+      prompt: 'A matrix has singular values σ₁ = 3 and σ₂ = 1. AᵀA is symmetric with eigenvalues equal to the squared singular values. What is the larger eigenvalue of AᵀA?',
+      answer: 9,
+      tolerance: 0.001,
+      explanation: 'AᵀA = VΣ²Vᵀ, so its eigenvalues are exactly the singular values squared, in the same order: σ₁² = 9 and σ₂² = 1. This is one common way SVD is computed in practice — though real SVD routines work directly on A, since forming AᵀA squares the condition number (κ=3 becomes κ=9).'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

@@ -214,6 +214,12 @@ series: "linear_algebra"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">8</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>Two subspaces on opposite sides of a matrix are secretly the same dimension &mdash; and the operation that detects the overlap is a single number you multiply and add.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/dot-product/' | relative_url }}">Next: Dot product, projection, duality →</a>
@@ -225,8 +231,10 @@ series: "linear_algebra"
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/guide-math.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/linalg-viz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/guide-plot3d.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -472,6 +480,51 @@ series: "linear_algebra"
   renderA();
   renderB();
   renderC();
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'rank-subspaces-nullity',
+      kind: 'numeric',
+      prompt: 'A matrix has 5 columns and rank 3. Using the ledger rank(A) + nullity(A) = n, what is the nullity?',
+      answer: 2,
+      tolerance: 0,
+      explanation: 'Rank and nullity always sum to the number of columns: 3 pivot columns plus 2 free columns account for all 5. Those 2 free columns are exactly the dimensions of the null space.'
+    },
+    {
+      id: 'rank-subspaces-dims',
+      kind: 'numeric',
+      prompt: 'A 6&times;4 matrix has rank 3. The left null space lives in the codomain and has dimension m &minus; r. What is its dimension?',
+      answer: 3,
+      tolerance: 0,
+      explanation: 'm − r = 6 − 3 = 3. The left null space is the orthogonal complement of the column space inside the m-dimensional output space, so it picks up whatever dimension the rank does not use.'
+    },
+    {
+      id: 'rank-subspaces-column-collapse',
+      kind: 'choice',
+      prompt: 'In the 3&times;2 matrix demo, you drag the align slider until the two columns point in the same direction. What happens to the rank and the null space?',
+      options: [
+        { label: 'Rank drops from 2 to 1, and a nonzero null space appears in the 2-D input space.', correct: true },
+        { label: 'Rank stays at 2, but the column space grows to fill all of R³.', correct: false },
+        { label: 'The null space disappears entirely.', correct: false }
+      ],
+      explanation: 'Once the two columns align, they no longer span a plane — only a line — so the column space drops to dimension 1 and a whole line of inputs is now squashed to zero, which is exactly what appears in the domain-side canvas.'
+    },
+    {
+      id: 'rank-subspaces-orthogonal-pairs',
+      kind: 'choice',
+      prompt: 'The four fundamental subspaces pair up as orthogonal complements. Which pairing does the page describe?',
+      options: [
+        { label: 'Row space ⊥ null space (both in the domain); column space ⊥ left null space (both in the codomain).', correct: true },
+        { label: 'Row space ⊥ column space; null space ⊥ left null space.', correct: false },
+        { label: 'All four subspaces are mutually orthogonal to every other one.', correct: false }
+      ],
+      explanation: 'The domain splits into the row space (where A acts faithfully) and its orthogonal complement, the null space (which A discards). Symmetrically, the codomain splits into the column space (reachable outputs) and its orthogonal complement, the left null space.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

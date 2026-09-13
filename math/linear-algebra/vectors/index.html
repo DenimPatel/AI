@@ -183,6 +183,12 @@ series: "linear_algebra"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">8</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>One vector is a point; two vectors can be a whole plane &mdash; until they line up and everything collapses.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/span-basis/' | relative_url }}">Next: Span, independence and basis →</a>
@@ -194,7 +200,9 @@ series: "linear_algebra"
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/guide-math.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/linalg-viz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -336,6 +344,54 @@ series: "linear_algebra"
     drawD();
   });
   drawD();
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'vec-tail',
+      kind: 'choice',
+      prompt: 'The arrow from the origin to <var>(2, 1)</var> and the arrow from <var>(3, 3)</var> to <var>(5, 4)</var> — are they the same vector?',
+      options: [
+        { label: 'Yes — they have the same length and point the same way; the tail position isn’t part of the vector.', correct: true },
+        { label: 'No — they start at different points, so they are different vectors.', correct: false },
+        { label: 'Only if you also rotate one of them to match the other.', correct: false }
+      ],
+      explanation: 'A vector has no fixed home. Only the displacement — how far and which way — is part of it, and both arrows go 2 right and 1 up.'
+    },
+    {
+      id: 'vec-scale-negative',
+      kind: 'choice',
+      prompt: 'You scale a vector <var>v</var> by <var>k = -1.5</var>. What happens to it?',
+      options: [
+        { label: 'It flips to point the opposite direction and its length multiplies by 1.5.', correct: true },
+        { label: 'It stays pointing the same way but shrinks.', correct: false },
+        { label: 'Scaling by a negative number is undefined for vectors.', correct: false }
+      ],
+      explanation: 'Scaling by k keeps the direction and multiplies the length by k, except a negative k also flips the direction — exactly what the dashed kv arrow in the first demo shows as you drag the slider negative.'
+    },
+    {
+      id: 'vec-collinear',
+      kind: 'choice',
+      prompt: 'In the linear-combination demo, you drag <var>w</var> until it points in exactly the same direction as <var>v</var> (just a different length). What happens to the reachable region <var>av + bw</var>?',
+      options: [
+        { label: 'It collapses from the whole plane down to a single line.', correct: true },
+        { label: 'Nothing changes — you can still reach every point in the plane.', correct: false },
+        { label: 'The region becomes a single point, the origin.', correct: false }
+      ],
+      explanation: 'When two vectors point in the same (or opposite) direction, every linear combination of them lands somewhere on the line through the origin they both lie on — you lose a whole dimension of reach, however hard you push the coefficients.'
+    },
+    {
+      id: 'vec-embedding-dim',
+      kind: 'numeric',
+      prompt: 'A word embedding is described as "a vector with hundreds or thousands of coordinates." If a model uses 768-dimensional embeddings, how many numbers does one embedding vector contain?',
+      answer: 768,
+      tolerance: 0,
+      explanation: 'The dimension of a vector space is just the number of slots in the list — nothing stops it from being large. The arrow picture stops being drawable well before 3 dimensions are exceeded, but the arithmetic (add entrywise, scale entrywise) keeps working exactly the same way.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

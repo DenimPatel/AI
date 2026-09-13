@@ -205,6 +205,12 @@ series: "calculus_in_motion"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">9</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>We now have the two densities. The next part adds them up over regions and boundaries and discovers that three famous theorems are one theorem.</span>
     <a class="btn btn-secondary" href="{{ '/math/calculus-in-motion/stokes/' | relative_url }}">Next: Green, Stokes, Divergence: one theorem →</a>
@@ -216,6 +222,8 @@ series: "calculus_in_motion"
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/calc-viz.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -602,6 +610,48 @@ series: "calculus_in_motion"
   draw2();
   draw3();
   draw5();
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'dc-shear-curl',
+      kind: 'numeric',
+      prompt: 'The shear preset is F(x, y) = (y, 0). Using curl F = ∂Q/∂x − ∂P/∂y, what is curl F at every point?',
+      answer: -1,
+      tolerance: 0.01,
+      explanation: 'Here P = y and Q = 0, so ∂Q/∂x = 0 and ∂P/∂y = 1, giving curl F = 0 − 1 = −1. The paddlewheel spins clockwise everywhere, matching the demo\'s reading for the shear field.'
+    },
+    {
+      id: 'dc-sink-div',
+      kind: 'numeric',
+      prompt: 'The sink preset is F(x, y) = (−x, −y). Using div F = ∂P/∂x + ∂Q/∂y, what is div F at every point?',
+      answer: -2,
+      tolerance: 0.01,
+      explanation: '∂P/∂x = −1 and ∂Q/∂y = −1, so div F = −1 + −1 = −2 everywhere: a constant inflow, the mirror image of the radial source\'s constant +2.'
+    },
+    {
+      id: 'dc-incompressible',
+      kind: 'choice',
+      prompt: 'A field with div F = 0 everywhere — like the pure rotation preset — is described on this page as:',
+      options: [
+        { label: 'Incompressible: no point creates or destroys "fluid," so a small blob keeps its area as it is carried along.', correct: true },
+        { label: 'Irrotational: the field never spins a paddlewheel.', correct: false },
+        { label: 'Undefined at the origin.', correct: false }
+      ],
+      explanation: 'Divergence-free means net outflow is zero everywhere, which is exactly the incompressible condition. Irrotational is the separate, curl = 0 condition — a field can be one, the other, both, or neither.'
+    },
+    {
+      id: 'dc-spiral-div',
+      kind: 'numeric',
+      prompt: 'The nonlinear spiral preset has div F(x, y) = 3(x² + y²). What is div F at the point (1, 2)?',
+      answer: 15,
+      tolerance: 0.01,
+      explanation: '3(1² + 2²) = 3(1 + 4) = 3 × 5 = 15. Unlike the linear presets, this field\'s divergence (and curl, which shares the same formula here) grows with distance from the origin instead of staying constant.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

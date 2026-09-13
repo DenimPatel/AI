@@ -168,6 +168,12 @@ series: "linear_algebra"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">7</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>In the eigenbasis a matrix is nothing but its stretch factors &mdash; which is why powers of a matrix settle, cycle or explode.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/diagonalization/' | relative_url }}">Next: Matrix powers and dynamical systems →</a>
@@ -179,7 +185,9 @@ series: "linear_algebra"
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/guide-math.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/linalg-viz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -477,6 +485,51 @@ series: "linear_algebra"
     drawD();
   });
   drawD();
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'eig-definition',
+      kind: 'choice',
+      prompt: 'Which condition defines <var>v</var> as an eigenvector of <var>A</var> with eigenvalue <var>&lambda;</var>?',
+      options: [
+        { label: '<var>Av = &lambda;v</var>, with <var>v</var> nonzero — the image lands back on the same line as v.', correct: true },
+        { label: '<var>Av</var> is perpendicular to <var>v</var>.', correct: false },
+        { label: '<var>Av</var> has the same length as <var>v</var>, whatever direction it points.', correct: false }
+      ],
+      explanation: 'An eigenvector is a direction the map only stretches or flips, never turns — so Av must be some scalar multiple of v itself. The zero vector is excluded because it trivially satisfies the equation for every λ, which would make the definition useless.'
+    },
+    {
+      id: 'eig-shear-repeated',
+      kind: 'choice',
+      prompt: 'The shear preset, <var>[[1,1],[0,1]]</var>, has the repeated eigenvalue <var>&lambda; = 1</var>. How many independent eigen-directions does it have?',
+      options: [
+        { label: 'Only one — the horizontal axis is fixed pointwise, but every other vector gets tilted sideways with no second independent direction that merely stretches.', correct: true },
+        { label: 'Two, since a repeated eigenvalue always comes with two independent eigenvectors.', correct: false },
+        { label: 'Zero — a shear has no eigenvectors at all.', correct: false }
+      ],
+      explanation: 'A repeated eigenvalue does not guarantee two independent eigenvectors. The shear is the standard counterexample: it fixes the horizontal axis but shears everything else, so only one eigen-direction survives even though λ = 1 is a double root of the characteristic polynomial.'
+    },
+    {
+      id: 'eig-larger-value',
+      kind: 'numeric',
+      prompt: 'The sweep demo’s default matrix is <var>[[2, 1], [1, 2]]</var>. Its trace is 4 and its determinant is 3. What is the larger of its two eigenvalues?',
+      answer: 3,
+      tolerance: 0.01,
+      explanation: 'The eigenvalues satisfy λ₁ + λ₂ = tr A = 4 and λ₁λ₂ = det A = 3, so they solve λ² − 4λ + 3 = 0, which factors as (λ − 1)(λ − 3). The eigenvalues are 1 and 3, so the larger is 3.'
+    },
+    {
+      id: 'eig-discriminant',
+      kind: 'numeric',
+      prompt: 'For that same matrix, <var>[[2, 1], [1, 2]]</var>, with trace 4 and determinant 3, what is the discriminant <var>&Delta; = (tr A)&sup2; &minus; 4 det A</var>?',
+      answer: 4,
+      tolerance: 0.01,
+      explanation: 'Δ = 4² − 4·3 = 16 − 12 = 4. Because Δ is positive, the matrix has two distinct real eigenvalues (1 and 3) and two independent real eigen-directions — exactly the case this part calls out as the most common one for a symmetric-looking matrix.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

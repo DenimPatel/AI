@@ -168,6 +168,12 @@ series: "linear_algebra"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">7</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>A basis is a coordinate system; the next step is to move it, and to send the whole plane somewhere else.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/transformations/' | relative_url }}">Next: Linear transformations are matrices →</a>
@@ -179,7 +185,9 @@ series: "linear_algebra"
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/guide-math.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/linalg-viz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -349,6 +357,57 @@ series: "linear_algebra"
     drawC();
   });
   drawC();
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'span-basis-dependent-example',
+      kind: 'choice',
+      prompt: 'The text gives <var>v = (1, 2)</var> and <var>w = (2, 4)</var> as an example. What do these two vectors span?',
+      options: [
+        { label: 'A line through the origin, since w is exactly twice v.', correct: true },
+        { label: 'The whole plane, since there are two vectors to work with.', correct: false },
+        { label: 'Just the origin, since the cross product comes out negative.', correct: false }
+      ],
+      explanation: 'w = 2v, so the pair is dependent: the cross product is 1·4 − 2·2 = 0, and every linear combination av + bw lands on the line through (1, 2), never off it.'
+    },
+    {
+      id: 'span-basis-basis-def',
+      kind: 'choice',
+      prompt: 'What exactly makes a set of vectors a basis for the plane?',
+      options: [
+        { label: 'It is independent and it spans the plane — enough directions to reach everywhere, and none redundant.', correct: true },
+        { label: 'It contains exactly two vectors, regardless of which directions they point.', correct: false },
+        { label: 'It spans the plane, even if one of the vectors is redundant.', correct: false }
+      ],
+      explanation: 'Spanning guarantees every point is reachable; independence guarantees the coefficients that reach it are unique. A basis needs both — a redundant vector in a spanning set does not stop it from spanning, but it does stop it from being a basis.'
+    },
+    {
+      id: 'span-basis-cross-zero',
+      kind: 'choice',
+      prompt: 'In the span demo, the readout tracks the cross product <var>v&times;w = v<sub>x</sub>w<sub>y</sub> &minus; v<sub>y</sub>w<sub>x</sub></var>. What does it mean when this value is exactly zero?',
+      options: [
+        { label: 'v and w are collinear, so their span has collapsed from the whole plane down to a single line.', correct: true },
+        { label: 'v and w are perpendicular, so their span is as large as possible.', correct: false },
+        { label: 'One of v or w must be the zero vector.', correct: false }
+      ],
+      explanation: 'The cross product is the area of the parallelogram v and w sweep out. It vanishes exactly when the two arrows line up, which is the same collapse you can drag into being in the demo.'
+    },
+    {
+      id: 'span-basis-dependent-target',
+      kind: 'choice',
+      prompt: 'In the target demo, the pair v and w is collinear, but the target T happens to sit exactly on their shared span line. How many pairs (a, b) satisfy av + bw = T?',
+      options: [
+        { label: 'Infinitely many.', correct: true },
+        { label: 'Exactly one.', correct: false },
+        { label: 'None — the system is inconsistent.', correct: false }
+      ],
+      explanation: 'A dependent pair with the target off the line gives no solution at all, but when the target lies on the line the readout reports infinitely many combinations, since you can trade a step along v for a step along w without changing the sum.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

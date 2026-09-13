@@ -179,6 +179,12 @@ series: "calculus_in_motion"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">8</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>An arrow at every point invites a new question: drag a path through a field and add up what the arrows do along the way.</span>
     <a class="btn btn-secondary" href="{{ '/math/calculus-in-motion/line-integrals/' | relative_url }}">Next: Line integrals &amp; conservative fields →</a>
@@ -190,6 +196,8 @@ series: "calculus_in_motion"
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/calc-viz.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -613,6 +621,51 @@ series: "calculus_in_motion"
   draw1();
   rebuild2(); reseedParticles(); draw2();
   draw4();
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'vf-uniform-magnitude',
+      kind: 'numeric',
+      prompt: 'The uniform preset is the constant field F(x, y) = (1, 0.35). What is |F|, its magnitude at any point?',
+      answer: 1.0595,
+      tolerance: 0.01,
+      explanation: 'A uniform field has the same arrow everywhere, so its magnitude is just √(1² + 0.35²) ≈ 1.06, independent of where you sample it.'
+    },
+    {
+      id: 'vf-rotation-streamline',
+      kind: 'choice',
+      prompt: 'Drop a particle into the rotation preset F(x, y) = (−y, x) away from the origin. What does its streamline do?',
+      options: [
+        { label: 'It closes into a periodic orbit — the particle circles back to where it started.', correct: true },
+        { label: 'It spirals outward and escapes to the boundary.', correct: false },
+        { label: 'It converges into the origin and stops there.', correct: false }
+      ],
+      explanation: 'Pure rotation has zero divergence and nonzero curl: nothing pushes the particle in or out, only around, so the trajectory closes into a loop — the verdict the demo calls "closes into an orbit (curl dominates)".'
+    },
+    {
+      id: 'vf-superposition-spiral',
+      kind: 'choice',
+      prompt: 'In the superposition demo you set component A to the radial source and component B to rotation, both with weight 1. What does the combined field look like?',
+      options: [
+        { label: 'A spiral — the outward push of the source and the swirl of the rotation combine.', correct: true },
+        { label: 'A pure rotation, since the two components cancel the outflow.', correct: false },
+        { label: 'The zero field everywhere.', correct: false }
+      ],
+      explanation: 'Superposition just adds the two arrows pointwise. The source pushes a particle outward while the rotation carries it around, and together those two motions trace a spiral.'
+    },
+    {
+      id: 'vf-source-magnitude',
+      kind: 'numeric',
+      prompt: 'For the radial source preset F(x, y) = (x, y), what is |F(p)| at the point p = (3, 4)?',
+      answer: 5,
+      tolerance: 0.01,
+      explanation: 'F(3, 4) = (3, 4), and its length is √(3² + 4²) = √25 = 5 — the classic 3–4–5 triangle, which is why a radial source’s arrow length is just the distance from the origin.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

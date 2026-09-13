@@ -165,6 +165,12 @@ series: "linear_algebra"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">8</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>Two arrows are perpendicular when their overlap is zero &mdash; and that test is enough to manufacture a whole basis out of nothing.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/orthogonality/' | relative_url }}">Next: Orthonormal bases and Gram–Schmidt →</a>
@@ -176,7 +182,9 @@ series: "linear_algebra"
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/guide-math.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/linalg-viz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -474,6 +482,54 @@ series: "linear_algebra"
   var dualSetup = Guide.setupCanvas(el('dual-line'), 640, 90, drawDualLine);
   dualCtx = dualSetup.ctx;
   drawC();
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'dot-product-orthogonal-test',
+      kind: 'choice',
+      prompt: 'Two vectors satisfy <var>v&middot;w = 0</var>. What does this mean?',
+      options: [
+        { label: 'They meet at a right angle — they are orthogonal.', correct: true },
+        { label: 'They point in exactly the same direction.', correct: false },
+        { label: 'One of them must be the zero vector.', correct: false }
+      ],
+      explanation: 'Since |v| and |w| are positive lengths, v·w = 0 forces cosθ = 0, which means a right angle. Neither vector needs to be zero — they just need to be perpendicular.'
+    },
+    {
+      id: 'dot-product-duality',
+      kind: 'choice',
+      prompt: 'The page reveals that a 1&times;n row matrix acting on a vector is really the same thing as what other operation?',
+      options: [
+        { label: 'A dot product between the row (read as a vector) and the input.', correct: true },
+        { label: 'A cross product between the row and the input.', correct: false },
+        { label: 'A determinant computed from the row and the input.', correct: false }
+      ],
+      explanation: 'w^T x expands entry by entry to w_x x_x + w_y x_y, which is exactly w·x. A row of weights and a column of coordinates are the same list of numbers playing two different roles.'
+    },
+    {
+      id: 'dot-product-cosine-similarity',
+      kind: 'choice',
+      prompt: 'Cosine similarity divides the dot product by both vectors’ lengths. Why does the page say this matters for comparing embeddings?',
+      options: [
+        { label: 'It strips out magnitude, so two embeddings pointing the same way score maximally similar regardless of how long they are.', correct: true },
+        { label: 'It converts the dot product directly into an angle measured in radians.', correct: false },
+        { label: 'It guarantees the two vectors are orthogonal.', correct: false }
+      ],
+      explanation: 'A token’s embedding magnitude is often just an artefact of how often it appears, while its direction is what carries meaning — dividing out the lengths compares directions alone, which is what retrieval and attention actually want.'
+    },
+    {
+      id: 'dot-product-cauchy-schwarz',
+      kind: 'numeric',
+      prompt: 'Cauchy&ndash;Schwarz says <var>|v&middot;w| &le; |v||w|</var>. If <var>|v| = 4</var> and <var>|w| = 5</var>, what is the largest possible value of <var>v&middot;w</var>?',
+      answer: 20,
+      tolerance: 0.001,
+      explanation: 'The bound is |v||w| = 4 × 5 = 20, achieved only when v and w point in exactly the same direction, so cosθ = 1.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

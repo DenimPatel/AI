@@ -170,6 +170,12 @@ series: "calculus_in_motion"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">9</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/3 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>The area element is now in hand. The next part sweeps double and triple integrals in polar, cylindrical and spherical coordinates, carrying each volume element with it.</span>
     <a class="btn btn-secondary" href="{{ '/math/calculus-in-motion/multiple-integrals/' | relative_url }}">Next: Multiple integrals &amp; coordinates →</a>
@@ -181,6 +187,8 @@ series: "calculus_in_motion"
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/calc-viz.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -580,6 +588,40 @@ series: "calculus_in_motion"
     if (v) v.textContent = s.value;
     draw5();
   });
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'cov-polar-detj',
+      kind: 'numeric',
+      prompt: 'For polar coordinates T(r, θ) = (r cos θ, r sin θ), the page derives det J = r. What is det J at r = 3?',
+      answer: 3,
+      tolerance: 0.01,
+      explanation: 'det J = r cos²θ + r sin²θ = r(cos²θ + sin²θ) = r, so at r = 3 the local area scale is simply 3 — a cell there is stretched to three times the area of the same-sized cell near the origin.'
+    },
+    {
+      id: 'cov-forgotten-r',
+      kind: 'numeric',
+      prompt: 'Forgetting the r factor, ∬1 dA in polar coordinates over a unit disc (R = 1) becomes 2πR instead of πR². What is 2πR for R = 1, to two decimal places?',
+      answer: 6.28,
+      tolerance: 0.02,
+      explanation: 'The warning box spells this out directly: without the r, the "area" of the unit disc comes out as 2π ≈ 6.28 instead of the correct π ≈ 3.14 — almost exactly double, because forgetting r under-weights the ring near the origin and over-weights nothing to compensate.'
+    },
+    {
+      id: 'cov-negative-det',
+      kind: 'choice',
+      prompt: 'A negative Jacobian determinant (det J < 0) at a point means the map:',
+      options: [
+        { label: 'Reverses orientation there, like a reflection — though the area scale is still |det J|.', correct: true },
+        { label: 'Shrinks every cell to zero area.', correct: false },
+        { label: 'Is not differentiable at that point.', correct: false }
+      ],
+      explanation: 'The sign of det J records whether corners are traversed in the same or opposite rotational sense as the source cell — a mirror flips that sense. Areas are always reported as positive, which is exactly why the change-of-variables formula uses |det J|, not det J.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

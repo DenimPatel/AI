@@ -181,6 +181,12 @@ series: "calculus"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">10</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>We have a vector of partials. The next part asks which direction it points, and answers: straight uphill.</span>
     <a class="btn btn-secondary" href="{{ '/math/calculus/gradient/' | relative_url }}">Next: The gradient →</a>
@@ -191,8 +197,10 @@ series: "calculus"
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/calc-viz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/guide-plot3d.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -493,6 +501,57 @@ series: "calculus"
       draw5();
     });
   });
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'mv-slice-reduces',
+      kind: 'choice',
+      prompt: 'To compute ∂f/∂y at a point, the demo slices the surface with the plane x=x₀ and finds the ordinary slope of the resulting curve in y. Why does this work?',
+      options: [
+        { label: 'Holding x fixed reduces f to an ordinary single-variable function of y, and the derivative rules already apply to it unchanged.', correct: true },
+        { label: 'Slicing a surface always produces a straight line.', correct: false },
+        { label: '∂f/∂y ignores the value of f entirely.', correct: false }
+      ],
+      explanation: 'g(y) = f(x₀, y) is just a plain function of one variable once x₀ is fixed, so ∂f/∂y(x₀,y₀) is literally g′(y₀) — no new limit or rule is needed, only the old single-variable one applied to the sliced curve.'
+    },
+    {
+      id: 'mv-total-differential',
+      kind: 'choice',
+      prompt: 'The total differential is df = fx dx + fy dy. What does this represent?',
+      options: [
+        { label: 'The first-order (linear) prediction of how f changes for a small step with both an x-part and a y-part.', correct: true },
+        { label: 'The exact change in f for any step size, no matter how large.', correct: false },
+        { label: 'The sum of the two partial derivatives, evaluated once and for all.', correct: false }
+      ],
+      explanation: 'df generalises the single-variable tangent-line approximation: f(x₀+dx, y₀+dy) ≈ f(x₀,y₀) + fx dx + fy dy, with an error that is second order in the step size — exact only in the limit of an infinitesimal step.'
+    },
+    {
+      id: 'mv-clairaut',
+      kind: 'choice',
+      prompt: 'For a function with continuous second partials, fxy and fyx are computed in opposite orders — differentiate in x then y, versus y then x. What does Clairaut\'s theorem guarantee?',
+      options: [
+        { label: 'The two mixed partials are always equal.', correct: true },
+        { label: 'The two mixed partials always differ by a fixed constant.', correct: false },
+        { label: 'Only one of the two orders is mathematically valid.', correct: false }
+      ],
+      explanation: 'As long as the second partials are continuous (the C² case), fxy = fyx — order of differentiation does not matter, which is exactly why the Hessian built from them is a symmetric matrix.'
+    },
+    {
+      id: 'mv-c1-meaning',
+      kind: 'choice',
+      prompt: 'The guide says the site "leans on" the assumption that f is C¹. What does this mean?',
+      options: [
+        { label: 'The partial derivatives of f exist and are themselves continuous functions.', correct: true },
+        { label: 'f is required to be a polynomial.', correct: false },
+        { label: 'f has exactly one critical point.', correct: false }
+      ],
+      explanation: 'C¹ means differentiable with continuous derivatives — that continuity is precisely what makes the linear (and later quadratic) approximation honest, with an error term that shrinks predictably as the step shrinks.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

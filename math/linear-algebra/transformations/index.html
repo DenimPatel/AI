@@ -188,6 +188,12 @@ series: "linear_algebra"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">7</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>One matrix moves the plane; two in a row compose into a product &mdash; and the order matters.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/composition/' | relative_url }}">Next: Matrix multiplication is composition →</a>
@@ -199,7 +205,9 @@ series: "linear_algebra"
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/guide-math.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/linalg-viz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -382,6 +390,57 @@ series: "linear_algebra"
     drawD();
   });
   drawD();
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'transformations-columns',
+      kind: 'choice',
+      prompt: 'A matrix’s first column is <var>(0, 1)</var> and its second column is <var>(&minus;1, 0)</var>. Where does this matrix send the basis vector <var>&#309; = (0, 1)</var>?',
+      options: [
+        { label: '(&minus;1, 0) &mdash; the second column is exactly the image of &#309;.', correct: true },
+        { label: '(0, 1) &mdash; &#309; never moves under any matrix.', correct: false },
+        { label: '(1, 0) &mdash; the first column is always the image of &#309;.', correct: false }
+      ],
+      explanation: 'Column one is where the map sends î; column two is where it sends ĵ. This matrix is the Rotate 90° preset from the gallery: î → (0, 1) and ĵ → (−1, 0).'
+    },
+    {
+      id: 'transformations-origin-fixed',
+      kind: 'choice',
+      prompt: 'Why can a linear transformation never include a translation (sliding every point sideways by a fixed amount)?',
+      options: [
+        { label: 'Linearity forces T(0) = 0, and a translation would move the origin, which contradicts that.', correct: true },
+        { label: 'Translations always reverse the orientation of the plane, which linear maps cannot do.', correct: false },
+        { label: 'Translations only make sense in three or more dimensions.', correct: false }
+      ],
+      explanation: 'If a linear map sent the origin to some point q, then T(0·v) would have to equal both q and 0·T(v) = 0 &mdash; a contradiction unless q is zero. Every matrix fixes the origin for exactly this reason.'
+    },
+    {
+      id: 'transformations-det-sign',
+      kind: 'choice',
+      prompt: 'The rotation and reflection presets both preserve lengths and areas, but their determinants have opposite signs. What is the sign difference, and why?',
+      options: [
+        { label: 'Rotation has det = +1 (orientation preserved); reflection has det = −1 (orientation flipped).', correct: true },
+        { label: 'Rotation has det = −1; reflection has det = +1.', correct: false },
+        { label: 'Both have det = 0, since neither one changes area.', correct: false }
+      ],
+      explanation: 'The magnitude of the determinant is the area scale factor, which is 1 for both. The sign is orientation: a reflection turns the plane over, which a rotation never does, so only the reflection’s determinant goes negative.'
+    },
+    {
+      id: 'transformations-collapse',
+      kind: 'choice',
+      prompt: 'You drag the î and ĵ handles in the first demo until they point in exactly the same direction. What happens to the image of the unit square?',
+      options: [
+        { label: 'It flattens into a segment with zero area &mdash; the map has lost a dimension.', correct: true },
+        { label: 'It grows into a larger square.', correct: false },
+        { label: 'Nothing changes, since the handles still point somewhere on the plane.', correct: false }
+      ],
+      explanation: 'When the two columns become parallel, every linear combination of them lands on a single line, so the parallelogram that was the image of the unit square collapses to a segment with no area &mdash; the same rank collapse from span and independence, seen inside a transformation.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

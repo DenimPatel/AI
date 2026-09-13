@@ -151,6 +151,12 @@ series: "linear_algebra"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">8</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>A ratio tells you how far a small error can travel &mdash; but the maps that never amplify it at all are the ones built from length-preserving rotations.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/rotations/' | relative_url }}">Next: Rotations, SO(3) and the exponential map →</a>
@@ -162,7 +168,9 @@ series: "linear_algebra"
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/guide-math.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/linalg-viz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -467,6 +475,51 @@ series: "linear_algebra"
   costCtx = costSetup.ctx;
   Guide.bindSliders([el('nu-n')], function (s) { nExp = parseInt(s.value, 10); drawCost(); });
   drawCost();
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'num-backward-stable',
+      kind: 'choice',
+      prompt: 'A "backward stable" algorithm solves <var>Ax = b</var>. What does that guarantee, and what does it NOT guarantee?',
+      options: [
+        { label: 'It keeps the extra error it introduces at the level of rounding, but the forward error can still be large if κ(A) itself is large — that floor is a property of the problem, not the algorithm.', correct: true },
+        { label: 'It guarantees the computed x is close to the true x no matter how ill-conditioned A is.', correct: false },
+        { label: 'It guarantees κ(A) = 1 for every matrix it is applied to.', correct: false }
+      ],
+      explanation: 'Backward error asks how much you would have to perturb the input to make your computed answer exact for that perturbed input; a stable algorithm keeps that at rounding level regardless of κ(A). Forward error is bounded by backward error times κ(A), so even a perfectly stable algorithm can have a large forward error on an ill-conditioned problem — that error floor is a property of the problem, not the method.'
+    },
+    {
+      id: 'num-normal-danger',
+      kind: 'choice',
+      prompt: 'Why does the page call forming <var>A&#7488;A</var> to solve least squares "the one rearrangement you should never make"?',
+      options: [
+        { label: 'Squaring the matrix squares its condition number, κ(AᵀA) = κ(A)², so a mild loss of digits in A becomes a severe one in AᵀA before you have even solved anything.', correct: true },
+        { label: 'AᵀA is not symmetric, so standard solvers cannot be applied to it at all.', correct: false },
+        { label: 'Forming AᵀA is mathematically incorrect — the normal equations do not actually characterize the least-squares solution.', correct: false }
+      ],
+      explanation: 'κ(AᵀA) = σ_max²/σ_min² = κ(A)². A matrix with κ(A) = 10⁴ — already a four-digit loss — becomes κ(AᵀA) = 10⁸ once squared. QR avoids this entirely by factoring A directly and never forming the product, which is why it is the safe default for least squares.'
+    },
+    {
+      id: 'num-kappa-squared',
+      kind: 'numeric',
+      prompt: 'If a matrix <var>A</var> has condition number <var>&kappa;(A) = 10&#8308;</var>, what is <var>&kappa;(A&#7488;A)</var>, using <var>&kappa;(A&#7488;A) = &kappa;(A)&sup2;</var>?',
+      answer: 100000000,
+      relativeTolerance: 0.001,
+      explanation: 'κ(AᵀA) = (10⁴)² = 10⁸ = 100,000,000. Squaring the matrix squares every singular value, so the ratio σ_max²/σ_min² is the square of the original ratio — a direct numerical illustration of why the normal equations are dangerous.'
+    },
+    {
+      id: 'num-cholesky-svd-ratio',
+      kind: 'numeric',
+      prompt: 'For an n×n dense matrix, Cholesky costs about <var>n&sup3;/3</var> operations and a full SVD costs about <var>12n&sup3;</var>. Using those leading terms, about how many times more expensive is the SVD than Cholesky?',
+      answer: 36,
+      tolerance: 1,
+      explanation: '12n³ divided by n³/3 is 12 × 3 = 36 — matching the text’s claim that "Cholesky is roughly thirty-six times cheaper than a full SVD." That gap is why you reach for Cholesky whenever the matrix is symmetric positive definite and save the SVD for when you specifically need the singular values.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}
