@@ -195,6 +195,12 @@ series: "calculus_in_motion"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">9</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>The theorems gave you exactness; the next part asks how a region's area scales when you deform it, which is the Jacobian determinant.</span>
     <a class="btn btn-secondary" href="{{ '/math/calculus-in-motion/change-of-variables/' | relative_url }}">Next: The Jacobian determinant →</a>
@@ -206,6 +212,8 @@ series: "calculus_in_motion"
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/calc-viz.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -732,6 +740,57 @@ series: "calculus_in_motion"
   setTheorem('greenC');
   draw4();
   draw5();
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'gs-green-statement',
+      kind: 'choice',
+      prompt: "Green's theorem equates the circulation ∮_∂R F·dr around a region's boundary to:",
+      options: [
+        { label: 'The integral of curl F over the region\'s interior.', correct: true },
+        { label: 'The area of the region times the field\'s magnitude at the centre.', correct: false },
+        { label: 'The integral of F itself over the interior.', correct: false }
+      ],
+      explanation: 'That is the whole content of the theorem: a total measured only on the boundary equals a total of a derivative (curl) accumulated over the interior — the two routines the demo computes completely independently and then compares.'
+    },
+    {
+      id: 'gs-orientation',
+      kind: 'choice',
+      prompt: 'Reversing the orientation of the boundary walk (clockwise instead of counter-clockwise) does what to the two sides of Green\'s theorem?',
+      options: [
+        { label: 'Flips the sign of the boundary circulation, but leaves the interior curl integral unchanged.', correct: true },
+        { label: 'Flips the sign of both the boundary and interior totals.', correct: false },
+        { label: 'Changes neither total, since the region itself hasn\'t moved.', correct: false }
+      ],
+      explanation: 'Every step of the walk changes sign when you reverse direction, so ∮F·dr flips. The interior integral only sees the fixed region R, not which way you happened to walk its edge, so it stays put — orientation is a bookkeeping choice on the boundary side alone.'
+    },
+    {
+      id: 'gs-tiling',
+      kind: 'choice',
+      prompt: 'The "tiling" argument that unifies Green\'s, Stokes\' and the divergence theorem into one idea works because, when you cut the interior into small cells:',
+      options: [
+        { label: 'Each interior edge is shared by two cells that traverse it in opposite directions, so their contributions cancel and only the outer boundary survives.', correct: true },
+        { label: 'Every cell\'s boundary integral is exactly zero, so only the curl matters.', correct: false },
+        { label: 'The cells outside the region contribute the interior total.', correct: false }
+      ],
+      explanation: 'That pairwise cancellation is the whole trick: sum each tiny cell\'s own boundary integral (which is its curl or divergence times its area), and everything in the interior cancels except the true outer edge — leaving exactly the boundary total on one side and the accumulated derivative on the other.'
+    },
+    {
+      id: 'gs-ftc-boundary',
+      kind: 'choice',
+      prompt: "In the Fundamental Theorem of Calculus f(b) − f(a) = ∫_a^b f′ dx, viewed as the one-dimensional ancestor of Green's, Stokes' and the divergence theorem, what plays the role of the 'boundary'?",
+      options: [
+        { label: 'The pair of endpoints {a, b}.', correct: true },
+        { label: 'The entire interval [a, b].', correct: false },
+        { label: 'The derivative f′ itself.', correct: false }
+      ],
+      explanation: 'The interval [a, b] is the "interior," where f′ is accumulated by the integral; its zero-dimensional boundary is just the two endpoints, and f(b) − f(a) is the total measured there — exactly the pattern each higher-dimensional theorem repeats.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

@@ -181,6 +181,12 @@ series: "calculus_in_motion"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">9</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>Flat state spaces are not the whole story: a rotation, a sphere or a set of poses is curved, and the Euler step has to be replaced by one that respects the surface.</span>
     <a class="btn btn-secondary" href="{{ '/math/calculus-in-motion/manifolds/' | relative_url }}">Next: Calculus on manifolds →</a>
@@ -192,6 +198,8 @@ series: "calculus_in_motion"
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/calc-viz.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -591,6 +599,48 @@ series: "calculus_in_motion"
 
   // Button/drag-only demo: paint it once (slider demos already painted).
   draw1();
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'odes-rk4-halving',
+      kind: 'numeric',
+      prompt: 'RK4 has global error O(h⁴). If you halve the step size h, by what factor does the error shrink (roughly)?',
+      answer: 16,
+      tolerance: 0.5,
+      explanation: 'Halving h means (h/2)⁴ = h⁴/16, so a fourth-order method\'s error shrinks by a factor of 16 — much faster than Euler\'s first-order O(h), which only halves.'
+    },
+    {
+      id: 'odes-unicycle-radius',
+      kind: 'numeric',
+      prompt: 'The unicycle kinematics are x′ = v cos θ, y′ = v sin θ, θ′ = ω. With the demo\'s default v = 1.2 m/s and ω = 0.5 rad/s, what is the turning radius R = v/ω, in metres?',
+      answer: 2.4,
+      tolerance: 0.02,
+      explanation: '1.2 / 0.5 = 2.4 m. Whenever ω ≠ 0 the robot traces a circle of exactly this radius — drive forward while turning at a constant rate and you get a constant-radius arc.'
+    },
+    {
+      id: 'odes-pendulum-period',
+      kind: 'numeric',
+      prompt: 'The pendulum demo uses g/L = 9.81 (equivalently L = 1 m with g = 9.81 m/s²). Using the small-angle period formula T = 2π/√(g/L), what is T in seconds (3 dp)?',
+      answer: 2.006,
+      tolerance: 0.01,
+      explanation: 'T = 2π/√9.81 ≈ 6.2832/3.1321 ≈ 2.006 s. That is only the small-swing approximation; the demo shows the measured period growing above this value as θ₀ increases, because sin θ saturates below θ and the restoring force weakens.'
+    },
+    {
+      id: 'odes-hopf-stable',
+      kind: 'choice',
+      prompt: 'In the stability demo (Hopf normal form), the Jacobian at the origin has eigenvalues μ ± i. For μ slightly negative, the equilibrium is:',
+      options: [
+        { label: 'A stable focus — nearby trajectories spiral into it.', correct: true },
+        { label: 'An unstable focus — nearby trajectories spiral away.', correct: false },
+        { label: 'A saddle — stable along one direction, unstable along another.', correct: false }
+      ],
+      explanation: 'All eigenvalues having negative real part means every perturbation decays, and complex eigenvalues (the ±i part) mean it decays while spiralling rather than moving straight in — exactly the "stable focus" case the linearisation test predicts.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

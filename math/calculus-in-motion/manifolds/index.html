@@ -162,6 +162,12 @@ series: "calculus_in_motion"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">9</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>The surface is now differentiable. The next part optimises over entire curves rather than single points — the last piece of the volume.</span>
     <a class="btn btn-secondary" href="{{ '/math/calculus-in-motion/variations/' | relative_url }}">Next: Calculus of variations &amp; optimal control →</a>
@@ -173,6 +179,8 @@ series: "calculus_in_motion"
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/calc-viz.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -672,6 +680,57 @@ series: "calculus_in_motion"
 
   // Demo 1 has no slider, so paint it once itself.
   draw1();
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'mf-riemannian-gradient',
+      kind: 'choice',
+      prompt: 'On the sphere, the Riemannian gradient ∇_M f(p) is obtained from the ambient gradient ∇f(p) by:',
+      options: [
+        { label: 'Subtracting its component along the normal direction p, leaving only the tangential part.', correct: true },
+        { label: 'Rotating it 90 degrees within the tangent plane.', correct: false },
+        { label: 'Dividing it by its own length so it always has length 1.', correct: false }
+      ],
+      explanation: '∇_M f(p) = ∇f(p) − (∇f(p)·p) p removes exactly the part of the ambient gradient that points off the surface. What is left lies in the tangent plane and is the only direction you are legally allowed to move in while staying on the manifold.'
+    },
+    {
+      id: 'mf-so3-noncommute',
+      kind: 'choice',
+      prompt: 'In SO(2), R(α)R(β) = R(α+β) always holds — rotation angles simply add. In SO(3), the analogous statement R_x(α)R_y(β) = R_y(β)R_x(α):',
+      options: [
+        { label: 'Is generally false — 3D rotations about different axes do not commute.', correct: true },
+        { label: 'Is always true, just like in SO(2).', correct: false },
+        { label: 'Is true only when α = β.', correct: false }
+      ],
+      explanation: 'The page demonstrates this directly: composing a rotation about x then y gives a different pose than y then x, with the leftover difference coming from the commutator of the two generators. This is exactly why rotation parameters can\'t simply be added like plain numbers.'
+    },
+    {
+      id: 'mf-retraction-order',
+      kind: 'choice',
+      prompt: 'A retraction such as add-and-renormalise, R_p(v) = (p+v)/|p+v|, agrees with the true exponential map exp_p(v):',
+      options: [
+        { label: 'To first order only — the two diverge at higher order, growing like h³/3 in geodesic distance for step size h.', correct: true },
+        { label: 'Exactly, for any step size.', correct: false },
+        { label: 'Only when v has zero length.', correct: false }
+      ],
+      explanation: 'The page states this precisely: R_p(v) lands on the same geodesic as exp_p, but at angle arctan|v| instead of |v| — identical when |v| is small, but the gap between arctan h and h grows as h³/3, which is exactly the drift the loop demo accumulates over many steps.'
+    },
+    {
+      id: 'mf-why-no-averaging',
+      kind: 'choice',
+      prompt: 'Why can\'t you average two rotations, or add two rotation vectors, the way you\'d average two points in flat space?',
+      options: [
+        { label: 'The space of rotations is curved — a manifold, not a vector space — so legal composition is matrix multiplication in the group, and perturbations must live in the tangent space.', correct: true },
+        { label: 'Rotation matrices are not invertible in general.', correct: false },
+        { label: 'Averaging is fine for rotations; only translations require special handling.', correct: false }
+      ],
+      explanation: 'SO(3) has no addition operation of its own — only composition (matrix multiplication) and, locally, the tangent-space perturbation via the exponential map or a retraction. Treating rotation parameters as ordinary vectors to be added is exactly the mistake this whole page is built to prevent.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

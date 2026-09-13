@@ -195,6 +195,12 @@ series: "calculus_in_motion"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">10</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/3 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>With the identities in hand, the next part assembles them into an algorithm: run a small graph forward, then fill gradients in backwards.</span>
     <a class="btn btn-secondary" href="{{ '/math/calculus-in-motion/backprop/' | relative_url }}">Next: Backpropagation is the chain rule →</a>
@@ -207,6 +213,8 @@ series: "calculus_in_motion"
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/calc-viz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/guide-math.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -724,6 +732,43 @@ series: "calculus_in_motion"
     });
   });
   draw5();
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'mc-denominator-layout',
+      kind: 'choice',
+      prompt: 'PyTorch\'s .backward() hands back a gradient shaped exactly like the tensor you differentiated against — ∂L/∂W has the same shape as W. This matches which convention?',
+      options: [
+        { label: 'Denominator layout.', correct: true },
+        { label: 'Numerator layout.', correct: false },
+        { label: 'Neither — the shapes are unrelated to a layout convention.', correct: false }
+      ],
+      explanation: 'The page explains this directly: a weight update W ← W − η·∂L/∂W only type-checks if ∂L/∂W has the same shape as W, which is exactly what denominator layout guarantees.'
+    },
+    {
+      id: 'mc-quadratic-gradient',
+      kind: 'numeric',
+      prompt: 'Using the identity ∇_x(xᵀAx) = (A + Aᵀ)x, for A = [[1, 2], [3, 4]] and x = [1, 1], what is the first component of (A + Aᵀ)x?',
+      answer: 7,
+      tolerance: 0.01,
+      explanation: 'A + Aᵀ = [[2, 5], [5, 8]]. Multiplying by x = [1, 1] gives [2+5, 5+8] = [7, 13], so the first component is 7.'
+    },
+    {
+      id: 'mc-outer-product-shape',
+      kind: 'choice',
+      prompt: 'The chain-rule step ∂L/∂W = (∂L/∂a)xᵀ is an outer product. If ∂L/∂a is a column of length 3 (hidden units) and x is a column of length 4 (inputs), what shape is ∂L/∂W?',
+      options: [
+        { label: '3×4', correct: true },
+        { label: '4×3', correct: false },
+        { label: '3×3', correct: false }
+      ],
+      explanation: 'An outer product of a length-m column and a length-n column produces an m×n matrix — here 3×4 — which matches the shape of W in a = Wx + b (3 hidden units, 4 inputs).'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}

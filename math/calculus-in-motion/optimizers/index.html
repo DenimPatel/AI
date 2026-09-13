@@ -184,6 +184,12 @@ series: "calculus_in_motion"
     </ul>
   </section>
 
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">10</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
   <div class="g-next">
     <span>With curvature understood, the next part asks where the numbers come from: what calculus has to say about probability.</span>
     <a class="btn btn-secondary" href="{{ '/math/calculus-in-motion/probability/' | relative_url }}">Next: Calculus of probability →</a>
@@ -196,6 +202,8 @@ series: "calculus_in_motion"
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/calc-viz.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/guide-math.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
 {% raw %}
 <script>
 (function () {
@@ -581,6 +589,48 @@ series: "calculus_in_motion"
     el('t-k1').textContent = kit; el('t-k2').textContent = kit; el('t-k3').textContent = kit;
   }
   Guide.bindSliders([newtonK], drawNewton);
+
+  // ------------------------------------------------------------------
+  // Check your understanding
+  // ------------------------------------------------------------------
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'opt-condition-rate',
+      kind: 'numeric',
+      prompt: 'For condition number κ = 20 (the race demo\'s default), what is the best fixed-step contraction ratio r = (κ − 1)/(κ + 1)?',
+      answer: 0.9048,
+      tolerance: 0.001,
+      explanation: '(20 − 1)/(20 + 1) = 19/21 ≈ 0.9048. The closer r is to 1, the slower the crawl toward the minimum — this is the number that sets how many iterations gradient descent needs at its best fixed step.'
+    },
+    {
+      id: 'opt-best-eta',
+      kind: 'numeric',
+      prompt: 'The step-size demo fixes the spectrum at λ_max = 10, λ_min = 1. What is the best fixed learning rate η* = 2/(λ_max + λ_min)?',
+      answer: 0.1818,
+      tolerance: 0.001,
+      explanation: '2/(10 + 1) = 2/11 ≈ 0.1818. This is the rate that makes both eigendirections decay by the same ratio (κ−1)/(κ+1) per step — biased toward neither the fast nor the slow mode.'
+    },
+    {
+      id: 'opt-newton-iterations',
+      kind: 'choice',
+      prompt: 'On a quadratic surface, how many iterations does Newton\'s method need to reach the exact minimum, regardless of the condition number κ?',
+      options: [
+        { label: 'One.', correct: true },
+        { label: 'log(κ), like a well-tuned gradient method.', correct: false },
+        { label: 'κ iterations — it still depends on the conditioning.', correct: false }
+      ],
+      explanation: 'Because the quadratic model is exact on a quadratic surface, solving Hp = −g and taking that single Newton step lands exactly on the minimum, with no dependence on κ at all — the trade is that each step costs an O(n³) solve.'
+    },
+    {
+      id: 'opt-stability-threshold',
+      kind: 'numeric',
+      prompt: 'Stability of gradient descent requires the step η < 2/λ_max. For λ_max = 10 (the step-size demo\'s fixed value), what is that stability threshold?',
+      answer: 0.2,
+      tolerance: 0.001,
+      explanation: '2/10 = 0.2. Push η past this value and the steep eigendirection\'s contraction factor |1 − ηλ_max| exceeds 1 in magnitude, so that coordinate grows every step instead of shrinking — the demo\'s "diverges" verdict.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
 })();
 </script>
 {% endraw %}
