@@ -275,7 +275,10 @@ series: "llm_serving"
         ]
       };
     }
-    var rows = [row('B = 1', 1), row('B = ' + v.batch, v.batch), row('B = 256', 256)];
+    // The middle row tracks the slider; drop it when it would duplicate a reference row.
+    var rows = [row('B = 1', 1)];
+    if (v.batch !== 1 && v.batch !== 256) rows.push(row('B = ' + v.batch, v.batch));
+    rows.push(row('B = 256', 256));
     Guide.drawStacked(setupA.ctx, 640, 360, rows, {
       padL: 74, padR: 18, padT: 22, padB: 40, gap: 18,
       showSegmentLabels: true, axisLabel: 'bytes read per decode step — weights + KV (shared linear scale)'
@@ -295,7 +298,9 @@ series: "llm_serving"
     el('budget-readout').innerHTML =
       '<div><span class="k">bytes / step @ B=' + v.batch + '</span> <span class="hi">' + Guide.fmtBytes(tot) + '</span></div>' +
       '<div><span class="k">weights</span> ' + Guide.fmtBytes(tw) + ' (' + wpct.toFixed(1) + '%) &nbsp; <span class="k">KV</span> ' + Guide.fmtBytes(tk) + ' (' + kpct.toFixed(1) + '%)</div>' +
-      '<div><span class="k">aggregate tokens/s</span> B=1: <span class="hi">' + t1.toFixed(1) + '</span> &nbsp; B=' + v.batch + ': <span class="hi">' + tc.toFixed(0) + '</span> &nbsp; B=256: <span class="hi">' + t256.toFixed(0) + '</span></div>' +
+      '<div><span class="k">aggregate tokens/s</span> B=1: <span class="hi">' + t1.toFixed(1) + '</span>' +
+        (v.batch === 1 || v.batch === 256 ? '' : ' &nbsp; B=' + v.batch + ': <span class="hi">' + tc.toFixed(1) + '</span>') +
+        ' &nbsp; B=256: <span class="hi">' + t256.toFixed(1) + '</span></div>' +
       '<div><span class="k">per-sequence tokens/s @ B=' + v.batch + '</span> ' + (tc / v.batch).toFixed(2) + '</div>';
 
     var ai = 2 * v.batch / v.bpp;

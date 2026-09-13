@@ -73,7 +73,10 @@ series: "llm_serving"
         <div class="bt-gantt-title">Continuous / iteration-level batching</div>
         <div class="g-canvas-wrap" style="max-width:none;"><canvas id="gantt-cont" width="640" height="170"></canvas></div>
       </div>
-      <table class="bt-table" id="pol-table"></table>
+      <!-- max-width:100% is load-bearing: as a flex item this wrapper's automatic minimum
+           size would otherwise be the table's min-content width and push the whole demo
+           (all three Gantt canvases included) past a narrow viewport. -->
+      <div style="overflow-x:auto; min-width:0; max-width:100%;"><table class="bt-table" id="pol-table"></table></div>
     </div>
 
     <div class="g-goal">💡 <span><b>Read the three axes.</b> Grey is queued, blue is prefill, the darker band is decode. Utilisation is the fraction of the run in which at least one sequence was computing; throughput is finished output tokens per second over the whole run; p99 e2e is the worst-request latency.</span></div>
@@ -155,6 +158,7 @@ series: "llm_serving"
 
   <section class="g-step">
     <h2>Cheat sheet</h2>
+    <div style="overflow-x:auto;">
     <table class="g-cheat">
       <thead><tr><th>Policy / knob</th><th>What it does</th><th>Cost</th></tr></thead>
       <tbody>
@@ -168,6 +172,7 @@ series: "llm_serving"
         <tr><td><code>max_num_batched_tokens</code></td><td>Per-iteration token budget</td><td>Prompt latency down, ITL up</td></tr>
       </tbody>
     </table>
+    </div>
   </section>
 
   <section class="g-step">
