@@ -124,6 +124,30 @@ parts:
     short: "Part 18"
     permalink: /math/linear-algebra/pseudoinverse/
     blurb: "One widget for every shape of Ax = b: unique, least-squares, least-norm, and the big picture that unifies them."
+  - num: 19
+    act: applied
+    title: "Conditioning, stability, and cost"
+    short: "Part 19"
+    permalink: /math/linear-algebra/numerics/
+    blurb: "Why a tiny change in b can move x a long way, and what each decomposition costs."
+  - num: 20
+    act: applied
+    title: "Rotations, SO(3) and the exponential map"
+    short: "Part 20"
+    permalink: /math/linear-algebra/rotations/
+    blurb: "Rotations as matrices, angle-axis and the exponential map, gimbal lock, and why quaternions exist."
+  - num: 21
+    act: applied
+    title: "Jacobians, Hessians and Gauss–Newton"
+    short: "Part 21"
+    permalink: /math/linear-algebra/optimization/
+    blurb: "Jacobians, Hessians and the Gauss–Newton step, with the sparsity pattern that makes pose graphs tractable."
+  - num: 22
+    act: applied
+    title: "Linear algebra in ML and AI"
+    short: "Part 22"
+    permalink: /math/linear-algebra/ml-ai/
+    blurb: "Attention as three matrices, and a low-rank update to a weight matrix — the linear algebra a transformer runs on."
 appendix:
   - title: "Glossary and identities to know"
     short: "Reference"
