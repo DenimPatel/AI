@@ -204,7 +204,8 @@ SERIES_NAME_HINTS = {
   # deliberately disjoint: only the full volume titles match. "N-part calculus"
   # on its own is intentionally left unpoliced rather than mis-attributed.
   'calculus' => /calculus,\s*interactively/i,
-  'calculus_in_motion' => /calculus\s+in\s+motion/i
+  'calculus_in_motion' => /calculus\s+in\s+motion/i,
+  'statistics' => /statistics,\s*interactively/i
 }.freeze
 
 Find.find('.') do |path|

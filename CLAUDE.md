@@ -9,10 +9,12 @@ framework, no npm, no build step beyond Jekyll. There are no automated tests, bu
 (`.github/workflows/ci.yml`) runs a build, an internal link check, and a content linter on
 every push and PR — see Commands below. A separate monthly job checks external links too.
 
-Content is roughly 250,000 words across ~60 pages, and the great majority of it is five
+Content is roughly 250,000 words across ~60 pages, and the great majority of it is eight
 long interactive guides made of hand-written `<canvas>` and vanilla JS. Treat those guide
 pages as the crown jewels: they are fragile, they are not covered by any test, and a change
-you cannot see rendered is a change you cannot verify.
+you cannot see rendered is a change you cannot verify. The statistics guide's numerics have
+a self-check (`scripts/check-stats-viz.js`) and every guide page can be smoke-tested in a
+real browser (`scripts/smoke-guides.js`) — use them.
 
 ## Commands
 
@@ -33,6 +35,15 @@ bundle exec htmlproofer _site --disable-external --swap-urls '^/AI:' \
 # counters, series permalink round-trips, bare hrefs, {% raw %} leaks, redirect_from
 # coverage of series `legacy` URLs).
 ruby scripts/lint-content.rb
+
+# numerics self-check for the statistics domain layer (no test framework in the repo;
+# asserts known CDF/quantile/test/Kalman values against assets/js/stats-viz.js)
+node scripts/check-stats-viz.js
+
+# rendered-page smoke test: loads built guide pages from _site in a real browser,
+# fails on console/page errors and blank canvases. Local dev aid, NOT in CI. Pass a
+# path prefix to scope it, e.g. `node scripts/smoke-guides.js math/statistics`.
+node scripts/smoke-guides.js
 ```
 
 CI (`.github/workflows/ci.yml`) runs all three of the above on every push and PR — this is
@@ -78,7 +89,8 @@ the prev/next block, the hub card grid, and the homepage counter all follow auto
    `section-hub.html` or `series-hub.html`. Normal Jekyll.
 2. **Standalone interactive guides** (`ai/llm-training/*/index.html`,
    `vision/{multi-view-geometry,nonlinear-optimization}/*/index.html`,
-   `math/linear-algebra/*/index.html`). These have **no
+   `math/{linear-algebra,calculus,calculus-in-motion,statistics}/*/index.html`). These have
+   **no
    `layout:`** — each is a complete `<!DOCTYPE html>` document with its own `<head>` and its
    own page-specific `<style>` block. They pull in shared chrome explicitly:
    ```liquid
@@ -181,6 +193,38 @@ eigen) and a reusable 2D cartesian `plane` widget that most of its demos are bui
 The same split rule applies — generic primitives to the kit, domain-shaped code to the
 series file. `LinAlg.mat.svd` is one-sided Jacobi, not `eig(AᵀA)`, because the latter
 squares the condition number and Part 19 deliberately constructs near-singular matrices.
+
+The Statistics series (`_data/series/statistics.yml`, `/math/statistics/`, 32 parts plus a
+`glossary` appendix) is the guide kit's **third real consumer**, and the first to reuse
+another series' domain layer. It adds one small generic helper to `guide-core.js` —
+`Guide.niceTicks(min, max, target)`, the standard 1/2/5×10ᵏ nice-number tick algorithm that
+`drawLines` should have had; `Stats.plot.axes` is its first consumer. Everything else
+domain-shaped lives in `assets/js/stats-viz.js` (`window.Stats`): the special functions the
+repo otherwise lacks (`erf`/`erfinv`, `lgamma`/`lbeta`, regularized incomplete beta/gamma,
+without which no exact t/χ²/F tail area is possible), seeded samplers and `{pdf,cdf,quantile,
+mean,var}` for every distribution the series draws from, summary statistics, `chol`,
+estimators (OLS/ridge/lasso/MLE/observed Fisher), resampling (bootstrap/BCa/permutation/
+jackknife), classical tests, Bayesian helpers (conjugate updates, Metropolis, Gibbs, Laplace,
+R-hat), recursive filters (histogram1d, Kalman, EKF, particle), ML and causal metrics, and
+`Stats.plot(canvas, opts)` — a canvas widget modelled directly on `LinAlg.plane`, with the
+same `px/py/wx/wy` mapping and `handles(specsOrFn, onChange)` world-coordinate contract,
+plus `axes` (real numeric ticks), `columns` (vertical histogram) and `ellipse(cov, mean, k)`.
+
+**`assets/js/linalg-viz.js` is loaded by the statistics pages too** (before `stats-viz.js`),
+for `LinAlg.mat.*` (solve/inverse/eigSym/svd/pinv) and for `LinAlg.plane` where a plain 2D
+plane or a live matrix readout is wanted; `LinAlg.plane.ellipse(A)` already draws the image
+of the unit circle under a matrix, so handing it `chol(Σ)·k` is a covariance ellipse for
+free. No file was changed to enable this — it is a genuinely generic matrix library and
+re-implementing LU/QR/SVD inside `stats-viz.js` would be pure duplication — but it does make
+`linalg-viz.js` de facto shared, so treat its public surface as stable.
+
+The series also carries two Node scripts that are *not* wired into CI (Ruby-only):
+`scripts/check-stats-viz.js` asserts known values for the special functions, distribution
+tails, conjugate updates, the scalar Kalman update, OLS, bootstrap/permutation and the
+metrics; `scripts/smoke-guides.js` loads built pages from `_site` in Playwright (resolving a
+browser from the npx cache or installed Chrome), failing on console/page errors and blank
+canvases. Its glossary appendix is a filterable term index plus the distribution table, the
+test-selection table and the estimator/interval card.
 
 `assets/js/guide-quiz.js` (`window.GuideQuiz`) adds a "check your understanding" quiz
 section every `/math/` part page ends with, right before `.g-next`. It is generic — the UI,

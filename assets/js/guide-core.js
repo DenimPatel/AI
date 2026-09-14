@@ -329,6 +329,27 @@
     });
   }
 
+  // "Nice" tick locations for a numeric axis: multiples of 1, 2 or 5 times a
+  // power of ten, spaced so that roughly `target` ticks fall in [min, max].
+  // The standard algorithm `drawLines` should always have had. Returns an array
+  // of values (possibly empty when the range is degenerate or non-finite).
+  function niceTicks(min, max, target) {
+    target = Math.max(1, target || 6);
+    if (!isFinite(min) || !isFinite(max) || max <= min) return [];
+    var raw = (max - min) / target;
+    if (!isFinite(raw) || raw <= 0) return [];
+    var mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    var norm = raw / mag;
+    var step = (norm < 1.5 ? 1 : (norm < 3 ? 2 : (norm < 7 ? 5 : 10))) * mag;
+    var ticks = [];
+    var v = Math.ceil(min / step) * step;
+    for (var i = 0; i < 1000 && v <= max + step * 1e-9; i++) {
+      ticks.push(Math.abs(v) < step * 1e-9 ? 0 : v);
+      v += step;
+    }
+    return ticks;
+  }
+
   // Arrow from (x0,y0) to (x1,y1) with a filled head and an optional label.
   // opts: {color, width=2, head=9, dashed, label, labelColor, labelOffset}.
   function drawArrow(ctx, x0, y0, x1, y1, opts) {
@@ -426,7 +447,7 @@
   global.Guide = {
     css: css, colors: colors, setupCanvas: setupCanvas, hitTest: hitTest,
     drawBars: drawBars, drawLines: drawLines, drawStacked: drawStacked, drawHeatmap: drawHeatmap,
-    drawArrow: drawArrow, dragHandles: dragHandles,
+    drawArrow: drawArrow, dragHandles: dragHandles, niceTicks: niceTicks,
     softmax: softmax, seededRandom: seededRandom,
     fmtBytes: fmtBytes, fmtNum: fmtNum, fmtMs: fmtMs,
     loop: loop, bindSliders: bindSliders
