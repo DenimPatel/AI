@@ -9,7 +9,7 @@ framework, no npm, no build step beyond Jekyll. There are no automated tests, bu
 (`.github/workflows/ci.yml`) runs a build, an internal link check, and a content linter on
 every push and PR — see Commands below. A separate monthly job checks external links too.
 
-Content is roughly 250,000 words across ~60 pages, and the great majority of it is eight
+Content is roughly 250,000 words across ~60 pages, and the great majority of it is ten
 long interactive guides made of hand-written `<canvas>` and vanilla JS. Treat those guide
 pages as the crown jewels: they are fragile, they are not covered by any test, and a change
 you cannot see rendered is a change you cannot verify. The statistics guide's numerics have
@@ -89,8 +89,8 @@ the prev/next block, the hub card grid, and the homepage counter all follow auto
    `section-hub.html` or `series-hub.html`. Normal Jekyll.
 2. **Standalone interactive guides** (`ai/llm-training/*/index.html`,
    `vision/{multi-view-geometry,nonlinear-optimization}/*/index.html`,
-   `math/{linear-algebra,calculus,calculus-in-motion,statistics}/*/index.html`). These have
-   **no
+   `math/{linear-algebra,calculus,calculus-in-motion,probability,probability-in-action,statistics}/*/index.html`).
+   These have **no
    `layout:`** — each is a complete `<!DOCTYPE html>` document with its own `<head>` and its
    own page-specific `<style>` block. They pull in shared chrome explicitly:
    ```liquid
@@ -194,9 +194,17 @@ The same split rule applies — generic primitives to the kit, domain-shaped cod
 series file. `LinAlg.mat.svd` is one-sided Jacobi, not `eig(AᵀA)`, because the latter
 squares the condition number and Part 19 deliberately constructs near-singular matrices.
 
+The Probability guides (`_data/series/probability.yml`, `_data/series/probability_in_action.yml`, `/math/probability/` and `/math/probability-in-action/`) are the guide kit's **third real consumer** and its first two-volume series. Both volumes are registered in `_data/sections.yml`; each hub is a `series-hub` page, and each volume groups its parts under `acts:` in its series YAML. They add `assets/js/prob-viz.js` (`window.Prob`) on top of the kit: a seeded RNG and the standard discrete/continuous families, the special functions (`erf`, `erfinv`, `lgamma`, `regIncGamma`, `regIncBeta`, `logChoose`), `Prob.hist`, a multivariate normal with marginal/conditional extraction and covariance ellipses, Markov chains, entropy/KL/mutual-information measures, the histogram/Kalman/EKF/particle filters, and Metropolis/Gibbs/HMC. Kit-side they add exactly three generic helpers to `guide-core.js` (`Guide.fmtPct`, `Guide.gaussianFrom` — a seeded Box–Muller over a `seededRandom` stream — and `Guide.drawColumns`, the vertical counterpart to `drawBars`) and `.g-legend`/`.g-legend-item`/`.g-swatch` to `guide.css`.
+
+`Prob.plot` is deliberately **not** `LinAlg.plane`. The plane widget captures `xRange`/`yRange` at construction with no setter, and probability demos rescale constantly — a σ slider changes the pdf's height, a bin-width slider changes a histogram's range. `Prob.plot` keeps the same method vocabulary (`clear`, `axes`, `grid`, `curve`, `bars`, `points`, `vline`, `handles`) and adds `setRange`, `area` (tail and interval shading) and `steps` (CDF staircases). Every stochastic demo draws through `Prob.rng` (which wraps `Guide.seededRandom`), never `Math.random()`; `GuideMath.gaussianNoise` is intentionally unused for sampling because it cannot be seeded.
+
 The Statistics series (`_data/series/statistics.yml`, `/math/statistics/`, 32 parts plus a
-`glossary` appendix) is the guide kit's **third real consumer**, and the first to reuse
-another series' domain layer. It adds one small generic helper to `guide-core.js` —
+`glossary` appendix) is the guide kit's **fourth real consumer**, and the first to reuse
+another series' domain layer. It builds on the Probability volumes' prerequisites without
+linking into them page-by-page (nothing in the series links to a Probability URL that did
+not yet exist when it was authored), and now that both volumes ship in the same site the hub
+pages cross-link at the `/math/` and `/math/statistics/` level. It adds one small generic
+helper to `guide-core.js` —
 `Guide.niceTicks(min, max, target)`, the standard 1/2/5×10ᵏ nice-number tick algorithm that
 `drawLines` should have had; `Stats.plot.axes` is its first consumer. Everything else
 domain-shaped lives in `assets/js/stats-viz.js` (`window.Stats`): the special functions the
