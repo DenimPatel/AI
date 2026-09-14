@@ -4,7 +4,8 @@ A Jekyll site published by GitHub Pages at https://denimpatel.github.io/AI/. It'
 record of the AI field (timeline, product releases, benchmarks, labs, quotes, key papers),
 two long interactive guides on multi-view geometry and nonlinear optimization, a 15-part
 interactive guide on how a language model is trained, a 20-part guide on serving it at
-scale, and a set of field notes on ROS and robot navigation.
+scale, two interactive probability volumes (`/math/probability/` and
+`/math/probability-in-action/`), and a set of field notes on ROS and robot navigation.
 
 No JavaScript framework, no npm, no build step beyond Jekyll.
 
