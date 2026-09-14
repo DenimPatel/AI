@@ -200,11 +200,16 @@ SERIES_NAME_HINTS = {
   'multi_view_geometry' => /multi[\s-]*view[\s-]*geometry/i,
   'nonlinear_optimization' => /nonlinear[\s-]*optimization/i,
   'linear_algebra' => /linear[\s-]*algebra/i,
+  # The two probability volumes share the word "probability", so their hints
+  # are deliberately disjoint: only the full volume titles match.
+  'probability' => /probability,\s*interactively/i,
+  'probability_in_action' => /probability\s+in\s+action/i,
   # The two calculus series share the word "calculus", so their hints are
   # deliberately disjoint: only the full volume titles match. "N-part calculus"
   # on its own is intentionally left unpoliced rather than mis-attributed.
   'calculus' => /calculus,\s*interactively/i,
-  'calculus_in_motion' => /calculus\s+in\s+motion/i
+  'calculus_in_motion' => /calculus\s+in\s+motion/i,
+  'statistics' => /statistics,\s*interactively/i
 }.freeze
 
 Find.find('.') do |path|

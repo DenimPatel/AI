@@ -99,6 +99,19 @@
     return n.toFixed(digits).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
 
+  // Fraction -> percent string: fmtPct(0.952, 1) === "95.2%".
+  function fmtPct(x, digits) {
+    digits = digits == null ? 0 : digits;
+    return (x * 100).toFixed(digits) + '%';
+  }
+
+  // One standard normal drawn from a *seeded* stream (Box–Muller). The seeded
+  // counterpart to GuideMath.gaussianNoise, which calls Math.random().
+  function gaussianFrom(rng) {
+    var u = Math.max(rng(), 1e-9), v = rng();
+    return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+  }
+
   function fmtMs(ms) {
     if (ms == null) return '—';
     if (ms < 1) return (ms * 1000).toFixed(0) + ' µs';
@@ -262,6 +275,46 @@
     return { px: px, py: py, padL: padL, padT: padT, plotW: plotW, plotH: plotH };
   }
 
+  // Vertical bar / histogram chart (drawBars is horizontal only). data is either
+  // [{x, y}] with x a bucket centre, or [{x0, x1, y}] with explicit edges.
+  // Returns the same mapper bundle as drawLines so a caller can overlay a curve.
+  function drawColumns(ctx, W, H, data, opts) {
+    opts = opts || {};
+    var c = colors();
+    ctx.clearRect(0, 0, W, H);
+    data = data || [];
+    var padL = opts.padL != null ? opts.padL : 44, padR = opts.padR != null ? opts.padR : 16;
+    var padT = opts.padT != null ? opts.padT : 12, padB = opts.padB != null ? opts.padB : 28;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+    var xs = [], ys = [0];
+    data.forEach(function (d) {
+      if (d.x0 != null) { xs.push(d.x0); xs.push(d.x1); } else { xs.push(d.x); }
+      ys.push(d.y);
+    });
+    if (!xs.length) xs = [0, 1];
+    var xRange = opts.xRange || [Math.min.apply(null, xs), Math.max.apply(null, xs)];
+    if (xRange[0] === xRange[1]) xRange = [xRange[0] - 0.5, xRange[0] + 0.5];
+    var yRange = opts.yRange || [opts.minY != null ? opts.minY : Math.min(0, Math.min.apply(null, ys)),
+      opts.maxY != null ? opts.maxY : Math.max.apply(null, ys) || 1];
+    if (yRange[0] === yRange[1]) yRange = [0, yRange[0] || 1];
+    function px(x) { return padL + plotW * (x - xRange[0]) / (xRange[1] - xRange[0]); }
+    function py(y) { return padT + plotH * (1 - (y - yRange[0]) / (yRange[1] - yRange[0])); }
+    var baseY = py(0);
+    var autoW = (xRange[1] - xRange[0]) / Math.max(1, data.length);
+    data.forEach(function (d) {
+      var x0, x1;
+      if (d.x0 != null) { x0 = px(d.x0); x1 = px(d.x1); }
+      else { var half = px(xRange[0] + autoW / 2) - px(xRange[0]); x0 = px(d.x) - half; x1 = px(d.x) + half; }
+      var y1 = py(d.y);
+      ctx.fillStyle = d.color || opts.color || c.accent;
+      ctx.fillRect(x0, Math.min(baseY, y1), Math.max(1, x1 - x0), Math.max(1, Math.abs(baseY - y1)));
+    });
+    ctx.strokeStyle = c.divider; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(padL, baseY); ctx.lineTo(padL + plotW, baseY); ctx.stroke();
+    if (opts.xLabel) { ctx.fillStyle = c.text; ctx.font = '11px ' + c.font; ctx.textAlign = 'center'; ctx.fillText(opts.xLabel, padL + plotW / 2, H - 4); }
+    return { px: px, py: py, padL: padL, padT: padT, plotW: plotW, plotH: plotH };
+  }
+
   // requestAnimationFrame-driven loop with a play/pause button.
   // opts: { onStep(dt), button: <el>, interval: ms-between-steps (default: every frame) }
   // Returns { start, stop, toggle, running }.
@@ -327,6 +380,27 @@
       el.addEventListener('input', sync);
       sync();
     });
+  }
+
+  // "Nice" tick locations for a numeric axis: multiples of 1, 2 or 5 times a
+  // power of ten, spaced so that roughly `target` ticks fall in [min, max].
+  // The standard algorithm `drawLines` should always have had. Returns an array
+  // of values (possibly empty when the range is degenerate or non-finite).
+  function niceTicks(min, max, target) {
+    target = Math.max(1, target || 6);
+    if (!isFinite(min) || !isFinite(max) || max <= min) return [];
+    var raw = (max - min) / target;
+    if (!isFinite(raw) || raw <= 0) return [];
+    var mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    var norm = raw / mag;
+    var step = (norm < 1.5 ? 1 : (norm < 3 ? 2 : (norm < 7 ? 5 : 10))) * mag;
+    var ticks = [];
+    var v = Math.ceil(min / step) * step;
+    for (var i = 0; i < 1000 && v <= max + step * 1e-9; i++) {
+      ticks.push(Math.abs(v) < step * 1e-9 ? 0 : v);
+      v += step;
+    }
+    return ticks;
   }
 
   // Arrow from (x0,y0) to (x1,y1) with a filled head and an optional label.
@@ -425,10 +499,10 @@
 
   global.Guide = {
     css: css, colors: colors, setupCanvas: setupCanvas, hitTest: hitTest,
-    drawBars: drawBars, drawLines: drawLines, drawStacked: drawStacked, drawHeatmap: drawHeatmap,
-    drawArrow: drawArrow, dragHandles: dragHandles,
-    softmax: softmax, seededRandom: seededRandom,
-    fmtBytes: fmtBytes, fmtNum: fmtNum, fmtMs: fmtMs,
+    drawBars: drawBars, drawLines: drawLines, drawColumns: drawColumns, drawStacked: drawStacked, drawHeatmap: drawHeatmap,
+    drawArrow: drawArrow, dragHandles: dragHandles, niceTicks: niceTicks,
+    softmax: softmax, seededRandom: seededRandom, gaussianFrom: gaussianFrom,
+    fmtBytes: fmtBytes, fmtNum: fmtNum, fmtPct: fmtPct, fmtMs: fmtMs,
     loop: loop, bindSliders: bindSliders
   };
 })(window);

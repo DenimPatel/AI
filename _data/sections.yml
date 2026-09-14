@@ -70,8 +70,11 @@
   title: "Math"
   url: /math/
   kicker: "Foundations"
-  blurb: "The machinery every other subject assumes, built from pictures first: a 22-part interactive guide to linear algebra, and two interactive calculus volumes that build single- and multivariable calculus from local linearity up to the gradients, Jacobians, backprop and Lie-group updates the AI, vision and robotics guides consume."
+  blurb: "The machinery every other subject assumes, built from pictures first: a 22-part interactive guide to linear algebra, two interactive calculus volumes that build single- and multivariable calculus from local linearity up to the gradients, Jacobians, backprop and Lie-group updates the AI, vision and robotics guides consume, two interactive probability volumes that go from what a probability means to the filters, samplers and estimators those guides run on, and an interactive guide to statistics that starts at a sample you can redraw and ends at Kalman filters and causal inference."
   series:
     - linear_algebra
     - calculus
     - calculus_in_motion
+    - probability
+    - probability_in_action
+    - statistics
