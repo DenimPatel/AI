@@ -51,7 +51,9 @@ redirect_from:
   }
   .mvg-demo {
     display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;
-    background: var(--color-surface); border-radius: var(--radius-md); padding: 18px;
+    background: var(--glass-bg-strong); border: 1px solid var(--glass-border);
+    backdrop-filter: blur(14px) saturate(150%); -webkit-backdrop-filter: blur(14px) saturate(150%);
+    box-shadow: var(--glass-shadow); border-radius: var(--radius-md); padding: 18px;
     margin-top: 8px;
   }
   .mvg-canvas-wrap { flex: 1 1 380px; min-width: 280px; }
