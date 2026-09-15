@@ -6,6 +6,17 @@ When the series declares an `acts:` list, the pills are grouped under act labels
 (presentational only: `num` is still the single source of part numbers, and
 series-prevnext.html still walks parts + appendix in flat order).
 {%- endcomment -%}
+{%- assign current_part = nil -%}
+{%- for part in include.series.parts -%}
+{%- if page.url == part.permalink or page.permalink == part.permalink -%}
+{%- assign current_part = part -%}
+{%- endif -%}
+{%- endfor -%}
+{%- for extra in include.series.appendix -%}
+{%- if page.url == extra.permalink or page.permalink == extra.permalink -%}
+{%- assign current_part = extra -%}
+{%- endif -%}
+{%- endfor -%}
 <nav class="nav nav--series" aria-label="{{ include.series.title }} parts">
   <a href="{{ include.series.hub | relative_url }}"{% if page.url == include.series.hub %} aria-current="page"{% endif %}>Contents</a>
   {%- if include.series.acts -%}
@@ -31,3 +42,27 @@ series-prevnext.html still walks parts + appendix in flat order).
   {%- endfor %}
   {%- endif %}
 </nav>
+{%- if current_part %}
+<div class="nav-compact" id="series-nav-compact" aria-hidden="true">
+  <span class="nav-compact-series">{{ include.series.title }}</span>
+  <span class="nav-compact-sep">&middot;</span>
+  <span class="nav-compact-part">{{ current_part.short }}</span>
+</div>
+{%- endif %}
+<script>
+(function () {
+  var seriesNav = document.querySelector('.nav--series');
+  var current = seriesNav && seriesNav.querySelector('a[aria-current="page"]');
+  if (current) { current.scrollIntoView({ block: 'nearest', inline: 'center' }); }
+
+  var siteNav = document.getElementById('site-nav');
+  var compact = document.getElementById('series-nav-compact');
+  if (!siteNav || !seriesNav || !compact) return;
+  siteNav.classList.add('nav--has-series');
+  var onScroll = function () {
+    compact.classList.toggle('is-visible', seriesNav.getBoundingClientRect().bottom < 0);
+  };
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+})();
+</script>
