@@ -14,7 +14,7 @@
       accent: css('--color-accent') || '#2b5fff',
       accent2: css('--color-accent-2') || '#d6006c',
       accent400: css('--color-accent-400') || '#5d85fd',
-      accent500: css('--color-accent-500') || '#93aefe',
+      accent500: css('--color-accent-500') || '#2b5fff',
       accent700: css('--color-accent-700') || '#0b3cd0',
       text: css('--color-text') || '#201e1d',
       divider: css('--color-divider') || '#ccc',

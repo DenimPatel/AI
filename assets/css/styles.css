@@ -81,7 +81,13 @@
 
 /* — reset & base — */
 *, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; }
+html {
+  -webkit-text-size-adjust: 100%;
+  /* The global nav is a sticky floating pill (see .nav below); without this,
+     jumping to an in-page anchor (e.g. a guide's table of contents) lands the
+     target heading right under the nav, which then covers it. */
+  scroll-padding-top: 90px;
+}
 body {
   margin: 0;
   background: var(--color-bg);
