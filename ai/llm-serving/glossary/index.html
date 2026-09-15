@@ -71,32 +71,32 @@ series: "llm_serving"
     <p class="g-eyebrow">Six expressions that explain most serving behaviour</p>
     <p>Every interactive demo in the series is a version of one of these. Keep them in a notebook; they are accurate to a factor you can reason about, which is the point. Bytes per element is written <span class="glo-num">&beta;</span> and equals 2 for BF16/FP16, 1 for FP8/INT8 and 0.5 for INT4.</p>
     <div class="g-grid2">
-      <div class="g-card glo-formula">
+      <div class="g-card glo-formula reveal">
         <h3>KV bytes</h3>
         <div class="g-math g-katex">$$\text{KV bytes} \;=\; 2\,L\,H_{kv}\,d_{head}\,T\,b\,\beta$$</div>
         <p>L layers, H<sub>kv</sub> KV heads, head width d<sub>head</sub>, T cached tokens, batch b. For MLA replace <span class="glo-num">2 H<sub>kv</sub> d<sub>head</sub></span> with the cached latent width (576 for DeepSeek-V3).</p>
       </div>
-      <div class="g-card glo-formula">
+      <div class="g-card glo-formula reveal">
         <h3>Step time</h3>
         <div class="g-math g-katex">$$T_{\text{step}} \;\approx\; \max\!\left(\frac{P\,b_p + \text{KV}_{\text{read}}}{\text{BW}},\; \frac{\text{FLOPs}}{\text{Peak}}\right) + T_{\text{overhead}}$$</div>
         <p>The max of the memory-bound and compute-bound terms, plus launch and synchronization overhead. Decode at small batch is memory-bound; prefill is compute-bound.</p>
       </div>
-      <div class="g-card glo-formula">
+      <div class="g-card glo-formula reveal">
         <h3>Expected speculative tokens</h3>
         <div class="g-math g-katex">$$\mathbb{E}[\text{tokens}] \;=\; \frac{1-\alpha^{\gamma+1}}{1-\alpha}$$</div>
         <p>Per draft round with acceptance rate &alpha; and &gamma; draft tokens: 1 + &alpha; + &alpha;<sup>2</sup> + &hellip; + &alpha;<sup>&gamma;</sup>. At &alpha;=0.8 and &gamma;=4 the round yields about 3.36 tokens.</p>
       </div>
-      <div class="g-card glo-formula">
+      <div class="g-card glo-formula reveal">
         <h3>Pipeline bubble fraction</h3>
         <div class="g-math g-katex">$$\text{bubble} \;=\; \frac{p-1}{m+p-1}$$</div>
         <p>p pipeline stages and m microbatches. The fraction of stage-time spent idle while the pipe fills and drains; it vanishes only as m grows large.</p>
       </div>
-      <div class="g-card glo-formula">
+      <div class="g-card glo-formula reveal">
         <h3>All-reduce bytes</h3>
         <div class="g-math g-katex">$$\text{bytes/GPU} \;=\; 2\cdot\frac{N-1}{N}\cdot S$$</div>
         <p>Ring all-reduce moving message size S across N ranks. The factor 2 is the reduce-scatter plus all-gather; it is the per-step tax every TP group pays.</p>
       </div>
-      <div class="g-card glo-formula">
+      <div class="g-card glo-formula reveal">
         <h3>Goodput</h3>
         <div class="g-math g-katex">$$G \;=\; \frac{1}{T}\sum_{r} \mathbb{1}\!\left[\text{TTFT}_r \le \text{SLO}_{\text{ttft}} \;\wedge\; \text{TPOT}_r \le \text{SLO}_{\text{tpot}}\right]$$</div>
         <p>Requests per second that satisfy both latency limits. Raw throughput counts work you cannot bill for; goodput counts only the work that met its contract.</p>
@@ -410,7 +410,7 @@ series: "llm_serving"
     </ul>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>This page is a reference. The series itself starts at the decode loop.</span>
     <a class="btn btn-secondary" href="{{ '/ai/llm-serving/decode-loop/' | relative_url }}">Start with Part 1 →</a>
   </div>

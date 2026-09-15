@@ -121,12 +121,12 @@ series: "statistics"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">A random sample of methods that run this loop</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics &amp; Vision</div>
         <h3 style="margin:6px 0;">Estimators inside RANSAC</h3>
         <p style="margin-bottom:0;">RANSAC in the <a href="{{ '/vision/multi-view-geometry/ransac/' | relative_url }}">multi-view geometry guide</a> is an estimator whose randomness is explicit: it draws a random minimal sample of correspondences, fits a model, and counts inliers. Different draws give different models, and a different random seed gives a different answer from the same data. Its guarantees &mdash; how many iterations are needed, how likely a clean sample is &mdash; are statements about the sampling distribution of that estimate, which is why the method reasons about inlier probabilities rather than a single fitted line.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">Latency percentiles over repeated runs</h3>
         <p style="margin-bottom:0;">A reported p99 latency is a statistic computed from a finite set of requests, and a second run over a different set of requests returns a different p99. The <a href="{{ '/ai/llm-serving/metrics/' | relative_url }}">serving metrics chapter</a> treats those numbers as estimates with their own sampling variability, which is why comparing two deployments on a single measurement is unreliable: the difference may be smaller than the standard error of the percentile itself. The same reasoning applies when comparing two benchmark scores.</p>
@@ -167,7 +167,7 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>The sampling distribution is centred near the truth and narrows like <var>1/&radic;n</var>. The next part explains why it keeps approaching a normal curve even when the population it came from is nothing like one.</span>
     <a class="btn btn-secondary" href="{{ '/math/statistics/clt-standard-error/' | relative_url }}">Next: The CLT you can feel →</a>
   </div>

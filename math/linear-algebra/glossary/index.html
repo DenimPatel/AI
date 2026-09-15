@@ -47,11 +47,11 @@ series: "linear_algebra"
     <p class="g-eyebrow">The conventions every part follows</p>
     <p>Vectors are columns and are written bold: <var><b>v</b></var>. The transpose <var><b>v</b>ᵀ</var> is the same numbers in a row, so a column vector is an <var>n×1</var> matrix. The <var>i</var>-th coordinate is <var>v<sub>i</sub></var>. Matrices are capital letters, <var>A</var>, with entry <var>A<sub>ij</sub></var> in row <var>i</var>, column <var>j</var>. In code a matrix is an array of rows, matching the toolkit. The identity is <var>I</var>, the zero matrix <var>0</var>, the inverse <var>A⁻¹</var>, the transpose <var>Aᵀ</var>, the norm <var>‖<b>v</b>‖</var>, eigenvalues <var>λ</var>, singular values <var>σ</var>, and the pseudoinverse <var>A⁺</var>.</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <h3 style="margin-top:0;">Sizes</h3>
         <p style="margin-bottom:0;font-family:var(--font-mono);font-size:12.5px;">A: m×n &nbsp;·&nbsp; x: n×1 &nbsp;·&nbsp; Ax: m×1<br>J: m×n &nbsp;·&nbsp; JᵀJ: n×n &nbsp;·&nbsp; σ: min(m,n)</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <h3 style="margin-top:0;">Reading order</h3>
         <p style="margin-bottom:0;">Parts build on each other, but each stands alone. Acts I&ndash;III are the machinery; Act IV is where it shows up. Every core part ends with a "Where this shows up" panel linking into the site's other guides.</p>
       </div>
@@ -75,19 +75,19 @@ series: "linear_algebra"
     </div>
     <p class="g-eyebrow" style="margin-top:22px;">Identities worth keeping</p>
     <div class="g-grid2">
-      <div class="g-card glo-formula">
+      <div class="g-card glo-formula reveal">
         <div class="g-math g-katex">$$A = U\Sigma V^\top, \qquad A^{+} = V\Sigma^{+}U^\top, \qquad A^\top A = V\Sigma^2 V^\top$$</div>
         <p>The SVD and the pseudoinverse it produces. <var>Σ⁺</var> inverts the nonzero singular values and zeroes the rest.</p>
       </div>
-      <div class="g-card glo-formula">
+      <div class="g-card glo-formula reveal">
         <div class="g-math g-katex">$$\lambda_1\lambda_2 = \det A, \qquad \lambda_1+\lambda_2 = \operatorname{tr}A$$</div>
         <p>For a 2×2 the eigenvalues are two numbers that account for the determinant and the trace; the discriminant decides real or complex.</p>
       </div>
-      <div class="g-card glo-formula">
+      <div class="g-card glo-formula reveal">
         <div class="g-math g-katex">$$\operatorname{rank}A + \operatorname{nullity}A = n, \qquad \kappa(A) = \frac{\sigma_{\max}}{\sigma_{\min}}$$</div>
         <p>Rank&ndash;nullity counts the dimensions a map preserves and destroys; the condition number measures how close <var>σ<sub>min</sub></var> is to zero.</p>
       </div>
-      <div class="g-card glo-formula">
+      <div class="g-card glo-formula reveal">
         <div class="g-math g-katex">$$Q^\top Q = I, \qquad [\mathbf{a}]_\times \mathbf{b} = \mathbf{a}\times\mathbf{b}, \qquad R = e^{\theta[\hat{\mathbf{u}}]_\times}$$</div>
         <p>Orthonormal columns; the cross product as a skew matrix; a rotation as the exponential of a skew matrix.</p>
       </div>
@@ -242,7 +242,7 @@ series: "linear_algebra"
     </div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>That is the whole series. Go back to the beginning, or open the contents page to jump to any part.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/' | relative_url }}">Series contents →</a>
   </div>

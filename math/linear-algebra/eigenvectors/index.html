@@ -144,12 +144,12 @@ series: "linear_algebra"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">One idea, two worlds</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics &amp; dynamics</div>
         <h3 style="margin:6px 0;">Principal axes and modes</h3>
         <p style="margin-bottom:0;">A rigid body has a set of principal axes: spin it about one of those axes and it keeps rotating about that direction instead of wobbling, and the eigenvalues of its inertia tensor are the moments of inertia about them. The same idea governs the modes of a linearised system near an equilibrium &mdash; the eigenvectors are the shapes of motion and the eigenvalues decide whether a mode decays or grows. The <a href="{{ '/vision/nonlinear-optimization/3d-rotations/' | relative_url }}">3D rotations part</a> of the optimization guide uses these axes when it converts between rotation representations.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">The dominant directions of data</h3>
         <p style="margin-bottom:0;">A covariance matrix is symmetric, and its top eigenvector is the direction along which a dataset varies the most &mdash; the first principal component. Keeping only the largest eigenvalues compresses a point cloud while losing the least information, which is exactly the story of Part 17 on low-rank approximation and PCA. The same handedness turns up in the weight matrices of a network: the <a href="{{ '/ai/llm-training/architecture/' | relative_url }}">architecture chapter</a> shows the matrices, and their dominant singular directions are what training slowly shapes.</p>
@@ -174,7 +174,7 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>In the eigenbasis a matrix is nothing but its stretch factors &mdash; which is why powers of a matrix settle, cycle or explode.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/diagonalization/' | relative_url }}">Next: Matrix powers and dynamical systems →</a>
   </div>
@@ -255,7 +255,7 @@ series: "linear_algebra"
     dirs.forEach(function (d) {
       var align = Math.abs(v[0] * d.v[0] + v[1] * d.v[1]);
       var a = (0.14 + 0.72 * Math.pow(align, 10)).toFixed(2);
-      drawEigenLine(planeA, d, 'rgba(0,136,176,' + a + ')');
+      drawEigenLine(planeA, d, 'rgba(43,95,255,' + a + ')');
     });
 
     var cross = v[0] * Av[1] - v[1] * Av[0];
@@ -305,7 +305,7 @@ series: "linear_algebra"
     planeB.ellipse(MB, { color: 'rgba(214,0,108,0.45)', width: 1.8, fill: 'rgba(214,0,108,0.05)' });
 
     var dirs = eigDirs(MB);
-    dirs.forEach(function (d) { drawEigenLine(planeB, d, 'rgba(0,136,176,0.85)'); });
+    dirs.forEach(function (d) { drawEigenLine(planeB, d, 'rgba(43,95,255,0.85)'); });
 
     var tr = MB[0][0] + MB[1][1];
     var det = LA.mat.det(MB);
@@ -391,7 +391,7 @@ series: "linear_algebra"
     if (disc >= 0) {
       var dirs = eigDirs(A);
       if (!dirs.length) dirs = [{ v: [1, 0], lambda: e.values[0].re }];
-      dirs.forEach(function (d) { drawEigenLine(planeC, d, 'rgba(0,136,176,0.85)'); });
+      dirs.forEach(function (d) { drawEigenLine(planeC, d, 'rgba(43,95,255,0.85)'); });
       html +=
         '<div><span class="k">tr A</span> ' + tr.toFixed(2) + '</div>' +
         '<div><span class="k">det A</span> ' + det.toFixed(2) + '</div>' +
@@ -456,7 +456,7 @@ series: "linear_algebra"
     planeD.axes();
 
     var dirs = eigDirs(MD);
-    dirs.forEach(function (d) { drawEigenLine(planeD, d, 'rgba(0,136,176,0.55)'); });
+    dirs.forEach(function (d) { drawEigenLine(planeD, d, 'rgba(43,95,255,0.55)'); });
 
     var spin = spinDeg * Math.PI / 180;
     for (var i = 0; i < ND; i++) {
@@ -466,7 +466,7 @@ series: "linear_algebra"
       var v = [Math.cos(ang) * rad, Math.sin(ang) * rad];
       var Av = LA.mat.mulVec(MD, v);
       planeD.polygon([v, Av], { stroke: 'rgba(32,30,29,0.12)', width: 1 });
-      planeD.vector(v, { color: 'rgba(0,136,176,0.30)', width: 1.3, head: 5 });
+      planeD.vector(v, { color: 'rgba(43,95,255,0.30)', width: 1.3, head: 5 });
       planeD.vector(Av, { color: c.accent2, width: 1.5, head: 6 });
     }
 

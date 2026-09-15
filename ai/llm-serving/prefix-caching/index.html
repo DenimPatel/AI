@@ -199,7 +199,7 @@ series: "llm_serving"
     </ul>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>The prefix cache decides what the model does not recompute. The next part opens the engine that computes it.</span>
     <a class="btn btn-secondary" href="{{ '/ai/llm-serving/engine/' | relative_url }}">Next: Inside the engine →</a>
   </div>
@@ -318,14 +318,14 @@ series: "llm_serving"
     return { tokens: tokens, id: victim.id };
   }
   function parseColor(str) {
-    str = (str || "#0088b0").trim();
+    str = (str || "#2b5fff").trim();
     if (str.charAt(0) === "#") {
       var h = str.slice(1);
       if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
       return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
     }
     var m = str.match(/(\d+)[^\d]+(\d+)[^\d]+(\d+)/);
-    return m ? [+m[1], +m[2], +m[3]] : [0, 136, 176];
+    return m ? [+m[1], +m[2], +m[3]] : [43, 95, 255];
   }
   function recencyColor(last, min, max) {
     var t = max > min ? (last - min) / (max - min) : 1;

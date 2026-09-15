@@ -48,59 +48,6 @@ description: A running record of artificial intelligence — milestones, product
   <div class="stats-rule"></div>
 </section>
 
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var reveals = document.querySelectorAll('.reveal');
-  var counters = document.querySelectorAll('.js-count');
-
-  if (reduceMotion) {
-    reveals.forEach(function (el) { el.classList.add('is-visible'); });
-    counters.forEach(function (el) { el.textContent = el.getAttribute('data-count'); });
-    return;
-  }
-
-  var animateCount = function (el) {
-    var target = parseInt(el.getAttribute('data-count'), 10) || 0;
-    var start = performance.now();
-    var duration = 900;
-    var step = function (now) {
-      var progress = Math.min((now - start) / duration, 1);
-      var eased = 1 - Math.pow(1 - progress, 3);
-      el.textContent = Math.round(eased * target);
-      if (progress < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  };
-
-  if (!('IntersectionObserver' in window)) {
-    reveals.forEach(function (el) { el.classList.add('is-visible'); });
-    counters.forEach(animateCount);
-    return;
-  }
-
-  var revealObserver = new IntersectionObserver(function (entries, obs) {
-    entries.forEach(function (entry) {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('is-visible');
-        obs.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.15 });
-  reveals.forEach(function (el) { revealObserver.observe(el); });
-
-  var countObserver = new IntersectionObserver(function (entries, obs) {
-    entries.forEach(function (entry) {
-      if (entry.isIntersecting) {
-        animateCount(entry.target);
-        obs.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.4 });
-  counters.forEach(function (el) { countObserver.observe(el); });
-});
-</script>
-
 <section class="section">
   <span class="section-kicker">Four ways in</span>
   <h2 class="section-title">Start here</h2>

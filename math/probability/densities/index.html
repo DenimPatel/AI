@@ -111,22 +111,22 @@ series: "probability"
     <div class="g-step-head"><span class="g-step-num">5</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">Densities under everything continuous</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Calculus</div>
         <h3 style="margin:6px 0;">Integrals over regions</h3>
         <p style="margin-bottom:0;">A probability is an integral of a density, and in several variables it becomes an integral over a region. That machinery &mdash; changing the order of integration, slicing a volume into areas &mdash; is developed in <a href="{{ '/math/calculus-in-motion/multiple-integrals/' | relative_url }}">multiple integrals</a>, and it is exactly what turns a joint density into a marginal one.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Calculus</div>
         <h3 style="margin:6px 0;">The calculus of probability</h3>
         <p style="margin-bottom:0;">Push a continuous variable through a smooth map and the density rescales by a Jacobian. The geometric picture, with densities as areas preserved under a change of coordinates, is told in <a href="{{ '/math/calculus-in-motion/probability/' | relative_url }}">Calculus of probability</a>; this part is the density it presumes.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Probability</div>
         <h3 style="margin:6px 0;">The discrete contrast</h3>
         <p style="margin-bottom:0;">Going the other way, a pmf assigns a mass to each value and the total is a sum. The families where that sum is easy &mdash; binomial, Poisson, geometric &mdash; are collected in <a href="{{ '/math/probability/discrete-families/' | relative_url }}">discrete families</a>, and comparing them with a density sharpens the difference between a mass and a rate.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / ML</div>
         <h3 style="margin:6px 0;">Likelihoods and log-densities</h3>
         <p style="margin-bottom:0;">Language models are trained by maximising a log density over a continuum of predictions, and per-token losses are log-densities that may be strongly negative even where probabilities are moderate. The connection between density, likelihood and loss is drawn out in <a href="{{ '/ai/llm-training/language-models/' | relative_url }}">language models</a>.</p>
@@ -171,7 +171,7 @@ series: "probability"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>You have the density; now meet the families that come with one &mdash; and the Gaussian at the centre of them all.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability/continuous-families/' | relative_url }}">Next: The continuous families and the Gaussian →</a>
   </div>
@@ -272,7 +272,7 @@ series: "probability"
     pl.xRange[0] = -4; pl.xRange[1] = 4;
     pl.yRange[0] = 0; pl.yRange[1] = yMax * 1.16;
     pl.clear();
-    pl.bars(h.bins, { color: densState.density ? 'rgba(0,136,176,0.30)' : 'rgba(0,136,176,0.34)', baseline: 0 });
+    pl.bars(h.bins, { color: densState.density ? 'rgba(43,95,255,0.30)' : 'rgba(43,95,255,0.34)', baseline: 0 });
     if (densState.density) {
       pl.curve(function (x) { return NORM.pdf(x); }, { color: c.accent2, width: 2.2, label: 'N(0,1) density' });
     }

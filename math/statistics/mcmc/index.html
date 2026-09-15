@@ -120,12 +120,12 @@ series: "statistics"
     <div class="g-step-head"><span class="g-step-num">7</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">Sampling when the formula runs out</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Vision &amp; Robotics</div>
         <h3 style="margin:6px 0;">Sampling-based SLAM</h3>
         <p style="margin-bottom:0;">The posterior over a robot's trajectory and map has no conjugate form &mdash; it is a nonlinear, high-dimensional distribution over thousands of variables. The <a href="{{ '/vision/nonlinear-optimization/slam/' | relative_url }}">SLAM chapter</a> shows the two responses: find the mode by optimisation, or sample the distribution with particle methods and MCMC. Sampling keeps the uncertainty that a single best-fit trajectory throws away, at the cost of the diagnostics you have just been reading.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">Uncertainty in model evaluation</h3>
         <p style="margin-bottom:0;">A held-out benchmark score is a point estimate; a Bayesian treatment of a model's error rate makes it a posterior over a parameter, and for non-conjugate likelihoods that posterior is sampled rather than derived. The <a href="{{ '/ai/llm-training/evaluation/' | relative_url }}">evaluation chapter</a> builds intervals on finite test sets, and the resampling ideas there and the MCMC ideas here share the same premise: when you cannot integrate, you simulate.</p>
@@ -169,7 +169,7 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>MCMC gives you samples at the price of a chain that may not have converged. The next part buys speed instead &mdash; fitting a simple Gaussian to the posterior, or optimising a variational bound.</span>
     <a class="btn btn-secondary" href="{{ '/math/statistics/variational/' | relative_url }}">Next: Laplace and variational approximations →</a>
   </div>
@@ -322,7 +322,7 @@ series: "statistics"
           var v = Math.exp(gridVal[j][i] - maxLp);
           var a = Math.pow(v, 0.55) * 0.85;
           if (a < 0.01) continue;
-          ctx.fillStyle = 'rgba(0,136,176,' + a.toFixed(3) + ')';
+          ctx.fillStyle = 'rgba(43,95,255,' + a.toFixed(3) + ')';
           var X0 = targetPlot.px(x0), X1 = targetPlot.px(x1);
           ctx.fillRect(X0, Y1, Math.max(1, X1 - X0 + 1), Math.max(1, Y0 - Y1 + 1));
         }
@@ -339,13 +339,13 @@ series: "statistics"
       }
     }
     if (burnPts.length) targetPlot.points(burnPts, { color: 'rgba(214,0,108,0.22)', r: 1.5 });
-    if (keepPts.length) targetPlot.points(keepPts, { color: 'rgba(0,136,176,0.72)', r: 1.7 });
+    if (keepPts.length) targetPlot.points(keepPts, { color: 'rgba(43,95,255,0.72)', r: 1.7 });
     if (states[0] && chains[0].length) {
       targetPlot.points([states[0]], { color: c.accent2, r: 4.5, stroke: '#fff', width: 1.5 });
     }
     targetPlot.points([PM], { color: c.text, r: 4, stroke: '#fff', width: 1.2 });
     targetPlot.legend([
-      { label: 'target density', color: 'rgba(0,136,176,0.55)', fill: true, swatch: true },
+      { label: 'target density', color: 'rgba(43,95,255,0.55)', fill: true, swatch: true },
       { label: 'retained samples', color: c.accent },
       { label: 'burn-in samples', color: c.accent2 },
       { label: 'current state', color: c.accent2 },
@@ -387,7 +387,7 @@ series: "statistics"
       for (k = 0; k < chains[ci].length; k++) pts.push([k, chains[ci][k][0]]);
       if (!pts.length) continue;
       tracePlot.curve(pts, {
-        color: ci === 0 ? c.accent : 'rgba(0,136,176,0.35)',
+        color: ci === 0 ? c.accent : 'rgba(43,95,255,0.35)',
         width: ci === 0 ? 1.6 : 1
       });
     }
@@ -395,7 +395,7 @@ series: "statistics"
     tracePlot.hline(PM[0], { color: c.text, dashed: true, width: 1.2, labelX: tracePlot.xRange[1], label: 'true θ₁' });
     tracePlot.legend([
       { label: 'chain 1', color: c.accent },
-      { label: 'chains 2–4', color: 'rgba(0,136,176,0.55)' },
+      { label: 'chains 2–4', color: 'rgba(43,95,255,0.55)' },
       { label: 'target mean', color: c.text, dashed: true }
     ], { dy: 8 });
   }

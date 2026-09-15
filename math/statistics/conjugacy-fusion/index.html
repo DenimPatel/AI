@@ -100,12 +100,12 @@ series: "statistics"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">One update, two worlds</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Wheel odometry meets a sensor</h3>
         <p style="margin-bottom:0;">A robot has a motion model that predicts where it should be and a wheel encoder that reports how far it thinks it went; both are uncertain, and both are summarised by Gaussians. The <a href="{{ '/robotics/navigation/odometry/' | relative_url }}">odometry chapter</a> runs exactly this fusion: the model supplies a prior, the encoder supplies a measurement, and the precision-weighted average is the position estimate. Repeat it every timestep and the recursion above becomes a localization filter.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Vision &amp; Geometry</div>
         <h3 style="margin:6px 0;">Beliefs in a SLAM system</h3>
         <p style="margin-bottom:0;">A SLAM backend holds a Gaussian belief over poses and landmarks and folds in every camera observation as a measurement. The <a href="{{ '/vision/nonlinear-optimization/slam/' | relative_url }}">SLAM chapter</a> replaces the single unknown here with a large vector and the scalar precision with an information matrix, but the operation on each new measurement is still the fusion on this page &mdash; a weighted merge in which sharper constraints dominate the result.</p>
@@ -145,7 +145,7 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>The posterior is a distribution, not a decision. The next part turns it into an interval you can report and a number you should act on.</span>
     <a class="btn btn-secondary" href="{{ '/math/statistics/credible-intervals/' | relative_url }}">Next: Credible intervals and decision theory →</a>
   </div>
@@ -216,7 +216,7 @@ series: "statistics"
 
     plot.raw(function (ctx) {
       ctx.globalAlpha = aSources;
-      plot.area(priorPdf, XR[0], XR[1], { color: 'rgba(0,136,176,0.16)' });
+      plot.area(priorPdf, XR[0], XR[1], { color: 'rgba(43,95,255,0.16)' });
       plot.curve(priorPdf, { color: c.accent, width: 2.2 });
       ctx.globalAlpha = aSources;
       plot.area(obsPdf, XR[0], XR[1], { color: 'rgba(214,0,108,0.14)' });
@@ -226,7 +226,7 @@ series: "statistics"
     if (mergeT > 0.01) {
       plot.raw(function (ctx) {
         ctx.globalAlpha = Math.min(1, mergeT);
-        plot.area(postPdf, XR[0], XR[1], { color: 'rgba(0,103,134,0.22)' });
+        plot.area(postPdf, XR[0], XR[1], { color: 'rgba(11,60,208,0.22)' });
         plot.curve(postPdf, { color: c.accent700, width: 3 });
         plot.vline(p.mu, { color: c.accent700, width: 1.6 });
       });

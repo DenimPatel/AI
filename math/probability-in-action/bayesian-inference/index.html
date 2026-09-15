@@ -114,22 +114,22 @@ series: "probability_in_action"
     <div class="g-step-head"><span class="g-step-num">5</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">Beta–binomial in the wild</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / ML</div>
         <h3 style="margin:6px 0;">Calibrated model outputs</h3>
         <p style="margin-bottom:0;">A model's stated probability can be read as a belief about a rate, and smoothing that belief with a Beta prior is a standard defence against overconfidence on small counts. That perspective is what <a href="{{ '/ai/llm-training/evaluation/' | relative_url }}">calibration and evaluation</a> measure, and what proper scoring rules such as log loss grade.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / ML</div>
         <h3 style="margin:6px 0;">Preferences as evidence</h3>
         <p style="margin-bottom:0;">Preference learning in <a href="{{ '/ai/llm-training/rlhf/' | relative_url }}">RLHF</a> is Bayesian in spirit: a prior over what a good response looks like, updated by human comparisons, with the posterior standing in for the reward signal. Conjugate updates are the tractable special case; general posteriors need the sampling machinery of Part 11.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">The general theorem</h3>
         <p style="margin-bottom:0;">The coin is one instance of the rule that flips the conditioning in <a href="{{ '/math/probability/bayes/' | relative_url }}">Bayes' theorem</a>: <var>$p(\theta\mid x)\propto p(x\mid\theta)p(\theta)$</var> applies to any unknown quantity, not just a bias. The Beta is simply the case where the algebra stays closed-form.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">What the likelihood could not do</h3>
         <p style="margin-bottom:0;">The <a href="{{ '/math/probability-in-action/likelihood/' | relative_url }}">previous part</a> built the likelihood surface and showed why it is not a distribution over the parameter. Everything here is the repair: multiply by a prior, renormalise, and the same surface becomes a belief you can integrate.</p>
@@ -173,7 +173,7 @@ series: "probability_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>You have a posterior &mdash; but is the number you report from it actually a good estimate?</span>
     <a class="btn btn-secondary" href="{{ '/math/probability-in-action/estimators/' | relative_url }}">Next: Is this estimator any good? →</a>
   </div>
@@ -332,7 +332,7 @@ series: "probability_in_action"
   var MAXFLIP = 400;
   var T = { theta: 0.6, n: 0, seed: 20260914, prefix: [0] };
   var SENS_PRIORS = [
-    { a: 1, b: 1, name: 'Beta(1, 1) flat', color: '#0088b0' },
+    { a: 1, b: 1, name: 'Beta(1, 1) flat', color: '#2b5fff' },
     { a: 8, b: 3, name: 'Beta(8, 3)', color: '#d6006c' },
     { a: 3, b: 8, name: 'Beta(3, 8)', color: '#1f9d55' },
     { a: 15, b: 2, name: 'Beta(15, 2)', color: '#8a4fd8' }

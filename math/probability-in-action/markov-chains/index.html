@@ -136,22 +136,22 @@ series: "probability_in_action"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">The hidden matrix behind the process</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / serving</div>
         <h3 style="margin:6px 0;">Sampling as a walk</h3>
         <p style="margin-bottom:0;">A language model emits one token at a time, and each next-token distribution is conditioned on the tokens already generated. That is a chain over the vocabulary with an enormous, context-dependent transition matrix. The <a href="{{ '/ai/llm-serving/decode-loop/' | relative_url }}">decode loop</a> is the sampler stepping through it, and the temperature and top-p knobs are edits to the same transition probabilities this page lets you type by hand.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / training</div>
         <h3 style="margin:6px 0;">N-grams and smoothing</h3>
         <p style="margin-bottom:0;">The classic statistical language model is an explicit Markov chain: the state is the last few words, and the transition matrix is a table of next-word counts. In <a href="{{ '/ai/llm-training/language-models/' | relative_url }}">language modelling</a> the sparsity of that table is the whole problem, and the smoothing tricks that fill in unseen transitions are the ancestors of the neural models that replaced them.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">Fixed points as eigenvectors</h3>
         <p style="margin-bottom:0;">The equation <var>$\pi=\pi P$</var> says the stationary distribution is a left eigenvector with eigenvalue one, and the mixing rate is governed by the second eigenvalue. The <a href="{{ '/math/linear-algebra/' | relative_url }}">linear algebra guide</a> develops the spectral tools &mdash; Perron&ndash;Frobenius, the eigenvalue ordering, the gap &mdash; that this convergence claim quietly relies on.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / serving</div>
         <h3 style="margin:6px 0;">Accept and reject</h3>
         <p style="margin-bottom:0;">A draft model proposes several tokens and the target model accepts or rejects each one. Whether a proposal survives is a random event whose chance depends on how far along the draft has gone, and the walk of accepted prefixes is a small Markov chain. <a href="{{ '/ai/llm-serving/speculative/' | relative_url }}">Speculative decoding</a> is the speed-up that falls out of analysing it.</p>
@@ -196,7 +196,7 @@ series: "probability_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>The chain gives you a stationary distribution for a matrix you can write down. MCMC turns that around: start from a distribution you cannot sample and build a chain whose stationary distribution is the one you want.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability-in-action/mcmc/' | relative_url }}">Next: MCMC →</a>
   </div>
@@ -285,7 +285,7 @@ series: "probability_in_action"
     var ctx = mcCanvas.ctx;
     var geo = Guide.drawHeatmap(ctx, 640, 300, mcP, {
       rowLabels: STATE, colLabels: STATE, min: 0, max: 1,
-      colorLow: [247, 249, 250], colorHigh: [0, 136, 176]
+      colorLow: [247, 249, 250], colorHigh: [43, 95, 255]
     });
     ctx.font = '11px ' + c.font;
     for (var r = 0; r < 3; r++) {
@@ -320,7 +320,7 @@ series: "probability_in_action"
     pl.grid({ step: 0.25 });
     var bars = [];
     for (i = 0; i < STATE.length; i++) bars.push({ x: i, y: mc.freq[i] });
-    pl.bars(bars, { width: 0.52, color: 'rgba(0,136,176,0.30)', label: 'empirical frequency' });
+    pl.bars(bars, { width: 0.52, color: 'rgba(43,95,255,0.30)', label: 'empirical frequency' });
     var piPts = [], afterPts = [];
     for (i = 0; i < STATE.length; i++) {
       piPts.push({ x: i, y: mc.pi[i] });
@@ -470,7 +470,7 @@ series: "probability_in_action"
     for (i = 0; i < PR_PAGES.length; i++) {
       var x = PR_POS[i][0], y = PR_POS[i][1], r = prRadius(pr.pi[i]);
       ctx.beginPath(); ctx.arc(x, y, r, 0, 2 * Math.PI);
-      ctx.fillStyle = 'rgba(0,136,176,0.22)'; ctx.fill();
+      ctx.fillStyle = 'rgba(43,95,255,0.22)'; ctx.fill();
       ctx.lineWidth = 2;
       ctx.strokeStyle = c.accent;
       if (i === 4 && !pr.fixDangling) { ctx.setLineDash([5, 4]); ctx.strokeStyle = c.accent2; }

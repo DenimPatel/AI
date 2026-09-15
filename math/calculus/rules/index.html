@@ -179,7 +179,7 @@ series: "calculus"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>This toolbox handles every single operation except composition. The next part is the one rule that composes all of these, and the reason a network can be trained at all.</span>
     <a class="btn btn-secondary" href="{{ '/math/calculus/chain-rule/' | relative_url }}">Next: The chain rule →</a>
   </div>
@@ -243,9 +243,9 @@ series: "calculus"
       }
     }
 
-    rect(0, 0, u, v, 'rgba(0,136,176,0.16)', c.accent700, 'uv', u.toFixed(2) + '\u00d7' + v.toFixed(2));
+    rect(0, 0, u, v, 'rgba(43,95,255,0.16)', c.accent700, 'uv', u.toFixed(2) + '\u00d7' + v.toFixed(2));
     rect(u, 0, u + du, v, 'rgba(214,0,108,0.22)', c.accent2, 'v\u00b7du', (v * du).toFixed(3));
-    rect(0, v, u, v + dv, 'rgba(0,136,176,0.30)', c.accent, 'u\u00b7dv', (u * dv).toFixed(3));
+    rect(0, v, u, v + dv, 'rgba(43,95,255,0.30)', c.accent, 'u\u00b7dv', (u * dv).toFixed(3));
     rect(u, v, u + du, v + dv, 'rgba(32,30,29,0.30)', c.text, 'du\u00b7dv', (du * dv).toFixed(3));
 
     var added = v * du + u * dv + du * dv;

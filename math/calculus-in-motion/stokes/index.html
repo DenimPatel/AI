@@ -201,7 +201,7 @@ series: "calculus_in_motion"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>The theorems gave you exactness; the next part asks how a region's area scales when you deform it, which is the Jacobian determinant.</span>
     <a class="btn btn-secondary" href="{{ '/math/calculus-in-motion/change-of-variables/' | relative_url }}">Next: The Jacobian determinant →</a>
   </div>
@@ -395,7 +395,7 @@ series: "calculus_in_motion"
 
     ins.cells.forEach(function (cell) {
       var X = ax.px(cell.cx - ins.cellW / 2), Y = ax.py(cell.cy + ins.cellH / 2);
-      ctx.fillStyle = 'rgba(0,136,176,0.10)';
+      ctx.fillStyle = 'rgba(43,95,255,0.10)';
       ctx.fillRect(X, Y, ax.px(cell.cx + ins.cellW / 2) - X, ax.py(cell.cy - ins.cellH / 2) - Y);
     });
 

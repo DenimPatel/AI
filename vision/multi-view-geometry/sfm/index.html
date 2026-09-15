@@ -67,7 +67,9 @@ redirect_from:
   .mvg-matrix-grid.cols-1 { grid-template-columns: minmax(2.2em, auto); }
   .mvg-demo {
     display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;
-    background: var(--color-surface); border-radius: var(--radius-md); padding: 18px;
+    background: var(--glass-bg-strong); border: 1px solid var(--glass-border);
+    backdrop-filter: blur(14px) saturate(150%); -webkit-backdrop-filter: blur(14px) saturate(150%);
+    box-shadow: var(--glass-shadow); border-radius: var(--radius-md); padding: 18px;
     margin-top: 8px;
   }
   .mvg-canvas-wrap { flex: 1 1 420px; min-width: 280px; }
@@ -363,7 +365,7 @@ redirect_from:
 
   function css(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
   var COLOR_TEXT = css('--color-text') || '#201e1d';
-  var COLOR_ACCENT = css('--color-accent') || '#0088b0';
+  var COLOR_ACCENT = css('--color-accent') || '#2b5fff';
   var COLOR_ACCENT2 = css('--color-accent-2') || '#d6006c';
   var COLOR_DIVIDER = css('--color-divider') || 'rgba(32,30,29,0.16)';
 

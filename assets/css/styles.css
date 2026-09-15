@@ -1,7 +1,7 @@
 /* ==========================================================================
    AI — site stylesheet
    Design language: "Broadsheet" — newsprint set for the web. Near-black
-   serif on paper white, with cyan / magenta used sparingly as spot color.
+   serif on paper white, with blue / magenta used sparingly as spot color.
    Hierarchy comes from type scale and whitespace, not boxes or rules.
    ========================================================================== */
 
@@ -11,7 +11,7 @@
   --color-bg: #f3f2f2;
   --color-surface: #eae9e9;
   --color-text: #201e1d;
-  --color-accent: #0088b0;
+  --color-accent: #2b5fff;
   --color-accent-2: #d6006c;
   --color-divider: color-mix(in srgb, #201e1d 16%, transparent);
 
@@ -25,15 +25,15 @@
   --color-neutral-800: #444141;
   --color-neutral-900: #2d2b2b;
 
-  --color-accent-100: #e9f8ff;
-  --color-accent-200: #cbeeff;
-  --color-accent-300: #99e0ff;
-  --color-accent-400: #62c5ee;
-  --color-accent-500: #38a6cf;
-  --color-accent-600: #1186ac;
-  --color-accent-700: #006786;
-  --color-accent-800: #004961;
-  --color-accent-900: #0a303e;
+  --color-accent-100: #eaf0ff;
+  --color-accent-200: #cfdcff;
+  --color-accent-300: #93aefe;
+  --color-accent-400: #5d85fd;
+  --color-accent-500: #2b5fff;
+  --color-accent-600: #0744fb;
+  --color-accent-700: #0b3cd0;
+  --color-accent-800: #16399e;
+  --color-accent-900: #0f2e8a;
 
   --color-accent-2-100: #fff1f4;
   --color-accent-2-200: #ffdee6;
@@ -67,7 +67,7 @@
 
   --content-width: 1200px;
 
-  /* — liquid glass tokens (global nav + homepage) — */
+  /* — liquid glass tokens (site-wide) — */
   --glass-blue: #2b5fff;
   --glass-blue-dark: #16399e;
   --glass-blue-100: #eaf0ff;
@@ -81,7 +81,13 @@
 
 /* — reset & base — */
 *, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; }
+html {
+  -webkit-text-size-adjust: 100%;
+  /* The global nav is a sticky floating pill (see .nav below); without this,
+     jumping to an in-page anchor (e.g. a guide's table of contents) lands the
+     target heading right under the nav, which then covers it. */
+  scroll-padding-top: 90px;
+}
 body {
   margin: 0;
   background: var(--color-bg);
@@ -226,11 +232,15 @@ main { display: block; }
 }
 .nav--series a {
   font-size: 13px; padding: 3px 9px; border-radius: var(--radius-sm);
-  background: var(--color-surface); white-space: nowrap;
+  background: var(--glass-bg); border: 1px solid var(--glass-border);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  white-space: nowrap;
 }
-.nav--series a:hover { background: var(--color-accent-100); }
+.nav--series a:hover { background: var(--glass-bg-strong); }
 .nav--series a[aria-current='page'] {
   background: var(--color-accent); color: #fff;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--glass-blue) 18%, transparent);
 }
 /* Optional act grouping (only when the series YAML declares `acts:`). The group
    is presentational: display:contents lets its children sit directly in the
@@ -339,7 +349,12 @@ main { display: block; }
 .btn-primary { background: var(--color-accent); color: var(--color-bg); }
 .btn-primary:hover { background: var(--color-accent-600); color: var(--color-bg); }
 .btn-primary:active { background: var(--color-accent-700); }
-.btn-secondary { border-color: var(--color-divider); }
+.btn-secondary {
+  border-color: var(--glass-border);
+  background: var(--glass-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
 .btn-secondary:hover { background: color-mix(in srgb, var(--color-text) 7%, transparent); color: var(--color-text); }
 .btn-ghost { color: var(--color-accent); padding-inline: var(--space-1); }
 .btn-ghost:hover { background: color-mix(in srgb, var(--color-accent) 10%, transparent); color: var(--color-accent-700); }
@@ -347,7 +362,16 @@ main { display: block; }
 /* — cards — */
 .card {
   display: flex; flex-direction: column; gap: var(--space-2);
-  padding: var(--space-3); border-radius: var(--radius-md); background: var(--color-surface);
+  padding: var(--space-3); border-radius: var(--radius-md);
+  background: var(--glass-bg); border: 1px solid var(--glass-border);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  box-shadow: var(--glass-shadow);
+  transition: transform .35s cubic-bezier(.2,.7,.3,1), box-shadow .35s ease, border-color .35s ease;
+}
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--glass-shadow-hover);
 }
 .card-kicker { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-accent); }
 .card-title {
@@ -407,11 +431,11 @@ main { display: block; }
   padding: 40px 0 64px; font-size: 13px; line-height: 1.6;
   color: color-mix(in srgb, var(--color-text) 70%, transparent);
 }
-.site-footer .stats-rule { border-top-color: var(--color-divider); margin-bottom: 24px; }
+.site-footer .stats-rule { border-top-color: color-mix(in srgb, var(--glass-border) 40%, var(--color-divider)); margin-bottom: 24px; }
 
 /* ==========================================================================
-   Homepage — liquid glass treatment. Scoped to `.layout-home` so the rest
-   of the site (still on the broadsheet look) is untouched for now.
+   Homepage — the strongest liquid-glass treatment: drifting colour pools,
+   fade-up hero, and a heavier card lift than the shared `.card` glass.
    ========================================================================== */
 .layout-home .hero {
   position: relative;
@@ -503,16 +527,16 @@ main { display: block; }
 }
 .layout-home .card-kicker { color: var(--glass-blue-dark); }
 
-.layout-home .reveal {
+.reveal {
   opacity: 0; transform: translateY(20px);
   transition: opacity .6s ease, transform .6s ease;
 }
-.layout-home .reveal.is-visible { opacity: 1; transform: translateY(0); }
+.reveal.is-visible { opacity: 1; transform: translateY(0); }
 
 @media (prefers-reduced-motion: reduce) {
   .layout-home .hero::before, .layout-home .hero::after { animation: none; }
   .layout-home .hero h1, .layout-home .hero p, .layout-home .hero-actions { animation: none; }
-  .layout-home .reveal { opacity: 1; transform: none; transition: none; }
+  .reveal { opacity: 1; transform: none; transition: none; }
   .layout-home .card, .layout-home .btn-primary, .layout-home .btn-ghost { transition: none; }
 }
 

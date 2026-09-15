@@ -1313,7 +1313,7 @@
         pts.push([x, fn(x)]);
       }
       ctx.save();
-      ctx.fillStyle = o.color || 'rgba(0,136,176,0.20)';
+      ctx.fillStyle = o.color || 'rgba(43,95,255,0.20)';
       withClip(function () {
         ctx.beginPath();
         ctx.moveTo(px(pts[0][0]), py(Math.max(yRange[0], Math.min(yRange[1], pts[0][1]))));
@@ -1383,7 +1383,7 @@
       if (loFn) for (var i = 0; i <= n; i++) { var x = a + (b - a) * i / n; loPts.push([x, loFn(x)]); }
       if (hiFn) for (i = 0; i <= n; i++) { var x2 = a + (b - a) * i / n; hiPts.push([x2, hiFn(x2)]); }
       ctx.save();
-      ctx.fillStyle = o.color || 'rgba(0,136,176,0.16)';
+      ctx.fillStyle = o.color || 'rgba(43,95,255,0.16)';
       withClip(function () {
         ctx.beginPath();
         for (i = 0; i < loPts.length; i++) { var X = px(loPts[i][0]), Y = py(loPts[i][1]); if (i === 0) ctx.moveTo(X, Y); else ctx.lineTo(X, Y); }

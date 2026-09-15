@@ -60,7 +60,7 @@ series: "probability_in_action"
         <canvas id="ent-canvas" width="640" height="360"></canvas>
         <p class="g-canvas-hint">Blue bars are the distribution <var>p</var> you are shaping; the dashed line is the uniform level <var>1/K</var>; the pink outline is the reference <var>q</var> used for the cross-entropy readout. The label on each bar is its optimal codelength <var>$\lceil-\log_2 p\rceil$</var>.</p>
         <div class="g-legend g-ent-legend">
-          <span class="g-legend-item"><span class="g-swatch" style="background:#0088b0"></span> p, your distribution</span>
+          <span class="g-legend-item"><span class="g-swatch" style="background:#2b5fff"></span> p, your distribution</span>
           <span class="g-legend-item"><span class="g-swatch" style="background:#d6006c"></span> q, reference</span>
         </div>
       </div>
@@ -99,7 +99,7 @@ series: "probability_in_action"
         <canvas id="kl-canvas" width="640" height="360"></canvas>
         <p class="g-canvas-hint">The blue curve is the bimodal target <var>p</var>. The pink dashed curve minimises <var>$\mathrm{KL}(q\|p)$</var> and commits to one mode; the gold dashed curve minimises <var>$\mathrm{KL}(p\|q)$</var> and straddles both.</p>
         <div class="g-legend">
-          <span class="g-legend-item"><span class="g-swatch" style="background:#0088b0"></span> target p</span>
+          <span class="g-legend-item"><span class="g-swatch" style="background:#2b5fff"></span> target p</span>
           <span class="g-legend-item"><span class="g-swatch" style="background:#d6006c"></span> reverse KL, mode-seeking</span>
           <span class="g-legend-item"><span class="g-swatch" style="background:#c9a227"></span> forward KL, mode-covering</span>
         </div>
@@ -129,7 +129,7 @@ series: "probability_in_action"
         <p class="g-canvas-hint g-mi-hint">The product of the marginals <var>$p(x)\,p(y)$</var>, drawn on the same colour scale. Wherever it differs from the joint above, the joint is carrying dependence the marginals cannot.</p>
         <div class="g-legend">
           <span class="g-legend-item"><span class="g-swatch" style="background:#eef4f8"></span> low mass</span>
-          <span class="g-legend-item"><span class="g-swatch" style="background:#0088b0"></span> high mass</span>
+          <span class="g-legend-item"><span class="g-swatch" style="background:#2b5fff"></span> high mass</span>
         </div>
       </div>
       <div class="g-controls">
@@ -144,22 +144,22 @@ series: "probability_in_action"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">The same logarithm, four costumes</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / ML</div>
         <h3 style="margin:6px 0;">Language-model loss</h3>
         <p style="margin-bottom:0;">A next-token model is trained by minimising the cross-entropy between its predicted distribution and the observed token. That is average negative log-likelihood, it decomposes over positions by the chain rule, and the <a href="{{ '/ai/llm-training/language-models/' | relative_url }}">language models part</a> derives the exact form the gradient takes once teacher forcing is in play.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / ML</div>
         <h3 style="margin:6px 0;">Perplexity and calibration</h3>
         <p style="margin-bottom:0;">Perplexity is <var>2^{H}</var>, the effective number of equally likely choices per token; lower is better and always at least the true entropy. When a model's stated probabilities drift from the observed frequencies, cross-entropy and calibration diverge, which is the gap the <a href="{{ '/ai/llm-training/evaluation/' | relative_url }}">evaluation part</a> is built to measure.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / ML</div>
         <h3 style="margin:6px 0;">The KL leash in RLHF</h3>
         <p style="margin-bottom:0;">Reward maximisation alone drives a policy off the manifold of fluent text, so the objective adds a KL penalty against a frozen reference model. The <a href="{{ '/ai/llm-training/rlhf/' | relative_url }}">RLHF part</a> shows the coefficient as the dial between "say anything that scores" and "stay recognisably the model you started with."</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">Densities and their Jacobians</h3>
         <p style="margin-bottom:0;">For continuous variables the sum becomes an integral and the entropy picks up a reference scale, but every identity survives. Pushing a variable through a map rescales its density by the Jacobian, and <a href="{{ '/math/calculus-in-motion/probability/' | relative_url }}">the calculus of probability</a> is where that change of variables is worked out.</p>
@@ -207,7 +207,7 @@ series: "probability_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Once you can factor a joint, you can draw the model as a graph &mdash; and read independence straight off its edges.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability-in-action/graphical-models/' | relative_url }}">Next: Bayes nets and factor graphs →</a>
   </div>

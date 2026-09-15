@@ -49,8 +49,8 @@ redirect_from:
     <p>Instead of writing "the correct answer," labelers (human annotators, or sometimes another model acting as a judge — Part 10 covers the pitfalls of that) are shown a prompt with two candidate responses and asked which is better. Each judgment becomes one training example: a <strong>chosen</strong> response and a <strong>rejected</strong> response for the same prompt.</p>
     <div class="llmt-demo">
       <div class="llmt-pair">
-        <div class="llmt-card"><span class="label">Response A</span><p id="s1-a"></p></div>
-        <div class="llmt-card"><span class="label">Response B</span><p id="s1-b"></p></div>
+        <div class="llmt-card reveal"><span class="label">Response A</span><p id="s1-a"></p></div>
+        <div class="llmt-card reveal"><span class="label">Response B</span><p id="s1-b"></p></div>
       </div>
       <div class="llmt-controls" style="flex-basis:100%;">
         <div class="llmt-btnrow">
@@ -193,7 +193,7 @@ redirect_from:
   </section>
 {% endraw %}
 
-  <div class="llmt-next">
+  <div class="llmt-next reveal">
     <span>For tasks with an automatically checkable answer, there's now a whole parallel track that skips human preferences entirely.</span>
     <a class="btn btn-secondary" href="{{ '/ai/llm-training/reasoning/' | relative_url }}">Continue: reasoning &amp; RL with verifiable rewards →</a>
   </div>

@@ -196,7 +196,7 @@ series: "llm_serving"
     </ul>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Shape tells you what to run. The next part is how to keep it running: gateways, autoscaling, cold starts and routing.</span>
     <a class="btn btn-secondary" href="{{ '/ai/llm-serving/cluster/' | relative_url }}">Next: Kubernetes, autoscaling, cold starts and routing →</a>
   </div>
@@ -434,7 +434,7 @@ series: "llm_serving"
         // gap region
         var gx = x + (prefill + decode) * scale, gw = gap * scale;
         if (policy === "hold") {
-          tctx.fillStyle = "rgba(0,136,176,0.18)";
+          tctx.fillStyle = "rgba(43,95,255,0.18)";
           tctx.fillRect(gx, y, gw, h);
         } else if (policy === "recompute") {
           tctx.fillStyle = "rgba(214,0,108,0.14)";

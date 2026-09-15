@@ -122,12 +122,12 @@ series: "statistics"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">The Gaussian belief and the optimisation it rides on</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Vision &amp; Robotics</div>
         <h3 style="margin:6px 0;">Gaussian beliefs in state estimation</h3>
         <p style="margin-bottom:0;">A SLAM system does not carry a posterior; it carries a mean and a covariance, updated by linearising each new measurement. That is the Laplace approximation applied once per step, with the Hessian of the negative log-posterior serving as the information matrix. The <a href="{{ '/vision/nonlinear-optimization/slam/' | relative_url }}">SLAM chapter</a> reads that matrix as a map of what the trajectory knows, and it explains why a poorly excited direction produces a huge error bar: the curvature is nearly zero there, so its reciprocal is not.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Optimisation &amp; ML</div>
         <h3 style="margin:6px 0;">Curvature as a posterior</h3>
         <p style="margin-bottom:0;">The Hessian a Newton step inverts to choose a direction is the same matrix the Laplace approximation inverts to describe uncertainty: both read the quadratic term of the same expansion. The <a href="{{ '/math/calculus-in-motion/optimizers/' | relative_url }}">optimisers chapter</a> follows the gradient to the mode; once that mode is found, the inverse Hessian becomes a covariance, and an optimisation routine turns into an inference procedure without changing a line of arithmetic.</p>
@@ -171,7 +171,7 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Approximate posteriors trade bias for tractability. The next part replaces the posterior altogether with a single number and asks how its error splits into the part that shrinks with data and the part that does not.</span>
     <a class="btn btn-secondary" href="{{ '/math/statistics/bias-variance/' | relative_url }}">Next: Bias and variance, revisited →</a>
   </div>
@@ -299,8 +299,8 @@ series: "statistics"
     klPlot.clear();
     klPlot.axes({ xLabel: "x", yLabel: "density" });
 
-    klPlot.area(pOf, X0, X1, { color: "rgba(98,197,238,0.32)" });
-    if (which === "pq") klPlot.area(qFn, X0, X1, { color: "rgba(0,136,176,0.16)" });
+    klPlot.area(pOf, X0, X1, { color: "rgba(93,133,253,0.32)" });
+    if (which === "pq") klPlot.area(qFn, X0, X1, { color: "rgba(43,95,255,0.16)" });
     klPlot.curve(pOf, { color: c.accent400, width: 2.2, samples: 400 });
     klPlot.curve(qFn, { color: c.accent, width: 2.4, samples: 320 });
 
@@ -365,7 +365,7 @@ series: "statistics"
     lapPlot.clear();
     lapPlot.axes({ xLabel: "x", yLabel: "density" });
 
-    lapPlot.area(pOf, X0, X1, { color: "rgba(98,197,238,0.32)" });
+    lapPlot.area(pOf, X0, X1, { color: "rgba(93,133,253,0.32)" });
     lapPlot.curve(pOf, { color: c.accent400, width: 2.2, samples: 400 });
     lapPlot.curve(function (x) { return S.dist.normal.pdf(x, mode, lapSd); }, { color: c.accent2, dashed: true, width: 2.2, samples: 320 });
     lapPlot.vline(mode, { color: c.text, dashed: true, width: 1.2, label: "mode", labelY: ymax * 0.98 });

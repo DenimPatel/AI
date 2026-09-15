@@ -121,22 +121,22 @@ series: "probability"
     <div class="g-step-head"><span class="g-step-num">5</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">Spread and its bounds, in practice</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Covariance as uncertainty</h3>
         <p style="margin-bottom:0;">A robot's pose is never a point; it is a point with a covariance, and a Kalman filter's whole job is to propagate <var>$\Sigma$</var> through motion and measurement. The ellipse of a confidence region is drawn from the eigenvectors and eigenvalues of that matrix, the same symmetric structure described in <a href="{{ '/math/linear-algebra/symmetric/' | relative_url }}">Symmetric matrices</a>.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / ML</div>
         <h3 style="margin:6px 0;">Generalisation from concentration</h3>
         <p style="margin-bottom:0;">The classic argument that test error stays near training error is Hoeffding or Chernoff applied to an average of bounded losses over <var>n</var> samples. With <var>n</var> in the exponent, the allowed gap shrinks fast enough to matter &mdash; the reasoning behind the <a href="{{ '/ai/llm-training/scaling/' | relative_url }}">scaling laws</a> and why more data buys reliability, not just accuracy.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Vision</div>
         <h3 style="margin:6px 0;">Weighting errors by variance</h3>
         <p style="margin-bottom:0;">Bundle adjustment and pose graph optimisation weight each residual by the inverse of its variance, so a noisy measurement pulls the solution less. That is a covariance at work inside a least-squares problem, treated in the <a href="{{ '/vision/nonlinear-optimization/' | relative_url }}">nonlinear optimisation</a> material.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">Second moments of known laws</h3>
         <p style="margin-bottom:0;">Every named distribution comes with a variance formula, and expectation &mdash; the first moment &mdash; is the <a href="{{ '/math/probability/expectation/' | relative_url }}">previous part</a>. Knowing <var>$\mathbb{E}[X]$</var> and <var>$\mathbb{E}[X^2]$</var> for the Bernoulli, binomial and Poisson is what makes Chebyshev instantly applicable.</p>
@@ -184,7 +184,7 @@ series: "probability"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>The spread of a sum is settled; now meet the individual distributions that supply those spreads, family by family.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability/discrete-families/' | relative_url }}">Next: The discrete families →</a>
   </div>
@@ -259,7 +259,7 @@ series: "probability"
       { color: 'rgba(32,30,29,0.22)', width: 1.6, label: '(x - m)^2' });
     var items = [];
     for (i = 0; i < 3; i++) {
-      items.push({ x: momState.x[i], y: momState.w[i] * 2.5, color: 'rgba(0,136,176,0.16)' });
+      items.push({ x: momState.x[i], y: momState.w[i] * 2.5, color: 'rgba(43,95,255,0.16)' });
     }
     pl.bars(items, { baseline: 0 });
     for (i = 0; i < 3; i++) {

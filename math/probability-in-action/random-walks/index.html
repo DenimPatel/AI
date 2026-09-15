@@ -157,22 +157,22 @@ series: "probability_in_action"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">Accumulated noise everywhere</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Drift in dead reckoning</h3>
         <p style="margin-bottom:0;">When a robot integrates noisy velocity to track its pose, small independent errors pile up exactly like the steps of a walk. The position error grows with the square root of elapsed time, which is why <a href="{{ '/robotics/navigation/odometry/' | relative_url }}">odometry</a> needs periodic correction from a global sensor and why loop closures matter so much.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">The CLT behind the limit</h3>
         <p style="margin-bottom:0;">Brownian motion exists because <var>$S_n/\sqrt n$</var> converges in distribution to a normal. That statement and its hypotheses are the work of the <a href="{{ '/math/probability/clt/' | relative_url }}">central limit theorem</a>, which is the engine converting independent bounded steps into Gaussian noise.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / ML</div>
         <h3 style="margin:6px 0;">Stochastic gradient noise</h3>
         <p style="margin-bottom:0;">Each minibatch gradient is a noisy estimate, so the parameter path under stochastic optimisation is a random walk with drift, and the noise scale falls as batches grow. That relationship between batch size, step size and loss noise is central to <a href="{{ '/ai/llm-training/scaling/' | relative_url }}">training at scale</a>.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Vision</div>
         <h3 style="margin:6px 0;">Inertial integration for SLAM</h3>
         <p style="margin-bottom:0;">An IMU's bias performs a slow random walk, and integrating its measurements compounds that error. Treating bias as a Brownian process and propagating its uncertainty is what makes <a href="{{ '/vision/nonlinear-optimization/slam/' | relative_url }}">visual-inertial SLAM</a> work, and it is the same martingale bookkeeping in a different notation.</p>
@@ -219,7 +219,7 @@ series: "probability_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Drop the coin and keep the state: when the next step depends only on where you are now, you have a Markov chain &mdash; and a stationary distribution to find.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability-in-action/markov-chains/' | relative_url }}">Next: Markov chains →</a>
   </div>
@@ -282,7 +282,7 @@ series: "probability_in_action"
     pl.curve(function (x) { return -Math.sqrt(x); },
       { from: 0, to: WK.n, samples: 120, color: c.accent2, width: 2, dash: [6, 4] });
     for (i = 0; i < WK.paths.length; i++) {
-      pl.curve(walkFn(WK.paths[i], WK.n), { from: 0, to: WK.n, samples: WK.n, color: 'rgba(0,136,176,0.22)', width: 1 });
+      pl.curve(walkFn(WK.paths[i], WK.n), { from: 0, to: WK.n, samples: WK.n, color: 'rgba(43,95,255,0.22)', width: 1 });
     }
     pl.curve(walkFn(WK.paths[0], WK.n), { from: 0, to: WK.n, samples: WK.n, color: c.accent, width: 2.4, label: 'one walk' });
     pl.axes({ step: 50, xLabel: 'steps n', yLabel: 'position S_n' });
@@ -371,7 +371,7 @@ series: "probability_in_action"
     var pl = poTl, ev = PO.events, i, prev = 0;
     pl.clear();
     for (i = 0; i < ev.length; i++) {
-      pl.band(prev, ev[i], { color: (i % 2 === 0) ? 'rgba(0,136,176,0.10)' : 'rgba(214,0,108,0.07)' });
+      pl.band(prev, ev[i], { color: (i % 2 === 0) ? 'rgba(43,95,255,0.10)' : 'rgba(214,0,108,0.07)' });
       prev = ev[i];
     }
     pl.band(prev, PT, { color: 'rgba(214,0,108,0.07)' });
@@ -403,7 +403,7 @@ series: "probability_in_action"
     var h = Prob.hist(PO.counts, { bins: K + 1, range: [-0.5, K + 0.5], density: true });
     pl.clear();
     pl.grid({ step: 5 });
-    pl.bars(h.bins, { color: 'rgba(0,136,176,0.55)', label: 'simulated counts' });
+    pl.bars(h.bins, { color: 'rgba(43,95,255,0.55)', label: 'simulated counts' });
     var pd = Prob.dist.poisson(mu), pb = [];
     for (k = 0; k <= K; k++) { if (pd.pmf(k) > 1e-5) pb.push({ x: k, y: pd.pmf(k), color: c.accent2 }); }
     pl.bars(pb, { width: 0.42, color: c.accent2, label: 'Poisson(λL) pmf' });
@@ -464,7 +464,7 @@ series: "probability_in_action"
     pl.grid({ step: 0.5 });
     pl.hline(0, { color: c.divider });
     for (i = 1; i < BR.paths.length; i++) {
-      pl.curve(brownianFn(BR.paths[i], n), { from: 0, to: 1, samples: Math.min(n, 600), color: 'rgba(0,136,176,0.45)', width: 1.2 });
+      pl.curve(brownianFn(BR.paths[i], n), { from: 0, to: 1, samples: Math.min(n, 600), color: 'rgba(43,95,255,0.45)', width: 1.2 });
     }
     pl.curve(brownianFn(BR.paths[0], n), { from: 0, to: 1, samples: Math.min(n, 600), color: c.accent, width: 2.4, label: 'S over √n' });
     pl.axes({ step: 1, xLabel: 'time t', yLabel: 'rescaled position' });

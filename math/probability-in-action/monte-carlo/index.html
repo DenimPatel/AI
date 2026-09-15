@@ -97,7 +97,7 @@ series: "probability_in_action"
         <div class="g-legend">
           <span class="g-legend-item"><span class="g-swatch" style="background:#d6006c"></span> naive</span>
           <span class="g-legend-item"><span class="g-swatch" style="background:#e09000"></span> antithetic</span>
-          <span class="g-legend-item"><span class="g-swatch" style="background:#0088b0"></span> control variates</span>
+          <span class="g-legend-item"><span class="g-swatch" style="background:#2b5fff"></span> control variates</span>
           <span class="g-legend-item"><span class="g-swatch" style="background:#1a7f37"></span> stratified</span>
         </div>
         <div class="g-readout" id="race-readout"></div>
@@ -110,22 +110,22 @@ series: "probability_in_action"
     <div class="g-step-head"><span class="g-step-num">4</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">Every expectation you cannot compute directly</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / ML</div>
         <h3 style="margin:6px 0;">Policy gradients and baselines</h3>
         <p style="margin-bottom:0;">Reinforcement learning from human feedback estimates an expected reward by sampling trajectories, and the estimator is a Monte Carlo average with all the noise that implies. The standard fix in <a href="{{ '/ai/llm-training/rlhf/' | relative_url }}">RLHF</a> &mdash; subtracting a baseline from the reward &mdash; is a control variate whose known mean is zero for a centred advantage, and it is the reason policy-gradient training converges at all.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">Integrals past three dimensions</h3>
         <p style="margin-bottom:0;">The Riemann sums of <a href="{{ '/math/calculus-in-motion/multiple-integrals/' | relative_url }}">multiple integrals</a> become hopeless once the dimension climbs, while the Monte Carlo error stays <var>&sigma;/&radic;N</var> regardless of dimension. That dimension-independence is why simulation replaces quadrature in statistical physics, rendering, and Bayesian computation.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Vision</div>
         <h3 style="margin:6px 0;">Stochastic objectives in optimization</h3>
         <p style="margin-bottom:0;">Robust fitting and pose estimation optimise expectations over noise and outliers, and stochastic methods in <a href="{{ '/vision/nonlinear-optimization/' | relative_url }}">nonlinear optimization</a> replace the exact objective with a sampled one. Variance reduction is what keeps those sampled gradients from drowning the descent direction in noise.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">The samplers it depends on</h3>
         <p style="margin-bottom:0;">Every estimator here assumes you can draw the right points, and in high dimensions that is its own problem. The inverse-CDF, rejection and importance-sampling machines of <a href="{{ '/math/probability-in-action/sampling/' | relative_url }}">How to draw a sample</a> are what turn a target distribution into the stream of <var>x_i</var> this part averages; importance sampling is itself a variance-reduction technique, aimed at a different representation of the same integral.</p>
@@ -171,7 +171,7 @@ series: "probability_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Randomness also accumulates over time &mdash; next, walks that drift, jump and diffuse.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability-in-action/random-walks/' | relative_url }}">Next: Random walks, Poisson processes, Brownian motion →</a>
   </div>
@@ -236,7 +236,7 @@ series: "probability_in_action"
     var n = pi.n, i, x, y;
     for (i = 0; i < n; i++) {
       x = pi.xs[i]; y = pi.ys[i];
-      ctx.fillStyle = (x * x + y * y <= 1) ? 'rgba(0,136,176,0.80)' : 'rgba(32,30,29,0.26)';
+      ctx.fillStyle = (x * x + y * y <= 1) ? 'rgba(43,95,255,0.80)' : 'rgba(32,30,29,0.26)';
       ctx.fillRect(X(x) - 1, Y(y) - 1, 2.2, 2.2);
     }
     ctx.fillStyle = c.accent2; ctx.font = '12px ' + c.font; ctx.textAlign = 'left';
@@ -270,7 +270,7 @@ series: "probability_in_action"
       ctx.lineTo(X, Y);
     }
     ctx.closePath();
-    ctx.fillStyle = 'rgba(0,136,176,0.10)';
+    ctx.fillStyle = 'rgba(43,95,255,0.10)';
     ctx.fill();
     ctx.restore();
     pl.hline(PI, { color: c.accent2, dash: [6, 4], labelText: '\u03c0 = 3.14159\u2026' });
@@ -282,7 +282,7 @@ series: "probability_in_action"
     pl.legend([
       { label: 'running estimate', color: c.accent },
       { label: '\u03c0 (truth)', color: c.accent2, dash: [6, 4] },
-      { label: '\u00b11.64/\u221aN error band', color: 'rgba(0,136,176,0.10)', fill: true }
+      { label: '\u00b11.64/\u221aN error band', color: 'rgba(43,95,255,0.10)', fill: true }
     ]);
     var est = pi.est[n], ins = pi.cum[n];
     el('pi-readout').innerHTML =
@@ -353,7 +353,7 @@ series: "probability_in_action"
     var methods = [
       { name: 'naive', fn: estNaive, color: '#d6006c', ys: [] },
       { name: 'antithetic', fn: estAnti, color: '#e09000', ys: [] },
-      { name: 'control variates', fn: estControl, color: '#0088b0', ys: [] },
+      { name: 'control variates', fn: estControl, color: '#2b5fff', ys: [] },
       { name: 'stratified', fn: estStrat, color: '#1a7f37', ys: [] }
     ];
     var xs = [], i, j, lo = Infinity, hi = -Infinity, e, y;

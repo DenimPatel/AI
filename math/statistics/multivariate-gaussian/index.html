@@ -136,12 +136,12 @@ series: "statistics"
     <div class="g-step-head"><span class="g-step-num">7</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">One distribution, an entire engineering stack</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics &amp; Vision</div>
         <h3 style="margin:6px 0;">Gaussian state estimation</h3>
         <p style="margin-bottom:0;">A robot's belief about its pose is a Gaussian, and every measurement is a slice. SLAM systems keep the joint distribution of the trajectory and the map as a large covariance matrix and update it by conditioning; the <a href="{{ '/vision/nonlinear-optimization/slam/' | relative_url }}">SLAM chapter</a> is this page with thousands of coordinates instead of two. The four closure properties you just watched are exactly what lets those systems keep a single belief rather than a pile of samples.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">The covariance matrix and PCA</h3>
         <p style="margin-bottom:0;">The ellipse on this page is the covariance matrix made visible, and asking for its axes is asking for its eigenvectors. The <a href="{{ '/math/linear-algebra/low-rank-pca/' | relative_url }}">low-rank PCA chapter</a> takes the same matrix and keeps only the widest directions, which is the ellipse's longest axis promoted to a summary of the whole cloud. Dimensionality reduction, whitening and latent-variable models all begin from this object.</p>
@@ -181,7 +181,7 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>A Gaussian belief that is shifted by motion and sliced by a measurement is a filter. The next part makes that recursion something you can watch, one door at a time.</span>
     <a class="btn btn-secondary" href="{{ '/math/statistics/bayes-filter/' | relative_url }}">Next: The Bayes filter →</a>
   </div>
@@ -282,7 +282,7 @@ series: "statistics"
     ctx.lineTo(mainPlot.px(mainPlot.xRange[1]), base);
     ctx.lineTo(mainPlot.px(mainPlot.xRange[0]), base);
     ctx.closePath();
-    ctx.fillStyle = 'rgba(0,136,176,0.12)'; ctx.fill();
+    ctx.fillStyle = 'rgba(43,95,255,0.12)'; ctx.fill();
     var Xa = mainPlot.px(aVal);
     var Ya = base - k * S.dist.normal.pdf(aVal, MU[0], sd);
     ctx.beginPath(); ctx.moveTo(Xa, base); ctx.lineTo(Xa, Ya);
@@ -316,7 +316,7 @@ series: "statistics"
       ctx.strokeStyle = color; ctx.lineWidth = width;
       ctx.setLineDash(dashed || []); ctx.stroke(); ctx.setLineDash([]);
     }
-    curve(MU[1], sd2, c.accent400, 1.6, [5, 4], 'rgba(98,197,238,0.12)');
+    curve(MU[1], sd2, c.accent400, 1.6, [5, 4], 'rgba(93,133,253,0.12)');
     curve(CM, Math.sqrt(Math.max(1e-8, CV)), c.accent2, 2, [], 'rgba(214,0,108,0.12)');
     ctx.fillStyle = c.text; ctx.font = '10px ' + c.font; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
     ctx.fillText('p(x\u2082)', base + 4, mainPlot.padT + 2);
@@ -348,8 +348,8 @@ series: "statistics"
 
     mainPlot.clear();
     mainPlot.axes({ xLabel: 'x\u2081', yLabel: 'x\u2082' });
-    mainPlot.ellipse(SIG, MU, 2, { color: c.accent400, width: 1.3, dash: [5, 4], fill: 'rgba(0,136,176,0.05)' });
-    mainPlot.ellipse(SIG, MU, 1, { color: c.accent, width: 2.2, fill: 'rgba(0,136,176,0.13)' });
+    mainPlot.ellipse(SIG, MU, 2, { color: c.accent400, width: 1.3, dash: [5, 4], fill: 'rgba(43,95,255,0.05)' });
+    mainPlot.ellipse(SIG, MU, 1, { color: c.accent, width: 2.2, fill: 'rgba(43,95,255,0.13)' });
     var xr0 = mainPlot.xRange[0], xr1 = mainPlot.xRange[1];
     mainPlot.curve([[xr0, MU[1] + beta * (xr0 - MU[0])], [xr1, MU[1] + beta * (xr1 - MU[0])]],
       { color: c.accent700, width: 1.8, dash: [6, 4] });
@@ -468,7 +468,7 @@ series: "statistics"
     }
     var heat = {
       type: 'contour', x: xs, y: ys, z: z,
-      colorscale: [[0, '#f3f7f9'], [0.4, '#cfe8f1'], [0.75, '#62c5ee'], [1, '#006786']],
+      colorscale: [[0, '#f3f6ff'], [0.4, '#cfdcff'], [0.75, '#5d85fd'], [1, '#0b3cd0']],
       contours: { coloring: 'heatmap', showlines: false },
       line: { width: 0 }, hoverinfo: 'skip', showscale: false
     };
@@ -519,7 +519,7 @@ series: "statistics"
     affinePlane.grid(null, { step: 1, color: 'rgba(32,30,29,0.08)', width: 1 });
     affinePlane.axes();
     affinePlane.ellipse([[1, 0], [0, 1]], { color: 'rgba(32,30,29,0.35)', width: 1.2, dash: [4, 4] });
-    affinePlane.ellipse(Ap, { color: c.accent, width: 2.2, fill: 'rgba(0,136,176,0.12)' });
+    affinePlane.ellipse(Ap, { color: c.accent, width: 2.2, fill: 'rgba(43,95,255,0.12)' });
     affinePlane.points(AZ, { color: 'rgba(32,30,29,0.28)', r: 2.2 });
     var xp = [], i;
     for (i = 0; i < AZ.length; i++) xp.push(LA.mat.mulVec(Ap, AZ[i]));

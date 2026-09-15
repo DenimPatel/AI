@@ -108,12 +108,12 @@ series: "statistics"
     <div class="g-step-head"><span class="g-step-num">7</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">A test by any other name</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Vision &amp; Geometry</div>
         <h3 style="margin:6px 0;">Testing whether a fit is real</h3>
         <p style="margin-bottom:0;">RANSAC in the <a href="{{ '/vision/multi-view-geometry/ransac/' | relative_url }}">multi-view geometry guide</a> repeatedly samples a minimal set of correspondences, fits a model, and counts inliers. The natural question &mdash; is this many inliers more than chance would give? &mdash; is a hypothesis test. The null is a random correspondence set, the statistic is the inlier count, and the threshold on that count plays the role of <var>&alpha;</var>. The geometry page reasons about those probabilities exactly as this part does.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">A/B model comparisons</h3>
         <p style="margin-bottom:0;">Comparing two models on the same benchmark is an A/B test. With paired inputs a permutation over the paired differences gives an exact null without assuming normality, which matters because benchmark scores are bounded and often skewed. The <a href="{{ '/ai/llm-training/evaluation/' | relative_url }}">evaluation chapter</a> reports the scores; this part is how you decide whether a gap between them is real or is the wobble of a finite test set.</p>
@@ -154,7 +154,7 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>A p-value tells you how surprising the data are under the null. The next part asks the complementary question: if an effect is really there, how often will the test find it?</span>
     <a class="btn btn-secondary" href="{{ '/math/statistics/power/' | relative_url }}">Next: Errors, power, and sample size →</a>
   </div>

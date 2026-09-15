@@ -24,7 +24,7 @@ windowObj.Guide = {
     return function () { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
   },
   colors: function () {
-    return { accent: '#0088b0', accent2: '#d6006c', accent400: '#62c5ee', accent700: '#006786', text: '#201e1d', divider: '#ccc', font: 'sans-serif', mono: 'monospace' };
+    return { accent: '#2b5fff', accent2: '#d6006c', accent400: '#5d85fd', accent700: '#0b3cd0', text: '#201e1d', divider: '#ccc', font: 'sans-serif', mono: 'monospace' };
   },
   niceTicks: function (min, max, target) {
     target = Math.max(1, target || 6);

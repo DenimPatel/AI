@@ -122,22 +122,22 @@ series: "probability"
     <p class="g-eyebrow">Σ is the workhorse object</p>
     <p>Three fields have independently converged on the same second-moment idea, which is a good sign it is the right abstraction.</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Estimating state, not just values</h3>
         <p style="margin-bottom:0;">A filter on a robot's <a href="{{ '/robotics/navigation/odometry/' | relative_url }}">odometry</a> tracks a mean state and a covariance matrix together. The diagonal says how uncertain each coordinate is; the off-diagonal says how errors are coupled, which decides how a single measurement should correct several coordinates at once. Drop the off-diagonals and the filter becomes overconfident in exactly the directions where the errors are correlated.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Linear algebra</div>
         <h3 style="margin:6px 0;">Eigenvectors as principal axes</h3>
         <p style="margin-bottom:0;">The covariance matrix is symmetric, so it <a href="{{ '/math/linear-algebra/symmetric/' | relative_url }}">diagonalises in an orthonormal basis</a>. Its eigenvectors are the directions in which the cloud stretches and shrinks, and its eigenvalues rank those directions by variance. That is the entire geometric content of the next two links: compression by <a href="{{ '/math/linear-algebra/low-rank-pca/' | relative_url }}">PCA</a> is nothing but throwing away the small eigenvalues of Σ.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Optimisation</div>
         <h3 style="margin:6px 0;">Curvature and correlated steps</h3>
         <p style="margin-bottom:0;">The Hessian of a least-squares problem is a covariance-like matrix, and its correlation structure is why plain gradient descent zig-zags along narrow valleys. Preconditioning in <a href="{{ '/vision/nonlinear-optimization/' | relative_url }}">nonlinear optimisation</a> is the art of rescaling so that the effective covariance is close to the identity, at which point the elliptical valley becomes a round bowl.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Probability</div>
         <h3 style="margin:6px 0;">When covariance tells the truth</h3>
         <p style="margin-bottom:0;">Zero covariance and <a href="{{ '/math/probability/independence/' | relative_url }}">independence</a> agree only for the joint Gaussian, where Σ captures the whole distribution. Everywhere else it is a partial description, which is why the multivariate Gaussian is the one place a covariance matrix is a complete summary — and why the next part is devoted to it.</p>
@@ -181,7 +181,7 @@ series: "probability"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Once you have a mean vector and a covariance matrix, the Gaussian writes itself &mdash; and conditioning becomes slicing an ellipse.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability/multivariate-gaussian/' | relative_url }}">Next: The multivariate Gaussian →</a>
   </div>
@@ -246,7 +246,7 @@ series: "probability"
     var e2 = P.confEllipse(st.Sigma, st.mean, 2);
     var e1 = P.confEllipse(st.Sigma, st.mean, 1);
     pl.polygon(e2, { fill: 'rgba(214,0,108,0.08)', stroke: 'rgba(214,0,108,0.45)', width: 1.5 });
-    pl.polygon(e1, { fill: 'rgba(0,136,176,0.10)', stroke: 'rgba(0,136,176,0.75)', width: 2 });
+    pl.polygon(e1, { fill: 'rgba(43,95,255,0.10)', stroke: 'rgba(43,95,255,0.75)', width: 2 });
     pl.points(cloud, { r: 3, color: 'rgba(32,30,29,0.5)' });
     if (centreHandle) centreHandle.draw();
 

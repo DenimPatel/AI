@@ -51,7 +51,9 @@ redirect_from:
   }
   .mvg-demo {
     display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;
-    background: var(--color-surface); border-radius: var(--radius-md); padding: 18px;
+    background: var(--glass-bg-strong); border: 1px solid var(--glass-border);
+    backdrop-filter: blur(14px) saturate(150%); -webkit-backdrop-filter: blur(14px) saturate(150%);
+    box-shadow: var(--glass-shadow); border-radius: var(--radius-md); padding: 18px;
     margin-top: 8px;
   }
   .mvg-canvas-wrap { flex: 1 1 380px; min-width: 280px; }
@@ -299,7 +301,7 @@ redirect_from:
 
   function css(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
   var COLOR_TEXT = css('--color-text') || '#201e1d';
-  var COLOR_ACCENT = css('--color-accent') || '#0088b0';
+  var COLOR_ACCENT = css('--color-accent') || '#2b5fff';
   var COLOR_ACCENT2 = css('--color-accent-2') || '#d6006c';
   var COLOR_DIVIDER = css('--color-divider') || 'rgba(32,30,29,0.16)';
 
@@ -562,7 +564,7 @@ redirect_from:
 
       // clicked-point marker
       if (clicked) {
-        ctxL.fillStyle = '#0088b0';
+        ctxL.fillStyle = '#2b5fff';
         ctxL.beginPath(); ctxL.arc(clicked.px, clicked.py, 3, 0, 7); ctxL.fill();
         ctxL.strokeStyle = '#fff'; ctxL.lineWidth = 1; ctxL.stroke();
 
@@ -578,7 +580,7 @@ redirect_from:
 
         if (mode === 'rect') {
           var m = runMatch(rig.cam1, rig.cam2, clicked.px, clicked.py, rig.B);
-          ctxR.fillStyle = '#0088b0';
+          ctxR.fillStyle = '#2b5fff';
           ctxR.beginPath(); ctxR.arc(m.qx, clicked.py, 3, 0, 7); ctxR.fill();
           ctxR.strokeStyle = '#fff'; ctxR.lineWidth = 1; ctxR.stroke();
 

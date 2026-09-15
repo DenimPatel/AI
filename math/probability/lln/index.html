@@ -127,22 +127,22 @@ series: "probability"
     <div class="g-step-head"><span class="g-step-num">5</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">Why the average is the default estimator</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Averaging out sensor noise</h3>
         <p style="margin-bottom:0;">A robot integrates thousands of noisy <a href="{{ '/robotics/navigation/odometry/' | relative_url }}">odometry</a> and range readings. The law of large numbers is why the running estimate of a constant bias converges, and why a filter can treat the average residual as a trustworthy calibration. The strong law is the version that justifies treating a single long run as representative.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / ML</div>
         <h3 style="margin:6px 0;">Concentration as the engine of scaling</h3>
         <p style="margin-bottom:0;">Training and evaluation are averages over data. The law of large numbers says a larger sample gives a mean closer to the population value, and the concentration inequalities sharpen the rate. That is the statistical spine of the <a href="{{ '/ai/llm-training/scaling/' | relative_url }}">scaling</a> story: more data narrows the gap between measured and expected loss.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Vision</div>
         <h3 style="margin:6px 0;">How many random samples are enough</h3>
         <p style="margin-bottom:0;">Robust fitting in <a href="{{ '/vision/multi-view-geometry/ransac/' | relative_url }}">multi-view geometry</a> draws random minimal samples until enough of them are all-inlier. The inlier fraction is itself estimated by an average, and the law of large numbers is what lets a RANSAC loop trust the running estimate enough to stop.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">The bridge from probability to statistics</h3>
         <p style="margin-bottom:0;">The <a href="{{ '/math/probability/expectation/' | relative_url }}">expectation</a> of a distribution is an abstract balance point; the sample mean is a computable object. The law of large numbers is the theorem that connects them, and it is the licence for every estimator that quotes a sample average as if it were the population value.</p>
@@ -188,7 +188,7 @@ series: "probability"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>The average settles; the next question is how the leftover error is distributed &mdash; and the answer is Gaussian.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability/clt/' | relative_url }}">Next: The Central Limit Theorem →</a>
   </div>
@@ -258,7 +258,7 @@ series: "probability"
     for (t = 0; t < NTRAILS; t++) {
       var run = trailState.data[t];
       ctx.save();
-      ctx.strokeStyle = 'rgba(0,136,176,0.30)';
+      ctx.strokeStyle = 'rgba(43,95,255,0.30)';
       ctx.lineWidth = 1;
       ctx.beginPath();
       for (i = 1; i <= n; i += step) {
@@ -453,11 +453,11 @@ series: "probability"
     }
     // outer region: convergence in distribution
     ell(ctx, 320, 190, 292, 152);
-    ctx.fillStyle = fill(mode === 'dist', 'rgba(0,136,176,0.06)', 'rgba(0,136,176,0.22)');
+    ctx.fillStyle = fill(mode === 'dist', 'rgba(43,95,255,0.06)', 'rgba(43,95,255,0.22)');
     ctx.fill();
     // inner region: convergence in probability
     ell(ctx, 305, 195, 208, 112);
-    ctx.fillStyle = fill(mode === 'prob', 'rgba(0,136,176,0.10)', 'rgba(0,136,176,0.30)');
+    ctx.fillStyle = fill(mode === 'prob', 'rgba(43,95,255,0.10)', 'rgba(43,95,255,0.30)');
     ctx.fill();
     // overlapping strong regions
     ell(ctx, 248, 197, 82, 82);

@@ -109,12 +109,12 @@ series: "statistics"
     <div class="g-step-head"><span class="g-step-num">5</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">One penalty, two worlds</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">Weight decay is a Gaussian prior</h3>
         <p style="margin-bottom:0;">"Weight decay" in the <a href="{{ '/ai/llm-training/pretraining/' | relative_url }}">pretraining chapter</a> is this page's $L_2$ penalty applied to every weight of a neural network. The loss is training error plus $\lambda\lVert\theta\rVert_2^2$, which is a Gaussian prior on the parameters and a shrunken, better-conditioned optimum. Decoupled variants such as AdamW exist precisely because the interaction between the adaptive gradient and the penalty matters when the prior is being applied per-parameter at scale.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Linear Algebra</div>
         <h3 style="margin:6px 0;">The regularised normal equations</h3>
         <p style="margin-bottom:0;">The <a href="{{ '/math/linear-algebra/least-squares/' | relative_url }}">least-squares part</a> solves $X\beta = y$ in the least-squares sense; ridge is the same problem with $\lambda I$ added to the Gram matrix, trading exactness for a bounded, stable solution. The same move appears whenever an inverse is nearly singular, and the <a href="{{ '/math/linear-algebra/rank-subspaces/' | relative_url }}">rank and subspaces part</a> explains the geometry: a penalty suppresses the directions where the data carry little information.</p>
@@ -156,7 +156,7 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Regularisation is one penalty with one dial. Choosing which model to keep, and how strong the penalty should be, is the next part's job.</span>
     <a class="btn btn-secondary" href="{{ '/math/statistics/model-selection/' | relative_url }}">Next: Cross-validation, AIC and BIC →</a>
   </div>
@@ -256,7 +256,7 @@ series: "statistics"
     if (invXtX) {
       var levels = [0.6, 1.2, 1.8, 2.4, 3.0, 3.6];
       levels.forEach(function (k) {
-        geoPlot.ellipse(invXtX, betaOls, k, { color: 'rgba(0,136,176,0.28)', width: 1, dash: [3, 3] });
+        geoPlot.ellipse(invXtX, betaOls, k, { color: 'rgba(43,95,255,0.28)', width: 1, dash: [3, 3] });
       });
       var kStar = Math.sqrt(Math.max(0, quadForm(bhat)));
       if (kStar > 1e-6) {
@@ -265,10 +265,10 @@ series: "statistics"
     }
 
     if (mode === 'lasso') {
-      fillPoly(geoPlot, diamondPts(t), 'rgba(0,136,176,0.14)');
+      fillPoly(geoPlot, diamondPts(t), 'rgba(43,95,255,0.14)');
       geoPlot.curve(diamondPts(t), { color: c.accent, width: 2 });
     } else {
-      fillPoly(geoPlot, circlePts(t), 'rgba(0,136,176,0.14)');
+      fillPoly(geoPlot, circlePts(t), 'rgba(43,95,255,0.14)');
       geoPlot.curve(circlePts(t), { color: c.accent, width: 2 });
     }
 
@@ -279,7 +279,7 @@ series: "statistics"
     geoPlot.points([bhat], { color: c.accent2, r: 5, stroke: '#ffffff', width: 1.5 });
 
     geoPlot.legend([
-      { label: 'RSS loss contours', color: 'rgba(0,136,176,0.55)', dashed: true },
+      { label: 'RSS loss contours', color: 'rgba(43,95,255,0.55)', dashed: true },
       { label: 'contour the solution touches', color: c.accent2 },
       { label: mode === 'lasso' ? 'L1 constraint (diamond)' : 'L2 constraint (circle)', color: c.accent },
       { label: 'OLS solution (λ = 0)', color: c.accent400 }

@@ -213,7 +213,7 @@ series: "llm_serving"
     </ul>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>This part built the fleet and priced its failures. The last part turns all of it into a number you can defend.</span>
     <a class="btn btn-secondary" href="{{ '/ai/llm-serving/economics/' | relative_url }}">Next: Benchmarking, cost and capacity planning →</a>
   </div>
@@ -551,7 +551,7 @@ series: "llm_serving"
       panelLine(ctx, top, xR, yLoad, rows.map(function (d) { return { x: d.t, y: d.cap }; }), c.accent, 2.5);
       panelLine(ctx, bot, xR, yT, rows.map(function (d) { return { x: d.t, y: SLO }; }), c.accent2, 1.2, true);
       panelLine(ctx, bot, xR, yT, rows.map(function (d) { return { x: d.t, y: d.ttft }; }), c.accent700, 2);
-      panelArea(ctx, bot, xR, yRep, rows.map(function (d) { return { x: d.t, y: d.ready }; }), "rgba(98,197,238,0.30)");
+      panelArea(ctx, bot, xR, yRep, rows.map(function (d) { return { x: d.t, y: d.ready }; }), "rgba(93,133,253,0.30)");
       panelLine(ctx, bot, xR, yRep, rows.map(function (d) { return { x: d.t, y: d.ready }; }), c.accent500, 1.5);
 
       ctx.fillStyle = c.accent2; ctx.font = "10.5px " + c.font; ctx.textAlign = "left";

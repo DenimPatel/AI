@@ -164,12 +164,12 @@ series: "linear_algebra"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">One idea, two worlds</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics &amp; vision</div>
         <h3 style="margin:6px 0;">Cameras and image warps are matrices</h3>
         <p style="margin-bottom:0;">A pinhole camera projects a 3D point to a 2D image through a linear map, and its intrinsic matrix is exactly the columns-are-images object drawn above: it turns coordinates in the camera frame into pixel coordinates. Rectifying a lens, aligning a stereo pair and warping an image are all matrices acting on homogeneous coordinates &mdash; the same picture, one dimension up. The <a href="{{ '/vision/multi-view-geometry/pinhole-camera/' | relative_url }}">pinhole camera part</a> builds the intrinsics explicitly.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">A linear layer is this transformation</h3>
         <p style="margin-bottom:0;">The dense linear layer at the heart of a transformer is <var>y = Wx</var>, with <var>W</var> a learned matrix. Its columns are the directions the layer can send the basis vectors, and training adjusts those columns. Activations, attention projections and the value/output maps are all instances of the same operation, applied at a much larger scale. The <a href="{{ '/ai/llm-training/architecture/' | relative_url }}">architecture chapter</a> places them inside the model; a later part of this series returns to attention as three matrices.</p>
@@ -194,7 +194,7 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>One matrix moves the plane; two in a row compose into a product &mdash; and the order matters.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/composition/' | relative_url }}">Next: Matrix multiplication is composition →</a>
   </div>
@@ -246,7 +246,7 @@ series: "linear_algebra"
 
     var c0 = col0(), c1v = col1();
     planeA.polygon([[0, 0], [1, 0], [1, 1], [0, 1]], { stroke: 'rgba(32,30,29,0.35)', width: 1.2 });
-    planeA.polygon([[0, 0], c0, LA.vadd(c0, c1v), c1v], { fill: 'rgba(0,136,176,0.12)', stroke: 'rgba(0,136,176,0.45)', width: 1.5 });
+    planeA.polygon([[0, 0], c0, LA.vadd(c0, c1v), c1v], { fill: 'rgba(43,95,255,0.12)', stroke: 'rgba(43,95,255,0.45)', width: 1.5 });
 
     planeA.vector(probe, { color: c.accent700, dashed: true, width: 1.6, head: 7, label: 'p' });
     var Mp = LA.mat.mulVec(M, probe);
@@ -322,7 +322,7 @@ series: "linear_algebra"
     planeC.axes();
     var c0 = col0(), c1v = col1();
     planeC.polygon([[0, 0], [1, 0], [1, 1], [0, 1]], { stroke: 'rgba(32,30,29,0.35)', width: 1.2 });
-    planeC.polygon([[0, 0], c0, LA.vadd(c0, c1v), c1v], { fill: 'rgba(0,136,176,0.14)', stroke: 'rgba(0,136,176,0.5)', width: 1.5 });
+    planeC.polygon([[0, 0], c0, LA.vadd(c0, c1v), c1v], { fill: 'rgba(43,95,255,0.14)', stroke: 'rgba(43,95,255,0.5)', width: 1.5 });
     planeC.vector(c0, { color: c.accent, label: 'î ⟶', width: 2.4 });
     planeC.vector(c1v, { color: c.accent400, label: 'ĵ ⟶', width: 2.4 });
     LA.setMatrix(el('tf-preset-mat'), M, { digits: 2, label: 'M =' });
@@ -358,7 +358,7 @@ series: "linear_algebra"
 
     var c0 = col0(), c1v = col1();
     planeD.polygon([[0, 0], [1, 0], [1, 1], [0, 1]], { stroke: 'rgba(32,30,29,0.4)', width: 1.2 });
-    planeD.polygon([[0, 0], c0, LA.vadd(c0, c1v), c1v], { fill: 'rgba(0,136,176,0.12)', stroke: 'rgba(0,136,176,0.45)', width: 1.5 });
+    planeD.polygon([[0, 0], c0, LA.vadd(c0, c1v), c1v], { fill: 'rgba(43,95,255,0.12)', stroke: 'rgba(43,95,255,0.45)', width: 1.5 });
     planeD.vector(c0, { color: c.accent, label: 'col 1', width: 2.2 });
     planeD.vector(c1v, { color: c.accent400, label: 'col 2', width: 2.2 });
 

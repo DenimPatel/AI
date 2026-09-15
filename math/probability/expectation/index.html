@@ -140,22 +140,22 @@ series: "probability"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">Expectation under everything</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">Variance and concentration</h3>
         <p style="margin-bottom:0;">The next part defines variance as <var>$\mathbb{E}[(X-\mathbb{E}[X])^2]$</var>, a second moment built entirely out of expectation, and then bounds how far a variable can stray using only its mean. Linearity is what makes <var>$\operatorname{Var}(X)=\mathbb{E}[X^2]-\mathbb{E}[X]^2$</var> and <var>$\operatorname{Var}(X+Y)$</var> computable. See <a href="{{ '/math/probability/variance/' | relative_url }}">Spread, moments and concentration</a>.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / ML</div>
         <h3 style="margin:6px 0;">Training loss as an expectation</h3>
         <p style="margin-bottom:0;">A language model is trained to minimise the expected negative log-likelihood of the next token, and the corpus loss is a sample mean of that expectation. Perplexity is its exponential. Linearity is why the per-example gradients can be averaged and why the loss on a batch estimates the loss on the distribution. See <a href="{{ '/ai/llm-training/language-models/' | relative_url }}">language models</a>.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Vision</div>
         <h3 style="margin:6px 0;">How many RANSAC iterations?</h3>
         <p style="margin-bottom:0;">Robust fitting samples minimal sets and counts inliers, and the expected number of iterations needed to hit an all-inlier sample is a short expectation calculation over indicators. That is why the required iteration count grows so steeply with the inlier ratio. See <a href="{{ '/vision/multi-view-geometry/ransac/' | relative_url }}">RANSAC</a>.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Linear algebra</div>
         <h3 style="margin:6px 0;">Expectation as an inner product</h3>
         <p style="margin-bottom:0;">Write the values as a vector <var>$\mathbf{x}$</var> and the probabilities as a vector <var>$\mathbf{p}$</var>. Then <var>$\mathbb{E}[X]=\mathbf{x}\cdot\mathbf{p}$</var>: expectation is a dot product against a vector of weights that sums to one. The <a href="{{ '/math/linear-algebra/dot-product/' | relative_url }}">dot product</a> carries the whole geometry of projections with it.</p>
@@ -202,7 +202,7 @@ series: "probability"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>The mean is the first moment; the second one measures how far a variable wanders from it, and it comes with bounds that work for any distribution.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability/variance/' | relative_url }}">Next: Spread, moments and concentration →</a>
   </div>
@@ -276,10 +276,10 @@ series: "probability"
       var x = X(POS[i]);
       var r = 8 + 22 * Math.sqrt(p[i]);
       var cy = beamY - 44 - 34 * p[i];
-      ctx.strokeStyle = 'rgba(0,136,176,0.35)'; ctx.lineWidth = 2;
+      ctx.strokeStyle = 'rgba(43,95,255,0.35)'; ctx.lineWidth = 2;
       ctx.beginPath(); ctx.moveTo(x, beamY); ctx.lineTo(x, cy + r); ctx.stroke();
       ctx.beginPath(); ctx.arc(x, cy, r, 0, 2 * Math.PI);
-      ctx.fillStyle = 'rgba(0,136,176,0.85)'; ctx.fill();
+      ctx.fillStyle = 'rgba(43,95,255,0.85)'; ctx.fill();
       ctx.fillStyle = '#ffffff'; ctx.font = 'bold 11px ' + c.font; ctx.textAlign = 'center';
       ctx.fillText((100 * p[i]).toFixed(0) + '%', x, cy + 4);
       ctx.fillStyle = c.text; ctx.font = '11px ' + c.font;

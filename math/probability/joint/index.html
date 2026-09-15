@@ -122,22 +122,22 @@ series: "probability"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">Tables, slices and products everywhere</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Fusing a pose and a measurement</h3>
         <p style="margin-bottom:0;">A <a href="{{ '/vision/nonlinear-optimization/slam/' | relative_url }}">SLAM</a> or <a href="{{ '/robotics/navigation/odometry/' | relative_url }}">odometry</a> pipeline carries a joint belief over pose and landmark, then conditions it on each new range reading. That conditioning is literally a slice and a renormalisation; the marginal over the pose is what the planner finally consumes, and the two operations are implemented as matrix factorisations of the same joint.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / ML</div>
         <h3 style="margin:6px 0;">Attention and co-occurrence tables</h3>
         <p style="margin-bottom:0;">An attention matrix is a joint distribution over query and key positions before its rows are renormalised; the softmax makes each row sum to one, which is conditioning by construction. Co-occurrence counts in <a href="{{ '/ai/llm-training/pretraining/' | relative_url }}">pretraining</a> are joint tables whose row and column marginals drive pointwise mutual information and the embeddings built from it.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Vision</div>
         <h3 style="margin:6px 0;">Stereo and conditional depth</h3>
         <p style="margin-bottom:0;">In <a href="{{ '/vision/multi-view-geometry/' | relative_url }}">multi-view geometry</a> the disparity at a pixel is a conditional distribution given the pixel's neighbourhood, and the joint over disparity fields is what a matching cost approximates. Marginalising over neighbouring disparities is the slice-and-sum that turns a joint cost volume into a per-pixel estimate.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">Independence, and what breaks it</h3>
         <p style="margin-bottom:0;">The <a href="{{ '/math/probability/independence/' | relative_url }}">independence part</a> treats the product condition as a hypothesis to test; the <a href="{{ '/math/probability/covariance/' | relative_url }}">covariance part</a> measures the linear part of the dependence. Between them they cover the two questions a joint table always raises: does one variable inform the other, and if so, in what direction and by how much?</p>
@@ -185,7 +185,7 @@ series: "probability"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Independence rules out every relationship; the covariance rules out only the linear ones &mdash; and that difference is where the ellipse comes from.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability/covariance/' | relative_url }}">Next: Covariance, correlation and Σ →</a>
   </div>
@@ -296,7 +296,7 @@ series: "probability"
       padL: JLAY.padL, padT: JLAY.padT, padB: JLAY.padB,
       rowLabels: ROW_LABELS, colLabels: COL_LABELS,
       min: 0, max: maxV || 1,
-      colorLow: [238, 246, 250], colorHigh: [0, 136, 176],
+      colorLow: [234, 240, 255], colorHigh: [43, 95, 255],
       fontSize: 11
     });
     var gx = geo.padL, gy = geo.padT, cw = geo.cellW, ch = geo.cellH;

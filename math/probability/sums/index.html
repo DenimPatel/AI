@@ -133,22 +133,22 @@ series: "probability"
     <div class="g-step-head"><span class="g-step-num">5</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">Sums under everything</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Probability</div>
         <h3 style="margin:6px 0;">Families closed under addition</h3>
         <p style="margin-bottom:0;">Normal, Poisson, gamma and Cauchy each convolve to a member of their own family, with parameters that add. Recognising this converts a convolution integral into arithmetic on the parameters — the reason <a href="{{ '/math/probability/continuous-families/' | relative_url }}">continuous families</a> and <a href="{{ '/math/probability/discrete-families/' | relative_url }}">discrete families</a> come with matching addition rules.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Limits</div>
         <h3 style="margin:6px 0;">The road to the CLT</h3>
         <p style="margin-bottom:0;">Iterating the product rule is exactly how the <a href="{{ '/math/probability/clt/' | relative_url }}">central limit theorem</a> is proved: the mgf of a standardised sum telescopes into a power, and its limit is <var>e^{t^2/2}</var>. Without the transform, controlling an <var>n</var>-fold convolution directly is hopeless.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Heavy tails</div>
         <h3 style="margin:6px 0;">When sums refuse to settle</h3>
         <p style="margin-bottom:0;">Cauchy stability is the counterexample that keeps the limit theorems honest. The mgf does not exist, the mean diverges, and averaging buys nothing. The <a href="{{ '/math/probability/tails/' | relative_url }}">tails and heavy tails part</a> follows this failure into Chernoff bounds and high dimensions.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Stacking independent errors</h3>
         <p style="margin-bottom:0;">A <a href="{{ '/robotics/navigation/odometry/' | relative_url }}">navigation stack</a> composes many small noise sources into one pose uncertainty. When each is Gaussian and independent, the combined covariance is the sum of the pieces — convolution reduced to adding matrices, which is why Gaussian noise is the default assumption in every filter.</p>
@@ -194,7 +194,7 @@ series: "probability"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Averaging works because the mgf of a long sum is a power &mdash; and the law of large numbers is what that power does at the origin.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability/lln/' | relative_url }}">Next: The Law of Large Numbers →</a>
   </div>
@@ -287,7 +287,7 @@ series: "probability"
     convBot.yRange[1] = Math.max(0.1, ymax * 1.25);
     convBot.clear();
     convBot.grid({ step: span / 6 });
-    convBot.bars(bins, { color: 'rgba(0,136,176,0.20)', width: span / cfg.bins * 0.92, label: 'X + Y (seeded)' });
+    convBot.bars(bins, { color: 'rgba(43,95,255,0.20)', width: span / cfg.bins * 0.92, label: 'X + Y (seeded)' });
     convBot.curve(function (x) { return convValue(x); },
       { color: c.accent, width: 2.4, from: sRange[0], to: sRange[1], samples: 220, label: '(f*g)(s)' });
     convBot.vline(conv.s, { color: 'rgba(32,30,29,0.55)', dash: [4, 3], label: 's' });
@@ -490,7 +490,7 @@ series: "probability"
     stabPlot.yRange[1] = Math.max(0.1, ymax * 1.22);
     stabPlot.clear();
     stabPlot.grid({ step: 1 });
-    stabPlot.bars(bins, { color: 'rgba(0,136,176,0.22)', width: 12 / 64 * 0.92, label: 'sample mean (seeded)' });
+    stabPlot.bars(bins, { color: 'rgba(43,95,255,0.22)', width: 12 / 64 * 0.92, label: 'sample mean (seeded)' });
     stabPlot.curve(function (x) { return theo.pdf(x); },
       { color: c.accent2, width: 2.2, from: lo, to: hi, samples: 300, label: stab.kind === 'normal' ? 'N(0, 1/n)' : 'Cauchy(0,1)' });
     stabPlot.vline(0, { color: 'rgba(32,30,29,0.4)', dash: [4, 3] });

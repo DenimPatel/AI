@@ -136,12 +136,12 @@ series: "linear_algebra"
     <p class="g-eyebrow">One matrix, two worlds</p>
     <p>The cross product is one of the few pieces of linear algebra that appears in almost the same form in two very different fields. In robotics it turns an angular velocity into a linear velocity; in computer vision the identical skew matrix encodes the translation between two camera positions. The reason is structural rather than coincidental: both fields need to describe motion or displacement perpendicular to a given direction, and both need that description to be a linear map so it can be composed, differentiated and stacked with everything else. The skew matrix is that linear map, and once it is a matrix it obeys the same algebra as every other matrix in this series.</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Angular velocity and the cross product</h3>
         <p style="margin-bottom:0;">A rotating body has an angular-velocity vector <b>&omega;</b>, and the linear velocity of any point on it is <span class="g-math g-katex">$\mathbf{v}=\boldsymbol{\omega}\times\mathbf{r}=[\boldsymbol{\omega}]_\times\mathbf{r}$</span>. Every joint of a robot arm contributes one such term, and stacking them is how a Jacobian maps joint rates to end-effector motion. The <a href="{{ '/vision/nonlinear-optimization/3d-rotations/' | relative_url }}">3D rotations part</a> of the optimization guide uses the skew matrix to linearise rotations about an axis.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Vision / geometry</div>
         <h3 style="margin:6px 0;">The essential matrix E = [t]<sub>&times;</sub>R</h3>
         <p style="margin-bottom:0;">Two calibrated cameras looking at the same scene are separated by a translation <b>t</b>. The constraint that ties a point in one image to its match in the other is packed into <span class="g-math g-katex">$E=[\mathbf{t}]_\times R$</span>, and <span class="g-math g-katex">$[\mathbf{t}]_\times$</span> is precisely the skew matrix from this part. Because <span class="g-math g-katex">$[\mathbf{t}]_\times$</span> is skew and therefore singular, <var>E</var> has rank two, and that shortage of rank is exactly what makes the epipolar constraint a single scalar equation rather than a full system. The <a href="{{ '/vision/multi-view-geometry/epipolar/' | relative_url }}">epipolar geometry part</a> derives the constraint from this matrix.</p>
@@ -187,7 +187,7 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>A cross product is a matrix in disguise, and so is every linear map &mdash; change the basis and the same transformation wears a different matrix.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/change-of-basis/' | relative_url }}">Next: Same map, different coordinates →</a>
   </div>

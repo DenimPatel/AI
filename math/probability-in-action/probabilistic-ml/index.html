@@ -163,22 +163,22 @@ series: "probability_in_action"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">The distribution under every output</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / Training</div>
         <h3 style="margin:6px 0;">The language model's loss</h3>
         <p style="margin-bottom:0;">Every <a href="{{ '/ai/llm-training/language-models/' | relative_url }}">language model</a> is a categorical distribution over the vocabulary at each position, trained by the negative log-likelihood of the next token. Perplexity is the exponential of that loss, and the softmax is the layer that defines it.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / Evaluation</div>
         <h3 style="margin:6px 0;">Calibration and honest confidences</h3>
         <p style="margin-bottom:0;">A model whose confidences are trusted downstream must be calibrated, and <a href="{{ '/ai/llm-training/evaluation/' | relative_url }}">evaluation</a> measures that with reliability diagrams and ECE. Temperature scaling is the cheap post-hoc fix when the curve misses the diagonal.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / Serving</div>
         <h3 style="margin:6px 0;">Sampling the next token</h3>
         <p style="margin-bottom:0;">The <a href="{{ '/ai/llm-serving/decode-loop/' | relative_url }}">decode loop</a> samples from the temperature-scaled softmax, and <a href="{{ '/ai/llm-serving/speculative/' | relative_url }}">speculative decoding</a> compares two such distributions to accept or reject draft tokens. The dial is the same one on this page.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / Alignment</div>
         <h3 style="margin:6px 0;">Log-probabilities as preferences</h3>
         <p style="margin-bottom:0;">Preference training in <a href="{{ '/ai/llm-training/rlhf/' | relative_url }}">RLHF</a> scores candidate completions by the log probability the model assigned them &mdash; cross-entropy read with a sign flip &mdash; and then pushes on the parameters to move that number.</p>
@@ -229,7 +229,7 @@ series: "probability_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Every idea in this volume, mapped to the AI, vision and robotics guide that puts it to work.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability-in-action/glossary/' | relative_url }}">Next: Where each idea is used on this site →</a>
   </div>
@@ -270,7 +270,7 @@ series: "probability_in_action"
     pl.grid({ step: 1 });
     var items = [];
     for (var i = 0; i < p.length; i++) {
-      items.push({ x: i, y: p[i], color: i === 0 ? c.accent : 'rgba(0,136,176,0.55)' });
+      items.push({ x: i, y: p[i], color: i === 0 ? c.accent : 'rgba(43,95,255,0.55)' });
     }
     pl.bars(items, { width: 0.72, baseline: 0 });
     pl.hline(1 / p.length, { color: 'rgba(32,30,29,0.4)', dash: [5, 4], labelText: 'uniform 1/K' });
@@ -310,7 +310,7 @@ series: "probability_in_action"
     pl.grid({ step: 1 });
     var items = [];
     for (var i = 0; i < CK; i++) {
-      items.push({ x: i, y: q[i], color: i === CE.truth ? c.accent2 : 'rgba(0,136,176,0.5)' });
+      items.push({ x: i, y: q[i], color: i === CE.truth ? c.accent2 : 'rgba(43,95,255,0.5)' });
     }
     pl.bars(items, { width: 0.72, baseline: 0 });
     pl.vline(CE.truth, { color: c.accent2, dash: [3, 3], labelText: 'true label' });
@@ -476,8 +476,8 @@ series: "probability_in_action"
       hi.push(post.mean[i] + 2 * post.sd[i]);
     }
     var traces = [
-      { type: 'scatter', mode: 'lines', x: gpGrid, y: hi, line: { color: 'rgba(0,136,176,0.12)', width: 0 }, hoverinfo: 'skip', showlegend: false },
-      { type: 'scatter', mode: 'lines', x: gpGrid, y: lo, fill: 'tonexty', fillcolor: 'rgba(0,136,176,0.18)', line: { color: 'rgba(0,136,176,0.12)', width: 0 }, hoverinfo: 'skip', showlegend: false },
+      { type: 'scatter', mode: 'lines', x: gpGrid, y: hi, line: { color: 'rgba(43,95,255,0.12)', width: 0 }, hoverinfo: 'skip', showlegend: false },
+      { type: 'scatter', mode: 'lines', x: gpGrid, y: lo, fill: 'tonexty', fillcolor: 'rgba(43,95,255,0.18)', line: { color: 'rgba(43,95,255,0.12)', width: 0 }, hoverinfo: 'skip', showlegend: false },
       { type: 'scatter', mode: 'lines', x: gpGrid, y: post.mean, line: { color: c.accent, width: 2.4 }, hoverinfo: 'skip', showlegend: false },
       { type: 'scatter', mode: 'markers', x: GP.xt, y: GP.yt, marker: { color: c.accent2, size: 9, line: { color: '#ffffff', width: 1.5 } }, hoverinfo: 'skip', showlegend: false }
     ];
@@ -539,7 +539,7 @@ series: "probability_in_action"
     pl.clear();
     pl.grid({ step: 1 });
     pl.points(orig, { color: 'rgba(32,30,29,0.18)', r: 2.2, label: 'data x' });
-    pl.points(cur, { color: 'rgba(0,136,176,' + fmt(0.35 + 0.6 * DIFF.t, 2) + ')', r: 2.4, label: 'noised x_t' });
+    pl.points(cur, { color: 'rgba(43,95,255,' + fmt(0.35 + 0.6 * DIFF.t, 2) + ')', r: 2.4, label: 'noised x_t' });
     pl.axes({ step: 1, xLabel: 'latent coordinate 1', yLabel: 'latent coordinate 2' });
     pl.legend();
     var snr = a / Math.max(1e-9, 1 - a);

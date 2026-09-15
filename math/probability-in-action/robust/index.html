@@ -137,22 +137,22 @@ series: "probability_in_action"
     <div class="g-step-head"><span class="g-step-num">5</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">Robustness wherever data is cheap and dirty</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Vision</div>
         <h3 style="margin:6px 0;">Two-view geometry</h3>
         <p style="margin-bottom:0;">Feature matches between two images are full of wrong correspondences, so the eight-point algorithm is run inside <a href="{{ '/vision/multi-view-geometry/ransac/' | relative_url }}">RANSAC</a> before any structure is triangulated. The minimal sample is four or more points and the inlier threshold is a few pixels of Sampson error.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Optimisation</div>
         <h3 style="margin:6px 0;">Robust cost in the solver</h3>
         <p style="margin-bottom:0;">Pose-graph and bundle-adjustment solvers bolt a robust kernel onto the residual, then optimise it with <a href="{{ '/vision/nonlinear-optimization/gradient-descent/' | relative_url }}">gradient-based</a> methods. The IRLS weights reappear as a diagonal matrix folded into the normal equations at every iteration.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">Why heavy tails change the rules</h3>
         <p style="margin-bottom:0;">The whole failure traces back to the shape of the tails: a Gaussian makes large deviations negligible, a <a href="{{ '/math/probability/tails/' | relative_url }}">heavy-tailed distribution</a> does not. Mean and variance can even fail to exist, which is exactly why squared-error summaries mislead.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Sampling</div>
         <h3 style="margin:6px 0;">Consensus by random draws</h3>
         <p style="margin-bottom:0;">RANSAC is a stochastic search, and its guarantees are probabilistic. It is the same reasoning as rejection and importance <a href="{{ '/math/probability-in-action/sampling/' | relative_url }}">sampling</a>: draw repeatedly from a cheap proposal and keep the draw that scores best, trusting a counting argument for how many draws suffice.</p>
@@ -196,7 +196,7 @@ series: "probability_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>With robust fits in hand, the final part turns probability into the engine of a machine-learning model, from softmax to cross-entropy to diffusion.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability-in-action/probabilistic-ml/' | relative_url }}">Next: Probability in machine learning →</a>
   </div>
@@ -434,7 +434,7 @@ series: "probability_in_action"
   // Demo C — robust loss curves, weights, and IRLS
   // ------------------------------------------------------------------
   var COL = {
-    sq: 'rgba(0,136,176,0.95)',
+    sq: 'rgba(43,95,255,0.95)',
     hu: 'rgba(214,0,108,0.95)',
     ca: 'rgba(201,162,39,0.98)',
     tu: 'rgba(95,138,58,0.98)'

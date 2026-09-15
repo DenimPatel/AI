@@ -76,7 +76,7 @@ series: "statistics"
       <div class="g-controls">
         <div class="g-fitkey">
           <span><span class="swatch" style="background: var(--color-accent);"></span>fitted line</span>
-          <span><span class="swatch" style="background: rgba(0,136,176,0.28);"></span>95% band</span>
+          <span><span class="swatch" style="background: rgba(43,95,255,0.28);"></span>95% band</span>
           <span><span class="swatch" style="background: var(--color-accent-2);"></span>residuals</span>
         </div>
         <div class="g-readout" id="fit-readout"></div>
@@ -117,12 +117,12 @@ series: "statistics"
     <p class="g-eyebrow">The same normal equation, two worlds</p>
     <p>Regression is the first model most people fit and the last one they outgrow. Its ingredients &mdash; a design matrix, a noisy target, a squared-error criterion, a covariance matrix for the answer &mdash; reappear wherever a few numbers are estimated from many measurements, and $\hat\beta$ stays a random variable throughout.</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Linear algebra</div>
         <h3 style="margin:6px 0;">The same fit as a projection</h3>
         <p style="margin-bottom:0;">The normal equation $X^{\mathsf T}X\hat{\boldsymbol{\beta}} = X^{\mathsf T}\mathbf{y}$ says the residual is orthogonal to the column space of $X$, and the fitted values are the projection of $\mathbf{y}$ onto it. The <a href="{{ '/math/linear-algebra/least-squares/' | relative_url }}">least-squares part</a> draws that geometry; this part adds the statistics on top, turning the projection into an estimator with a sampling distribution. The numerical caution about forming $X^{\mathsf T}X$ lives in the <a href="{{ '/math/linear-algebra/numerics/' | relative_url }}">numerics part</a>.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Vision &amp; Robotics</div>
         <h3 style="margin:6px 0;">Calibration is weighted regression</h3>
         <p style="margin-bottom:0;">Fitting camera intrinsics, a distortion curve or a sensor alignment to noisy measurements is least squares in a handful of parameters. The <a href="{{ '/vision/multi-view-geometry/calibration/' | relative_url }}">calibration part</a> builds exactly this system and reads its residuals to judge the model &mdash; the diagnostic habit this part is built around. When the parameters are fitted by stepping rather than solving, the gradient of the same sum of squares drives the iteration, which is where the <a href="{{ '/math/calculus/gradient/' | relative_url }}">gradient</a> and <a href="{{ '/vision/nonlinear-optimization/gradient-descent/' | relative_url }}">gradient descent</a> enter.</p>
@@ -162,7 +162,7 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>A standard error is one number of uncertainty. The next part turns it into an interval you can carry around and interpret.</span>
     <a class="btn btn-secondary" href="{{ '/math/statistics/confidence-intervals/' | relative_url }}">Next: Confidence intervals →</a>
   </div>
@@ -249,7 +249,7 @@ series: "statistics"
       return f.beta[0] + f.beta[1] * x0 + tc * se;
     }
 
-    mainPlot.band(loFn, hiFn, { a: XR[0], b: XR[1], color: 'rgba(0,136,176,0.18)', samples: 160 });
+    mainPlot.band(loFn, hiFn, { a: XR[0], b: XR[1], color: 'rgba(43,95,255,0.18)', samples: 160 });
     mainPlot.curve(function (x0) { return f.beta[0] + f.beta[1] * x0; }, { color: c.accent, width: 2.4 });
 
     var bars = pts.map(function (p) {
@@ -264,7 +264,7 @@ series: "statistics"
     mainPlot.legend([
       { label: 'data', color: c.accent700 },
       { label: 'fitted line', color: c.accent },
-      { label: '95% band for the mean', color: 'rgba(0,136,176,0.55)', fill: true, swatch: true }
+      { label: '95% band for the mean', color: 'rgba(43,95,255,0.55)', fill: true, swatch: true }
     ], { dy: 8 });
 
     if (drag) drag.draw();

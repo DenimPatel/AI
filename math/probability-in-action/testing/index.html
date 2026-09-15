@@ -157,22 +157,22 @@ series: "probability_in_action"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">The test is everywhere data are compared</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / benchmarks</div>
         <h3 style="margin:6px 0;">Leaderboards are families of tests</h3>
         <p style="margin-bottom:0;">Comparing many models on many tasks is a multiplicity problem with dozens of correlated hypotheses. A single best-on-the-board result is the maximum of a noisy family, so <a href="{{ '/ai/benchmarks/' | relative_url }}">benchmark</a> claims need confidence intervals and corrections, not just a winning score.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / evaluation</div>
         <h3 style="margin:6px 0;">Significance in model evaluation</h3>
         <p style="margin-bottom:0;">A/B tests and evaluation suites decide whether an update ships, and they run at scale. Bootstrapped intervals, paired tests and multiplicity control are the difference between a real gain and a lucky slice of <a href="{{ '/ai/llm-training/evaluation/' | relative_url }}">evaluation</a> noise.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">Tests and intervals are duals</h3>
         <p style="margin-bottom:0;">Rejecting the null at level <var>$\alpha$</var> is the same as the <var>$1-\alpha$</var> confidence interval excluding the null value. That duality is built in <a href="{{ '/math/probability-in-action/intervals/' | relative_url }}">Confidence vs credible</a>, and it is why an interval always tells you more than a binary verdict.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Vision</div>
         <h3 style="margin:6px 0;">Selecting the best model is a test</h3>
         <p style="margin-bottom:0;">Keeping whichever configuration scored best on a validation set is a selection over a family, and the winner's curse inflates its apparent accuracy. Robust pipelines account for this, much as <a href="{{ '/vision/nonlinear-optimization/' | relative_url }}">nonlinear optimization</a> accounts for noise in the objective it minimizes.</p>
@@ -221,7 +221,7 @@ series: "probability_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>One dataset, no formula: resample it with replacement and grow a sampling distribution from the data itself.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability-in-action/bootstrap/' | relative_url }}">Next: The bootstrap →</a>
   </div>
@@ -277,7 +277,7 @@ series: "probability_in_action"
     pl.clear();
     pl.grid({ step: 1 });
     pl.area(function (x) { return ND.pdf(x); }, crit, pl.xRange[1], { color: 'rgba(214,0,108,0.24)', label: 'α / Type I' });
-    pl.area(function (x) { return h1.pdf(x); }, pl.xRange[0], Math.min(crit, pl.xRange[1]), { color: 'rgba(0,136,176,0.24)', label: 'β / Type II' });
+    pl.area(function (x) { return h1.pdf(x); }, pl.xRange[0], Math.min(crit, pl.xRange[1]), { color: 'rgba(43,95,255,0.24)', label: 'β / Type II' });
     pl.curve(function (x) { return ND.pdf(x); }, { color: c.accent2, width: 2.2, label: 'H₀ ~ N(0,1)' });
     pl.curve(function (x) { return h1.pdf(x); }, { color: c.accent, width: 2.2, label: 'H₁ ~ N(nc,1)' });
     pl.vline(crit, { color: '#555555', dash: [5, 4], labelText: 'critical value c' });
@@ -388,7 +388,7 @@ series: "probability_in_action"
     pl.yRange[1] = Math.max(0.1, Math.min(1, maxFrac * 1.15));
     pl.clear();
     pl.grid({ step: 0.1 });
-    pl.bars(scaled, { color: 'rgba(0,136,176,0.55)' });
+    pl.bars(scaled, { color: 'rgba(43,95,255,0.55)' });
     pl.hline(1 / 20, { color: c.accent2, dash: [6, 4], labelText: 'uniform expectation' });
     pl.vline(0.05, { color: 'rgba(214,0,108,0.7)', dash: [4, 4], labelText: 'p = 0.05' });
     pl.axes({ step: 0.1, xLabel: 'p-value', yLabel: 'fraction per bin' });
@@ -470,7 +470,7 @@ series: "probability_in_action"
     pl.hline(a, { color: 'rgba(32,30,29,0.6)', dash: [5, 4], labelText: 'Šidák / target α' });
     var pts = [], step = 5;
     for (var k = step; k <= mMax; k += step) pts.push({ x: k, y: mcEmpirical(k) });
-    pl.points(pts, { color: 'rgba(0,136,176,0.9)', r: 2.6, label: 'simulated families' });
+    pl.points(pts, { color: 'rgba(43,95,255,0.9)', r: 2.6, label: 'simulated families' });
     pl.vline(mcState.m, { color: 'rgba(214,0,108,0.7)', dash: [4, 4], labelText: 'm = ' + mcState.m });
     pl.axes({ step: 50, xLabel: 'number of null tests m', yLabel: 'family-wise error rate' });
     pl.legend();

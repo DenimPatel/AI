@@ -150,12 +150,12 @@ series: "linear_algebra"
     <p class="g-eyebrow">One idea, two worlds</p>
     <p>The four moves in this part &mdash; project with a matrix, score with an inner product, normalise with a softmax, mix with a weighted sum &mdash; are not unique to attention. The same four moves, with different names and different shapes, are what a robot uses to reconcile a thousand noisy measurements into one coherent pose.</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">The transformer and its cache</h3>
         <p style="margin-bottom:0;">Every block of a language model is the matrix multiplies you just edited: the <a href="{{ '/ai/llm-training/architecture/' | relative_url }}">architecture chapter</a> lays out the tensors and how many of them there are, and the <a href="{{ '/ai/llm-serving/kv-cache/' | relative_url }}">KV cache</a> is simply the keys and values from this head kept in memory so a new token does not recompute them. Generation is, in the end, a stream of inner products.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Jacobians and least squares</h3>
         <p style="margin-bottom:0;">The same operations fit a robot. A pose-graph optimiser linearises its residuals into a Jacobian, forms the normal equations, and solves a sparse least-squares problem &mdash; the subject of <a href="{{ '/math/linear-algebra/optimization/' | relative_url }}">Part 21</a>, running on real sensors in the <a href="{{ '/vision/nonlinear-optimization/pose-graph/' | relative_url }}">pose-graph chapter</a>. Attention and bundle adjustment are different problems wearing the same linear algebra.</p>
@@ -181,7 +181,7 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>That is the series. Every idea in it &mdash; span, rank, projection, eigenvector, SVD &mdash; is now something a model computes, in a loop, billions of times.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/glossary/' | relative_url }}">Reference: Glossary and identities →</a>
   </div>

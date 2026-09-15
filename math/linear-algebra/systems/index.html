@@ -11,7 +11,7 @@ series: "linear_algebra"
 {% include guide-head.html katex=true plotly=true %}
 <style>
   .g-plot3d { width: 100%; height: 380px; background: var(--color-neutral-100); border-radius: var(--radius-sm); }
-  .g-aug .g-matrix-cell--hi { background: rgba(0,136,176,0.14); border-radius: 3px; }
+  .g-aug .g-matrix-cell--hi { background: rgba(43,95,255,0.14); border-radius: 3px; }
   .g-pivot-cell { outline: 2px solid var(--color-accent-2); outline-offset: -1px; border-radius: 3px; }
   .g-opline {
     font-family: var(--font-mono); font-size: 13px; padding: 10px 12px; margin: 10px 0 4px;
@@ -149,12 +149,12 @@ series: "linear_algebra"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">One idea, two worlds</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Triangulation and trilateration</h3>
         <p style="margin-bottom:0;">A robot that hears three ranges, or a camera rig that sees one point from several views, ends up with a small linear system whose right-hand side is built from the measurements. Solving it recovers a position in space, and the conditioning of that system decides how much a noisy range moves the estimate. The <a href="{{ '/vision/multi-view-geometry/triangulation/' | relative_url }}">triangulation part</a> of the geometry guide walks through exactly this solve.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">Normal equations and reusable factors</h3>
         <p style="margin-bottom:0;">Fitting a model means solving a linear system, and large models solve the same structured system over and over with different right-hand sides. Factoring once and reusing the factors is the difference between a training run that finishes and one that does not. The <a href="{{ '/ai/llm-training/inference/' | relative_url }}">inference chapter</a> shows how much of that arithmetic is dominated by the same matrix operations.</p>
@@ -179,7 +179,7 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Elimination hides two subspaces in plain sight: the inputs that land on zero, and the outputs that are reachable at all. Naming them is the next step.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/rank-subspaces/' | relative_url }}">Next: Rank, null space, and the four subspaces →</a>
   </div>
@@ -330,21 +330,21 @@ series: "linear_algebra"
   var CASES = {
     point: {
       planes: [[1, 1, 1, 3], [1, -1, 1, 1], [-1, 1, 1, 1]],
-      colors: ['rgba(0,136,176,0.55)', 'rgba(214,0,108,0.50)', 'rgba(201,162,39,0.55)'],
+      colors: ['rgba(43,95,255,0.55)', 'rgba(214,0,108,0.50)', 'rgba(201,162,39,0.55)'],
       point: [1, 1, 1],
       title: 'consistent \u2014 unique solution',
       detail: 'The three sheets cross at exactly one point, so every pivot is nonzero and there are no free variables.'
     },
     line: {
       planes: [[0, 0, 1, 0], [1, -1, -1, 0], [-1, 1, -1, 0]],
-      colors: ['rgba(0,136,176,0.55)', 'rgba(214,0,108,0.50)', 'rgba(201,162,39,0.55)'],
+      colors: ['rgba(43,95,255,0.55)', 'rgba(214,0,108,0.50)', 'rgba(201,162,39,0.55)'],
       line: [1, 1, 0],
       title: 'consistent \u2014 infinitely many solutions',
       detail: 'All three sheets contain the same line, so one equation is redundant and one variable is free.'
     },
     empty: {
       planes: [[1, 0, 1, 1], [0, 1, 1, 1], [1, 1, 2, 1]],
-      colors: ['rgba(0,136,176,0.55)', 'rgba(214,0,108,0.50)', 'rgba(201,162,39,0.55)'],
+      colors: ['rgba(43,95,255,0.55)', 'rgba(214,0,108,0.50)', 'rgba(201,162,39,0.55)'],
       title: 'inconsistent \u2014 no solution',
       detail: 'The sheets form a triangular prism: each pair meets in a line, but the three lines never share a point.'
     }

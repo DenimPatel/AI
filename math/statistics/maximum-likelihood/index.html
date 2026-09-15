@@ -118,12 +118,12 @@ series: "statistics"
     <div class="g-step-head"><span class="g-step-num">7</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">One principle, two very different machines</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math &amp; Statistics</div>
         <h3 style="margin:6px 0;">Least squares is Gaussian likelihood</h3>
         <p style="margin-bottom:0;">Fitting a line by minimising the sum of squared residuals is not a separate idea from maximum likelihood; it is maximum likelihood for a normal error model. If each observation is $y_i \sim \mathcal{N}(a + bx_i, \sigma^2)$ with the same $\sigma$, the log-likelihood is largest exactly where the sum of squared residuals is smallest, and the score equations are the normal equations. The <a href="{{ '/math/linear-algebra/least-squares/' | relative_url }}">least-squares part</a> solves the same problem by projection, so its algebra and this part's probability are two views of one fit.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Vision &amp; Robotics</div>
         <h3 style="margin:6px 0;">MLE in SLAM</h3>
         <p style="margin-bottom:0;">Pose-graph optimisation, the engine of modern SLAM, is maximum likelihood written large: choose the robot poses that best explain a set of relative measurements, each with its own Gaussian noise. The result is a weighted least-squares problem whose Hessian is the information matrix, and the optimiser is a direct descendant of walking up the log-likelihood surface shown here. The <a href="{{ '/vision/nonlinear-optimization/pose-graph/' | relative_url }}">pose-graph part</a> makes that connection explicit; the same principle drives the calibration and triangulation problems in the multi-view geometry guide.</p>
@@ -164,7 +164,7 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>The peak of the log-likelihood tells you where the estimate is; the sharpness of that peak tells you how much to trust it. Next, that curvature becomes a bound.</span>
     <a class="btn btn-secondary" href="{{ '/math/statistics/fisher-information/' | relative_url }}">Next: Fisher information and the Cramér–Rao bound →</a>
   </div>
@@ -290,7 +290,7 @@ series: "statistics"
     var surf = buildSurface();
     var heat = {
       type: "contour", x: surf.gx, y: surf.gy, z: surf.z,
-      colorscale: [[0, "#f3f7f9"], [0.35, "#cfe8f1"], [0.7, "#62c5ee"], [1, "#006786"]],
+      colorscale: [[0, "#f3f6ff"], [0.35, "#cfdcff"], [0.7, "#5d85fd"], [1, "#0b3cd0"]],
       contours: { coloring: "heatmap", showlines: false },
       line: { width: 0 }, hoverinfo: "skip", showscale: false
     };

@@ -193,7 +193,7 @@ series: "llm_serving"
     </ul>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>You have made each token cheaper to produce. Next: produce fewer steps of it.</span>
     <a class="btn btn-secondary" href="{{ '/ai/llm-serving/speculative/' | relative_url }}">Next: Speculative decoding →</a>
   </div>
@@ -222,8 +222,8 @@ series: "llm_serving"
       { id: 'fp32', label: 'FP32', kind: 'float', e: 8, m: 23, maxExp: 254, color: '#7a5c9e' },
       { id: 'fp16', label: 'FP16', kind: 'float', e: 5, m: 10, maxExp: 30, color: '#5f8a3a' },
       { id: 'bf16', label: 'BF16', kind: 'float', e: 8, m: 7, maxExp: 254, color: '#c9a227' },
-      { id: 'fp8e4m3', label: 'FP8 E4M3', kind: 'float', e: 4, m: 3, maxExp: 15, color: '#0088b0' },
-      { id: 'fp8e5m2', label: 'FP8 E5M2', kind: 'float', e: 5, m: 2, maxExp: 30, color: '#38a6cf' },
+      { id: 'fp8e4m3', label: 'FP8 E4M3', kind: 'float', e: 4, m: 3, maxExp: 15, color: '#2b5fff' },
+      { id: 'fp8e5m2', label: 'FP8 E5M2', kind: 'float', e: 5, m: 2, maxExp: 30, color: '#93aefe' },
       { id: 'int8', label: 'INT8', kind: 'int', bits: 8, color: '#b0552d' },
       { id: 'int4', label: 'INT4', kind: 'int', bits: 4, color: '#d6006c' }
     ];

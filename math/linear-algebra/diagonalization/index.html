@@ -155,12 +155,12 @@ series: "linear_algebra"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">One iteration, two worlds</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Discrete-system stability and filter convergence</h3>
         <p style="margin-bottom:0;">A robot estimating its pose runs a filter whose error update is a discrete linear system; whether the estimate settles on the truth is a question about the magnitudes of that system's eigenvalues, and a filter with an eigenvalue on or outside the unit circle diverges. The <a href="{{ '/vision/nonlinear-optimization/slam/' | relative_url }}">SLAM chapter</a> of the geometry guide lives inside exactly this loop, and the <a href="{{ '/vision/nonlinear-optimization/pose-graph/' | relative_url }}">pose-graph part</a> shows the linear systems that each step must solve.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">Stationary distributions and stable recurrence</h3>
         <p style="margin-bottom:0;">PageRank-style ranking is the dominant eigenvector of a transition matrix, and the same reasoning governs any recurrence that carries a probability or activation vector forward. Training itself is a dynamical system in the parameters: if the effective eigenvalues of the update grow past one the run diverges, which is why the learning-rate and stability analysis in the <a href="{{ '/ai/llm-training/scaling/' | relative_url }}">scaling chapter</a> matters, and why schedules in <a href="{{ '/ai/llm-serving/scheduling/' | relative_url }}">LLM serving</a> are tuned to keep the system in a stable regime.</p>
@@ -185,7 +185,7 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Not every matrix has perpendicular eigenvectors &mdash; but symmetric ones always do, and that is what makes their powers predictable.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/symmetric/' | relative_url }}">Next: Symmetric matrices and quadratic forms →</a>
   </div>
@@ -272,14 +272,14 @@ series: "linear_algebra"
     if (!planeA) return;
     var e = LA.mat.eig2x2(A);
     planeA.clear();
-    planeA.grid(A, { step: 1, color: 'rgba(0,136,176,0.10)', width: 1 });
+    planeA.grid(A, { step: 1, color: 'rgba(43,95,255,0.10)', width: 1 });
     planeA.axes();
     for (var i = 0; i < e.vectors.length; i++) {
-      if (e.vectors[i]) drawEigLine(e.vectors[i], i === 0 ? 'rgba(0,136,176,0.55)' : 'rgba(0,103,134,0.55)');
+      if (e.vectors[i]) drawEigLine(e.vectors[i], i === 0 ? 'rgba(43,95,255,0.55)' : 'rgba(11,60,208,0.55)');
     }
     for (i = 0; i < cloud.length; i++) {
       var q = orbitPt(cloud[i], kA);
-      if (isFinite(q[0]) && isFinite(q[1])) planeA.points([q], { color: 'rgba(0,136,176,0.22)', r: 2.2 });
+      if (isFinite(q[0]) && isFinite(q[1])) planeA.points([q], { color: 'rgba(43,95,255,0.22)', r: 2.2 });
     }
     var ctx = planeA.ctx;
     ctx.save();

@@ -168,7 +168,7 @@ series: "calculus_in_motion"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>The surface is now differentiable. The next part optimises over entire curves rather than single points — the last piece of the volume.</span>
     <a class="btn btn-secondary" href="{{ '/math/calculus-in-motion/variations/' | relative_url }}">Next: Calculus of variations &amp; optimal control →</a>
   </div>
@@ -245,7 +245,7 @@ series: "calculus_in_motion"
   // ------------------------------------------------------------------
   function sphereGrid(ctx, view) {
     ctx.beginPath(); ctx.arc(view.cx, view.cy, view.r, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(0,136,176,0.05)'; ctx.fill();
+    ctx.fillStyle = 'rgba(43,95,255,0.05)'; ctx.fill();
     ctx.strokeStyle = 'rgba(32,30,29,0.35)'; ctx.lineWidth = 1.4; ctx.stroke();
 
     function polyline(f, n) {
@@ -315,8 +315,8 @@ series: "calculus_in_motion"
     ctx.beginPath();
     corners.forEach(function (q, i) { var b = screenOf(q, view); if (i === 0) ctx.moveTo(b.X, b.Y); else ctx.lineTo(b.X, b.Y); });
     ctx.closePath();
-    ctx.fillStyle = 'rgba(0,136,176,0.12)'; ctx.fill();
-    ctx.strokeStyle = 'rgba(0,136,176,0.5)'; ctx.lineWidth = 1.2; ctx.stroke();
+    ctx.fillStyle = 'rgba(43,95,255,0.12)'; ctx.fill();
+    ctx.strokeStyle = 'rgba(43,95,255,0.5)'; ctx.lineWidth = 1.2; ctx.stroke();
   }
 
   function canvasTitle(ctx, text) {
@@ -477,7 +477,7 @@ series: "calculus_in_motion"
     ctx.clearRect(0, 0, W, H);
     canvasTitle(ctx, 'SO(2): R(\u03b1)R(\u03b2) = R(\u03b1+\u03b2)');
     ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(0,136,176,0.05)'; ctx.fill();
+    ctx.fillStyle = 'rgba(43,95,255,0.05)'; ctx.fill();
     ctx.strokeStyle = 'rgba(32,30,29,0.3)'; ctx.lineWidth = 1.4; ctx.stroke();
     ctx.strokeStyle = 'rgba(32,30,29,0.12)'; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(cx - r, cy); ctx.lineTo(cx + r, cy); ctx.moveTo(cx, cy - r); ctx.lineTo(cx, cy + r); ctx.stroke();

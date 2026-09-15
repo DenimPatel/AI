@@ -163,22 +163,22 @@ series: "probability"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">Ellipses under the machinery</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics / Vision</div>
         <h3 style="margin:6px 0;">SLAM pose and landmark covariances</h3>
         <p style="margin-bottom:0;">Every <a href="{{ '/vision/nonlinear-optimization/slam/' | relative_url }}">SLAM</a> and bundle-adjustment system stores a Gaussian belief over poses and landmarks, and every update conditions it on a measurement using exactly the formulas of Step 4. The marginal blocks of $\Sigma$ are the uncertainty of the robot's trajectory; the conditional is the refined estimate after a loop closure.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">Symmetric matrices and the spectral theorem</h3>
         <p style="margin-bottom:0;">The claim that the ellipse axes are orthogonal and real is the spectral theorem for <a href="{{ '/math/linear-algebra/symmetric/' | relative_url }}">symmetric matrices</a>, applied to a positive-definite one. Covariance is the probability face of that theorem; the same diagonalisation drives PCA and the Hessian analysis of optimisation.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">Singular values of a data matrix</h3>
         <p style="margin-bottom:0;">If $X$ is a matrix of centred samples, the eigenvectors of its covariance are the right singular vectors of $X$, and the eigenvalues are the squared singular values over $n$. That is the bridge from covariance to the <a href="{{ '/math/linear-algebra/svd/' | relative_url }}">SVD</a> and to low-rank approximation.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Probability</div>
         <h3 style="margin:6px 0;">Covariance as an object to read</h3>
         <p style="margin-bottom:0;">The <a href="{{ '/math/probability/covariance/' | relative_url }}">covariance part</a> builds $\Sigma$ entry by entry and draws the one- and two-sigma ellipses from a draggable cloud. This part takes that matrix and reads it through its eigenvectors, conditionals and inverse &mdash; the same object, four more lenses.</p>
@@ -224,7 +224,7 @@ series: "probability"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Two Gaussians added together stay Gaussian; two arbitrary densities do not &mdash; and the operation that combines them is a convolution.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability/sums/' | relative_url }}">Next: Sums, convolution and generating functions →</a>
   </div>
@@ -287,11 +287,11 @@ series: "probability"
     var pl = densPl, S = Sigma();
     pl.clear();
     pl.grid(null, { step: 1 });
-    var fills = ['rgba(0,136,176,0.10)', 'rgba(0,136,176,0.16)', 'rgba(0,136,176,0.24)'];
+    var fills = ['rgba(43,95,255,0.10)', 'rgba(43,95,255,0.16)', 'rgba(43,95,255,0.24)'];
     for (var k = 3; k >= 1; k--) pl.polygon(Prob.confEllipse(S, MU, k), { fill: fills[k - 1] });
     pl.polygon(Prob.confEllipse(S, MU, 1), { stroke: c.accent, width: 2 });
-    pl.polygon(Prob.confEllipse(S, MU, 2), { stroke: 'rgba(0,136,176,0.55)', width: 1.3 });
-    pl.polygon(Prob.confEllipse(S, MU, 3), { stroke: 'rgba(0,136,176,0.30)', width: 1.1 });
+    pl.polygon(Prob.confEllipse(S, MU, 2), { stroke: 'rgba(43,95,255,0.55)', width: 1.3 });
+    pl.polygon(Prob.confEllipse(S, MU, 3), { stroke: 'rgba(43,95,255,0.30)', width: 1.1 });
     pl.points(cloud, { color: 'rgba(32,30,29,0.42)', r: 2.2 });
     var e = LA.mat.eigSym(S);
     var V = e.vectors, vals = e.values;
@@ -341,7 +341,7 @@ series: "probability"
     }
     var traces = [{
       type: 'surface', x: xs, y: ys, z: zz, showscale: false, opacity: 1, hoverinfo: 'skip',
-      colorscale: [[0, '#eaf4f8'], [1, '#0088b0']]
+      colorscale: [[0, '#eaf0ff'], [1, '#2b5fff']]
     }];
     render3d(sdiv, traces, GuidePlot3D.baseLayout({
       range: { x: [lo, hi], y: [lo, hi], z: [0, zmax * 1.05] },
@@ -373,7 +373,7 @@ series: "probability"
     var uc = [], t;
     for (i = 0; i <= 72; i++) { t = 2 * Math.PI * i / 72; uc.push([Math.cos(t), Math.sin(t)]); }
     pl.polygon(uc, { stroke: 'rgba(32,30,29,0.35)', width: 1.2 });
-    pl.ellipse(A, { color: c.accent, width: 2.6, fill: 'rgba(0,136,176,0.10)' });
+    pl.ellipse(A, { color: c.accent, width: 2.6, fill: 'rgba(43,95,255,0.10)' });
     pl.vector([A[0][0], A[1][0]], { color: c.accent2, width: 2.2, label: 'axis 1' });
     pl.vector([A[0][1], A[1][1]], { color: c.accent2, width: 2.2, label: 'axis 2' });
     el('eig-readout').innerHTML =
@@ -396,7 +396,7 @@ series: "probability"
     var S = Sigma(), pl = condPl2d, cc = ST.cc;
     pl.clear();
     pl.grid(null, { step: 1 });
-    pl.polygon(Prob.confEllipse(S, MU, 2), { fill: 'rgba(0,136,176,0.10)' });
+    pl.polygon(Prob.confEllipse(S, MU, 2), { fill: 'rgba(43,95,255,0.10)' });
     pl.polygon(Prob.confEllipse(S, MU, 1), { stroke: c.accent, width: 1.8 });
     pl.ctx.save();
     pl.ctx.strokeStyle = c.accent2; pl.ctx.lineWidth = 2; pl.ctx.setLineDash([6, 4]);
@@ -451,8 +451,8 @@ series: "probability"
     var d = Math.sqrt(Math.max(0, mahaSq(ST.pro[0], ST.pro[1], inv)));
     pl.clear();
     pl.grid(null, { step: 1 });
-    pl.polygon(Prob.confEllipse(S, MU, 1), { stroke: 'rgba(0,136,176,0.65)', width: 1.4 });
-    pl.polygon(Prob.confEllipse(S, MU, 2), { stroke: 'rgba(0,136,176,0.35)', width: 1.1 });
+    pl.polygon(Prob.confEllipse(S, MU, 1), { stroke: 'rgba(43,95,255,0.65)', width: 1.4 });
+    pl.polygon(Prob.confEllipse(S, MU, 2), { stroke: 'rgba(43,95,255,0.35)', width: 1.1 });
     if (d > 1e-6) pl.polygon(Prob.confEllipse(S, MU, d), { stroke: c.accent2, width: 2.2 });
     var r = Math.sqrt(ST.pro[0] * ST.pro[0] + ST.pro[1] * ST.pro[1]);
     var pts = [], t;
@@ -495,7 +495,7 @@ series: "probability"
     var pl = wbPl, S = Sigma();
     pl.clear();
     pl.grid(null, { step: 1 });
-    pl.polygon(Prob.confEllipse(S, MU, 2), { stroke: 'rgba(0,136,176,0.30)', width: 1.1 });
+    pl.polygon(Prob.confEllipse(S, MU, 2), { stroke: 'rgba(43,95,255,0.30)', width: 1.1 });
     pl.polygon(Prob.confEllipse(S, MU, 1), { stroke: c.accent, width: 1.8 });
     if (whitePts) pl.points(whitePts.map(function (p) { return p.src; }), { color: 'rgba(32,30,29,0.42)', r: 2 });
     pl.points([MU], { color: c.text, r: 3 });

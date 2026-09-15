@@ -210,7 +210,7 @@ redirect_from:
   </section>
 {% endraw %}
 
-  <div class="llmt-next">
+  <div class="llmt-next reveal">
     <span>Once the dataset exists, the actual training loop — turning trillions of tokens into a base model — has its own moving parts: loss, optimizers, schedules, and scale.</span>
     <a class="btn btn-secondary" href="{{ '/ai/llm-training/pretraining/' | relative_url }}">Continue: pretraining, the training loop →</a>
   </div>
@@ -373,8 +373,8 @@ redirect_from:
         var d = DETAIL[s.name] || { before:'—', after:'—' };
         body.innerHTML =
           '<div class="llmt-grid2">' +
-            '<div class="llmt-card"><div class="llmt-source" style="margin:0 0 6px;">Original</div>' + d.before + '</div>' +
-            '<div class="llmt-card"><div class="llmt-source" style="margin:0 0 6px;">Rewritten at scale</div>' + d.after + '</div>' +
+            '<div class="llmt-card reveal"><div class="llmt-source" style="margin:0 0 6px;">Original</div>' + d.before + '</div>' +
+            '<div class="llmt-card reveal"><div class="llmt-source" style="margin:0 0 6px;">Rewritten at scale</div>' + d.after + '</div>' +
           '</div>' +
           '<div class="llmt-readout" style="margin-top:10px;"><span class="k">output size:</span> ' + s.tokens_b + 'B tokens' +
           ' &nbsp; <span class="k">microanneal gains:</span> <span class="hi">' + gains(s) + '</span></div>';

@@ -112,8 +112,8 @@ redirect_from:
     <p class="llmt-eyebrow">Synthetic aggregation tasks</p>
     <p>Most long documents have no supervision for the tasks long-context models are actually used for — summarizing, counting, and synthesizing across a whole document. OLMo 3 injects that supervision synthetically, inspired by CLIPPER, by asking a model to build aggregation questions from snippets it can see. Two task types are used:</p>
     <div class="llmt-grid2" style="margin:14px 0;">
-      <div class="llmt-card"><b>CWE — Common Word Extraction</b><p style="font-size:13.5px;margin:6px 0 0;">QA pairs whose answer is the exact number of times a common unigram occurs in a document partition. Only answerable by scanning the whole window.</p></div>
-      <div class="llmt-card"><b>REX — Rewriting EXpressions</b><p style="font-size:13.5px;margin:6px 0 0;">The same aggregation task rendered as one of 12 vignettes — a dialogue, flashcards, a quiz, a game show, a debate, an ELI5 explainer — forcing synthesis over the noun phrase throughout.</p></div>
+      <div class="llmt-card reveal"><b>CWE — Common Word Extraction</b><p style="font-size:13.5px;margin:6px 0 0;">QA pairs whose answer is the exact number of times a common unigram occurs in a document partition. Only answerable by scanning the whole window.</p></div>
+      <div class="llmt-card reveal"><b>REX — Rewriting EXpressions</b><p style="font-size:13.5px;margin:6px 0 0;">The same aggregation task rendered as one of 12 vignettes — a dialogue, flashcards, a quiz, a game show, a debate, an ELI5 explainer — forcing synthesis over the noun phrase throughout.</p></div>
     </div>
     <div class="llmt-demo" style="flex-direction:column;">
       <p style="margin:0 0 8px;font-size:13.5px;">Try a CWE task. The passage below is short enough to skim, but the same task at 32K tokens can only be answered by attending to the whole document. Count every occurrence of <b>“enzyme”</b>.</p>
@@ -218,7 +218,7 @@ redirect_from:
   </section>
 {% endraw %}
 
-  <div class="llmt-next">
+  <div class="llmt-next reveal">
     <span>Context windows large enough to hold a task also let a model hold a conversation with its environment — calling functions, reading results, and iterating. That is the next part.</span>
     <a class="btn btn-secondary" href="{{ '/ai/llm-training/tools-agents/' | relative_url }}">Continue: tool use, function calling &amp; agents →</a>
   </div>
@@ -414,7 +414,7 @@ redirect_from:
       var mode = 'bestfit';
       var docs = [5200, 3100, 2600, 4800, 1500, 7000, 2400, 900, 5600, 4200];
       var SEQ = 8192, W = 640, H = 240;
-      var COLORS = ['#0088b0','#38a6cf','#62c5ee','#006786','#d6006c','#e0559a','#7a4bd0','#3aa66a','#c98a00','#5a6b7a'];
+      var COLORS = ['#2b5fff','#93aefe','#5d85fd','#0b3cd0','#d6006c','#e0559a','#7a4bd0','#3aa66a','#c98a00','#5a6b7a'];
       G.setupCanvas(canvas, W, H, function(){ draw(); });
       function naive(){
         var rows = [], buf = 0, row = [];

@@ -90,10 +90,10 @@ series: "llm_serving"
     <p class="g-eyebrow">Three dials that are not interchangeable</p>
     <p>A quota surface exposes three independent knobs, and they fail in different ways. Requests per minute (RPM) caps call count and is trivially gamed by cheap requests — a tenant can spend its whole RPM budget on one-token prompts and use almost no GPU. Tokens per minute (TPM) caps the actual work and is the closest thing to a cost proxy, but a single 128K-token prompt can consume a minute's budget in one call. Concurrency caps in-flight sequences, which is the real constraint on KV residency and decode batching; it does not care about token count at all. A serious gateway limits all three, because each one is the failure mode of the other two.</p>
     <div class="mt-split" style="margin-top:14px;">
-      <div class="g-card"><h3>RPM</h3><p>Caps call count. Cheap-request flooding spends it instantly; a long prompt costs one unit. Enforce at the gateway before routing.</p></div>
-      <div class="g-card"><h3>TPM</h3><p>Caps work. Needs streaming-aware accounting: a request's token total is unknown until it finishes, so reserve against the budget and reconcile on completion.</p></div>
-      <div class="g-card"><h3>Concurrency</h3><p>Caps resident sequences and therefore KV pressure. The one dial that protects the engine when two tenants both go long-context at once.</p></div>
-      <div class="g-card"><h3>SLO per tenant</h3><p>The point of the other three. Quotas are admission control; the SLO is what you promised once admitted, and it needs its own isolation story.</p></div>
+      <div class="g-card reveal"><h3>RPM</h3><p>Caps call count. Cheap-request flooding spends it instantly; a long prompt costs one unit. Enforce at the gateway before routing.</p></div>
+      <div class="g-card reveal"><h3>TPM</h3><p>Caps work. Needs streaming-aware accounting: a request's token total is unknown until it finishes, so reserve against the budget and reconcile on completion.</p></div>
+      <div class="g-card reveal"><h3>Concurrency</h3><p>Caps resident sequences and therefore KV pressure. The one dial that protects the engine when two tenants both go long-context at once.</p></div>
+      <div class="g-card reveal"><h3>SLO per tenant</h3><p>The point of the other three. Quotas are admission control; the SLO is what you promised once admitted, and it needs its own isolation story.</p></div>
     </div>
   </section>
 
@@ -182,7 +182,7 @@ series: "llm_serving"
     </ul>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Isolation and quotas decide who shares a pool. The next part decides what the pool is even being asked to serve.</span>
     <a class="btn btn-secondary" href="{{ '/ai/llm-serving/workloads/' | relative_url }}">Next: Reasoning, agents and multimodal →</a>
   </div>

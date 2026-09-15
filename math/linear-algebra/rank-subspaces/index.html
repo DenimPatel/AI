@@ -190,12 +190,12 @@ series: "linear_algebra"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">One idea, two worlds</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Redundant manipulators and self-motion</h3>
         <p style="margin-bottom:0;">A robot arm with more joints than task dimensions has a Jacobian with a nonzero null space. Vectors in that null space are joint motions that move no end-effector at all &mdash; self-motion, which a planner can exploit to duck an obstacle without disturbing the tool. The <a href="{{ '/vision/nonlinear-optimization/pose-graph/' | relative_url }}">pose-graph part</a> of the optimization guide uses the same decomposition to reason about gauge freedom in a map.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">Low-rank weights and redundant features</h3>
         <p style="margin-bottom:0;">A weight matrix whose rank is far below its dimensions has a large null space: whole directions of the input never influence the output, and the effective model is smaller than the array suggests. Low-rank factorisations exploit exactly that slack to cut memory and compute. The <a href="{{ '/ai/llm-training/scaling/' | relative_url }}">scaling chapter</a> covers how those structure choices trade off against capacity.</p>
@@ -220,7 +220,7 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Two subspaces on opposite sides of a matrix are secretly the same dimension &mdash; and the operation that detects the overlap is a single number you multiply and add.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/dot-product/' | relative_url }}">Next: Dot product, projection, duality →</a>
   </div>
@@ -284,7 +284,7 @@ series: "linear_algebra"
       traces.push({
         type: 'scatter3d', mode: 'lines',
         x: [lo[0], hi[0]], y: [lo[1], hi[1]], z: [lo[2], hi[2]],
-        line: { color: 'rgba(0,136,176,0.5)', width: 9 }, hoverinfo: 'skip', showlegend: false
+        line: { color: 'rgba(43,95,255,0.5)', width: 9 }, hoverinfo: 'skip', showlegend: false
       });
     }
     traces.push({ type: 'scatter3d', mode: 'lines', x: [0, c1[0]], y: [0, c1[1]], z: [0, c1[2]], line: { color: c.accent, width: 5 }, hoverinfo: 'skip' });

@@ -120,12 +120,12 @@ series: "statistics"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">Curvature as the universal error bar</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Calibration as information</h3>
         <p style="margin-bottom:0;">A robot calibrating its wheel radii and sensor offsets is estimating parameters from noisy motion, and the covariance of those estimates is the inverse Fisher information of the calibration trajectory. A path that excites every parameter makes the log-likelihood curve sharply in each direction; a path that only drives straight leaves the heading offset nearly flat, and the error bar for it explodes. The <a href="{{ '/robotics/navigation/odometry/' | relative_url }}">odometry chapter</a> makes the same point from the drift side: poor conditioning is why dead reckoning diverges.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Numerics &amp; ML</div>
         <h3 style="margin:6px 0;">Conditioning is information</h3>
         <p style="margin-bottom:0;">The inverse information is a covariance matrix, and the directions where it is large are the directions where the experiment, not the arithmetic, is weak. That is the same diagnosis as an ill-conditioned matrix in <a href="{{ '/math/linear-algebra/numerics/' | relative_url }}">numerical linear algebra</a>: a nearly flat log-likelihood is a nearly singular problem, and the error bar is the reciprocal of the curvature just as the condition number is the reciprocal of the smallest singular value.</p>
@@ -167,7 +167,7 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>The bound needs the information, and the information needs a closed form. The next part gets an interval without either, by resampling the data in front of you.</span>
     <a class="btn btn-secondary" href="{{ '/math/statistics/bootstrap/' | relative_url }}">Next: The bootstrap and the plug-in principle →</a>
   </div>
@@ -251,7 +251,7 @@ series: "statistics"
     curvPlot.clear();
     curvPlot.axes({ xLabel: 'p', yLabel: 'log-likelihood (offset)' });
     curvPlot.band(function () { return -8; }, function () { return 1; },
-      { a: phat - sigmaHat, b: phat + sigmaHat, color: 'rgba(0,136,176,0.16)' });
+      { a: phat - sigmaHat, b: phat + sigmaHat, color: 'rgba(43,95,255,0.16)' });
     curvPlot.curve(quad, { color: c.accent2, dashed: true, width: 1.8, samples: 260 });
     curvPlot.curve(rel, { color: c.accent, width: 2.4, samples: 400 });
     curvPlot.hline(-0.5, { color: 'rgba(32,30,29,0.25)', dashed: true, width: 1 });

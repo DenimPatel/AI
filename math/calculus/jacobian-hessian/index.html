@@ -196,7 +196,7 @@ series: "calculus"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>The Jacobian and Hessian are the raw material; the last part assembles them into the local quadratic model and the matrix second-derivative test.</span>
     <a class="btn btn-secondary" href="{{ '/math/calculus/multivariable-taylor/' | relative_url }}">Next: Multivariable Taylor &amp; critical points →</a>
   </div>
@@ -366,7 +366,7 @@ series: "calculus"
       xLabel: 'θ₁ (rad)', yLabel: 'θ₂ (rad)', title: 'Joint space: square of perturbations (half-width ' + h + ')', tickTarget: 5
     });
     var sq = [[t1 - h, t2 - h], [t1 + h, t2 - h], [t1 + h, t2 + h], [t1 - h, t2 + h]];
-    fillPoly(setup2a.ctx, axA, sq, 'rgba(0,136,176,0.18)', c.accent, 2);
+    fillPoly(setup2a.ctx, axA, sq, 'rgba(43,95,255,0.18)', c.accent, 2);
     handle(setup2a.ctx, axA.px(t1), axA.py(t2), c.text, 'config');
 
     var J = armJ(t1, t2, L1, L2);

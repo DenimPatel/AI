@@ -671,10 +671,10 @@
       }
       ctx.lineTo(px(b), py(base));
       ctx.closePath();
-      ctx.fillStyle = o.color || 'rgba(0,136,176,0.2)';
+      ctx.fillStyle = o.color || 'rgba(43,95,255,0.2)';
       ctx.fill();
       ctx.restore();
-      if (o.label) legendEntries.push({ label: o.label, color: o.color || 'rgba(0,136,176,0.2)', fill: true });
+      if (o.label) legendEntries.push({ label: o.label, color: o.color || 'rgba(43,95,255,0.2)', fill: true });
     }
 
     function inferWidth(items) {

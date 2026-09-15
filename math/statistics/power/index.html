@@ -106,12 +106,12 @@ series: "statistics"
     <div class="g-step-head"><span class="g-step-num">5</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">Two thresholds, two costs</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">Detecting a small benchmark improvement</h3>
         <p style="margin-bottom:0;">A new model improves a benchmark by a fraction of a point, and the question is whether that is real. The <a href="{{ '/ai/llm-training/evaluation/' | relative_url }}">evaluation chapter</a> estimates error on a finite test set, so the measured delta is a sample mean with a standard error. A small test set has low power against a small improvement, which is how teams ship "no change" verdicts that later reverse. Sizing the evaluation set is a power calculation.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Sensor fault detection thresholds</h3>
         <p style="margin-bottom:0;">A robot comparing a sensor reading against an expected value is running a hypothesis test every cycle. A loose threshold lets a drifting sensor pass as healthy; a tight one makes ordinary noise trigger false alarms that waste recovery behaviour. The <a href="{{ '/robotics/navigation/odometry/' | relative_url }}">odometry chapter</a> fuses measurements into a pose estimate, and fault detection is the residual check around it. The threshold is the critical value, and choosing it is the $\alpha$/$\beta$ trade under real cost.</p>
@@ -152,7 +152,7 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>A single well-powered test is one clean answer. Run many tests over many slices of the same data and the false-positive rate quietly multiplies &mdash; the next part is about that garden of forking paths.</span>
     <a class="btn btn-secondary" href="{{ '/math/statistics/multiple-comparisons/' | relative_url }}">Next: p-hacking and the garden of forking paths →</a>
   </div>
@@ -226,7 +226,7 @@ series: "statistics"
     // beta: left region of the alternative below the critical value
     densityPlot.area(altPdf, lo, cv, { color: 'rgba(32,30,29,0.12)' });
     // power: everything else under the alternative
-    densityPlot.area(altPdf, cv, hi, { color: 'rgba(0,136,176,0.22)' });
+    densityPlot.area(altPdf, cv, hi, { color: 'rgba(43,95,255,0.22)' });
 
     densityPlot.curve(nullPdf, { color: c.text, width: 2, dashed: true });
     densityPlot.curve(altPdf, { color: c.accent, width: 2 });
@@ -241,7 +241,7 @@ series: "statistics"
       { label: 'alternative H\u2081: effect d', color: c.accent },
       { label: 'type I (\u03b1): false positive', color: 'rgba(214,0,108,0.5)', fill: true },
       { label: 'type II (\u03b2): miss', color: 'rgba(32,30,29,0.3)', fill: true },
-      { label: 'power: detected', color: 'rgba(0,136,176,0.5)', fill: true }
+      { label: 'power: detected', color: 'rgba(43,95,255,0.5)', fill: true }
     ], { dy: 6 });
 
     var beta = betaOf(), power = 1 - beta, n80 = nFor80();

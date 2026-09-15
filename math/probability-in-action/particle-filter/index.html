@@ -125,7 +125,7 @@ series: "probability_in_action"
         <div class="g-legend">
           <span class="g-legend-item"><span class="g-swatch" style="background:#201e1d"></span> true pose</span>
           <span class="g-legend-item"><span class="g-swatch" style="background:#d6006c"></span> weighted estimate</span>
-          <span class="g-legend-item"><span class="g-swatch" style="background:#0088b0"></span> particles (bright = heavy)</span>
+          <span class="g-legend-item"><span class="g-swatch" style="background:#2b5fff"></span> particles (bright = heavy)</span>
         </div>
       </div>
     </div>
@@ -136,22 +136,22 @@ series: "probability_in_action"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">Sampling wherever the integral refuses to close</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Localization without a map of beliefs</h3>
         <p style="margin-bottom:0;">A robot that wakes up not knowing where it is needs the multimodal belief a filter like this one carries. The motion model comes from <a href="{{ '/robotics/navigation/odometry/' | relative_url }}">odometry</a>, and the correction from a laser or range fan like the one on the canvas. This is the standard answer to the global-localization problem.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Vision</div>
         <h3 style="margin:6px 0;">SLAM and fastSLAM</h3>
         <p style="margin-bottom:0;">In simultaneous localization and mapping the map is part of the state, and a particle can carry its own map. FastSLAM exploits that decomposition to sample trajectories and solve the map in closed form, which is why particle methods sit beside the <a href="{{ '/vision/nonlinear-optimization/slam/' | relative_url }}">factor-graph and bundle-adjustment view</a> in the vision guide.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">Monte Carlo, sequenced</h3>
         <p style="margin-bottom:0;">The particle filter is <a href="{{ '/math/probability-in-action/monte-carlo/' | relative_url }}">Monte Carlo integration</a> advanced one time step at a time: estimate an expectation by sampling, then recycle the samples instead of starting over. Importance sampling is the same weight-multiply-normalise move, applied every frame.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Estimation</div>
         <h3 style="margin:6px 0;">The non-Gaussian Kalman</h3>
         <p style="margin-bottom:0;">Where the belief really is a single bell, the <a href="{{ '/math/probability-in-action/kalman/' | relative_url }}">Kalman filter</a> is cheaper and exact, and a particle filter with enough samples reproduces it. The two are not rivals: the Gaussian assumption buys speed, the cloud buys shapes, and the choice is a bet on the belief.</p>
@@ -197,7 +197,7 @@ series: "probability_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>A single bad reading can drag a least-squares fit anywhere &mdash; the next part makes the fit resist it.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability-in-action/robust/' | relative_url }}">Next: Outliers, RANSAC and robust estimation →</a>
   </div>
@@ -258,7 +258,7 @@ series: "probability_in_action"
     }
     var cmax = 0;
     for (i = 0; i < bins; i++) cmax = Math.max(cmax, counts[i]);
-    ctx.fillStyle = 'rgba(0,136,176,0.16)';
+    ctx.fillStyle = 'rgba(43,95,255,0.16)';
     for (i = 0; i < bins; i++) {
       if (!counts[i]) continue;
       var h = plotH * (counts[i] / (cmax || 1)) * 0.9;
@@ -454,7 +454,7 @@ series: "probability_in_action"
     if (!bSetup) return;
     var ctx = bSetup.ctx, W = B_W, H = B_H, i, j;
     ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = 'rgba(0,136,176,0.05)';
+    ctx.fillStyle = 'rgba(43,95,255,0.05)';
     ctx.fillRect(SX(0), SY(0), SCALE * MAPW, SCALE * MAPH);
     ctx.strokeStyle = 'rgba(32,30,29,0.06)'; ctx.lineWidth = 1;
     for (i = 0; i <= MAPW; i++) { ctx.beginPath(); ctx.moveTo(SX(i), SY(0)); ctx.lineTo(SX(i), SY(MAPH)); ctx.stroke(); }

@@ -197,12 +197,12 @@ series: "linear_algebra"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">One inverse, two worlds</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Redundant inverse kinematics</h3>
         <p style="margin-bottom:0;">A robot arm with more joints than task dimensions has a wide Jacobian, so a desired end-effector twist usually has a whole family of joint-velocity solutions. The damped pseudoinverse picks the least-norm member and, because it caps the near-singular directions, keeps the commanded velocities finite as the arm approaches a singularity. The <a href="{{ '/vision/nonlinear-optimization/pose-graph/' | relative_url }}">pose-graph part</a> of the optimization guide uses the same machinery to handle gauge freedom in a map.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">Regression and fine-tuning updates</h3>
         <p style="margin-bottom:0;">A linear regression layer fits its weights by the normal equation, and when features are correlated that system is ill-conditioned; ridge regression adds exactly the <var>&lambda;<sup>2</sup>I</var> term above and is the damped pseudoinverse under another name. The same least-norm choice appears in fine-tuning, where a small update is preferred among all the updates that fit a batch. The <a href="{{ '/ai/llm-training/architecture/' | relative_url }}">architecture chapter</a> sets up the matrices these updates act on.</p>
@@ -227,7 +227,7 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>One matrix now answers every shape of the question &mdash; but the same answer can be steady or wild depending on how close the columns are to dependent.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/numerics/' | relative_url }}">Next: Conditioning, stability, and cost →</a>
   </div>

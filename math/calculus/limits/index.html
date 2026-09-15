@@ -170,7 +170,7 @@ series: "calculus"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>With the limit pinned down, the next part uses it to build a slope — and turns the difference quotient into the derivative.</span>
     <a class="btn btn-secondary" href="{{ '/math/calculus/derivative/' | relative_url }}">Next: The derivative →</a>
   </div>
@@ -279,7 +279,7 @@ series: "calculus"
   }
 
   function drawBandWindow(ctx, ax, a, L, eps, delta) {
-    ctx.fillStyle = 'rgba(0,136,176,0.12)';
+    ctx.fillStyle = 'rgba(43,95,255,0.12)';
     ctx.fillRect(ax.plot.padL, ax.py(L + eps), ax.plot.plotW, ax.py(L - eps) - ax.py(L + eps));
     ctx.fillStyle = 'rgba(214,0,108,0.09)';
     ctx.fillRect(ax.px(a - delta), ax.plot.padT, ax.px(a + delta) - ax.px(a - delta), ax.plot.plotH);

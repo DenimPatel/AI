@@ -107,12 +107,12 @@ series: "statistics"
     <div class="g-step-head"><span class="g-step-num">5</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">Two places where many tests are run quietly</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">Leaderboards are families</h3>
         <p style="margin-bottom:0;">A model release advertises the benchmarks it wins, and the choice of which benchmarks to headline is made after the numbers are in. The <a href="{{ '/ai/llm-training/evaluation/' | relative_url }}">evaluation chapter</a> makes the same point from the other side: every held-out score is an estimate with sampling error, and scoring a model on a dozen suites and reporting the best is a garden of forking paths. The honest report is the pre-declared suite, or an adjustment that counts how many were tried. The <a href="{{ '/ai/llm-serving/metrics/' | relative_url }}">serving metrics chapter</a> meets the same arithmetic when it compares many latency configurations at once.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Vision &amp; Geometry</div>
         <h3 style="margin:6px 0;">RANSAC tests many hypotheses</h3>
         <p style="margin-bottom:0;">RANSAC in the <a href="{{ '/vision/multi-view-geometry/ransac/' | relative_url }}">multi-view geometry guide</a> draws one minimal sample of correspondences at a time, fits a model, and keeps it if enough points agree. Each draw is a hypothesis test against noise, and the confidence that at least one all-inlier sample is found obeys the same "many independent chances" arithmetic as FWER. Choosing the number of iterations is exactly choosing how small a family failure probability you can tolerate.</p>
@@ -154,7 +154,7 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>With many tests, the question becomes which test to run at all. The next part is a working reference to the whole zoo.</span>
     <a class="btn btn-secondary" href="{{ '/math/statistics/test-zoo/' | relative_url }}">Next: t, z, chi-square, F and the likelihood-ratio →</a>
   </div>

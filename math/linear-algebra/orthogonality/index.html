@@ -144,12 +144,12 @@ series: "linear_algebra"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">One idea, two worlds</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Rotations are orthonormal</h3>
         <p style="margin-bottom:0;">A rotation matrix has orthonormal columns, and that is the whole reason it preserves lengths and angles: multiplying by it moves a frame without stretching it. Composing rotations stays in the same family, and the inverse is just the transpose. The <a href="{{ '/vision/nonlinear-optimization/3d-rotations/' | relative_url }}">3D rotations part</a> of the optimization guide builds pose updates on exactly this fact.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">Orthogonal init and stable fitting</h3>
         <p style="margin-bottom:0;">Initialising weight matrices with orthonormal columns keeps signal from shrinking or exploding as it passes through many layers, and QR is the standard way to solve least-squares problems inside training without forming a normal-equation matrix that squares the condition number. The <a href="{{ '/ai/llm-training/architecture/' | relative_url }}">architecture chapter</a> shows where those matrices live.</p>
@@ -174,7 +174,7 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Perpendicular axes make projection easy &mdash; and projection is the answer to the system that has no solution.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/least-squares/' | relative_url }}">Next: Least squares is a projection →</a>
   </div>
@@ -238,7 +238,7 @@ series: "linear_algebra"
     planeA.axes();
     var vs = vecsA(), steps = gsA.steps, i, j;
     for (i = 0; i < vs.length; i++) {
-      planeA.vector(vs[i], { color: 'rgba(0,136,176,0.20)', width: 1.6, head: 6, label: 'v' + (i + 1) });
+      planeA.vector(vs[i], { color: 'rgba(43,95,255,0.20)', width: 1.6, head: 6, label: 'v' + (i + 1) });
     }
     for (i = 0; i < stageA && i < steps.length; i++) {
       var st = steps[i];
@@ -324,13 +324,13 @@ series: "linear_algebra"
 
     var s = 0.3;
     planeB.polygon([[0, 0], LA.vscale(e1, s), LA.vadd(LA.vscale(e1, s), LA.vscale(e2, s)), LA.vscale(e2, s)],
-      { fill: 'rgba(0,136,176,0.10)', stroke: 'rgba(0,136,176,0.5)', width: 1 });
+      { fill: 'rgba(43,95,255,0.10)', stroke: 'rgba(43,95,255,0.5)', width: 1 });
 
     var c1 = LA.vdot(P, e1), c2 = LA.vdot(P, e2);
     var p1 = LA.vscale(e1, c1), p2 = LA.vscale(e2, c2);
-    planeB.polygon([[0, 0], p1, P, p2], { fill: 'rgba(0,136,176,0.08)' });
-    planeB.vector(p1, { color: 'rgba(0,136,176,0.55)', width: 1.6, dashed: true });
-    planeB.vector(p2, { color: 'rgba(0,136,176,0.55)', width: 1.6, dashed: true });
+    planeB.polygon([[0, 0], p1, P, p2], { fill: 'rgba(43,95,255,0.08)' });
+    planeB.vector(p1, { color: 'rgba(43,95,255,0.55)', width: 1.6, dashed: true });
+    planeB.vector(p2, { color: 'rgba(43,95,255,0.55)', width: 1.6, dashed: true });
     planeB.vector(P, { color: c.accent700, width: 2.6, head: 10, label: 'p' });
 
     if (handlesB) handlesB.draw();
