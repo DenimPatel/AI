@@ -1,0 +1,23 @@
+# One source of truth for the Generative Media guide's part list.
+# Part numbers live here only — page descriptions/titles must not restate them.
+# The `acts:` list groups the pill nav under act labels (see
+# _includes/series-nav.html); parts carry an `act:` key matching one of these
+# ids, added by hand because scripts/new-part.sh does not emit it.
+# `appendix:` holds the glossary so the linter's part-count check sees the real
+# part count, not part count + 1 (an appendix is a reference card, not a part).
+hub: /ai/generative-media/
+title: Generative Media, Interactively
+acts:
+  - id: noise
+    label: "I · From noise to images"
+  - id: stack
+    label: "II · The modern stack"
+  - id: control
+    label: "III · Control and speed"
+  - id: video
+    label: "IV · Video"
+  - id: sound
+    label: "V · Sound"
+  - id: ship
+    label: "VI · Judging and shipping"
+parts: []

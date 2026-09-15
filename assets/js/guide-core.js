@@ -168,6 +168,27 @@
     return { scale: plotW / maxTotal, barH: barH, padL: padL, padT: padT };
   }
 
+  // Linear interpolation between two colours, t in [0,1]. `a`/`b` may be
+  // [r,g,b] arrays (as drawHeatmap uses) or '#rrggbb' strings. Promoted out of
+  // drawHeatmap's inline interpolation: the generative-media and multimodal
+  // guides recolour almost every demo with it.
+  function toRgb(c) {
+    if (typeof c === 'string') {
+      var h = c.replace('#', '');
+      if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+      var n = parseInt(h, 16);
+      return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+    }
+    return c;
+  }
+  function lerpColor(a, b, t) {
+    t = Math.max(0, Math.min(1, t));
+    var ca = toRgb(a), cb = toRgb(b);
+    return 'rgb(' + Math.round(ca[0] + (cb[0] - ca[0]) * t) + ',' +
+      Math.round(ca[1] + (cb[1] - ca[1]) * t) + ',' +
+      Math.round(ca[2] + (cb[2] - ca[2]) * t) + ')';
+  }
+
   // Heatmap for expert loads, attention masks and block tables. `matrix` is a 2D
   // array of numbers (rows x cols). opts: {min, max, colorLow, colorHigh, rowLabels, colLabels}.
   function drawHeatmap(ctx, W, H, matrix, opts) {
@@ -187,9 +208,7 @@
     var lo = opts.colorLow || [234, 240, 255], hi = opts.colorHigh || [43, 95, 255];
     function color(v) {
       var t = (max === min) ? 0 : (v - min) / (max - min);
-      t = Math.max(0, Math.min(1, t));
-      return 'rgb(' + Math.round(lo[0] + (hi[0] - lo[0]) * t) + ',' +
-        Math.round(lo[1] + (hi[1] - lo[1]) * t) + ',' + Math.round(lo[2] + (hi[2] - lo[2]) * t) + ')';
+      return lerpColor(lo, hi, Math.max(0, Math.min(1, t)));
     }
     for (var r = 0; r < rows; r++) {
       for (var q = 0; q < cols; q++) {
@@ -501,6 +520,7 @@
     css: css, colors: colors, setupCanvas: setupCanvas, hitTest: hitTest,
     drawBars: drawBars, drawLines: drawLines, drawColumns: drawColumns, drawStacked: drawStacked, drawHeatmap: drawHeatmap,
     drawArrow: drawArrow, dragHandles: dragHandles, niceTicks: niceTicks,
+    lerpColor: lerpColor,
     softmax: softmax, seededRandom: seededRandom, gaussianFrom: gaussianFrom,
     fmtBytes: fmtBytes, fmtNum: fmtNum, fmtPct: fmtPct, fmtMs: fmtMs,
     loop: loop, bindSliders: bindSliders

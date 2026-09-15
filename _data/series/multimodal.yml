@@ -1,0 +1,19 @@
+# One source of truth for the Multimodal Models guide's part list.
+# Part numbers live here only — page descriptions/titles must not restate them.
+# The `acts:` list groups the pill nav under act labels (see
+# _includes/series-nav.html); parts carry an `act:` key matching one of these
+# ids, added by hand because scripts/new-part.sh does not emit it.
+# `appendix:` holds the glossary so the linter's part-count check sees the real
+# part count, not part count + 1 (an appendix is a reference card, not a part).
+hub: /ai/multimodal/
+title: Multimodal Models, Interactively
+acts:
+  - id: seeing
+    label: "I · Seeing"
+  - id: gluing
+    label: "II · Gluing vision to a language model"
+  - id: trunk
+    label: "III · One trunk, many modalities"
+  - id: beyond
+    label: "IV · Beyond text out"
+parts: []
