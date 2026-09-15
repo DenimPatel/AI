@@ -65,7 +65,7 @@ series: "probability"
           <button type="button" id="cond-reset">Reset A and B</button>
         </div>
         <div class="g-legend">
-          <span class="g-legend-item"><span class="g-swatch" style="background:#0088b0"></span> A</span>
+          <span class="g-legend-item"><span class="g-swatch" style="background:#2b5fff"></span> A</span>
           <span class="g-legend-item"><span class="g-swatch" style="background:#d6006c"></span> B</span>
           <span class="g-legend-item"><span class="g-swatch" style="background:#7840a0"></span> A &cap; B</span>
         </div>
@@ -243,7 +243,7 @@ series: "probability"
     var A = sq.A, B = sq.B, ov = overlapOf(A, B);
 
     ctx.save();
-    ctx.fillStyle = 'rgba(0,136,176,0.22)';
+    ctx.fillStyle = 'rgba(43,95,255,0.22)';
     ctx.fillRect(pl.px(A.x0), pl.py(A.y1), pl.px(A.x1) - pl.px(A.x0), pl.py(A.y0) - pl.py(A.y1));
     ctx.fillStyle = 'rgba(214,0,108,0.20)';
     ctx.fillRect(pl.px(B.x0), pl.py(B.y1), pl.px(B.x1) - pl.px(B.x0), pl.py(B.y0) - pl.py(B.y1));
@@ -369,7 +369,7 @@ series: "probability"
       '<div><span class="k">P(A|B) = P(A&cap;B)/P(B)</span> <span class="hi">' + fmt(s.pAgB, 3) + '</span></div>' +
       '<div><span class="k">multiplication rule</span> ' + fmt(s.pAgB, 3) + ' &times; ' + fmt(s.pB, 3) + ' = ' + fmt(s.pAgB * s.pB, 3) + '</div>' +
       '<div style="margin-top:6px;">' + (s.indep ?
-        '<b style="color:#0088b0;">Independent:</b> P(A&cap;B) equals P(A)P(B), so conditioning on B does not move A.' :
+        '<b style="color:#2b5fff;">Independent:</b> P(A&cap;B) equals P(A)P(B), so conditioning on B does not move A.' :
         '<b>Dependent:</b> P(A&cap;B) differs from P(A)P(B), so knowing B shifts the probability of A.') + '</div>';
   }
 
@@ -421,7 +421,7 @@ series: "probability"
     var tSwitch = theorySwitch(monty.n);
     var tStay = 1 / monty.n;
     Guide.drawBars(ctx, W, H, [
-      { label: 'Switch — theory', value: tSwitch * 100, valueLabel: pct(tSwitch), color: 'rgba(0,136,176,0.35)' },
+      { label: 'Switch — theory', value: tSwitch * 100, valueLabel: pct(tSwitch), color: 'rgba(43,95,255,0.35)' },
       { label: 'Switch — simulated', value: sim.switchRate * 100, valueLabel: pct(sim.switchRate), color: c.accent },
       { label: 'Stay — theory', value: tStay * 100, valueLabel: pct(tStay), color: 'rgba(214,0,108,0.30)' },
       { label: 'Stay — simulated', value: sim.stayRate * 100, valueLabel: pct(sim.stayRate), color: c.accent2 }

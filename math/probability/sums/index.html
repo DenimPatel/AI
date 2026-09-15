@@ -287,7 +287,7 @@ series: "probability"
     convBot.yRange[1] = Math.max(0.1, ymax * 1.25);
     convBot.clear();
     convBot.grid({ step: span / 6 });
-    convBot.bars(bins, { color: 'rgba(0,136,176,0.20)', width: span / cfg.bins * 0.92, label: 'X + Y (seeded)' });
+    convBot.bars(bins, { color: 'rgba(43,95,255,0.20)', width: span / cfg.bins * 0.92, label: 'X + Y (seeded)' });
     convBot.curve(function (x) { return convValue(x); },
       { color: c.accent, width: 2.4, from: sRange[0], to: sRange[1], samples: 220, label: '(f*g)(s)' });
     convBot.vline(conv.s, { color: 'rgba(32,30,29,0.55)', dash: [4, 3], label: 's' });
@@ -490,7 +490,7 @@ series: "probability"
     stabPlot.yRange[1] = Math.max(0.1, ymax * 1.22);
     stabPlot.clear();
     stabPlot.grid({ step: 1 });
-    stabPlot.bars(bins, { color: 'rgba(0,136,176,0.22)', width: 12 / 64 * 0.92, label: 'sample mean (seeded)' });
+    stabPlot.bars(bins, { color: 'rgba(43,95,255,0.22)', width: 12 / 64 * 0.92, label: 'sample mean (seeded)' });
     stabPlot.curve(function (x) { return theo.pdf(x); },
       { color: c.accent2, width: 2.2, from: lo, to: hi, samples: 300, label: stab.kind === 'normal' ? 'N(0, 1/n)' : 'Cauchy(0,1)' });
     stabPlot.vline(0, { color: 'rgba(32,30,29,0.4)', dash: [4, 3] });

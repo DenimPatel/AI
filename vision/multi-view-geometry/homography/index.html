@@ -269,7 +269,7 @@ redirect_from:
   <section class="mvg-step" id="applications">
     <div class="mvg-step-head"><span class="mvg-step-num">6</span><h2>What homographies are actually used for</h2></div>
     <p class="mvg-eyebrow">Applications</p>
-    <p><strong>Panorama stitching.</strong> Successive frames from a camera that only rotates (no translation — the case that <a href="/vision/multi-view-geometry/epipolar/">makes <var>E</var> degenerate</a> because the baseline is zero) are related by exactly the pure-rotation homography from §1, <var>H=K RK&#8315;&#185;</var>: no depth, no baseline, one matrix per frame pair. Stitching software estimates that <var>H</var> between overlapping frames, warps each onto a shared cylindrical or spherical surface (a flat mosaic stretches area without bound away from the image center — a sphere doesn't), then blends the seams (feathering or multi-band blending) and corrects exposure differences between shots so the seam doesn't show as a brightness jump.</p>
+    {% endraw %}<p><strong>Panorama stitching.</strong> Successive frames from a camera that only rotates (no translation — the case that <a href="{{ '/vision/multi-view-geometry/epipolar/' | relative_url }}">makes <var>E</var> degenerate</a> because the baseline is zero) are related by exactly the pure-rotation homography from §1, <var>H=K RK&#8315;&#185;</var>: no depth, no baseline, one matrix per frame pair. Stitching software estimates that <var>H</var> between overlapping frames, warps each onto a shared cylindrical or spherical surface (a flat mosaic stretches area without bound away from the image center — a sphere doesn't), then blends the seams (feathering or multi-band blending) and corrects exposure differences between shots so the seam doesn't show as a brightness jump.</p>{% raw %}
     <p><strong>Planar AR-marker pose (ArUco / AprilTag).</strong> A printed marker of known real-world size defines a plane with a known local coordinate frame. Detect its four corners in the image, DLT-fit the homography from the marker's canonical corners to the observed ones, then run exactly the decomposition above (using the camera's known <var>K</var>) to get the marker's <var>(R,t)</var> relative to the camera directly — this is the whole pose-estimation step in ArUco and AprilTag, correspondence-to-pose with nothing else involved.</p>
     <p><strong>Inverse perspective mapping (bird's-eye view).</strong> A forward-facing road camera sees the ground plane in perspective — lane markings converge toward a vanishing point. Given the homography that maps that ground plane onto a top-down virtual camera, warping the whole image through it turns the road into a rectangle, which is what parking-assist and lane-detection systems actually run their geometry on.</p>
     <div class="mvg-warn">&#9888; <span><b>Only the ground plane is real:</b> IPM's homography is fit assuming <em>everything</em> in the image lies on the ground — true for lane paint and flat pavement, false for anything with height. A curb, a parked car, another vehicle's body: none of it is on the assumed plane, so IPM smears and distorts it exactly the way §2's off-plane point drifted away from its prediction. The demo below makes that failure visible on purpose.</span></div>
@@ -365,7 +365,7 @@ redirect_from:
 
   function css(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
   var COLOR_TEXT = css('--color-text') || '#201e1d';
-  var COLOR_ACCENT = css('--color-accent') || '#0088b0';
+  var COLOR_ACCENT = css('--color-accent') || '#2b5fff';
   var COLOR_ACCENT2 = css('--color-accent-2') || '#d6006c';
   var COLOR_DIVIDER = css('--color-divider') || 'rgba(32,30,29,0.16)';
 
@@ -1175,7 +1175,7 @@ redirect_from:
     var WALL_Z = 8, WALL_HW = 6, WALL_HH = 3.2;
     var DISKS = [
       { x:-2.5, y:1.0, r:0.5, c:[206,84,58] },
-      { x:0.8, y:-0.8, r:0.45, c:[0,136,176] },
+      { x:0.8, y:-0.8, r:0.45, c:[43,95,255] },
       { x:2.6, y:1.4, r:0.4, c:[138,92,255] }
     ];
     function ryMat(a){ var c=Math.cos(a), s=Math.sin(a); return [[c,0,s],[0,1,0],[-s,0,c]]; }

@@ -303,7 +303,7 @@ series: "linear_algebra"
       M[i][i] = 1;
       if (i + 1 < N) { M[i][i + 1] = 0.75; M[i + 1][i] = 0.75; }
     }
-    Guide.drawHeatmap(setC.ctx, 440, 380, M, { min: 0, max: 1, colorLow: [247, 249, 250], colorHigh: [0, 136, 176] });
+    Guide.drawHeatmap(setC.ctx, 440, 380, M, { min: 0, max: 1, colorLow: [247, 249, 250], colorHigh: [43, 95, 255] });
     var nonzeros = N + 2 * (N - 1);
     var density = nonzeros / (N * N);
     el('sparse-readout').innerHTML =

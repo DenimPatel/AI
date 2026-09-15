@@ -76,7 +76,7 @@ series: "statistics"
       <div class="g-controls">
         <div class="g-fitkey">
           <span><span class="swatch" style="background: var(--color-accent);"></span>fitted line</span>
-          <span><span class="swatch" style="background: rgba(0,136,176,0.28);"></span>95% band</span>
+          <span><span class="swatch" style="background: rgba(43,95,255,0.28);"></span>95% band</span>
           <span><span class="swatch" style="background: var(--color-accent-2);"></span>residuals</span>
         </div>
         <div class="g-readout" id="fit-readout"></div>
@@ -249,7 +249,7 @@ series: "statistics"
       return f.beta[0] + f.beta[1] * x0 + tc * se;
     }
 
-    mainPlot.band(loFn, hiFn, { a: XR[0], b: XR[1], color: 'rgba(0,136,176,0.18)', samples: 160 });
+    mainPlot.band(loFn, hiFn, { a: XR[0], b: XR[1], color: 'rgba(43,95,255,0.18)', samples: 160 });
     mainPlot.curve(function (x0) { return f.beta[0] + f.beta[1] * x0; }, { color: c.accent, width: 2.4 });
 
     var bars = pts.map(function (p) {
@@ -264,7 +264,7 @@ series: "statistics"
     mainPlot.legend([
       { label: 'data', color: c.accent700 },
       { label: 'fitted line', color: c.accent },
-      { label: '95% band for the mean', color: 'rgba(0,136,176,0.55)', fill: true, swatch: true }
+      { label: '95% band for the mean', color: 'rgba(43,95,255,0.55)', fill: true, swatch: true }
     ], { dy: 8 });
 
     if (drag) drag.draw();

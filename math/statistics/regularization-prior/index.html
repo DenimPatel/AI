@@ -256,7 +256,7 @@ series: "statistics"
     if (invXtX) {
       var levels = [0.6, 1.2, 1.8, 2.4, 3.0, 3.6];
       levels.forEach(function (k) {
-        geoPlot.ellipse(invXtX, betaOls, k, { color: 'rgba(0,136,176,0.28)', width: 1, dash: [3, 3] });
+        geoPlot.ellipse(invXtX, betaOls, k, { color: 'rgba(43,95,255,0.28)', width: 1, dash: [3, 3] });
       });
       var kStar = Math.sqrt(Math.max(0, quadForm(bhat)));
       if (kStar > 1e-6) {
@@ -265,10 +265,10 @@ series: "statistics"
     }
 
     if (mode === 'lasso') {
-      fillPoly(geoPlot, diamondPts(t), 'rgba(0,136,176,0.14)');
+      fillPoly(geoPlot, diamondPts(t), 'rgba(43,95,255,0.14)');
       geoPlot.curve(diamondPts(t), { color: c.accent, width: 2 });
     } else {
-      fillPoly(geoPlot, circlePts(t), 'rgba(0,136,176,0.14)');
+      fillPoly(geoPlot, circlePts(t), 'rgba(43,95,255,0.14)');
       geoPlot.curve(circlePts(t), { color: c.accent, width: 2 });
     }
 
@@ -279,7 +279,7 @@ series: "statistics"
     geoPlot.points([bhat], { color: c.accent2, r: 5, stroke: '#ffffff', width: 1.5 });
 
     geoPlot.legend([
-      { label: 'RSS loss contours', color: 'rgba(0,136,176,0.55)', dashed: true },
+      { label: 'RSS loss contours', color: 'rgba(43,95,255,0.55)', dashed: true },
       { label: 'contour the solution touches', color: c.accent2 },
       { label: mode === 'lasso' ? 'L1 constraint (diamond)' : 'L2 constraint (circle)', color: c.accent },
       { label: 'OLS solution (λ = 0)', color: c.accent400 }

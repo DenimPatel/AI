@@ -320,7 +320,7 @@ series: "probability"
     cltPlot.yRange[0] = 0; cltPlot.yRange[1] = Math.max(0.05, ymax * 1.25);
     cltPlot.clear();
     cltPlot.grid({ step: 1 });
-    cltPlot.bars(bins, { color: 'rgba(0,136,176,0.22)', width: 8 / 41 * 0.9, label: 'standardised sample mean' });
+    cltPlot.bars(bins, { color: 'rgba(43,95,255,0.22)', width: 8 / 41 * 0.9, label: 'standardised sample mean' });
     cltPlot.curve(function (x) { return PHI.pdf(x); },
       { color: c.accent2, width: 2.2, from: -4, to: 4, samples: 300, label: 'N(0,1) density' });
     cltPlot.axes({ step: 1, xLabel: 'standardised z', yLabel: 'density' });
@@ -354,7 +354,7 @@ series: "probability"
     rawPlot.yRange[0] = 0; rawPlot.yRange[1] = Math.max(0.05, ymax * 1.2);
     rawPlot.clear();
     rawPlot.grid({ step: niceStep(hi - lo) });
-    rawPlot.bars(bins, { color: 'rgba(0,136,176,0.20)', width: (hi - lo) / 41 * 0.9, label: 'sample mean' });
+    rawPlot.bars(bins, { color: 'rgba(43,95,255,0.20)', width: (hi - lo) / 41 * 0.9, label: 'sample mean' });
     rawPlot.curve(function (x) { return nd.pdf(x); },
       { color: c.accent2, width: 2.2, from: lo, to: hi, samples: 300, label: 'N(mu, sigma^2/n)' });
     rawPlot.vline(d.mean, { color: 'rgba(32,30,29,0.55)', dash: [5, 4] });

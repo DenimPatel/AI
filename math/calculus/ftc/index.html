@@ -251,7 +251,7 @@ series: "calculus"
     var ax = CalcViz.plotAxes(ctx, W, H, [0, 2], [0, 13],
       { xLabel: 'time t (s)', yLabel: 'speed f(t) (m/s)', title: 'speed, and the area travelled so far' });
     CalcViz.plotFunction(ax, f, { ctx: ctx, color: c.accent700, width: 2.4 });
-    fillArea(ctx, ax, 0, x, 'rgba(0,136,176,0.28)');
+    fillArea(ctx, ax, 0, x, 'rgba(43,95,255,0.28)');
     fillArea(ctx, ax, x, x + dx, 'rgba(214,0,108,0.38)');
     handle(ctx, ax.px(0), ax.py(0), c.text, 'a = 0');
     handle(ctx, ax.px(x), ax.py(f(x)), c.accent, 'x');
@@ -396,7 +396,7 @@ series: "calculus"
     ctx.beginPath(); ctx.arc(CX + 9, 206, 5, 0, Math.PI * 2); ctx.fill();
 
     // Speed bar behind the cart.
-    ctx.fillStyle = 'rgba(0,136,176,0.18)';
+    ctx.fillStyle = 'rgba(43,95,255,0.18)';
     var bw = 6 + 34 * (f(t) / f(T1));
     ctx.fillRect(CX - bw / 2, 130, bw, 10);
     ctx.fillStyle = c.accent700; ctx.font = '11px ' + c.mono;
@@ -454,7 +454,7 @@ series: "calculus"
     var ax = CalcViz.plotAxes(ctx, W, H, [0, 2], [0, 13],
       { xLabel: 't (s)', yLabel: 'f(t) (m/s)', title: 'Part 2, left side: ∫ from a to b of f(t) = 3t²' });
     CalcViz.plotFunction(ax, f, { ctx: ctx, color: c.accent700, width: 2.4 });
-    fillArea(ctx, ax, a, b, 'rgba(0,136,176,0.30)');
+    fillArea(ctx, ax, a, b, 'rgba(43,95,255,0.30)');
     handle(ctx, ax.px(a), ax.py(f(a)), c.accent, 'a');
     handle(ctx, ax.px(b), ax.py(f(b)), c.accent2, 'b');
 

@@ -28,7 +28,7 @@
   function guideColors(opts) {
     if (opts && opts.colors) return opts.colors;
     if (global.Guide && global.Guide.colors) return global.Guide.colors();
-    return { accent: '#0088b0', accent2: '#d6006c', accent400: '#62c5ee', accent700: '#006786', text: '#201e1d', divider: '#ccc', font: 'sans-serif' };
+    return { accent: '#2b5fff', accent2: '#d6006c', accent400: '#5d85fd', accent700: '#0b3cd0', text: '#201e1d', divider: '#ccc', font: 'sans-serif' };
   }
 
   function clamp(v, lo, hi) { return v < lo ? lo : (v > hi ? hi : v); }
@@ -468,7 +468,7 @@
   }
 
   function hexToRgb(hex) {
-    if (!hex) return [0, 136, 176];
+    if (!hex) return [43, 95, 255];
     var h = hex.replace('#', '');
     if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
     return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];

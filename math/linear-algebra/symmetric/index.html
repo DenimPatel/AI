@@ -289,12 +289,12 @@ series: "linear_algebra"
     var levels = [];
     var ks = [0.4, 0.9, 1.7, 2.8];
     if (cls.key === 'indef') {
-      ks.forEach(function (k) { levels.push({ v: k * S, color: 'rgba(0,136,176,0.55)' }); });
+      ks.forEach(function (k) { levels.push({ v: k * S, color: 'rgba(43,95,255,0.55)' }); });
       ks.forEach(function (k) { levels.push({ v: -k * S, color: 'rgba(214,0,108,0.45)' }); });
     } else if (cls.key === 'neg') {
       ks.forEach(function (k) { levels.push({ v: -k * S, color: 'rgba(214,0,108,0.5)' }); });
     } else {
-      ks.forEach(function (k) { levels.push({ v: k * S, color: 'rgba(0,136,176,0.55)' }); });
+      ks.forEach(function (k) { levels.push({ v: k * S, color: 'rgba(43,95,255,0.55)' }); });
     }
     drawContours(planeA, A, levels);
 
@@ -339,9 +339,9 @@ series: "linear_algebra"
 
     planeB.clear();
     var G = LA.lerpMat(LA.mat.identity(2), Q, SB.t);
-    planeB.grid(G, { step: 1, color: 'rgba(0,136,176,0.16)' });
+    planeB.grid(G, { step: 1, color: 'rgba(43,95,255,0.16)' });
     planeB.axes();
-    planeB.ellipse(A, { color: c.accent, width: 2.4, fill: 'rgba(0,136,176,0.06)' });
+    planeB.ellipse(A, { color: c.accent, width: 2.4, fill: 'rgba(43,95,255,0.06)' });
     eigenLines(planeB, Q, 'rgba(32,30,29,0.30)');
     planeB.vector(LA.vscale([Q[0][0], Q[1][0]], lam[0]), { color: c.accent2, width: 2, label: 'λ₁e₁' });
     planeB.vector(LA.vscale([Q[0][1], Q[1][1]], lam[1]), { color: c.accent400, width: 2, label: 'λ₂e₂' });

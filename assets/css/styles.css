@@ -1,7 +1,7 @@
 /* ==========================================================================
    AI — site stylesheet
    Design language: "Broadsheet" — newsprint set for the web. Near-black
-   serif on paper white, with cyan / magenta used sparingly as spot color.
+   serif on paper white, with blue / magenta used sparingly as spot color.
    Hierarchy comes from type scale and whitespace, not boxes or rules.
    ========================================================================== */
 
@@ -11,7 +11,7 @@
   --color-bg: #f3f2f2;
   --color-surface: #eae9e9;
   --color-text: #201e1d;
-  --color-accent: #0088b0;
+  --color-accent: #2b5fff;
   --color-accent-2: #d6006c;
   --color-divider: color-mix(in srgb, #201e1d 16%, transparent);
 
@@ -25,15 +25,15 @@
   --color-neutral-800: #444141;
   --color-neutral-900: #2d2b2b;
 
-  --color-accent-100: #e9f8ff;
-  --color-accent-200: #cbeeff;
-  --color-accent-300: #99e0ff;
-  --color-accent-400: #62c5ee;
-  --color-accent-500: #38a6cf;
-  --color-accent-600: #1186ac;
-  --color-accent-700: #006786;
-  --color-accent-800: #004961;
-  --color-accent-900: #0a303e;
+  --color-accent-100: #eaf0ff;
+  --color-accent-200: #cfdcff;
+  --color-accent-300: #93aefe;
+  --color-accent-400: #5d85fd;
+  --color-accent-500: #2b5fff;
+  --color-accent-600: #0744fb;
+  --color-accent-700: #0b3cd0;
+  --color-accent-800: #16399e;
+  --color-accent-900: #0f2e8a;
 
   --color-accent-2-100: #fff1f4;
   --color-accent-2-200: #ffdee6;

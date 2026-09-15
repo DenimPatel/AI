@@ -276,10 +276,10 @@ series: "probability"
       var x = X(POS[i]);
       var r = 8 + 22 * Math.sqrt(p[i]);
       var cy = beamY - 44 - 34 * p[i];
-      ctx.strokeStyle = 'rgba(0,136,176,0.35)'; ctx.lineWidth = 2;
+      ctx.strokeStyle = 'rgba(43,95,255,0.35)'; ctx.lineWidth = 2;
       ctx.beginPath(); ctx.moveTo(x, beamY); ctx.lineTo(x, cy + r); ctx.stroke();
       ctx.beginPath(); ctx.arc(x, cy, r, 0, 2 * Math.PI);
-      ctx.fillStyle = 'rgba(0,136,176,0.85)'; ctx.fill();
+      ctx.fillStyle = 'rgba(43,95,255,0.85)'; ctx.fill();
       ctx.fillStyle = '#ffffff'; ctx.font = 'bold 11px ' + c.font; ctx.textAlign = 'center';
       ctx.fillText((100 * p[i]).toFixed(0) + '%', x, cy + 4);
       ctx.fillStyle = c.text; ctx.font = '11px ' + c.font;

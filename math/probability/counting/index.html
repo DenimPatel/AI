@@ -299,7 +299,7 @@ series: "probability"
       }
       for (var q = 0; q < xs.length; q++) {
         ctx.beginPath(); ctx.arc(xs[q], y, j === k ? 6 : 4.5, 0, 2 * Math.PI);
-        ctx.fillStyle = j === k ? c.accent : 'rgba(0,136,176,0.35)'; ctx.fill();
+        ctx.fillStyle = j === k ? c.accent : 'rgba(43,95,255,0.35)'; ctx.fill();
         ctx.strokeStyle = c.accent; ctx.lineWidth = 1; ctx.stroke();
       }
       ctx.fillStyle = j === k ? c.accent : c.text;
@@ -317,7 +317,7 @@ series: "probability"
     ctx.font = 'bold 12px ' + c.font; ctx.textAlign = 'left';
     ctx.fillStyle = c.text;
     ctx.fillText('P(' + n + ',' + k + ') = ' + Pm + ' ordered selections', barX, 284);
-    ctx.fillStyle = 'rgba(0,136,176,0.85)';
+    ctx.fillStyle = 'rgba(43,95,255,0.85)';
     ctx.fillRect(barX, 290, Math.max(2, Pm * scale), barH);
     ctx.fillStyle = c.text;
     ctx.fillText('C(' + n + ',' + k + ') = ' + Cm + ' unordered sets   (P ÷ k! = ' + Pm + ' ÷ ' + fact(k) + ')', barX, 326);
@@ -477,7 +477,7 @@ series: "probability"
     var pl = bdayPlot;
     pl.clear();
     pl.grid({ step: 0.25 });
-    pl.area(function (x) { return bdayP(Math.round(x), DAYS); }, 1, BDAY.m, { color: 'rgba(0,136,176,0.12)' });
+    pl.area(function (x) { return bdayP(Math.round(x), DAYS); }, 1, BDAY.m, { color: 'rgba(43,95,255,0.12)' });
     pl.hline(0.5, { color: 'rgba(32,30,29,0.4)', dash: [3, 3] });
     pl.curve(function (x) { return bdayP(Math.round(x), DAYS); }, { from: 1, to: 80, samples: 80, color: c.accent, width: 2.4, label: 'P(shared birthday)' });
     var mstar = bdayMedian();

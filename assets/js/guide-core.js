@@ -11,11 +11,11 @@
 
   function colors() {
     return {
-      accent: css('--color-accent') || '#0088b0',
+      accent: css('--color-accent') || '#2b5fff',
       accent2: css('--color-accent-2') || '#d6006c',
-      accent400: css('--color-accent-400') || '#62c5ee',
-      accent500: css('--color-accent-500') || '#38a6cf',
-      accent700: css('--color-accent-700') || '#006786',
+      accent400: css('--color-accent-400') || '#5d85fd',
+      accent500: css('--color-accent-500') || '#93aefe',
+      accent700: css('--color-accent-700') || '#0b3cd0',
       text: css('--color-text') || '#201e1d',
       divider: css('--color-divider') || '#ccc',
       font: css('--font-body') || 'sans-serif',
@@ -184,7 +184,7 @@
     matrix.forEach(function (row) { row.forEach(function (v) { vals.push(v); }); });
     var min = opts.min != null ? opts.min : Math.min.apply(null, vals);
     var max = opts.max != null ? opts.max : Math.max.apply(null, vals) || 1;
-    var lo = opts.colorLow || [235, 244, 248], hi = opts.colorHigh || [0, 136, 176];
+    var lo = opts.colorLow || [234, 240, 255], hi = opts.colorHigh || [43, 95, 255];
     function color(v) {
       var t = (max === min) ? 0 : (v - min) / (max - min);
       t = Math.max(0, Math.min(1, t));

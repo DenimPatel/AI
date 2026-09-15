@@ -288,7 +288,7 @@ series: "probability_in_action"
     var peak = gpdf(theta.mu, theta.mu, theta.sigma);
     pl.yRange[0] = 0;
     pl.yRange[1] = Math.max(histMax, peak, 0.05) * 1.18;
-    pl.bars(h.bins, { color: 'rgba(0,136,176,0.22)' });
+    pl.bars(h.bins, { color: 'rgba(43,95,255,0.22)' });
     pl.curve(function (x) { return gpdf(x, theta.mu, theta.sigma); },
       { color: c.accent, width: 2.4, label: 'model N(μ, σ)' });
     pl.vline(theta.mu, { color: c.accent2, dash: [5, 4], labelText: 'μ' });

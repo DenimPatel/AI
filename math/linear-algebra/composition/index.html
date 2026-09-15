@@ -253,7 +253,7 @@ series: "linear_algebra"
     if (!planeA) return;
     planeA.clear();
     planeA.grid(null, { step: 1, color: 'rgba(32,30,29,0.10)', width: 1 });
-    planeA.grid(B, { step: 1, color: 'rgba(0,136,176,0.22)', width: 1 });
+    planeA.grid(B, { step: 1, color: 'rgba(43,95,255,0.22)', width: 1 });
     var M = LA.mat.mul(A, B);
     planeA.grid(M, { step: 1, color: c.accent, width: 1.4 });
     planeA.axes();
@@ -319,7 +319,7 @@ series: "linear_algebra"
       planeB.grid(PBA, { step: 1, color: 'rgba(214,0,108,0.20)', width: 1 });
       planeB.grid(PAB, { step: 1, color: c.accent, width: 1.5 });
     } else {
-      planeB.grid(PAB, { step: 1, color: 'rgba(0,136,176,0.20)', width: 1 });
+      planeB.grid(PAB, { step: 1, color: 'rgba(43,95,255,0.20)', width: 1 });
       planeB.grid(PBA, { step: 1, color: c.accent2, width: 1.5 });
     }
     planeB.axes();
@@ -363,8 +363,8 @@ series: "linear_algebra"
     if (!planeC) return;
     planeC.clear();
     planeC.grid(null, { step: 1, color: 'rgba(32,30,29,0.08)', width: 1 });
-    planeC.grid(Bpath, { step: 1, color: 'rgba(98,197,238,0.40)', width: 1 });
-    planeC.grid(ABpath, { step: 1, color: 'rgba(0,136,176,0.28)', width: 1 });
+    planeC.grid(Bpath, { step: 1, color: 'rgba(93,133,253,0.40)', width: 1 });
+    planeC.grid(ABpath, { step: 1, color: 'rgba(43,95,255,0.28)', width: 1 });
     var M = pathMatrix(tPath);
     planeC.grid(M, { step: 1, color: c.accent2, width: 1.6 });
     planeC.axes();
@@ -399,7 +399,7 @@ series: "linear_algebra"
     var right = LA.mat.mul(cA, BC);  // A(BC)
     planeD.clear();
     planeD.grid(null, { step: 1, color: 'rgba(32,30,29,0.08)', width: 1 });
-    planeD.grid(BC, { step: 1, color: 'rgba(98,197,238,0.45)', width: 1 });
+    planeD.grid(BC, { step: 1, color: 'rgba(93,133,253,0.45)', width: 1 });
     planeD.grid(left, { step: 1, color: c.accent, width: 1.5 });
     planeD.grid(right, { step: 1, color: c.accent2, width: 1.2 });
     planeD.axes();

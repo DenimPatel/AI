@@ -268,7 +268,7 @@ series: "linear_algebra"
     if (!planeA1) return;
     planeA1.clear();
     planeA1.grid(null, { step: 1, color: 'rgba(32,30,29,0.10)' });
-    planeA1.grid(A, { step: 1, color: 'rgba(0,136,176,0.30)' });
+    planeA1.grid(A, { step: 1, color: 'rgba(43,95,255,0.30)' });
     planeA1.axes();
     planeA1.vector(PA, { color: c.text, dashed: true, width: 1.6, head: 7, label: 'x' });
     planeA1.vector(LA.mat.mulVec(A, PA), { color: c.accent2, width: 2.4, label: 'Ax' });
@@ -353,7 +353,7 @@ series: "linear_algebra"
     if (q.co) {
       var t1 = LA.vscale(BB1, q.co[0]);
       var t2 = LA.vscale(BB2, q.co[1]);
-      planeB1.polygon([[0, 0], t1, XB, t2], { fill: 'rgba(0,136,176,0.10)', stroke: 'rgba(0,136,176,0.35)', width: 1 });
+      planeB1.polygon([[0, 0], t1, XB, t2], { fill: 'rgba(43,95,255,0.10)', stroke: 'rgba(43,95,255,0.35)', width: 1 });
       planeB1.vector(t1, { color: c.accent, dashed: true, width: 1.8, head: 7 });
       planeB1.vector(t2, { from: t1, color: c.accent400, dashed: true, width: 1.8, head: 7 });
     }
@@ -431,7 +431,7 @@ series: "linear_algebra"
     if (!planeC) return;
     planeC.clear();
     planeC.grid(null, { step: 1, color: 'rgba(32,30,29,0.10)' });
-    planeC.grid(AC, { step: 1, color: 'rgba(0,136,176,0.28)' });
+    planeC.grid(AC, { step: 1, color: 'rgba(43,95,255,0.28)' });
     planeC.axes();
 
     var e = LA.mat.eig2x2(AC);

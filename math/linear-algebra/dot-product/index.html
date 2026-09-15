@@ -259,7 +259,7 @@ series: "linear_algebra"
     var dot = LA.vdot(v, w);
     var nv = LA.vnorm(v), nw = LA.vnorm(w);
     var wn = nw || 1;
-    lineSeg(pl, [0, 0], [w[0] / wn, w[1] / wn], 13, 'rgba(0,136,176,0.12)', 9);
+    lineSeg(pl, [0, 0], [w[0] / wn, w[1] / wn], 13, 'rgba(43,95,255,0.12)', 9);
     pl.polygon([[0, 0], proj, v, perp], { fill: 'rgba(214,0,108,0.07)' });
     pl.vector(w, { color: c.accent400, label: 'w' });
     pl.vector(v, { color: c.accent, label: 'v' });

@@ -322,7 +322,7 @@ series: "statistics"
           var v = Math.exp(gridVal[j][i] - maxLp);
           var a = Math.pow(v, 0.55) * 0.85;
           if (a < 0.01) continue;
-          ctx.fillStyle = 'rgba(0,136,176,' + a.toFixed(3) + ')';
+          ctx.fillStyle = 'rgba(43,95,255,' + a.toFixed(3) + ')';
           var X0 = targetPlot.px(x0), X1 = targetPlot.px(x1);
           ctx.fillRect(X0, Y1, Math.max(1, X1 - X0 + 1), Math.max(1, Y0 - Y1 + 1));
         }
@@ -339,13 +339,13 @@ series: "statistics"
       }
     }
     if (burnPts.length) targetPlot.points(burnPts, { color: 'rgba(214,0,108,0.22)', r: 1.5 });
-    if (keepPts.length) targetPlot.points(keepPts, { color: 'rgba(0,136,176,0.72)', r: 1.7 });
+    if (keepPts.length) targetPlot.points(keepPts, { color: 'rgba(43,95,255,0.72)', r: 1.7 });
     if (states[0] && chains[0].length) {
       targetPlot.points([states[0]], { color: c.accent2, r: 4.5, stroke: '#fff', width: 1.5 });
     }
     targetPlot.points([PM], { color: c.text, r: 4, stroke: '#fff', width: 1.2 });
     targetPlot.legend([
-      { label: 'target density', color: 'rgba(0,136,176,0.55)', fill: true, swatch: true },
+      { label: 'target density', color: 'rgba(43,95,255,0.55)', fill: true, swatch: true },
       { label: 'retained samples', color: c.accent },
       { label: 'burn-in samples', color: c.accent2 },
       { label: 'current state', color: c.accent2 },
@@ -387,7 +387,7 @@ series: "statistics"
       for (k = 0; k < chains[ci].length; k++) pts.push([k, chains[ci][k][0]]);
       if (!pts.length) continue;
       tracePlot.curve(pts, {
-        color: ci === 0 ? c.accent : 'rgba(0,136,176,0.35)',
+        color: ci === 0 ? c.accent : 'rgba(43,95,255,0.35)',
         width: ci === 0 ? 1.6 : 1
       });
     }
@@ -395,7 +395,7 @@ series: "statistics"
     tracePlot.hline(PM[0], { color: c.text, dashed: true, width: 1.2, labelX: tracePlot.xRange[1], label: 'true θ₁' });
     tracePlot.legend([
       { label: 'chain 1', color: c.accent },
-      { label: 'chains 2–4', color: 'rgba(0,136,176,0.55)' },
+      { label: 'chains 2–4', color: 'rgba(43,95,255,0.55)' },
       { label: 'target mean', color: c.text, dashed: true }
     ], { dy: 8 });
   }

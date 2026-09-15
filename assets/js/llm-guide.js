@@ -8,11 +8,11 @@
 
   function colors() {
     return {
-      accent: css('--color-accent') || '#0088b0',
+      accent: css('--color-accent') || '#2b5fff',
       accent2: css('--color-accent-2') || '#d6006c',
-      accent400: css('--color-accent-400') || '#62c5ee',
-      accent500: css('--color-accent-500') || '#38a6cf',
-      accent700: css('--color-accent-700') || '#006786',
+      accent400: css('--color-accent-400') || '#5d85fd',
+      accent500: css('--color-accent-500') || '#93aefe',
+      accent700: css('--color-accent-700') || '#0b3cd0',
       text: css('--color-text') || '#201e1d',
       divider: css('--color-divider') || '#ccc',
       font: css('--font-body') || 'sans-serif',

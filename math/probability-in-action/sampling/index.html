@@ -317,7 +317,7 @@ series: "probability_in_action"
     pl.yRange[0] = 0; pl.yRange[1] = maxPdf * 1.18;
     pl.clear();
     pl.grid({ step: 0.25 });
-    pl.bars(h.bins, { color: 'rgba(0,136,176,0.55)', label: 'draws' });
+    pl.bars(h.bins, { color: 'rgba(43,95,255,0.55)', label: 'draws' });
     pl.curve(function (x) { return d.pdf(x); }, { color: c.accent2, width: 2.2, label: 'target pdf' });
     pl.axes({ xLabel: 'x', yLabel: 'density' });
     pl.legend();
@@ -426,9 +426,9 @@ series: "probability_in_action"
     pl.yRange[0] = 0; pl.yRange[1] = yTop;
     pl.clear();
     pl.grid({ step: 1 });
-    pl.area(targetPdf, REJ_RANGE[0], REJ_RANGE[1], { color: 'rgba(0,136,176,0.10)' });
+    pl.area(targetPdf, REJ_RANGE[0], REJ_RANGE[1], { color: 'rgba(43,95,255,0.10)' });
     pl.points(rej.rejected, { color: 'rgba(32,30,29,0.22)', r: 2 });
-    pl.points(rej.accepted, { color: 'rgba(0,136,176,0.85)', r: 2 });
+    pl.points(rej.accepted, { color: 'rgba(43,95,255,0.85)', r: 2 });
     pl.curve(function (x) { return targetPdf(x); }, { color: c.accent, width: 2.4, label: 'target f(x)' });
     pl.curve(function (x) { return rej.M * g.pdf(x); }, { color: c.accent2, width: 2, dash: [6, 4], label: 'envelope M\u00B7g(x)' });
     if (rejHandles) { rejHandles.draw(); }
@@ -540,7 +540,7 @@ series: "probability_in_action"
     isWeightPlot.yRange[0] = 0; isWeightPlot.yRange[1] = maxY * 1.15;
     isWeightPlot.clear();
     isWeightPlot.grid({ step: hi / 5 });
-    isWeightPlot.bars(h.bins, { color: 'rgba(0,136,176,0.6)', label: 'weight w' });
+    isWeightPlot.bars(h.bins, { color: 'rgba(43,95,255,0.6)', label: 'weight w' });
     isWeightPlot.vline(1, { color: c.accent2, dash: [6, 4], labelText: 'w = 1' });
     isWeightPlot.axes({ xLabel: 'importance weight', yLabel: 'count' });
     isWeightPlot.legend();

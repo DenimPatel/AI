@@ -270,7 +270,7 @@ series: "probability_in_action"
     pl.grid({ step: 1 });
     var items = [];
     for (var i = 0; i < p.length; i++) {
-      items.push({ x: i, y: p[i], color: i === 0 ? c.accent : 'rgba(0,136,176,0.55)' });
+      items.push({ x: i, y: p[i], color: i === 0 ? c.accent : 'rgba(43,95,255,0.55)' });
     }
     pl.bars(items, { width: 0.72, baseline: 0 });
     pl.hline(1 / p.length, { color: 'rgba(32,30,29,0.4)', dash: [5, 4], labelText: 'uniform 1/K' });
@@ -310,7 +310,7 @@ series: "probability_in_action"
     pl.grid({ step: 1 });
     var items = [];
     for (var i = 0; i < CK; i++) {
-      items.push({ x: i, y: q[i], color: i === CE.truth ? c.accent2 : 'rgba(0,136,176,0.5)' });
+      items.push({ x: i, y: q[i], color: i === CE.truth ? c.accent2 : 'rgba(43,95,255,0.5)' });
     }
     pl.bars(items, { width: 0.72, baseline: 0 });
     pl.vline(CE.truth, { color: c.accent2, dash: [3, 3], labelText: 'true label' });
@@ -476,8 +476,8 @@ series: "probability_in_action"
       hi.push(post.mean[i] + 2 * post.sd[i]);
     }
     var traces = [
-      { type: 'scatter', mode: 'lines', x: gpGrid, y: hi, line: { color: 'rgba(0,136,176,0.12)', width: 0 }, hoverinfo: 'skip', showlegend: false },
-      { type: 'scatter', mode: 'lines', x: gpGrid, y: lo, fill: 'tonexty', fillcolor: 'rgba(0,136,176,0.18)', line: { color: 'rgba(0,136,176,0.12)', width: 0 }, hoverinfo: 'skip', showlegend: false },
+      { type: 'scatter', mode: 'lines', x: gpGrid, y: hi, line: { color: 'rgba(43,95,255,0.12)', width: 0 }, hoverinfo: 'skip', showlegend: false },
+      { type: 'scatter', mode: 'lines', x: gpGrid, y: lo, fill: 'tonexty', fillcolor: 'rgba(43,95,255,0.18)', line: { color: 'rgba(43,95,255,0.12)', width: 0 }, hoverinfo: 'skip', showlegend: false },
       { type: 'scatter', mode: 'lines', x: gpGrid, y: post.mean, line: { color: c.accent, width: 2.4 }, hoverinfo: 'skip', showlegend: false },
       { type: 'scatter', mode: 'markers', x: GP.xt, y: GP.yt, marker: { color: c.accent2, size: 9, line: { color: '#ffffff', width: 1.5 } }, hoverinfo: 'skip', showlegend: false }
     ];
@@ -539,7 +539,7 @@ series: "probability_in_action"
     pl.clear();
     pl.grid({ step: 1 });
     pl.points(orig, { color: 'rgba(32,30,29,0.18)', r: 2.2, label: 'data x' });
-    pl.points(cur, { color: 'rgba(0,136,176,' + fmt(0.35 + 0.6 * DIFF.t, 2) + ')', r: 2.4, label: 'noised x_t' });
+    pl.points(cur, { color: 'rgba(43,95,255,' + fmt(0.35 + 0.6 * DIFF.t, 2) + ')', r: 2.4, label: 'noised x_t' });
     pl.axes({ step: 1, xLabel: 'latent coordinate 1', yLabel: 'latent coordinate 2' });
     pl.legend();
     var snr = a / Math.max(1e-9, 1 - a);

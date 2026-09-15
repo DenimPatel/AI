@@ -299,8 +299,8 @@ series: "statistics"
     klPlot.clear();
     klPlot.axes({ xLabel: "x", yLabel: "density" });
 
-    klPlot.area(pOf, X0, X1, { color: "rgba(98,197,238,0.32)" });
-    if (which === "pq") klPlot.area(qFn, X0, X1, { color: "rgba(0,136,176,0.16)" });
+    klPlot.area(pOf, X0, X1, { color: "rgba(93,133,253,0.32)" });
+    if (which === "pq") klPlot.area(qFn, X0, X1, { color: "rgba(43,95,255,0.16)" });
     klPlot.curve(pOf, { color: c.accent400, width: 2.2, samples: 400 });
     klPlot.curve(qFn, { color: c.accent, width: 2.4, samples: 320 });
 
@@ -365,7 +365,7 @@ series: "statistics"
     lapPlot.clear();
     lapPlot.axes({ xLabel: "x", yLabel: "density" });
 
-    lapPlot.area(pOf, X0, X1, { color: "rgba(98,197,238,0.32)" });
+    lapPlot.area(pOf, X0, X1, { color: "rgba(93,133,253,0.32)" });
     lapPlot.curve(pOf, { color: c.accent400, width: 2.2, samples: 400 });
     lapPlot.curve(function (x) { return S.dist.normal.pdf(x, mode, lapSd); }, { color: c.accent2, dashed: true, width: 2.2, samples: 320 });
     lapPlot.vline(mode, { color: c.text, dashed: true, width: 1.2, label: "mode", labelY: ymax * 0.98 });

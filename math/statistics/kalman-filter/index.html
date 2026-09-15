@@ -332,7 +332,7 @@ series: "statistics"
 
     if (mu) {
       var Sxy = [[Sigma[0][0], Sigma[0][1]], [Sigma[1][0], Sigma[1][1]]];
-      plot.ellipse(Sxy, [mu[0], mu[1]], 2, { color: c.accent700, width: 2, fill: 'rgba(0,103,134,0.14)' });
+      plot.ellipse(Sxy, [mu[0], mu[1]], 2, { color: c.accent700, width: 2, fill: 'rgba(11,60,208,0.14)' });
       plot.points([[mu[0], mu[1]]], { color: c.accent700, r: 4, stroke: '#ffffff', width: 1.5 });
     }
 
@@ -340,7 +340,7 @@ series: "statistics"
       { label: 'truth', color: c.text, dashed: true },
       { label: mode === 'kf' ? 'measurements' : 'range-bearing (converted)', color: c.accent2 },
       { label: 'filter estimate', color: c.accent700 },
-      { label: '2\u03C3 covariance (x\u2013y block)', color: c.accent700, fill: 'rgba(0,103,134,0.3)' }
+      { label: '2\u03C3 covariance (x\u2013y block)', color: c.accent700, fill: 'rgba(11,60,208,0.3)' }
     ], { dy: 8 });
 
     updateReadout();

@@ -249,7 +249,7 @@ series: "linear_algebra"
     ampPlane.axes();
 
     if (st.inv) {
-      ampPlane.ellipse(st.inv, { color: c.accent400, width: 1.8, fill: 'rgba(98,197,238,0.08)', samples: 220 });
+      ampPlane.ellipse(st.inv, { color: c.accent400, width: 1.8, fill: 'rgba(93,133,253,0.08)', samples: 220 });
       var kk = st.sv.S.length;
       if (kk) {
         var vMax = st.sv.V.map(function (row) { return row[0]; });
@@ -358,7 +358,7 @@ series: "linear_algebra"
         ctx.fillText(label, out.px(lx) + 4, out.py(ly) - 4);
       }
     }
-    guide(1, 'rgba(0,136,176,0.35)', 'slope 1');
+    guide(1, 'rgba(43,95,255,0.35)', 'slope 1');
     guide(2, 'rgba(214,0,108,0.35)', 'slope 2');
 
     var cur = neModel(bExp);

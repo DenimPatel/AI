@@ -268,7 +268,7 @@ series: "calculus_in_motion"
       ctx.stroke();
     }
     seg(e1, L1, 'rgba(214,0,108,0.85)');
-    seg(e2, L2, 'rgba(0,136,176,0.85)');
+    seg(e2, L2, 'rgba(43,95,255,0.85)');
     if (labels) {
       ctx.font = '600 11px ' + c.font; ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
       ctx.fillStyle = c.accent2;
@@ -497,7 +497,7 @@ series: "calculus_in_motion"
     drawContours(ctx, ax, k);
     // valley floor is the low-curvature eigendirection e2
     var e2 = [-ST, CT], L2 = Math.sqrt(2 * 1.0);
-    ctx.strokeStyle = 'rgba(0,136,176,0.6)'; ctx.lineWidth = 1.5; ctx.setLineDash([5, 4]);
+    ctx.strokeStyle = 'rgba(43,95,255,0.6)'; ctx.lineWidth = 1.5; ctx.setLineDash([5, 4]);
     ctx.beginPath();
     ctx.moveTo(ax.px(-e2[0] * L2), ax.py(-e2[1] * L2));
     ctx.lineTo(ax.px(e2[0] * L2), ax.py(e2[1] * L2));
@@ -569,7 +569,7 @@ series: "calculus_in_motion"
     var ctx = setupNewton.ctx, W = 640, H = 360;
     var ax = CalcViz.plotAxes(ctx, W, H, XR, YR, { xLabel: 'x', yLabel: 'y', title: 'Gradient steps versus one Newton step \u2014 \u03ba = ' + k.toFixed(1), padL: 48, padB: 38, tickTarget: 6 });
     drawContours(ctx, ax, k);
-    drawTraj(ctx, ax, gd.path, gd.path.length, 'rgba(0,136,176,0.55)', 1.6);
+    drawTraj(ctx, ax, gd.path, gd.path.length, 'rgba(43,95,255,0.55)', 1.6);
     arrow(ctx, ax, start, next, c.accent2);
     ctx.beginPath(); ctx.arc(ax.px(start[0]), ax.py(start[1]), 5, 0, Math.PI * 2);
     ctx.fillStyle = c.accent700; ctx.fill();

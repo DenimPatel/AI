@@ -342,7 +342,7 @@ series: "statistics"
     ensPlot.curve(ftrue, { color: c.text, dashed: true, width: 1.3 });
 
     // ensemble epistemic band
-    if (ensLoPts.length) ensPlot.band(ensLoPts, ensHiPts, { color: 'rgba(0,136,176,0.17)' });
+    if (ensLoPts.length) ensPlot.band(ensLoPts, ensHiPts, { color: 'rgba(43,95,255,0.17)' });
 
     // individual bootstrap members
     if (ensBetas.length) {
@@ -350,7 +350,7 @@ series: "statistics"
       for (var b = 0; b < ensBetas.length; b += stride) {
         var pts = [];
         for (var g = 0; g < grid.length; g++) pts.push([grid[g], poly(ensBetas[b], grid[g])]);
-        ensPlot.curve(pts, { color: 'rgba(0,136,176,0.20)', width: 1 });
+        ensPlot.curve(pts, { color: 'rgba(43,95,255,0.20)', width: 1 });
       }
     }
 
@@ -359,7 +359,7 @@ series: "statistics"
 
     ensPlot.legend([
       { label: 'ensemble mean', color: c.accent },
-      { label: 'ensemble band (epistemic)', color: 'rgba(0,136,176,0.45)', fill: true },
+      { label: 'ensemble band (epistemic)', color: 'rgba(43,95,255,0.45)', fill: true },
       { label: 'true f(x) (unknown)', color: c.text, dashed: true },
       { label: 'aleatoric band \u00b11.96\u03c3(x)', color: 'rgba(32,30,29,0.30)', fill: true },
       { label: 'training data', color: c.accent700 }

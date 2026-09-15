@@ -272,7 +272,7 @@ series: "probability"
     pl.xRange[0] = -4; pl.xRange[1] = 4;
     pl.yRange[0] = 0; pl.yRange[1] = yMax * 1.16;
     pl.clear();
-    pl.bars(h.bins, { color: densState.density ? 'rgba(0,136,176,0.30)' : 'rgba(0,136,176,0.34)', baseline: 0 });
+    pl.bars(h.bins, { color: densState.density ? 'rgba(43,95,255,0.30)' : 'rgba(43,95,255,0.34)', baseline: 0 });
     if (densState.density) {
       pl.curve(function (x) { return NORM.pdf(x); }, { color: c.accent2, width: 2.2, label: 'N(0,1) density' });
     }

@@ -304,8 +304,8 @@ series: "probability_in_action"
       lo2.push(run.est[i] - 2 * run.sd[i]); hi2.push(run.est[i] + 2 * run.sd[i]);
       measPts.push({ x: i, y: meas[i] });
     }
-    fillBetween(pl, xs, lo2, hi2, 'rgba(0,136,176,0.10)');
-    fillBetween(pl, xs, lo1, hi1, 'rgba(0,136,176,0.20)');
+    fillBetween(pl, xs, lo2, hi2, 'rgba(43,95,255,0.10)');
+    fillBetween(pl, xs, lo1, hi1, 'rgba(43,95,255,0.20)');
     pl.grid({ step: 5 });
     pl.axes({ step: 5, xLabel: 'time step', yLabel: 'position' });
     pl.curve(function (x) {
@@ -319,8 +319,8 @@ series: "probability_in_action"
     }, { from: 0, to: cur, samples: cur + 1, color: c.accent, width: 2.4 });
     pl.vline(cur, { color: c.divider });
     pl.legend([
-      { label: '±2σ', color: 'rgba(0,136,176,0.10)', fill: true },
-      { label: '±1σ', color: 'rgba(0,136,176,0.20)', fill: true },
+      { label: '±2σ', color: 'rgba(43,95,255,0.10)', fill: true },
+      { label: '±1σ', color: 'rgba(43,95,255,0.20)', fill: true },
       { label: 'estimate', color: c.accent },
       { label: 'measurements', color: c.accent2 },
       { label: 'truth', color: c.text, dash: [5, 4] }
@@ -430,9 +430,9 @@ series: "probability_in_action"
     ctx.stroke();
     ctx.restore();
     pl.points(poses.slice(0, cur + 1), { color: 'rgba(32,30,29,0.28)', r: 2 });
-    pl.points(ekfState.est.slice(0, cur + 1), { color: 'rgba(0,136,176,0.55)', r: 2 });
+    pl.points(ekfState.est.slice(0, cur + 1), { color: 'rgba(43,95,255,0.55)', r: 2 });
     pl.polygon(Prob.confEllipse(ekfState.estP[cur], ekfState.est[cur], 2),
-      { fill: 'rgba(0,136,176,0.10)', stroke: 'rgba(0,136,176,0.35)', width: 1.2 });
+      { fill: 'rgba(43,95,255,0.10)', stroke: 'rgba(43,95,255,0.35)', width: 1.2 });
     pl.polygon(Prob.confEllipse(ekfState.estP[cur], ekfState.est[cur], 1),
       { stroke: c.accent, width: 2 });
     pl.points([TRUE_LM], { color: c.accent2, r: 4.5 });
@@ -512,7 +512,7 @@ series: "probability_in_action"
     }
     render3d(ekfDiv, [{
       type: 'surface', x: xs, y: ys, z: zz, showscale: false, opacity: 1, hoverinfo: 'skip',
-      colorscale: [[0, '#eaf4f8'], [1, '#0088b0']]
+      colorscale: [[0, '#eaf0ff'], [1, '#2b5fff']]
     }], GuidePlot3D.baseLayout({
       range: { x: [lo0, hi0], y: [lo1, hi1], z: [0, zmax * 1.05] },
       aspectmode: 'data', xTitle: 'x (m)', yTitle: 'y (m)', zTitle: 'belief'

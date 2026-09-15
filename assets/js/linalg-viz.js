@@ -545,7 +545,7 @@
         var dir = n1 > 1e-9 ? vscale(v1, 1 / n1) : [1, 0];
         var big = diag;
         var a = vscale(dir, -big * 3), b = vscale(dir, big * 3);
-        ctx.strokeStyle = o.color || 'rgba(0,136,176,0.18)';
+        ctx.strokeStyle = o.color || 'rgba(43,95,255,0.18)';
         ctx.lineWidth = 10; ctx.lineCap = 'round';
         ctx.beginPath(); ctx.moveTo(px(a[0]), py(a[1])); ctx.lineTo(px(b[0]), py(b[1])); ctx.stroke();
       } else {
@@ -553,7 +553,7 @@
         var K = 3 * diag / m;
         var p1 = vscale(v1, K), p2 = vscale(v2, K);
         var quad = [vadd(p1, p2), vsub(p1, p2), vscale(vadd(p1, p2), -1), vsub(p2, p1)];
-        ctx.fillStyle = o.color || 'rgba(0,136,176,0.12)';
+        ctx.fillStyle = o.color || 'rgba(43,95,255,0.12)';
         ctx.beginPath();
         ctx.moveTo(px(quad[0][0]), py(quad[0][1]));
         for (var i = 1; i < quad.length; i++) ctx.lineTo(px(quad[i][0]), py(quad[i][1]));

@@ -285,7 +285,7 @@ series: "probability_in_action"
     var ctx = mcCanvas.ctx;
     var geo = Guide.drawHeatmap(ctx, 640, 300, mcP, {
       rowLabels: STATE, colLabels: STATE, min: 0, max: 1,
-      colorLow: [247, 249, 250], colorHigh: [0, 136, 176]
+      colorLow: [247, 249, 250], colorHigh: [43, 95, 255]
     });
     ctx.font = '11px ' + c.font;
     for (var r = 0; r < 3; r++) {
@@ -320,7 +320,7 @@ series: "probability_in_action"
     pl.grid({ step: 0.25 });
     var bars = [];
     for (i = 0; i < STATE.length; i++) bars.push({ x: i, y: mc.freq[i] });
-    pl.bars(bars, { width: 0.52, color: 'rgba(0,136,176,0.30)', label: 'empirical frequency' });
+    pl.bars(bars, { width: 0.52, color: 'rgba(43,95,255,0.30)', label: 'empirical frequency' });
     var piPts = [], afterPts = [];
     for (i = 0; i < STATE.length; i++) {
       piPts.push({ x: i, y: mc.pi[i] });
@@ -470,7 +470,7 @@ series: "probability_in_action"
     for (i = 0; i < PR_PAGES.length; i++) {
       var x = PR_POS[i][0], y = PR_POS[i][1], r = prRadius(pr.pi[i]);
       ctx.beginPath(); ctx.arc(x, y, r, 0, 2 * Math.PI);
-      ctx.fillStyle = 'rgba(0,136,176,0.22)'; ctx.fill();
+      ctx.fillStyle = 'rgba(43,95,255,0.22)'; ctx.fill();
       ctx.lineWidth = 2;
       ctx.strokeStyle = c.accent;
       if (i === 4 && !pr.fixDangling) { ctx.setLineDash([5, 4]); ctx.strokeStyle = c.accent2; }

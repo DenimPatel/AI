@@ -427,13 +427,13 @@ series: "probability"
       for (i = 0; i < h.bins.length; i++) {
         items.push({ x0: h.bins[i].x0, x1: h.bins[i].x1, y: h.bins[i].density * scale });
       }
-      plotB.bars(items, { color: 'rgba(0,136,176,0.28)' });
+      plotB.bars(items, { color: 'rgba(43,95,255,0.28)' });
       plotB.points(B.xs.map(function (v) { return { x: v, y: 0 }; }),
         { color: 'rgba(214,0,108,0.55)', r: 1.8 });
     }
 
     plotB.curve(function (x) { return d.pdf(x) * scale; },
-      { color: 'rgba(0,136,176,0.9)', width: 1.6, label: 'target density (scaled)' });
+      { color: 'rgba(43,95,255,0.9)', width: 1.6, label: 'target density (scaled)' });
     plotB.curve(function (x) { return d.cdf(x); },
       { color: c.accent, width: 2.4, label: 'F(x)' });
 
@@ -517,7 +517,7 @@ series: "probability"
 
     plotC.clear();
     plotC.grid({ step: 1 });
-    plotC.area(function () { return 0; }, a, b, { base: -1.4, color: 'rgba(0,136,176,0.20)' });
+    plotC.area(function () { return 0; }, a, b, { base: -1.4, color: 'rgba(43,95,255,0.20)' });
     plotC.curve(function (x) { return gC(x); }, { color: c.accent, width: 2.4, label: 'g(x)' });
     plotC.curve(function (x) {
       var t = (x - a) / (b - a);

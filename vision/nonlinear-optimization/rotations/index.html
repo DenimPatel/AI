@@ -351,9 +351,9 @@ redirect_from:
 
   function css(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
   var COLOR_TEXT = css('--color-text') || '#201e1d';
-  var COLOR_ACCENT = css('--color-accent') || '#0088b0';
+  var COLOR_ACCENT = css('--color-accent') || '#2b5fff';
   var COLOR_ACCENT2 = css('--color-accent-2') || '#d6006c';
-  var PALETTE = [100,200,300,400,500,600,700,800,900].map(function(n){ return css('--color-accent-'+n) || '#38a6cf'; });
+  var PALETTE = [100,200,300,400,500,600,700,800,900].map(function(n){ return css('--color-accent-'+n) || '#93aefe'; });
   var R0 = 3; // converts a bearing residual (radians) into distance-like units so it can be summed with range residuals
 
   function gaussianNoise(std){

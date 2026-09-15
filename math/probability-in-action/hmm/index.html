@@ -225,7 +225,7 @@ series: "probability_in_action"
   var K = 5;
   var COLOR = [0, 0, 1, 1, 0];
   var COLORNAME = ['blue', 'blue', 'red', 'red', 'blue'];
-  var OBS_COLOR = ['#0088b0', '#d6006c'];
+  var OBS_COLOR = ['#2b5fff', '#d6006c'];
 
   var TRANS = [
     [0.45, 0.55, 0.00, 0.00, 0.00],
@@ -429,7 +429,7 @@ series: "probability_in_action"
         ctx.fillRect(x, y, g.cellW, g.cellH);
         if (t < fwdReveal) {
           var a = full.alpha[i][t];
-          ctx.fillStyle = 'rgba(0,136,176,' + (0.05 + 0.5 * a).toFixed(3) + ')';
+          ctx.fillStyle = 'rgba(43,95,255,' + (0.05 + 0.5 * a).toFixed(3) + ')';
           ctx.fillRect(x + 1, y + 1, g.cellW - 2, g.cellH - 2);
         }
         if (gammaVisible(t)) {
@@ -462,7 +462,7 @@ series: "probability_in_action"
     // legend
     var ly = H - 22;
     ctx.textAlign = 'left';
-    ctx.fillStyle = 'rgba(0,136,176,0.5)'; ctx.fillRect(GEO.padL, ly - 9, 16, 12);
+    ctx.fillStyle = 'rgba(43,95,255,0.5)'; ctx.fillRect(GEO.padL, ly - 9, 16, 12);
     ctx.fillStyle = c.text; ctx.font = '11px ' + c.font;
     ctx.fillText('forward α (filtered)', GEO.padL + 22, ly);
     ctx.fillStyle = 'rgba(214,0,108,0.85)'; ctx.fillRect(GEO.padL + 190, ly - 4, 16, 6);
@@ -512,7 +512,7 @@ series: "probability_in_action"
         x = g.rx(t); y = g.ry(i);
         d = vit.delta[i][t] / maxd;
         dmax = Math.max(0, d);
-        ctx.fillStyle = 'rgba(0,136,176,' + (0.05 + 0.55 * dmax).toFixed(3) + ')';
+        ctx.fillStyle = 'rgba(43,95,255,' + (0.05 + 0.55 * dmax).toFixed(3) + ')';
         ctx.fillRect(x + 1, y + 1, g.cellW - 2, g.cellH - 2);
         ctx.strokeStyle = 'rgba(32,32,29,0.16)';
         ctx.lineWidth = 1;

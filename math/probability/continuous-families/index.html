@@ -291,7 +291,7 @@ series: "probability"
     var pl = panelPlot, step = (hi - lo) / 6;
     pl.xRange[0] = lo; pl.xRange[1] = hi; pl.yRange[0] = 0; pl.yRange[1] = Math.max(mx * 1.12, 1.05);
     pl.clear(); pl.grid({ step: step });
-    pl.area(function (t) { return d.pdf(t); }, lo, hi, { color: 'rgba(0,136,176,0.14)' });
+    pl.area(function (t) { return d.pdf(t); }, lo, hi, { color: 'rgba(43,95,255,0.14)' });
     pl.curve(function (t) { return d.pdf(t); }, { color: c.accent, width: 2.4, label: 'pdf' });
     pl.steps(function (t) { return d.cdf(t); }, { color: c.accent2, width: 1.7, dash: [5, 4], from: lo, to: hi, samples: 220, label: 'cdf' });
     pl.axes({ step: step, xLabel: 'x', yLabel: 'pdf / cdf' });
@@ -358,7 +358,7 @@ series: "probability"
     pl.xRange[0] = 0; pl.xRange[1] = xmax; pl.yRange[0] = 0; pl.yRange[1] = lam * 1.12;
     pl.clear(); pl.grid({ step: xmax / 6 });
     var f = function (x) { return x < s ? 0 : lam * Math.exp(-lam * (x - s)); };
-    pl.area(f, s + memo.t, xmax, { color: 'rgba(0,136,176,0.24)', label: 'P(X > s+t | X > s)' });
+    pl.area(f, s + memo.t, xmax, { color: 'rgba(43,95,255,0.24)', label: 'P(X > s+t | X > s)' });
     pl.curve(f, { color: c.accent, width: 2, label: 'X | X > s' });
     pl.vline(s, { color: 'rgba(32,30,29,0.5)', dash: [3, 3], labelText: 's' });
     pl.vline(s + memo.t, { color: c.accent2, dash: [5, 4], labelText: 's+t' });

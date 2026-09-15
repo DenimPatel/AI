@@ -97,7 +97,7 @@ series: "probability_in_action"
         <div class="g-legend">
           <span class="g-legend-item"><span class="g-swatch" style="background:#d6006c"></span> naive</span>
           <span class="g-legend-item"><span class="g-swatch" style="background:#e09000"></span> antithetic</span>
-          <span class="g-legend-item"><span class="g-swatch" style="background:#0088b0"></span> control variates</span>
+          <span class="g-legend-item"><span class="g-swatch" style="background:#2b5fff"></span> control variates</span>
           <span class="g-legend-item"><span class="g-swatch" style="background:#1a7f37"></span> stratified</span>
         </div>
         <div class="g-readout" id="race-readout"></div>
@@ -236,7 +236,7 @@ series: "probability_in_action"
     var n = pi.n, i, x, y;
     for (i = 0; i < n; i++) {
       x = pi.xs[i]; y = pi.ys[i];
-      ctx.fillStyle = (x * x + y * y <= 1) ? 'rgba(0,136,176,0.80)' : 'rgba(32,30,29,0.26)';
+      ctx.fillStyle = (x * x + y * y <= 1) ? 'rgba(43,95,255,0.80)' : 'rgba(32,30,29,0.26)';
       ctx.fillRect(X(x) - 1, Y(y) - 1, 2.2, 2.2);
     }
     ctx.fillStyle = c.accent2; ctx.font = '12px ' + c.font; ctx.textAlign = 'left';
@@ -270,7 +270,7 @@ series: "probability_in_action"
       ctx.lineTo(X, Y);
     }
     ctx.closePath();
-    ctx.fillStyle = 'rgba(0,136,176,0.10)';
+    ctx.fillStyle = 'rgba(43,95,255,0.10)';
     ctx.fill();
     ctx.restore();
     pl.hline(PI, { color: c.accent2, dash: [6, 4], labelText: '\u03c0 = 3.14159\u2026' });
@@ -282,7 +282,7 @@ series: "probability_in_action"
     pl.legend([
       { label: 'running estimate', color: c.accent },
       { label: '\u03c0 (truth)', color: c.accent2, dash: [6, 4] },
-      { label: '\u00b11.64/\u221aN error band', color: 'rgba(0,136,176,0.10)', fill: true }
+      { label: '\u00b11.64/\u221aN error band', color: 'rgba(43,95,255,0.10)', fill: true }
     ]);
     var est = pi.est[n], ins = pi.cum[n];
     el('pi-readout').innerHTML =
@@ -353,7 +353,7 @@ series: "probability_in_action"
     var methods = [
       { name: 'naive', fn: estNaive, color: '#d6006c', ys: [] },
       { name: 'antithetic', fn: estAnti, color: '#e09000', ys: [] },
-      { name: 'control variates', fn: estControl, color: '#0088b0', ys: [] },
+      { name: 'control variates', fn: estControl, color: '#2b5fff', ys: [] },
       { name: 'stratified', fn: estStrat, color: '#1a7f37', ys: [] }
     ];
     var xs = [], i, j, lo = Infinity, hi = -Infinity, e, y;

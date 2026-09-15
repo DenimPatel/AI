@@ -299,7 +299,7 @@ series: "probability_in_action"
       for (i = 0; i < n; i++) ctx.lineTo(X((i + 0.5) * CORR.L / n), baseY - bel[i] * scale);
       ctx.lineTo(X(CORR.L), baseY);
       ctx.closePath();
-      ctx.fillStyle = 'rgba(0,136,176,' + (0.10 + 0.11 * k).toFixed(2) + ')';
+      ctx.fillStyle = 'rgba(43,95,255,' + (0.10 + 0.11 * k).toFixed(2) + ')';
       ctx.fill();
       ctx.strokeStyle = c.accent; ctx.lineWidth = 1.1; ctx.stroke();
       var tx = X(wf.trues[k]);
@@ -360,7 +360,7 @@ series: "probability_in_action"
       b2.push({ x0: i * dx, x1: (i + 1) * dx, y: pred.bel[i] });
     }
     pl.bars(b1, { color: 'rgba(32,30,29,0.14)', label: 'bel before motion' });
-    pl.bars(b2, { color: 'rgba(0,136,176,0.58)', label: 'prediction' });
+    pl.bars(b2, { color: 'rgba(43,95,255,0.58)', label: 'prediction' });
     pl.vline(5, { color: c.text, dash: [4, 3], labelText: 'centre' });
     pl.vline(wrapX(5 + pf.shift), { color: c.accent2, dash: [4, 3], labelText: 'after shift' });
     pl.axes({ step: 1, xLabel: 'position x', yLabel: 'probability per cell' });
@@ -413,7 +413,7 @@ series: "probability_in_action"
     pl.bars(bp, { color: 'rgba(32,30,29,0.13)', label: 'prior prediction' });
     pl.curve(function (x) { return (like(up.z, up.s)(x) / lmax) * mx * 0.9; },
       { color: c.accent2, width: 2, dash: [6, 4], from: 0, to: CORR.L, samples: 240, label: 'likelihood p(z|x), scaled' });
-    pl.bars(bq, { color: 'rgba(0,136,176,0.62)', label: 'posterior bel' });
+    pl.bars(bq, { color: 'rgba(43,95,255,0.62)', label: 'posterior bel' });
     pl.vline(up.z, { color: c.accent2, dash: [3, 3], labelText: 'z' });
     pl.axes({ step: 1, xLabel: 'position x', yLabel: 'probability per cell' });
     pl.legend();
@@ -481,9 +481,9 @@ series: "probability_in_action"
       ctx.arc(cx, cy, R, a0, a1);
       ctx.arc(cx, cy, R - len, a1, a0, true);
       ctx.closePath();
-      ctx.fillStyle = 'rgba(0,136,176,0.55)';
+      ctx.fillStyle = 'rgba(43,95,255,0.55)';
       ctx.fill();
-      ctx.strokeStyle = 'rgba(0,104,134,0.7)'; ctx.lineWidth = 0.6; ctx.stroke();
+      ctx.strokeStyle = 'rgba(11,60,208,0.7)'; ctx.lineWidth = 0.6; ctx.stroke();
     }
     ctx.beginPath();
     ctx.arc(cx, cy, R, 0, 2 * Math.PI);
@@ -528,7 +528,7 @@ series: "probability_in_action"
     pl.clear();
     pl.grid({ step: 1 });
     var items = [];
-    for (i = 0; i < n; i++) items.push({ x0: i * dx, x1: (i + 1) * dx, y: bel[i], color: 'rgba(0,136,176,0.6)' });
+    for (i = 0; i < n; i++) items.push({ x0: i * dx, x1: (i + 1) * dx, y: bel[i], color: 'rgba(43,95,255,0.6)' });
     pl.bars(items, {});
     pl.vline(bf.truePos, { color: c.accent2, dash: [5, 4], labelText: 'true x' });
     pl.vline(bf.z, { color: c.accent700, dash: [2, 3], labelText: 'z' });
@@ -554,7 +554,7 @@ series: "probability_in_action"
     pl.hline(Math.log(bf.n) / Math.LN2, { color: c.divider, dash: [4, 4], labelText: 'uniform maximum' });
     var items = [];
     for (i = 0; i < bf.hist.length; i++) items.push({ x: i + 0.5, y: bf.hist[i] });
-    pl.bars(items, { color: 'rgba(0,136,176,0.55)', width: 0.7 });
+    pl.bars(items, { color: 'rgba(43,95,255,0.55)', width: 0.7 });
     pl.axes({ step: 1, xLabel: 'step (most recent 60)', yLabel: 'entropy (bits)' });
   }
   function drawMain() { drawRing(); drawHist(); drawEnt(); updateBfReadout(); }

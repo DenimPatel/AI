@@ -80,7 +80,7 @@ series: "probability_in_action"
           <button type="button" id="gmm-reset">Reset</button>
         </div>
         <div class="g-legend">
-          <span class="g-legend-item"><span class="g-swatch" style="background:#0088b0"></span> component 1</span>
+          <span class="g-legend-item"><span class="g-swatch" style="background:#2b5fff"></span> component 1</span>
           <span class="g-legend-item"><span class="g-swatch" style="background:#d6006c"></span> component 2</span>
           <span class="g-legend-item"><span class="g-swatch" style="background:#c9a227"></span> component 3</span>
           <span class="g-legend-item"><span class="g-swatch" style="background:rgba(201,162,39,0.5)"></span> gap = KL</span>
@@ -198,11 +198,11 @@ series: "probability_in_action"
   function el(id) { return document.getElementById(id); }
   function clamp(x, lo, hi) { return Math.max(lo, Math.min(hi, x)); }
   function hex2rgb(h) {
-    if (!h) return [0, 136, 176];
+    if (!h) return [43, 95, 255];
     h = String(h).replace('#', '');
     if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
     var n = parseInt(h, 16);
-    if (isNaN(n)) return [0, 136, 176];
+    if (isNaN(n)) return [43, 95, 255];
     return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
   }
   function rgba(rgb, a) { return 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',' + a + ')'; }

@@ -362,8 +362,8 @@ series: "linear_algebra"
 
     // rank-1 line through the mean along v1
     var L = 6;
-    plane.vector([v1[0] * L, v1[1] * L], { from: mean, color: 'rgba(0,136,176,0.16)', width: 9, head: 1 });
-    plane.vector([-v1[0] * L, -v1[1] * L], { from: mean, color: 'rgba(0,136,176,0.16)', width: 9, head: 1 });
+    plane.vector([v1[0] * L, v1[1] * L], { from: mean, color: 'rgba(43,95,255,0.16)', width: 9, head: 1 });
+    plane.vector([-v1[0] * L, -v1[1] * L], { from: mean, color: 'rgba(43,95,255,0.16)', width: 9, head: 1 });
 
     plane.points(cloud, { color: 'rgba(32,30,29,0.30)', r: 2.2 });
     var proj = pcaProjected(mix);
@@ -446,7 +446,7 @@ series: "linear_algebra"
     ctx.stroke(); ctx.setLineDash([]);
 
     // 90% guide line
-    ctx.strokeStyle = 'rgba(0,136,176,0.25)'; ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(43,95,255,0.25)'; ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(padL, padT + plotH - plotH * 0.9);
     ctx.lineTo(padL + plotW, padT + plotH - plotH * 0.9);

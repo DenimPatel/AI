@@ -380,8 +380,8 @@
     var c = opts.colors || {};
     var palette = {
       queued: opts.queuedColor || '#d9d4cc',
-      prefill: opts.prefillColor || (c.accent500 || '#38a6cf'),
-      decode: opts.decodeColor || (c.accent || '#0088b0'),
+      prefill: opts.prefillColor || (c.accent500 || '#93aefe'),
+      decode: opts.decodeColor || (c.accent || '#2b5fff'),
       swap: opts.swapColor || (c.accent2 || '#d6006c'),
       preempted: opts.preemptedColor || '#c9a227'
     };

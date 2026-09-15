@@ -246,7 +246,7 @@ series: "linear_algebra"
 
     var c0 = col0(), c1v = col1();
     planeA.polygon([[0, 0], [1, 0], [1, 1], [0, 1]], { stroke: 'rgba(32,30,29,0.35)', width: 1.2 });
-    planeA.polygon([[0, 0], c0, LA.vadd(c0, c1v), c1v], { fill: 'rgba(0,136,176,0.12)', stroke: 'rgba(0,136,176,0.45)', width: 1.5 });
+    planeA.polygon([[0, 0], c0, LA.vadd(c0, c1v), c1v], { fill: 'rgba(43,95,255,0.12)', stroke: 'rgba(43,95,255,0.45)', width: 1.5 });
 
     planeA.vector(probe, { color: c.accent700, dashed: true, width: 1.6, head: 7, label: 'p' });
     var Mp = LA.mat.mulVec(M, probe);
@@ -322,7 +322,7 @@ series: "linear_algebra"
     planeC.axes();
     var c0 = col0(), c1v = col1();
     planeC.polygon([[0, 0], [1, 0], [1, 1], [0, 1]], { stroke: 'rgba(32,30,29,0.35)', width: 1.2 });
-    planeC.polygon([[0, 0], c0, LA.vadd(c0, c1v), c1v], { fill: 'rgba(0,136,176,0.14)', stroke: 'rgba(0,136,176,0.5)', width: 1.5 });
+    planeC.polygon([[0, 0], c0, LA.vadd(c0, c1v), c1v], { fill: 'rgba(43,95,255,0.14)', stroke: 'rgba(43,95,255,0.5)', width: 1.5 });
     planeC.vector(c0, { color: c.accent, label: 'î ⟶', width: 2.4 });
     planeC.vector(c1v, { color: c.accent400, label: 'ĵ ⟶', width: 2.4 });
     LA.setMatrix(el('tf-preset-mat'), M, { digits: 2, label: 'M =' });
@@ -358,7 +358,7 @@ series: "linear_algebra"
 
     var c0 = col0(), c1v = col1();
     planeD.polygon([[0, 0], [1, 0], [1, 1], [0, 1]], { stroke: 'rgba(32,30,29,0.4)', width: 1.2 });
-    planeD.polygon([[0, 0], c0, LA.vadd(c0, c1v), c1v], { fill: 'rgba(0,136,176,0.12)', stroke: 'rgba(0,136,176,0.45)', width: 1.5 });
+    planeD.polygon([[0, 0], c0, LA.vadd(c0, c1v), c1v], { fill: 'rgba(43,95,255,0.12)', stroke: 'rgba(43,95,255,0.45)', width: 1.5 });
     planeD.vector(c0, { color: c.accent, label: 'col 1', width: 2.2 });
     planeD.vector(c1v, { color: c.accent400, label: 'col 2', width: 2.2 });
 

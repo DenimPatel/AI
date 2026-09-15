@@ -278,7 +278,7 @@ series: "calculus_in_motion"
   function drawBaseContours(ctx, ax) {
     CalcViz.contourField(ctx, F, D, FLEVELS, {
       axes: ax, nx: 74, ny: 74, width: 1,
-      colorLow: [234, 246, 251], colorHigh: [0, 103, 134],
+      colorLow: [234, 246, 251], colorHigh: [11, 60, 208],
       lineColor: 'rgba(32,30,29,0.32)'
     });
     var p = ax.plot;
@@ -563,7 +563,7 @@ series: "calculus_in_motion"
       if (i === 0) ctx.moveTo(X, Y); else ctx.lineTo(X, Y);
     }
     ctx.closePath();
-    ctx.fillStyle = 'rgba(98,197,238,0.30)'; ctx.fill();
+    ctx.fillStyle = 'rgba(93,133,253,0.30)'; ctx.fill();
     ctx.strokeStyle = c.accent2; ctx.lineWidth = 2.5; ctx.stroke();
 
     handle(ctx, ax.px(0), ax.py(0), c.accent, 'unconstrained min');

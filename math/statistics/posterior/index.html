@@ -247,7 +247,7 @@ series: "statistics"
     postPlot.clear();
     postPlot.axes({ xLabel: 'p \u2014 probability of heads', yLabel: 'density' });
 
-    postPlot.area(function (x) { return S.dist.beta.pdf(x, post.a, post.b); }, q025, q975, { color: 'rgba(0,136,176,0.16)', samples: 140 });
+    postPlot.area(function (x) { return S.dist.beta.pdf(x, post.a, post.b); }, q025, q975, { color: 'rgba(43,95,255,0.16)', samples: 140 });
 
     if (n > 0) {
       var Lmax = 0, L, scale;
@@ -275,7 +275,7 @@ series: "statistics"
       { label: 'prior', color: c.accent400 },
       { label: 'likelihood (scaled to its peak)', color: c.accent2, dashed: true },
       { label: 'posterior', color: c.accent },
-      { label: '95% credible interval', color: 'rgba(0,136,176,0.35)', fill: true }
+      { label: '95% credible interval', color: 'rgba(43,95,255,0.35)', fill: true }
     ], { dy: 6 });
 
     var priorMean = priorA / (priorA + priorB);

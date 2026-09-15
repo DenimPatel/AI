@@ -449,7 +449,7 @@ series: "llm_serving"
         var a = -Math.PI / 2 + d * 2 * Math.PI / N;
         var x = cx + R * Math.cos(a), y = cy + R * Math.sin(a);
         ctx.beginPath(); ctx.arc(x, y, 26, 0, 2 * Math.PI);
-        ctx.fillStyle = (d === (step % N)) ? c.accent : "rgba(0,136,176,0.16)";
+        ctx.fillStyle = (d === (step % N)) ? c.accent : "rgba(43,95,255,0.16)";
         ctx.fill(); ctx.strokeStyle = c.accent; ctx.lineWidth = 1.5; ctx.stroke();
         ctx.fillStyle = (d === (step % N)) ? "#fff" : c.text;
         ctx.font = "600 12px " + c.font; ctx.textAlign = "center"; ctx.textBaseline = "middle";

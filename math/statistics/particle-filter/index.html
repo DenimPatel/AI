@@ -325,7 +325,7 @@ series: "statistics"
     for (i = 0; i < history.length - 1; i++) {
       var row = history[i], pts = [];
       for (j = 0; j < row.particles.length; j++) pts.push({ x: row.particles[j].x, y: row.t });
-      if (pts.length) mapPlot.points(pts, { r: 1.6, color: 'rgba(0,136,176,0.13)' });
+      if (pts.length) mapPlot.points(pts, { r: 1.6, color: 'rgba(43,95,255,0.13)' });
     }
 
     var truePts = [], meanPts = [];
@@ -344,8 +344,8 @@ series: "statistics"
       else if (frac > 0.25) mid.push(pt);
       else weak.push(pt);
     }
-    if (weak.length) mapPlot.points(weak, { r: 2, color: 'rgba(0,136,176,0.30)' });
-    if (mid.length) mapPlot.points(mid, { r: 3, color: 'rgba(0,136,176,0.60)' });
+    if (weak.length) mapPlot.points(weak, { r: 2, color: 'rgba(43,95,255,0.30)' });
+    if (mid.length) mapPlot.points(mid, { r: 3, color: 'rgba(43,95,255,0.60)' });
     if (strong.length) mapPlot.points(strong, { r: 4.5, color: c.accent });
 
     mapPlot.points([{ x: trueX, y: t }], { r: 5, color: c.accent2, stroke: 'rgba(255,255,255,0.95)', width: 1.5 });

@@ -125,7 +125,7 @@ series: "probability_in_action"
         <div class="g-legend">
           <span class="g-legend-item"><span class="g-swatch" style="background:#201e1d"></span> true pose</span>
           <span class="g-legend-item"><span class="g-swatch" style="background:#d6006c"></span> weighted estimate</span>
-          <span class="g-legend-item"><span class="g-swatch" style="background:#0088b0"></span> particles (bright = heavy)</span>
+          <span class="g-legend-item"><span class="g-swatch" style="background:#2b5fff"></span> particles (bright = heavy)</span>
         </div>
       </div>
     </div>
@@ -258,7 +258,7 @@ series: "probability_in_action"
     }
     var cmax = 0;
     for (i = 0; i < bins; i++) cmax = Math.max(cmax, counts[i]);
-    ctx.fillStyle = 'rgba(0,136,176,0.16)';
+    ctx.fillStyle = 'rgba(43,95,255,0.16)';
     for (i = 0; i < bins; i++) {
       if (!counts[i]) continue;
       var h = plotH * (counts[i] / (cmax || 1)) * 0.9;
@@ -454,7 +454,7 @@ series: "probability_in_action"
     if (!bSetup) return;
     var ctx = bSetup.ctx, W = B_W, H = B_H, i, j;
     ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = 'rgba(0,136,176,0.05)';
+    ctx.fillStyle = 'rgba(43,95,255,0.05)';
     ctx.fillRect(SX(0), SY(0), SCALE * MAPW, SCALE * MAPH);
     ctx.strokeStyle = 'rgba(32,30,29,0.06)'; ctx.lineWidth = 1;
     for (i = 0; i <= MAPW; i++) { ctx.beginPath(); ctx.moveTo(SX(i), SY(0)); ctx.lineTo(SX(i), SY(MAPH)); ctx.stroke(); }

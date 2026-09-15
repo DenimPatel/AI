@@ -293,11 +293,11 @@ series: "probability_in_action"
     ctx.restore();
   }
   function targetBackdrop(pl) {
-    strokeEllipse(pl, SIG, MU, 3, { fill: 'rgba(0,136,176,0.06)' });
-    strokeEllipse(pl, SIG, MU, 2, { fill: 'rgba(0,136,176,0.10)' });
-    strokeEllipse(pl, SIG, MU, 1, { fill: 'rgba(0,136,176,0.14)', color: c.accent, width: 1.8 });
-    strokeEllipse(pl, SIG, MU, 2, { color: 'rgba(0,136,176,0.45)', width: 1.1 });
-    strokeEllipse(pl, SIG, MU, 3, { color: 'rgba(0,136,176,0.25)', width: 1 });
+    strokeEllipse(pl, SIG, MU, 3, { fill: 'rgba(43,95,255,0.06)' });
+    strokeEllipse(pl, SIG, MU, 2, { fill: 'rgba(43,95,255,0.10)' });
+    strokeEllipse(pl, SIG, MU, 1, { fill: 'rgba(43,95,255,0.14)', color: c.accent, width: 1.8 });
+    strokeEllipse(pl, SIG, MU, 2, { color: 'rgba(43,95,255,0.45)', width: 1.1 });
+    strokeEllipse(pl, SIG, MU, 3, { color: 'rgba(43,95,255,0.25)', width: 1 });
   }
   function polyline(pl, pts, color, width, dash) {
     var ctx = pl.ctx;
@@ -408,7 +408,7 @@ series: "probability_in_action"
     });
     var traces = [
       { type: 'surface', x: xs, y: xs, z: zz, showscale: false, opacity: 1, hoverinfo: 'skip',
-        colorscale: [[0, '#eaf4f8'], [1, '#0088b0']] },
+        colorscale: [[0, '#eaf0ff'], [1, '#2b5fff']] },
       { type: 'scatter3d', mode: 'markers', x: cx, y: cy, z: cz, name: 'chain',
         marker: { size: 2.6, color: '#d6006c' }, hoverinfo: 'skip' }
     ];
@@ -568,7 +568,7 @@ series: "probability_in_action"
     ap.clear();
     ap.grid({ step: 0.2 });
     ap.hline(0, { color: 'rgba(32,30,29,0.35)', dash: [3, 3] });
-    ap.bars(items, { color: 'rgba(0,136,176,0.55)', width: 0.7, baseline: 0 });
+    ap.bars(items, { color: 'rgba(43,95,255,0.55)', width: 0.7, baseline: 0 });
     ap.axes({ step: 0.2, xLabel: 'lag k', yLabel: 'autocorrelation' });
 
     var meanAll = 0, meanKept = 0;

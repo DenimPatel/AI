@@ -248,11 +248,11 @@ series: "linear_algebra"
     var det = LA.mat.det(A);
     var area = Math.abs(det);
     var pos = det >= 0;
-    var fill = pos ? 'rgba(0,136,176,0.22)' : 'rgba(214,0,108,0.22)';
+    var fill = pos ? 'rgba(43,95,255,0.22)' : 'rgba(214,0,108,0.22)';
     var line = pos ? c.accent : c.accent2;
     planeA.clear();
     planeA.grid(null, { step: 1, color: 'rgba(32,30,29,0.10)', width: 1 });
-    planeA.grid(A, { step: 1, color: 'rgba(0,136,176,0.18)', width: 1 });
+    planeA.grid(A, { step: 1, color: 'rgba(43,95,255,0.18)', width: 1 });
     planeA.axes();
     planeA.polygon(imageSquare(A), { fill: fill, stroke: line, width: 2 });
     planeA.polygon(UNIT, { fill: 'rgba(32,30,29,0.06)', stroke: 'rgba(32,30,29,0.5)', width: 1.4 });
@@ -288,10 +288,10 @@ series: "linear_algebra"
     var area = Math.abs(det);
     var collapsed = area < 0.02;
     var line = collapsed ? c.accent2 : c.accent;
-    var fill = collapsed ? 'rgba(214,0,108,0.30)' : 'rgba(0,136,176,0.22)';
+    var fill = collapsed ? 'rgba(214,0,108,0.30)' : 'rgba(43,95,255,0.22)';
     planeB.clear();
     planeB.grid(null, { step: 1, color: 'rgba(32,30,29,0.10)', width: 1 });
-    planeB.grid(M, { step: 1, color: 'rgba(0,136,176,0.18)', width: 1 });
+    planeB.grid(M, { step: 1, color: 'rgba(43,95,255,0.18)', width: 1 });
     planeB.axes();
     planeB.polygon(imageSquare(M), { fill: fill, stroke: line, width: 2 });
     planeB.polygon(UNIT, { fill: 'rgba(32,30,29,0.06)', stroke: 'rgba(32,30,29,0.5)', width: 1.4 });
