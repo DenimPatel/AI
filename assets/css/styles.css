@@ -252,6 +252,22 @@ main { display: block; }
   align-self: center; margin-left: 6px;
   color: color-mix(in srgb, var(--color-text) 52%, transparent);
 }
+/* On narrow screens the pill row can be 20+ items; wrapping them turns the
+   sticky ribbon into a multi-row block that pins to the top of the viewport
+   and eats most of the screen. Scroll it horizontally in one row instead,
+   and let it scroll away with the page rather than staying sticky. */
+@media (max-width: 640px) {
+  .nav--series {
+    position: static;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+    margin: 10px 14px 0;
+  }
+  .nav--series a,
+  .nav--series-act { scroll-snap-align: start; }
+}
 
 /* — prev/next footer for a series part — */
 .series-prevnext {

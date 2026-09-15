@@ -31,3 +31,10 @@ series-prevnext.html still walks parts + appendix in flat order).
   {%- endfor %}
   {%- endif %}
 </nav>
+<script>
+(function () {
+  var nav = document.currentScript.previousElementSibling;
+  var current = nav && nav.querySelector('a[aria-current="page"]');
+  if (current) { current.scrollIntoView({ block: 'nearest', inline: 'center' }); }
+})();
+</script>
