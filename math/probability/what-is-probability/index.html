@@ -108,22 +108,22 @@ series: "probability"
     <div class="g-step-head"><span class="g-step-num">5</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">The axioms under everything</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Sensor models as probabilities</h3>
         <p style="margin-bottom:0;">A robot's <a href="{{ '/robotics/navigation/odometry/' | relative_url }}">odometry</a> and range measurements are never exact, so every fusion step treats them as random variables with a probability distribution. Non-negativity and normalisation are what make a belief a distribution over poses rather than a score; the axioms are the sanity conditions every filter enforces on every update.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / ML</div>
         <h3 style="margin:6px 0;">Calibrated predictions</h3>
         <p style="margin-bottom:0;">A classifier that outputs <var>p</var> is claiming a long-run frequency: among all inputs it labels with 0.9, about ninety percent should be correct. That is the frequentist reading applied to a model's outputs, and it is what <a href="{{ '/ai/llm-training/evaluation/' | relative_url }}">calibration and evaluation</a> measure. Cross-entropy training pushes the outputs toward coherence with observed frequencies.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Vision</div>
         <h3 style="margin:6px 0;">RANSAC and hypothesis counts</h3>
         <p style="margin-bottom:0;">Robust fitting in <a href="{{ '/vision/multi-view-geometry/ransac/' | relative_url }}">multi-view geometry</a> reasons about the chance that a random sample of correspondences is all-inlier. That is a counting calculation built directly on the axioms, and it decides how many iterations are enough.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">The calculus of densities</h3>
         <p style="margin-bottom:0;">When a continuous variable is pushed through a map, probabilities are preserved but densities rescale by a Jacobian. That story is told as calculus in <a href="{{ '/math/calculus-in-motion/probability/' | relative_url }}">Calculus of probability</a>; the probability of it &mdash; what the density means and when it exists &mdash; is Part 10 of this volume.</p>
@@ -167,7 +167,7 @@ series: "probability"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Once you can count outcomes, you can compute probabilities &mdash; and it is almost never the arithmetic that is hard.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability/counting/' | relative_url }}">Next: Counting, and why it is the hard part →</a>
   </div>

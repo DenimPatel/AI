@@ -158,12 +158,12 @@ series: "linear_algebra"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">One number, two worlds</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Jacobians and singularities</h3>
         <p style="margin-bottom:0;">The Jacobian of a robot's forward kinematics maps joint velocities to end-effector velocity, and its determinant is the local volume-distortion factor of that map. When the Jacobian determinant hits zero the configuration is singular: the arm loses a degree of freedom and no joint motion can produce velocity in some direction. The <a href="{{ '/vision/nonlinear-optimization/pose-graph/' | relative_url }}">pose-graph part</a> sees the same signature as a badly conditioned optimization. Controllers watch the determinant precisely to stay away from these configurations.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">Change of variables</h3>
         <p style="margin-bottom:0;">Probability densities transform under a smooth change of variables by dividing by the absolute determinant of the Jacobian &mdash; volume in one coordinate system is not volume in another. Normalizing flows are built entirely from invertible maps with tractable determinants so that this bookkeeping stays cheap, and the <a href="{{ '/ai/llm-training/architecture/' | relative_url }}">architecture chapter</a> shows the transformer blocks these ideas sit beside. Whenever a model reshapes a distribution, a determinant is quietly doing the accounting.</p>
@@ -204,7 +204,7 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>The determinant tells you whether a system is solvable; elimination tells you how to solve it and what to do when it is not.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/systems/' | relative_url }}">Next: Solving Ax = b, and Gaussian elimination →</a>
   </div>

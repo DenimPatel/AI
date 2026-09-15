@@ -150,22 +150,22 @@ series: "probability_in_action"
     <div class="g-step-head"><span class="g-step-num">5</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">Every simulator is one of these three in disguise</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / ML</div>
         <h3 style="margin:6px 0;">Sampling the next token</h3>
         <p style="margin-bottom:0;">A language model outputs a probability for every token, and the <a href="{{ '/ai/llm-serving/decode-loop/' | relative_url }}">decode loop</a> turns those probabilities into an actual token. That is inverse-CDF sampling on a discrete support: form the running cumulative sum, draw one uniform, and pick the token whose cumulative interval contains it. Temperature reshapes the distribution first, and top-p truncation restricts the support before the same inversion runs.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / ML</div>
         <h3 style="margin:6px 0;">Off-policy correction</h3>
         <p style="margin-bottom:0;">Policy-gradient methods in <a href="{{ '/ai/llm-training/rlhf/' | relative_url }}">RLHF</a> learn from data collected by an older policy, so the gradient has to correct for the mismatch. The correction is the importance weight <var>$p_{\text{new}}/p_{\text{old}}$</var>, exactly the ratio <var>f/g</var> here, and its variance is why algorithms clip it instead of trusting it — the same degeneracy the ESS meter warns about.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">Change of variables</h3>
         <p style="margin-bottom:0;">The proof that <var>F^{-1}(U)</var> has the right distribution, and the derivation of the importance weight, are both statements about how densities transform under a map. That machinery is developed as calculus in <a href="{{ '/math/calculus-in-motion/probability/' | relative_url }}">Calculus of probability</a>, where the Jacobian is the whole story.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">Monte Carlo integration</h3>
         <p style="margin-bottom:0;">The next part, <a href="{{ '/math/probability-in-action/monte-carlo/' | relative_url }}">Monte Carlo integration</a>, takes these samplers as given and uses them to compute integrals. Every variance-reduction trick there — antithetic variates, control variates, stratification — is judged by how much it shrinks the error of an average built from exactly the draws this part taught you to produce.</p>
@@ -212,7 +212,7 @@ series: "probability_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Once you can draw from any distribution, the next question is what to do with the draws.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability-in-action/monte-carlo/' | relative_url }}">Next: Monte Carlo integration →</a>
   </div>

@@ -97,12 +97,12 @@ series: "statistics"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">The update rule, running under the hood</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics &amp; Vision</div>
         <h3 style="margin:6px 0;">Bayesian state estimation</h3>
         <p style="margin-bottom:0;">A robot estimating its pose runs this update: the belief over the pose is the prior, a sensor reading contributes a likelihood, and the posterior becomes the new belief. The Kalman filter in the <a href="{{ '/vision/nonlinear-optimization/slam/' | relative_url }}">SLAM part</a> is the Gaussian version of the canvas above &mdash; a Gaussian prior fused with a Gaussian likelihood, narrowed by each measurement.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">Preference modelling</h3>
         <p style="margin-bottom:0;">Preference models in the <a href="{{ '/ai/llm-training/rlhf/' | relative_url }}">RLHF chapter</a> are Bayesian at heart: a prior over which responses people prefer, a likelihood from the comparisons observed, and a posterior used to guide the policy. The tension you feel dragging the handles is the same one.</p>
@@ -145,7 +145,7 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>A Beta prior plus Binomial data gave a Beta posterior because the families matched. The next part makes that match a method, and fuses two Gaussians into one.</span>
     <a class="btn btn-secondary" href="{{ '/math/statistics/conjugacy-fusion/' | relative_url }}">Next: Conjugacy and Gaussian fusion →</a>
   </div>

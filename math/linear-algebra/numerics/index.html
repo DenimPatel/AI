@@ -127,12 +127,12 @@ series: "linear_algebra"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">One ratio, two worlds</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Why bundle adjustment avoids the normal equations</h3>
         <p style="margin-bottom:0;">A structure-from-motion problem has one camera block that is nearly singular whenever a camera has little parallax, so the reduced system <var>J<sup>ᵀ</sup>J</var> is exactly the squared-condition-number trap. Practical solvers either factor the sparse Jacobian with QR or run Cholesky on the reduced system with careful damping, and they always keep a trust region so the step stays finite. The <a href="{{ '/vision/nonlinear-optimization/pose-graph/' | relative_url }}">pose-graph part</a> of the optimization guide works through the same reduced system and its gauge freedom.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">Mixed precision and ill-conditioned layers</h3>
         <p style="margin-bottom:0;">Low-precision matrix multiplies are only safe while the matrices stay well-conditioned; when a weight matrix or an attention block is nearly low-rank, the rounding that mixed precision tolerates quietly becomes a large forward error, and the loss curve spikes. That is why large training runs keep sensitive reductions in higher precision and monitor scale factors, and why quantisation of an ill-conditioned layer is where accuracy is lost first &mdash; see <a href="{{ '/ai/llm-training/scaling/' | relative_url }}">training at scale</a> and <a href="{{ '/ai/llm-serving/quantization/' | relative_url }}">quantisation</a>.</p>
@@ -157,7 +157,7 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>A ratio tells you how far a small error can travel &mdash; but the maps that never amplify it at all are the ones built from length-preserving rotations.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/rotations/' | relative_url }}">Next: Rotations, SO(3) and the exponential map →</a>
   </div>

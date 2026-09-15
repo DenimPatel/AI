@@ -127,22 +127,22 @@ series: "probability_in_action"
     <div class="g-step-head"><span class="g-step-num">5</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">Error floors everywhere something is fitted</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / ML</div>
         <h3 style="margin:6px 0;">Uncertainty in evaluation</h3>
         <p style="margin-bottom:0;">A benchmark score is an estimate from a sample, so its standard error is <var>$\sigma/\sqrt n$</var>-shaped and two systems can differ less than the noise. Reporting intervals rather than point scores is the whole argument of <a href="{{ '/ai/llm-training/evaluation/' | relative_url }}">evaluation</a>, and it is this part's sampling distribution applied to a leaderboard.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Vision</div>
         <h3 style="margin:6px 0;">The floor under a fit</h3>
         <p style="margin-bottom:0;">Least-squares bundle adjustment is a maximum-likelihood estimator under Gaussian noise, so its covariance is bounded by the inverse Fisher information &mdash; the normal matrix of <a href="{{ '/vision/nonlinear-optimization/' | relative_url }}">nonlinear optimization</a>. The Hessian that a solver assembles is, up to scale, the information matrix that sets the error floor.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">Why the variance formula has an <var>n-1</var></h3>
         <p style="margin-bottom:0;">The estimator built in <a href="{{ '/math/probability/variance/' | relative_url }}">variance and standard deviation</a> divides by <var>n-1</var> for exactly the reason the histogram above moves when you switch denominators: deviations measured from the sample mean are too small, and the correction removes the bias.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">Curvature is a step size</h3>
         <p style="margin-bottom:0;">Newton's method multiplies the gradient by the inverse curvature, so a sharp likelihood means a small confident step. The optimizers in <a href="{{ '/math/calculus-in-motion/optimizers/' | relative_url }}">optimizers</a> are walking the same parabola whose second derivative is Fisher information.</p>
@@ -188,7 +188,7 @@ series: "probability_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>An estimate and its standard error are two numbers. Put them together four different ways and you get an interval &mdash; and two schools disagree loudly about what it means.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability-in-action/intervals/' | relative_url }}">Next: Confidence vs credible →</a>
   </div>

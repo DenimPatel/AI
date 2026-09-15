@@ -151,13 +151,13 @@ series: "llm_serving"
     <p>Everything after this page is a lever on one of the three terms above: the weight bytes (quantization, parallelism, MoE), the KV bytes (paging, prefix caching, GQA/MLA, long context), or the effective batch and its scheduling (continuous batching, schedulers, disaggregation). The glossary collects every constant cited here.</p>
     <div class="g-grid3" style="margin-top:14px;">
       {% for part in site.data.series.llm_serving.parts %}
-      <a class="g-card g-partcard" href="{{ part.permalink | relative_url }}">
+      <a class="g-card g-partcard reveal" href="{{ part.permalink | relative_url }}">
         <div style="font-family:var(--font-mono);font-size:11px;opacity:.6;">{{ part.short }}</div>
         <div style="font-weight:600;font-size:13.5px;line-height:1.35;">{{ part.title }}</div>
       </a>
       {% endfor %}
       {% for extra in site.data.series.llm_serving.appendix %}
-      <a class="g-card g-partcard" href="{{ extra.permalink | relative_url }}">
+      <a class="g-card g-partcard reveal" href="{{ extra.permalink | relative_url }}">
         <div style="font-family:var(--font-mono);font-size:11px;opacity:.6;">Reference</div>
         <div style="font-weight:600;font-size:13.5px;line-height:1.35;">{{ extra.title }}</div>
       </a>
@@ -191,7 +191,7 @@ series: "llm_serving"
     </ul>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Bandwidth is the headline number. Next: the machines that supply it, the interconnect that bounds them, and the energy each token costs.</span>
     <a class="btn btn-secondary" href="{{ '/ai/llm-serving/hardware/' | relative_url }}">Next: The machine →</a>
   </div>

@@ -123,12 +123,12 @@ series: "statistics"
     <div class="g-step-head"><span class="g-step-num">5</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">The covariance matrix is everywhere the plane is</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Pose uncertainty as a covariance</h3>
         <p style="margin-bottom:0;">A robot's estimate of where it is and which way it faces is never a point; it is a distribution, and the state of the art represents it with a covariance matrix. In the <a href="{{ '/robotics/navigation/odometry/' | relative_url }}">odometry part</a>, forward motion and turning are uncertain and correlated, so the ellipse of possible poses tilts as the robot drives. Marginalising that matrix onto one coordinate asks "how unsure am I about position, ignoring heading?", which is a Schur complement, and the conditioning on a measurement is a Kalman update on the same object drawn here.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">PCA is the ellipse, found</h3>
         <p style="margin-bottom:0;">The <a href="{{ '/math/linear-algebra/low-rank-pca/' | relative_url }}">low-rank PCA part</a> takes the covariance matrix from this page and asks for its eigenvectors. Those eigenvectors are the axes of the ellipse: the long axis is the direction of greatest variance, the short axis is the direction of least. Projecting data onto the leading eigenvectors is the same as keeping only the widest directions of the cloud, which is why the covariance matrix rather than the raw data is the starting point for dimensionality reduction.</p>
@@ -168,7 +168,7 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>One cloud of two variables is a single sample. The next part asks what happens when you draw samples over and over and look at the distribution of a summary itself.</span>
     <a class="btn btn-secondary" href="{{ '/math/statistics/sampling-distribution/' | relative_url }}">Next: The sampling distribution →</a>
   </div>

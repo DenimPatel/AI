@@ -97,12 +97,12 @@ series: "statistics"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">The same stopping rule, two different dashboards</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI Serving</div>
         <h3 style="margin:6px 0;">Online A/B tests of serving changes</h3>
         <p style="margin-bottom:0;">A new quantization level, cache policy, or routing rule is rolled out to a fraction of traffic and judged on latency and error rate. These metrics are watched live, which makes the peeking problem the default rather than the exception. The <a href="{{ '/ai/llm-serving/metrics/' | relative_url }}">serving metrics chapter</a> defines the quantities; when they may be read is this part's stopping rule. If the gate stops at the first significant latency win, its false-positive rate is not the level it was configured with.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI Training</div>
         <h3 style="margin:6px 0;">Evaluation is a stopping decision</h3>
         <p style="margin-bottom:0;">Choosing a checkpoint, a prompt, or a reward model by its score on a held-out set is a sequence of comparisons, and taking the best one is optional stopping in another costume. The <a href="{{ '/ai/llm-training/evaluation/' | relative_url }}">evaluation chapter</a> reports scores on finite test sets; selecting the winner of many trials inflates the apparent gain, exactly as looking many times inflates the false-positive rate. The fix is the same: pre-declare the comparison, or use a method that prices the search.</p>
@@ -144,7 +144,7 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Randomization keeps confounders from creeping in. The next part is about what happens when it is absent &mdash; and how a DAG tells you which variables to adjust for.</span>
     <a class="btn btn-secondary" href="{{ '/math/statistics/confounding/' | relative_url }}">Next: Confounding, Simpson's paradox, and DAGs →</a>
   </div>

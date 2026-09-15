@@ -119,22 +119,22 @@ series: "probability"
     <div class="g-step-head"><span class="g-step-num">5</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">Independence assumptions under the hood</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / ML</div>
         <h3 style="margin:6px 0;">Factorised language models</h3>
         <p style="margin-bottom:0;">An autoregressive <a href="{{ '/ai/llm-training/language-models/' | relative_url }}">language model</a> writes the joint probability of a sequence as a product of next-token conditionals. That is the chain rule, and the practical compression comes from assuming each prediction depends only on a bounded context &mdash; a conditional-independence claim about the past. Naive Bayes and mixture models make the same move more crudely, and their failures are usually failures of that assumption.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Vision</div>
         <h3 style="margin:6px 0;">Conditional independence in geometry</h3>
         <p style="margin-bottom:0;">In <a href="{{ '/vision/multi-view-geometry/' | relative_url }}">multi-view geometry</a> the measurements are modelled as conditionally independent given the camera poses and structure, which is what makes bundle adjustment a clean least-squares problem rather than a coupled one. When that assumption is wrong &mdash; correlated correspondences, rolling shutter &mdash; the optimiser still converges, but its uncertainty estimates are optimistic.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Filters and correlated noise</h3>
         <p style="margin-bottom:0;">A Kalman filter assumes the measurement noise is independent across steps and independent of the process noise. <a href="{{ '/robotics/navigation/odometry/' | relative_url }}">Odometry</a> violates the first part badly: integration errors persist and correlate, so a naive filter becomes overconfident. Tracking that correlation, usually with a state-augmentation or factor-graph formulation, is what keeps the covariance honest.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">Covariance and linear dependence</h3>
         <p style="margin-bottom:0;">Two random variables are uncorrelated when their covariance is zero, which is weaker than independence and is exactly what <a href="{{ '/math/linear-algebra/' | relative_url }}">linear algebra</a> sees. The covariance matrix encodes second moments only; a diagonal covariance means no linear dependence, not no dependence. The difference between the two is the same gap that Simpson's reversal exploits when it hides a confounding variable inside an average.</p>
@@ -181,7 +181,7 @@ series: "probability"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>With independence in hand, a random variable turns outcomes into numbers you can average, and the PMF and CDF into two views of the same object.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability/random-variables/' | relative_url }}">Next: Random variables, PMFs and CDFs →</a>
   </div>

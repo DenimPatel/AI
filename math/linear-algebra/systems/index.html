@@ -149,12 +149,12 @@ series: "linear_algebra"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">One idea, two worlds</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Triangulation and trilateration</h3>
         <p style="margin-bottom:0;">A robot that hears three ranges, or a camera rig that sees one point from several views, ends up with a small linear system whose right-hand side is built from the measurements. Solving it recovers a position in space, and the conditioning of that system decides how much a noisy range moves the estimate. The <a href="{{ '/vision/multi-view-geometry/triangulation/' | relative_url }}">triangulation part</a> of the geometry guide walks through exactly this solve.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">Normal equations and reusable factors</h3>
         <p style="margin-bottom:0;">Fitting a model means solving a linear system, and large models solve the same structured system over and over with different right-hand sides. Factoring once and reusing the factors is the difference between a training run that finishes and one that does not. The <a href="{{ '/ai/llm-training/inference/' | relative_url }}">inference chapter</a> shows how much of that arithmetic is dominated by the same matrix operations.</p>
@@ -179,7 +179,7 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Elimination hides two subspaces in plain sight: the inputs that land on zero, and the outputs that are reachable at all. Naming them is the next step.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/rank-subspaces/' | relative_url }}">Next: Rank, null space, and the four subspaces →</a>
   </div>

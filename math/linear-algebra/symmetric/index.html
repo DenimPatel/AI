@@ -129,12 +129,12 @@ series: "linear_algebra"
     <div class="g-step-head"><span class="g-step-num">5</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">One object, two worlds</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Hessians decide whether a step is safe</h3>
         <p style="margin-bottom:0;">A robot's cost function usually looks like a bowl near its minimum, and the bowl's shape is a symmetric matrix: the Hessian, whose entries are the second derivatives. If that Hessian is positive definite, the local model curves upward in every direction and a gradient step decreases the cost. If it has a negative eigenvalue, the model curves downward along that direction and the optimiser can slide away. The <a href="{{ '/vision/nonlinear-optimization/gradient-descent/' | relative_url }}">gradient descent part</a> of the optimization guide spends its time checking exactly this signature.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">Covariances and attention scores</h3>
         <p style="margin-bottom:0;">A covariance matrix is symmetric by construction, so it always has real eigenvalues and a perpendicular eigenbasis; those eigenvectors are the principal axes of the data cloud, and the eigenvalues are the variance along them. Attention is often described with a symmetric score matrix too, where the symmetry means token <var>i</var> weighing token <var>j</var> is the same relationship read in reverse. The <a href="{{ '/ai/llm-training/architecture/' | relative_url }}">architecture chapter</a> of the LLM-training guide uses both objects when it explains how a transformer mixes context.</p>
@@ -178,7 +178,7 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Symmetry is a special case. Generic matrices shear as well as scale, and the tool that handles them is the singular value decomposition.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/svd/' | relative_url }}">Next: Every matrix maps a circle to an ellipse →</a>
   </div>

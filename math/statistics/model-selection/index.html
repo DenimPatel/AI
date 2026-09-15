@@ -121,12 +121,12 @@ series: "statistics"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">The same gap, at two scales</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">Choosing a model size</h3>
         <p style="margin-bottom:0;">The <a href="{{ '/ai/llm-training/scaling/' | relative_url }}">scaling chapter</a> is this part's picture at industrial scale: training loss keeps falling with parameters and compute while held-out loss bottoms out and then rises. Scaling laws fit the held-out curve, and picking a size depends on never confusing the two.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">Held-out evaluation</h3>
         <p style="margin-bottom:0;">The <a href="{{ '/ai/llm-training/evaluation/' | relative_url }}">evaluation chapter</a> is held-out validation written large. A benchmark score is a validation estimate, and the instant you tune against it &mdash; a checkpoint, a prompt, a decoding setting &mdash; it acquires the selection bias cross-validation was invented to avoid. Contaminated test sets are optimism that escaped the lab.</p>
@@ -168,7 +168,7 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Cross-validation tells you how well a model generalises; the next part turns a generalising model's scores into decisions &mdash; thresholds, ROC and PR curves, and calibration.</span>
     <a class="btn btn-secondary" href="{{ '/math/statistics/calibration/' | relative_url }}">Next: Evaluation, ROC/PR, and calibration →</a>
   </div>

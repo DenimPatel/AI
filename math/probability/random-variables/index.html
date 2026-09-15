@@ -125,22 +125,22 @@ series: "probability"
     <div class="g-step-head"><span class="g-step-num">5</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">Every noisy number is a random variable</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Poses and range readings as variables</h3>
         <p style="margin-bottom:0;">A robot never observes its state directly; it observes functions of it, corrupted by noise. <a href="{{ '/robotics/navigation/odometry/' | relative_url }}">Odometry</a> integrates wheel turns into a pose estimate, and every sensor is a random variable whose PMF or density the filter carries forward. The histogram filter in this guide is literally a discretised PMF over positions, and its update step is the preimage sum applied to a measurement model.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / ML</div>
         <h3 style="margin:6px 0;">Next-token distributions</h3>
         <p style="margin-bottom:0;">A language model's softmax outputs a PMF over the vocabulary, and sampling a token is drawing a random variable from it. The <a href="{{ '/ai/llm-serving/decode-loop/' | relative_url }}">decode loop</a> reshapes that PMF at every step &mdash; temperature sharpens or flattens the bars, and nucleus sampling keeps the smallest set of values whose CDF reaches a threshold. Top-p decoding is an inverse-CDF operation, run millions of times a second.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">Random vectors and linear maps</h3>
         <p style="margin-bottom:0;">A list of random variables is a random vector, a function into <var>$\mathbb{R}^n$</var>, and a linear map sends one random vector to another. Covariance matrices, whitening, and PCA all live here: the second-moment structure of a vector-valued variable. The <a href="{{ '/math/linear-algebra/' | relative_url }}">linear algebra guide</a> provides the eigen-decomposition that diagonalises that structure.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Counting</div>
         <h3 style="margin:6px 0;">Why the dice triangle has its shape</h3>
         <p style="margin-bottom:0;">The number of cells that sum to <var>k</var> is a counting problem, and its answer is why <var>p_X(7)</var> is six times <var>p_X(2)</var>. That cell count is the preimage size from the transform formula. The <a href="{{ '/math/probability/counting/' | relative_url }}">counting part</a> is where those coefficients are derived, and it is what turns an outcome table into a PMF.</p>
@@ -186,7 +186,7 @@ series: "probability"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Distributions tell you what can happen; expectation tells you what happens on average.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability/expectation/' | relative_url }}">Next: Expectation →</a>
   </div>

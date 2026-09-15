@@ -131,22 +131,22 @@ series: "probability"
     <div class="g-step-head"><span class="g-step-num">5</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">Counting under the hood</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Vision</div>
         <h3 style="margin:6px 0;">RANSAC and minimal samples</h3>
         <p style="margin-bottom:0;">The number of iterations a robust fitter runs is a counting argument: a sample of <var>s</var> correspondences is all-inlier with probability <var>$p^s$</var>, so the chance that at least one of <var>M</var> samples succeeds is <var>$1-(1-p^s)^M$</var>. Choosing <var>M</var> is a birthday-style threshold problem, and <a href="{{ '/vision/multi-view-geometry/ransac/' | relative_url }}">RANSAC</a> is where it earns its keep.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / ML</div>
         <h3 style="margin:6px 0;">Sampling without replacement</h3>
         <p style="margin-bottom:0;">Temperature sampling, top-<var>k</var> and nucleus decoding are choices from a discrete set, and the combinatorics of the candidate pool bounds what a decoder can explore. <a href="{{ '/ai/llm-serving/speculative/' | relative_url }}">Speculative decoding</a> leans directly on the acceptance probability of independently drawn candidates, which is a collision calculation across draft and target distributions.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Association and collisions</h3>
         <p style="margin-bottom:0;">Deciding which landmark a measurement came from is a matching problem, and a wrong association is a collision between two hypotheses. Estimating the chance of such a coincidence, and how it grows with the number of landmarks, is the same birthday product, and it shapes the geometry of <a href="{{ '/robotics/navigation/odometry/' | relative_url }}">odometry and mapping</a>.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">Coordinates and bases</h3>
         <p style="margin-bottom:0;">How many ordered bases a vector space has, how many subspaces of a given dimension, how many ways to choose coordinates &mdash; count-and-order questions sit underneath the algebra of <a href="{{ '/math/linear-algebra/' | relative_url }}">linear algebra</a>. Choosing a basis is choosing an ordered set of vectors, and the binomial coefficient counts the unordered alternatives.</p>
@@ -192,7 +192,7 @@ series: "probability"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Counting gives you the sizes; conditioning is what lets you use them when information arrives.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability/conditional/' | relative_url }}">Next: Conditional probability →</a>
   </div>

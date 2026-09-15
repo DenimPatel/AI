@@ -144,12 +144,12 @@ series: "linear_algebra"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">One idea, two worlds</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics &amp; dynamics</div>
         <h3 style="margin:6px 0;">Principal axes and modes</h3>
         <p style="margin-bottom:0;">A rigid body has a set of principal axes: spin it about one of those axes and it keeps rotating about that direction instead of wobbling, and the eigenvalues of its inertia tensor are the moments of inertia about them. The same idea governs the modes of a linearised system near an equilibrium &mdash; the eigenvectors are the shapes of motion and the eigenvalues decide whether a mode decays or grows. The <a href="{{ '/vision/nonlinear-optimization/3d-rotations/' | relative_url }}">3D rotations part</a> of the optimization guide uses these axes when it converts between rotation representations.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">The dominant directions of data</h3>
         <p style="margin-bottom:0;">A covariance matrix is symmetric, and its top eigenvector is the direction along which a dataset varies the most &mdash; the first principal component. Keeping only the largest eigenvalues compresses a point cloud while losing the least information, which is exactly the story of Part 17 on low-rank approximation and PCA. The same handedness turns up in the weight matrices of a network: the <a href="{{ '/ai/llm-training/architecture/' | relative_url }}">architecture chapter</a> shows the matrices, and their dominant singular directions are what training slowly shapes.</p>
@@ -174,7 +174,7 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>In the eigenbasis a matrix is nothing but its stretch factors &mdash; which is why powers of a matrix settle, cycle or explode.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/diagonalization/' | relative_url }}">Next: Matrix powers and dynamical systems →</a>
   </div>

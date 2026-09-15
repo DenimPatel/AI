@@ -157,22 +157,22 @@ series: "probability_in_action"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">The test is everywhere data are compared</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / benchmarks</div>
         <h3 style="margin:6px 0;">Leaderboards are families of tests</h3>
         <p style="margin-bottom:0;">Comparing many models on many tasks is a multiplicity problem with dozens of correlated hypotheses. A single best-on-the-board result is the maximum of a noisy family, so <a href="{{ '/ai/benchmarks/' | relative_url }}">benchmark</a> claims need confidence intervals and corrections, not just a winning score.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / evaluation</div>
         <h3 style="margin:6px 0;">Significance in model evaluation</h3>
         <p style="margin-bottom:0;">A/B tests and evaluation suites decide whether an update ships, and they run at scale. Bootstrapped intervals, paired tests and multiplicity control are the difference between a real gain and a lucky slice of <a href="{{ '/ai/llm-training/evaluation/' | relative_url }}">evaluation</a> noise.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">Tests and intervals are duals</h3>
         <p style="margin-bottom:0;">Rejecting the null at level <var>$\alpha$</var> is the same as the <var>$1-\alpha$</var> confidence interval excluding the null value. That duality is built in <a href="{{ '/math/probability-in-action/intervals/' | relative_url }}">Confidence vs credible</a>, and it is why an interval always tells you more than a binary verdict.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Vision</div>
         <h3 style="margin:6px 0;">Selecting the best model is a test</h3>
         <p style="margin-bottom:0;">Keeping whichever configuration scored best on a validation set is a selection over a family, and the winner's curse inflates its apparent accuracy. Robust pipelines account for this, much as <a href="{{ '/vision/nonlinear-optimization/' | relative_url }}">nonlinear optimization</a> accounts for noise in the objective it minimizes.</p>
@@ -221,7 +221,7 @@ series: "probability_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>One dataset, no formula: resample it with replacement and grow a sampling distribution from the data itself.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability-in-action/bootstrap/' | relative_url }}">Next: The bootstrap →</a>
   </div>

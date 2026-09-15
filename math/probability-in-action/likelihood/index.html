@@ -139,22 +139,22 @@ series: "probability_in_action"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">One objective, many names</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / LLM</div>
         <h3 style="margin:6px 0;">Pretraining is maximum likelihood</h3>
         <p style="margin-bottom:0;">A language model assigns a probability to the next token given the context, and <a href="{{ '/ai/llm-training/pretraining/' | relative_url }}">pretraining</a> maximises the log-likelihood of the corpus, which the training loop reports as cross-entropy loss per token. Everything in this part applies with the model's weights playing the role of <var>$\theta$</var>; the gradient of the loss is the negative score.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / LLM</div>
         <h3 style="margin:6px 0;">Scaling laws are loss curves</h3>
         <p style="margin-bottom:0;">Empirical <a href="{{ '/ai/llm-training/scaling/' | relative_url }}">scaling laws</a> fit smooth functions to how the negative log-likelihood falls with compute and data. They are likelihood curves read across model sizes, and the irreducible floor they extrapolate to is the entropy of the data itself.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">Optimisers climb the log-likelihood</h3>
         <p style="margin-bottom:0;">Gradient ascent on <var>$\ell$</var> is gradient descent on the negative log-likelihood, and <a href="{{ '/math/calculus-in-motion/optimizers/' | relative_url }}">optimizers</a> like momentum and Adam are the machinery that reaches the peak when the score equation has no closed form. The demo's <em>Snap to MLE</em> is what those methods do, slowly and in high dimensions.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">Densities and change of variables</h3>
         <p style="margin-bottom:0;">The likelihood is a density, and pushing a random variable through a map rescales it by a Jacobian. That is the calculus of probability covered in <a href="{{ '/math/calculus-in-motion/probability/' | relative_url }}">Calculus of probability</a>, and it is why a maximum likelihood problem in transformed coordinates is a different optimisation problem even though the answer transforms cleanly.</p>
@@ -199,7 +199,7 @@ series: "probability_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>The likelihood tells you which parameters explain the data; a prior tells you which parameters you expected, and multiplying them gives the posterior.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability-in-action/bayesian-inference/' | relative_url }}">Next: Prior, posterior, conjugacy →</a>
   </div>

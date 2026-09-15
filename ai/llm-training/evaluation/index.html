@@ -113,12 +113,12 @@ redirect_from:
     <div class="llmt-step-head"><span class="llmt-step-num">6</span><h2>Other ways benchmark numbers mislead</h2></div>
     <p class="llmt-eyebrow">Named, not demoed</p>
     <div class="llmt-grid2">
-      <div class="llmt-card"><b>Contamination</b> — if a benchmark's questions (or close paraphrases) leaked into pretraining data, the model may have memorized answers rather than reasoned to them. N-gram overlap checks (Part 4) against known benchmark text are a standard mitigation.</div>
-      <div class="llmt-card"><b>Error bars and variance</b> — a benchmark score from a few hundred questions has real sampling noise; a 1-point difference between two models is often not statistically significant. Ai2 and others increasingly report confidence intervals, not just a point estimate.</div>
-      <div class="llmt-card"><b>Benchmark saturation</b> — once most frontier models score 90%+, a benchmark stops discriminating between them, and remaining errors may just be label noise in the benchmark itself.</div>
-      <div class="llmt-card"><b>OLMES</b> — Ai2's own standardized evaluation suite, built specifically to fix apples-to-oranges comparisons: fixed prompt formats, fixed few-shot counts, and documented scoring conventions per task, so numbers from different papers are actually comparable.</div>
+      <div class="llmt-card reveal"><b>Contamination</b> — if a benchmark's questions (or close paraphrases) leaked into pretraining data, the model may have memorized answers rather than reasoned to them. N-gram overlap checks (Part 4) against known benchmark text are a standard mitigation.</div>
+      <div class="llmt-card reveal"><b>Error bars and variance</b> — a benchmark score from a few hundred questions has real sampling noise; a 1-point difference between two models is often not statistically significant. Ai2 and others increasingly report confidence intervals, not just a point estimate.</div>
+      <div class="llmt-card reveal"><b>Benchmark saturation</b> — once most frontier models score 90%+, a benchmark stops discriminating between them, and remaining errors may just be label noise in the benchmark itself.</div>
+      <div class="llmt-card reveal"><b>OLMES</b> — Ai2's own standardized evaluation suite, built specifically to fix apples-to-oranges comparisons: fixed prompt formats, fixed few-shot counts, and documented scoring conventions per task, so numbers from different papers are actually comparable.</div>
     </div>
-    <p>See the site's <a href="/ai/benchmarks/">benchmarks page</a> for how these numbers get tracked over time across the industry.</p>
+    {% endraw %}<p>See the site's <a href="{{ '/ai/benchmarks/' | relative_url }}">benchmarks page</a> for how these numbers get tracked over time across the industry.</p>{% raw %}
   </section>
 
   <section class="llmt-step" id="suite">
@@ -207,7 +207,7 @@ redirect_from:
   </section>
 {% endraw %}
 
-  <div class="llmt-next">
+  <div class="llmt-next reveal">
     <span>With training and evaluation both covered, the last piece is making sure the deployed model behaves — and fails — safely.</span>
     <a class="btn btn-secondary" href="{{ '/ai/llm-training/guardrails/' | relative_url }}">Continue: guardrails, safety & deployment →</a>
   </div>

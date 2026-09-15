@@ -99,12 +99,12 @@ series: "statistics"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">The loop the rest of the site runs</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Vision &amp; Geometry</div>
         <h3 style="margin:6px 0;">Robust fitting from noisy points</h3>
         <p style="margin-bottom:0;">RANSAC in the <a href="{{ '/vision/multi-view-geometry/ransac/' | relative_url }}">multi-view geometry guide</a> is an estimator with exactly this structure: it draws a random minimal sample of correspondences, fits a model, and counts inliers. Different draws give different models. Its guarantees are statements about the sampling distribution of that estimate, which is why the guide reasons about inlier probabilities rather than a single fitted line.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">Evaluation is estimation</h3>
         <p style="margin-bottom:0;">A held-out benchmark score is an estimate of a model's true error on a population of inputs. The <a href="{{ '/ai/llm-training/evaluation/' | relative_url }}">evaluation chapter</a> reports accuracy on a finite test set; a different test set would give a different number, just as a different sample gives a different mean. Confidence intervals on benchmark scores are this part's wobble, made quantitative.</p>
@@ -144,7 +144,7 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>One sample is a cloud of numbers. The next part is about turning that cloud into a picture you can read at a glance &mdash; and about which single number to trust.</span>
     <a class="btn btn-secondary" href="{{ '/math/statistics/describing-data/' | relative_url }}">Next: Describing one sample →</a>
   </div>

@@ -98,14 +98,14 @@ series: "llm_serving"
     <p class="g-eyebrow">One row per failure mode</p>
     <p>A GPU-utilisation gauge is not a dashboard. Utilisation can read 100% in a healthy saturated server and 100% in a server spinning on preemption. What distinguishes states is a small set of quantities that move independently. These eight cover the failures in this series; each maps to a different remedy.</p>
     <div class="g-grid2">
-      <div class="g-card"><b>1 · Queue depth and wait time.</b> Requests admitted vs waiting, plus scheduler wait before first prefill. The earliest and cleanest overload signal.</div>
-      <div class="g-card"><b>2 · TTFT p50 and p99.</b> p50 moves with prompt length and prefix-cache hit rate; a p99 that diverges from p50 is the queue, not the kernels.</div>
-      <div class="g-card"><b>3 · TPOT/ITL p50 and p99.</b> Steady-state decode health. A p99 that spikes periodically is chunked-prefill interleaving or preemption churn.</div>
-      <div class="g-card"><b>4 · Goodput fraction.</b> Share of admitted requests meeting both SLOs. Throughput can be flat while goodput collapses.</div>
-      <div class="g-card"><b>5 · KV-cache occupancy and preemptions.</b> Used blocks, evictions, swaps and recomputes per second. Rising preemptions mean the cache, not the FLOPS, is the wall.</div>
-      <div class="g-card"><b>6 · Prefix-cache hit rate.</b> Hit tokens over requested tokens. A sudden drop means the traffic's shared structure changed or routing scattered it.</div>
-      <div class="g-card"><b>7 · Batch occupancy and step time.</b> Running sequences vs capacity, and milliseconds per iteration. It separates "slow model" from "empty batch".</div>
-      <div class="g-card"><b>8 · Adapter/tenant mix and error-retry rate.</b> LoRA adapter count, per-tenant token rate, and 429/5xx/retry volume. Retries multiply load exactly when the system is saturated.</div>
+      <div class="g-card reveal"><b>1 · Queue depth and wait time.</b> Requests admitted vs waiting, plus scheduler wait before first prefill. The earliest and cleanest overload signal.</div>
+      <div class="g-card reveal"><b>2 · TTFT p50 and p99.</b> p50 moves with prompt length and prefix-cache hit rate; a p99 that diverges from p50 is the queue, not the kernels.</div>
+      <div class="g-card reveal"><b>3 · TPOT/ITL p50 and p99.</b> Steady-state decode health. A p99 that spikes periodically is chunked-prefill interleaving or preemption churn.</div>
+      <div class="g-card reveal"><b>4 · Goodput fraction.</b> Share of admitted requests meeting both SLOs. Throughput can be flat while goodput collapses.</div>
+      <div class="g-card reveal"><b>5 · KV-cache occupancy and preemptions.</b> Used blocks, evictions, swaps and recomputes per second. Rising preemptions mean the cache, not the FLOPS, is the wall.</div>
+      <div class="g-card reveal"><b>6 · Prefix-cache hit rate.</b> Hit tokens over requested tokens. A sudden drop means the traffic's shared structure changed or routing scattered it.</div>
+      <div class="g-card reveal"><b>7 · Batch occupancy and step time.</b> Running sequences vs capacity, and milliseconds per iteration. It separates "slow model" from "empty batch".</div>
+      <div class="g-card reveal"><b>8 · Adapter/tenant mix and error-retry rate.</b> LoRA adapter count, per-tenant token rate, and 429/5xx/retry volume. Retries multiply load exactly when the system is saturated.</div>
     </div>
   </section>
 
@@ -218,7 +218,7 @@ series: "llm_serving"
     </ul>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>That is the end of the series. The <a href="{{ '/ai/llm-serving/glossary/' | relative_url }}">glossary and numbers card</a> collects every constant and definition used across all twenty parts.</span>
     <a class="btn btn-secondary" href="{{ '/ai/llm-serving/glossary/' | relative_url }}">Glossary &amp; numbers to know →</a>
   </div>

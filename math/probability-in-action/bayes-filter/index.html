@@ -156,22 +156,22 @@ series: "probability_in_action"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">One recursion, many filters</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Odometry fused with sensors</h3>
         <p style="margin-bottom:0;">Every mobile robot fuses <a href="{{ '/robotics/navigation/odometry/' | relative_url }}">odometry</a> with range and bearing readings through exactly this recursion. Odometry is the motion model; the rangefinder is the measurement model; the belief over pose is what the navigation stack consumes.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Vision</div>
         <h3 style="margin:6px 0;">SLAM is this filter, plus a map</h3>
         <p style="margin-bottom:0;">Simultaneous localisation and mapping in <a href="{{ '/vision/nonlinear-optimization/slam/' | relative_url }}">nonlinear optimization</a> runs the Bayes filter over a joint state of robot pose and landmark positions. The predict step is the motion model, and the update step conditions on every observed feature at once.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">Hidden Markov models</h3>
         <p style="margin-bottom:0;">A <a href="{{ '/math/probability-in-action/hmm/' | relative_url }}">hidden Markov model</a> is this filter on a finite state set. The forward algorithm is the predict&ndash;update recursion in matrix form, and <var><span class="bf-bar">bel</span></var> before normalisation is the forward message the next part of the trellis builds on.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">Kalman filters are the Gaussian special case</h3>
         <p style="margin-bottom:0;">If the belief and both models are Gaussian, the convolution and the pointwise product have closed forms, and the <a href="{{ '/math/probability-in-action/kalman/' | relative_url }}">Kalman filter</a> tracks a mean and a covariance instead of an array. The next part of this volume derives it directly from these two equations.</p>
@@ -216,7 +216,7 @@ series: "probability_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Keep the belief Gaussian and both steps collapse to closed-form updates of a mean and a covariance &mdash; that is the Kalman filter, and its nonlinear cousin the EKF.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability-in-action/kalman/' | relative_url }}">Next: The Kalman filter and EKF →</a>
   </div>

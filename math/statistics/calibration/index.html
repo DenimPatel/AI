@@ -139,12 +139,12 @@ series: "statistics"
     <div class="g-step-head"><span class="g-step-num">7</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">Reading a score defensibly</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">Benchmarks and scores</h3>
         <p style="margin-bottom:0;">A held-out benchmark score is a summary of a ranking, and the <a href="{{ '/ai/llm-training/evaluation/' | relative_url }}">evaluation chapter</a> treats it as one: accuracy is threshold-dependent, and a model that tops a leaderboard may simply be ranking well while its confidence values are inflated. Reporting ROC/PR curves and a calibration check turns a single headline number into a defensible claim about the operating region you actually use.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">Thresholding a classifier</h3>
         <p style="margin-bottom:0;">Guardrail classifiers for toxicity or jailbreak detection are scores thresholded into decisions, and their whole job is the trade-off in this part. The <a href="{{ '/ai/llm-training/guardrails/' | relative_url }}">guardrails chapter</a> sets the operating point deliberately: where to sit on the PR curve depends on whether a missed harm or a false alarm costs more. In production, the same questions show up as the monitoring metrics in the <a href="{{ '/ai/llm-serving/metrics/' | relative_url }}">serving metrics chapter</a>, where a shifting class balance quietly moves precision even when the model does not change.</p>
@@ -191,7 +191,7 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>A score that is calibrated gives you a probability. The next part turns that probability into a range for the quantity you actually care about, and shows what coverage means when the world shifts.</span>
     <a class="btn btn-secondary" href="{{ '/math/statistics/predictive-uncertainty/' | relative_url }}">Next: Predictive uncertainty →</a>
   </div>

@@ -129,12 +129,12 @@ series: "statistics"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">Uncertainty you have to act on</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Reporting a pose with uncertainty</h3>
         <p style="margin-bottom:0;">A pose estimate is never a point; it is a distribution, usually a Gaussian with a covariance. The <a href="{{ '/robotics/navigation/odometry/' | relative_url }}">odometry chapter</a> carries that distribution forward, and the <a href="{{ '/vision/nonlinear-optimization/slam/' | relative_url }}">SLAM</a> and <a href="{{ '/vision/nonlinear-optimization/pose-graph/' | relative_url }}">pose-graph</a> formulations refine it. But a planner needs one pose to steer toward. Whether you feed it the mean, the median or a cautious quantile is a loss decision: if a collision costs far more than a detour, you report a pessimistic quantile of the position posterior rather than its mean, and the robot hugs the safe side of the corridor. The credible ellipse is the interval; the reported pose is the Bayes action.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">Reporting a metric with a range</h3>
         <p style="margin-bottom:0;">A benchmark score or a latency figure is an estimate with uncertainty. The <a href="{{ '/ai/llm-training/evaluation/' | relative_url }}">evaluation chapter</a> turns a finite test set into an accuracy number, and the <a href="{{ '/ai/llm-serving/metrics/' | relative_url }}">serving metrics chapter</a> reports latency under load. A credible range turns each into an interval you can quote, and the ship-or-not decision is a loss problem: deploying a model that regresses quality usually costs more than waiting for a small improvement, so the threshold should be set on the posterior, not on the point estimate. Where the cost is asymmetric, the serving policy is a quantile of the posterior, not its mean.</p>
@@ -180,7 +180,7 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Conjugate updates keep the posterior in a named family. The next part is for when they do not &mdash; and the posterior has to be explored by sampling.</span>
     <a class="btn btn-secondary" href="{{ '/math/statistics/mcmc/' | relative_url }}">Next: When conjugacy fails &mdash; MCMC →</a>
   </div>

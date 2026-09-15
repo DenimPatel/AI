@@ -130,17 +130,17 @@ series: "probability"
     <div class="g-step-head"><span class="g-step-num">5</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">A map is always hiding in the model</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Calculus</div>
         <h3 style="margin:6px 0;">The same substitution, twice</h3>
         <p style="margin-bottom:0;">A change of variables in an integral and a change of variables for a density are the same theorem with different names for the integrand. <a href="{{ '/math/calculus-in-motion/change-of-variables/' | relative_url }}">The calculus of it</a> handles the Jacobian mechanically; <a href="{{ '/math/calculus-in-motion/probability/' | relative_url }}">here the probability of it</a> adds the requirements that the result integrate to one and stay non-negative.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / ML</div>
         <h3 style="margin:6px 0;">Reparameterised gradients</h3>
         <p style="margin-bottom:0;">Policy-gradient and variational methods sample from a distribution whose parameters they need to differentiate. Writing the sample as <var>F^{-1}(u)</var> moves all the randomness into <var>u</var> and leaves a smooth path to the parameters. This is the reparameterisation behind <a href="{{ '/ai/llm-training/rlhf/' | relative_url }}">RLHF</a> objectives and the reason a Gaussian policy can be trained by backprop.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Linear algebra</div>
         <h3 style="margin:6px 0;">Volume under a linear map</h3>
         <p style="margin-bottom:0;">For a linear map the Jacobian is constant and its determinant is the volume scale. Affine Gaussian changes of variables, whitening, and covariance propagation all reduce to <var>$|\det A|$</var>, which is why the <a href="{{ '/math/linear-algebra/' | relative_url }}">linear algebra</a> of determinants is the multivariate half of this formula.</p>
@@ -185,7 +185,7 @@ series: "probability"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>One variable at a time is a warm-up; the real subject begins when several of them share a table.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability/joint/' | relative_url }}">Next: Joint, marginal, conditional →</a>
   </div>

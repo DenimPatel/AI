@@ -110,22 +110,22 @@ series: "probability_in_action"
     <div class="g-step-head"><span class="g-step-num">4</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">Every expectation you cannot compute directly</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / ML</div>
         <h3 style="margin:6px 0;">Policy gradients and baselines</h3>
         <p style="margin-bottom:0;">Reinforcement learning from human feedback estimates an expected reward by sampling trajectories, and the estimator is a Monte Carlo average with all the noise that implies. The standard fix in <a href="{{ '/ai/llm-training/rlhf/' | relative_url }}">RLHF</a> &mdash; subtracting a baseline from the reward &mdash; is a control variate whose known mean is zero for a centred advantage, and it is the reason policy-gradient training converges at all.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">Integrals past three dimensions</h3>
         <p style="margin-bottom:0;">The Riemann sums of <a href="{{ '/math/calculus-in-motion/multiple-integrals/' | relative_url }}">multiple integrals</a> become hopeless once the dimension climbs, while the Monte Carlo error stays <var>&sigma;/&radic;N</var> regardless of dimension. That dimension-independence is why simulation replaces quadrature in statistical physics, rendering, and Bayesian computation.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Vision</div>
         <h3 style="margin:6px 0;">Stochastic objectives in optimization</h3>
         <p style="margin-bottom:0;">Robust fitting and pose estimation optimise expectations over noise and outliers, and stochastic methods in <a href="{{ '/vision/nonlinear-optimization/' | relative_url }}">nonlinear optimization</a> replace the exact objective with a sampled one. Variance reduction is what keeps those sampled gradients from drowning the descent direction in noise.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">The samplers it depends on</h3>
         <p style="margin-bottom:0;">Every estimator here assumes you can draw the right points, and in high dimensions that is its own problem. The inverse-CDF, rejection and importance-sampling machines of <a href="{{ '/math/probability-in-action/sampling/' | relative_url }}">How to draw a sample</a> are what turn a target distribution into the stream of <var>x_i</var> this part averages; importance sampling is itself a variance-reduction technique, aimed at a different representation of the same integral.</p>
@@ -171,7 +171,7 @@ series: "probability_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Randomness also accumulates over time &mdash; next, walks that drift, jump and diffuse.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability-in-action/random-walks/' | relative_url }}">Next: Random walks, Poisson processes, Brownian motion →</a>
   </div>

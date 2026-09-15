@@ -163,22 +163,22 @@ series: "probability"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">Ellipses under the machinery</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics / Vision</div>
         <h3 style="margin:6px 0;">SLAM pose and landmark covariances</h3>
         <p style="margin-bottom:0;">Every <a href="{{ '/vision/nonlinear-optimization/slam/' | relative_url }}">SLAM</a> and bundle-adjustment system stores a Gaussian belief over poses and landmarks, and every update conditions it on a measurement using exactly the formulas of Step 4. The marginal blocks of $\Sigma$ are the uncertainty of the robot's trajectory; the conditional is the refined estimate after a loop closure.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">Symmetric matrices and the spectral theorem</h3>
         <p style="margin-bottom:0;">The claim that the ellipse axes are orthogonal and real is the spectral theorem for <a href="{{ '/math/linear-algebra/symmetric/' | relative_url }}">symmetric matrices</a>, applied to a positive-definite one. Covariance is the probability face of that theorem; the same diagonalisation drives PCA and the Hessian analysis of optimisation.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">Singular values of a data matrix</h3>
         <p style="margin-bottom:0;">If $X$ is a matrix of centred samples, the eigenvectors of its covariance are the right singular vectors of $X$, and the eigenvalues are the squared singular values over $n$. That is the bridge from covariance to the <a href="{{ '/math/linear-algebra/svd/' | relative_url }}">SVD</a> and to low-rank approximation.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Probability</div>
         <h3 style="margin:6px 0;">Covariance as an object to read</h3>
         <p style="margin-bottom:0;">The <a href="{{ '/math/probability/covariance/' | relative_url }}">covariance part</a> builds $\Sigma$ entry by entry and draws the one- and two-sigma ellipses from a draggable cloud. This part takes that matrix and reads it through its eigenvectors, conditionals and inverse &mdash; the same object, four more lenses.</p>
@@ -224,7 +224,7 @@ series: "probability"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Two Gaussians added together stay Gaussian; two arbitrary densities do not &mdash; and the operation that combines them is a convolution.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability/sums/' | relative_url }}">Next: Sums, convolution and generating functions →</a>
   </div>

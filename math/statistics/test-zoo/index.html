@@ -112,12 +112,12 @@ series: "statistics"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">The same three ingredients, two worlds</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math &amp; Modelling</div>
         <h3 style="margin:6px 0;">The F test in regression</h3>
         <p style="margin-bottom:0;">In the <a href="{{ '/math/linear-algebra/least-squares/' | relative_url }}">least-squares part</a>, adding predictors always lowers the residual sum of squares, even if the predictors are noise. The F test asks whether the drop is larger than the extra degrees of freedom can explain, which is the likelihood-ratio engine applied to nested linear models. Every regression printout's "F-statistic" line is this page's F distribution with two degrees-of-freedom counts in the denominator.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">Which test for a benchmark</h3>
         <p style="margin-bottom:0;">The <a href="{{ '/ai/llm-training/evaluation/' | relative_url }}">evaluation chapter</a> compares models on a held-out set, and the right test depends on the question: paired differences across items want a t test on the differences, success rates want a proportion test, and a comparison across several models at once wants an F or a likelihood-ratio. Choosing the statistic before choosing the null distribution is where most benchmark comparisons go quietly wrong.</p>
@@ -159,7 +159,7 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Frequentist tests answer "how surprising is this?" The next part turns the question around and asks what the data imply about the parameter itself.</span>
     <a class="btn btn-secondary" href="{{ '/math/statistics/posterior/' | relative_url }}">Next: The posterior →</a>
   </div>

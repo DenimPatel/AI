@@ -521,16 +521,16 @@ main { display: block; }
 }
 .layout-home .card-kicker { color: var(--glass-blue-dark); }
 
-.layout-home .reveal {
+.reveal {
   opacity: 0; transform: translateY(20px);
   transition: opacity .6s ease, transform .6s ease;
 }
-.layout-home .reveal.is-visible { opacity: 1; transform: translateY(0); }
+.reveal.is-visible { opacity: 1; transform: translateY(0); }
 
 @media (prefers-reduced-motion: reduce) {
   .layout-home .hero::before, .layout-home .hero::after { animation: none; }
   .layout-home .hero h1, .layout-home .hero p, .layout-home .hero-actions { animation: none; }
-  .layout-home .reveal { opacity: 1; transform: none; transition: none; }
+  .reveal { opacity: 1; transform: none; transition: none; }
   .layout-home .card, .layout-home .btn-primary, .layout-home .btn-ghost { transition: none; }
 }
 

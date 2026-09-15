@@ -115,22 +115,22 @@ series: "probability"
     <div class="g-step-head"><span class="g-step-num">5</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">Conditioning under every model</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / ML</div>
         <h3 style="margin:6px 0;">Likelihoods and evaluation</h3>
         <p style="margin-bottom:0;">A language model is trained to maximise <var>$P(\text{token}\mid\text{context})$</var>, and the chain rule turns the probability of a whole document into a product of those conditionals. Measures such as perplexity and log loss are computed inside that conditioning, and <a href="{{ '/ai/llm-training/evaluation/' | relative_url }}">evaluation</a> is largely a matter of choosing the right conditional to score.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Vision</div>
         <h3 style="margin:6px 0;">Fusing what each measurement knows</h3>
         <p style="margin-bottom:0;">A camera pose is estimated given the observed features, and a consistency check is a conditional probability: how likely is this correspondence, given that it is an inlier? In <a href="{{ '/vision/nonlinear-optimization/slam/' | relative_url }}">SLAM</a> the whole map is the posterior of the world conditioned on a stream of sensor readings, updated landmark by landmark.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Beliefs that update</h3>
         <p style="margin-bottom:0;">A robot's <a href="{{ '/robotics/navigation/odometry/' | relative_url }}">odometry</a> is a noisy displacement, so the pose estimate is really a distribution conditioned on every measurement so far. Bayes' rule is the recursion that folds one new reading into that conditional, and the multiplication rule is what justifies the recursion.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">The algebra behind the crop</h3>
         <p style="margin-bottom:0;">Changing coordinates, projecting, and computing conditional distributions all lean on the same linear-algebra machinery &mdash; orthogonal projections and the Schur complement of a covariance matrix &mdash; developed in <a href="{{ '/math/linear-algebra/' | relative_url }}">Linear algebra</a>. Conditioning a Gaussian is a projection, which is why the formula looks so clean.</p>
@@ -175,7 +175,7 @@ series: "probability"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>The definition of conditioning is one equation, and turning it around gives you an entire engine for learning from evidence.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability/bayes/' | relative_url }}">Next: Bayes' rule →</a>
   </div>

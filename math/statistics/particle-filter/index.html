@@ -119,12 +119,12 @@ series: "statistics"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">The filter behind most robots that know where they are</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Odometry meets a map</h3>
         <p style="margin-bottom:0;">The <a href="{{ '/robotics/navigation/odometry/' | relative_url }}">odometry chapter</a> tracks pose by integrating wheel and inertial motion, and that dead reckoning drifts without bound. A particle filter is the natural place to fuse it with range readings against a map: propagate each particle through the odometry model, weight it by the sensors, resample. Odometry supplies the proposal; the map supplies the correction.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Vision &amp; Geometry</div>
         <h3 style="margin:6px 0;">SLAM and data association</h3>
         <p style="margin-bottom:0;">In visual SLAM the robot estimates its trajectory and the map at once, and correspondences are uncertain. <a href="{{ '/vision/nonlinear-optimization/slam/' | relative_url }}">The SLAM chapter</a> solves the joint problem by optimisation, but only after a front end supplies a good enough guess &mdash; and particle filters are one classic way to get one, because a cloud of trajectories can represent ambiguity that a single point estimate cannot.</p>
@@ -165,7 +165,7 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>The cloud has tracked one robot through one corridor. The next part turns to a different kind of measurement &mdash; deciding which of two versions of a page actually works.</span>
     <a class="btn btn-secondary" href="{{ '/math/statistics/ab-testing/' | relative_url }}">Next: A/B testing →</a>
   </div>

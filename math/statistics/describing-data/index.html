@@ -116,12 +116,12 @@ series: "statistics"
     <div class="g-step-head"><span class="g-step-num">5</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">The same summaries, two very different worlds</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">Latency tails and percentiles</h3>
         <p style="margin-bottom:0;">Serving systems report p50, p95 and p99 latency rather than a mean, because request latency is heavy-tailed and the few slowest requests dominate the average. A mean latency of 40 ms can sit on top of a p99 of two seconds, and it is the p99 the users actually feel. The <a href="{{ '/ai/llm-serving/metrics/' | relative_url }}">LLM serving metrics chapter</a> treats this directly: the ECDF and its quantiles are the honest summary of a tail, and the mean is the number that hides it.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Robust summaries of noisy measurements</h3>
         <p style="margin-bottom:0;">A robot estimating its displacement from wheel encoders or visual odometry accumulates occasional gross errors: a slip, a mismatched feature, a dropped frame. Averaging those readings lets one blunder corrupt the whole estimate, which is why pipelines reach for medians, trimmed means, and RANSAC-style consensus instead. The <a href="{{ '/robotics/navigation/odometry/' | relative_url }}">odometry chapter</a> is full of the robust side of the mean-versus-median question you have just dragged with the mouse.</p>
@@ -166,7 +166,7 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>One sample is described. The next part describes two at once, and meets the ellipse that ties covariance, correlation and regression together.</span>
     <a class="btn btn-secondary" href="{{ '/math/statistics/two-variables/' | relative_url }}">Next: Covariance, correlation, and the ellipse →</a>
   </div>

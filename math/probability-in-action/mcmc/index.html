@@ -161,22 +161,22 @@ series: "probability_in_action"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">When the posterior has no formula</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">The posterior you cannot integrate</h3>
         <p style="margin-bottom:0;">The <a href="{{ '/math/probability-in-action/bayesian-inference/' | relative_url }}">conjugate part</a> left the posterior as a closed-form Beta; the moment the model has a hierarchy or a non-conjugate likelihood, that closed form is gone and MCMC is the default way to get samples from it anyway.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">Conditionals and Gaussians</h3>
         <p style="margin-bottom:0;">Gibbs sampling lives off the closed-form conditionals of the <a href="{{ '/math/probability/multivariate-gaussian/' | relative_url }}">multivariate Gaussian</a>: block updates, marginal slices and the precision matrix all become moves on the chain rather than integrals.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Vision / Robotics</div>
         <h3 style="margin:6px 0;">Gradients for better proposals</h3>
         <p style="margin-bottom:0;">Hamiltonian moves need <var>$\nabla\log\pi$</var>, the same gradient machinery that powers <a href="{{ '/vision/nonlinear-optimization/' | relative_url }}">nonlinear optimization</a>. Where a map or a pose graph has an analytic gradient, HMC turns it into directed exploration instead of a blind walk.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / ML</div>
         <h3 style="margin:6px 0;">Uncertainty over model parameters</h3>
         <p style="margin-bottom:0;">When a model's weights are given a posterior rather than a point estimate, that posterior is sampled, not solved. The scoring of such distributions is what <a href="{{ '/ai/llm-training/evaluation/' | relative_url }}">model evaluation</a> measures, and the same diagnostics decide whether to believe the uncertainty it reports.</p>
@@ -223,7 +223,7 @@ series: "probability_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Latent structure turns one hard integral into a lower bound you can climb, and the sampler you just built becomes the E-step.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability-in-action/latent-variables/' | relative_url }}">Next: Latent variables: EM and the ELBO →</a>
   </div>

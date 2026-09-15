@@ -134,22 +134,22 @@ series: "probability_in_action"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">The trellis is everywhere the state is hidden</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Localisation along a route</h3>
         <p style="margin-bottom:0;">A robot integrating <a href="{{ '/robotics/navigation/odometry/' | relative_url }}">odometry</a> accumulates drift, and an HMM over discretised poses is the smallest honest fix: the transition model is the motion model and the emission model is the sensor. Forward&ndash;backward over the corridor is a one-dimensional relative of the full Bayes filter developed in the next part.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / ML</div>
         <h3 style="margin:6px 0;">Decoding text and sequences</h3>
         <p style="margin-bottom:0;">The token-by-token loop that generates a sequence in <a href="{{ '/ai/llm-serving/decode-loop/' | relative_url }}">LLM serving</a> is a search over a sequence of discrete hidden choices, and beam search is Viterbi's cousin: the same dynamic programming idea, truncated to a beam for tractability. When the objective is a whole-sequence score rather than a per-step one, you are in the max-plus world.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">One layer of the chain</h3>
         <p style="margin-bottom:0;">Strip away the observations and what remains is a <a href="{{ '/math/probability-in-action/markov-chains/' | relative_url }}">Markov chain</a>: the transition matrix, its stationary distribution, and the mixing that makes long-run behaviour forget the start. The HMM is that chain with a second, noisy layer glued on top, and the algorithms here are what you need to see through the glue.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Vision</div>
         <h3 style="margin:6px 0;">Tracks and segmentations</h3>
         <p style="margin-bottom:0;">Following a target through frames, smoothing a pose track, or labelling a video frame by frame are all hidden-state problems, and the same sum-product and max-product pair appears as message passing on the temporal chain. The graphical-models machinery of the <a href="{{ '/math/probability-in-action/graphical-models/' | relative_url }}">previous part</a> is the general version of what this trellis does by hand.</p>
@@ -194,7 +194,7 @@ series: "probability_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Everything here assumed a small discrete state that lives in one cell at a time &mdash; the Bayes filter keeps the same loop on a continuous corridor.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability-in-action/bayes-filter/' | relative_url }}">Next: The Bayes filter →</a>
   </div>

@@ -110,22 +110,22 @@ series: "probability_in_action"
     <div class="g-step-head"><span class="g-step-num">5</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">Hidden structure, every time</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / LLM</div>
         <h3 style="margin:6px 0;">Latent preferences in RLHF</h3>
         <p style="margin-bottom:0;">A reward model in <a href="{{ '/ai/llm-training/rlhf/' | relative_url }}">reinforcement learning from human feedback</a> is trained on preferences, and the preference itself is an observation of a hidden utility. Models with latent variables are the rule rather than the exception once you look past the loss function printed on screen.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Vision</div>
         <h3 style="margin:6px 0;">Robust fitting with unknown inliers</h3>
         <p style="margin-bottom:0;">Whether a correspondence is an inlier or an outlier is a hidden label, and robust estimation is the art of fitting while that label is unknown. The machinery in <a href="{{ '/vision/nonlinear-optimization/' | relative_url }}">nonlinear optimization</a> is the optimisation layer that EM's local optima force you to think about.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">Covariance geometry</h3>
         <p style="margin-bottom:0;">Every ellipse on this page is a level set of a <a href="{{ '/math/probability/multivariate-gaussian/' | relative_url }}">multivariate Gaussian</a>, drawn with its eigenvectors and eigenvalues. The M-step's responsibility-weighted scatter is the sample covariance of a soft partition, and its geometry is the geometry of the ellipse.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">Expectations and Jensen</h3>
         <p style="margin-bottom:0;">The ELBO rests entirely on Jensen's inequality for a concave function. The calculus behind that inequality &mdash; curvature, convexity, and the expectations it constrains &mdash; is the subject of <a href="{{ '/math/calculus-in-motion/probability/' | relative_url }}">Calculus of probability</a>, which makes the direction of the bound feel inevitable.</p>
@@ -174,7 +174,7 @@ series: "probability_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>The ELBO needed a KL divergence to measure the gap; entropy, cross-entropy and mutual information turn out to be the same quantity wearing different clothes.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability-in-action/information/' | relative_url }}">Next: Entropy, cross-entropy, KL, mutual information →</a>
   </div>

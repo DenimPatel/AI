@@ -120,22 +120,22 @@ series: "probability"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">The same five tables, under many names</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">Counting capstones</h3>
         <p style="margin-bottom:0;">Binomial probabilities are counting problems in disguise: the coefficient <var>$\binom{n}{k}$</var> is the whole content of <a href="{{ '/math/probability/counting/' | relative_url }}">the counting part</a>. Every time you choose which <var>k</var> of <var>n</var> trials succeed, you are doing the same enumeration that underlies combinations.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / ML</div>
         <h3 style="margin:6px 0;">Token sampling and arrivals</h3>
         <p style="margin-bottom:0;">A language model emitting tokens one at a time can be read as a sequence of Bernoulli choices, and the count of accepted tokens in speculative decoding is binomial. Request arrivals at a serving endpoint are modelled as a Poisson process, which is what sizes the batch in the <a href="{{ '/ai/llm-serving/decode-loop/' | relative_url }}">decode loop</a>.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Vision</div>
         <h3 style="margin:6px 0;">Inlier counts in robust fitting</h3>
         <p style="margin-bottom:0;">RANSAC reasons about the number of good correspondences in a random sample, a binomial count, and about the expected number of false matches over many hypotheses, which in the rare-error regime is Poisson. Both feed the iteration budget in <a href="{{ '/vision/multi-view-geometry/ransac/' | relative_url }}">multi-view geometry</a>.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / ML</div>
         <h3 style="margin:6px 0;">Likelihoods for counts</h3>
         <p style="margin-bottom:0;">A Poisson or negative-binomial likelihood scores how surprising a count is, and it appears in count-based language modelling, event prediction and evaluation. The mean-equals-variance diagnostic is the first thing to check when choosing between them, as in <a href="{{ '/ai/llm-training/language-models/' | relative_url }}">language models</a>.</p>
@@ -178,7 +178,7 @@ series: "probability"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>A PMF puts probability on separate points; a density smears it over a continuum &mdash; and a density is not a probability.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability/densities/' | relative_url }}">Next: From mass to density →</a>
   </div>

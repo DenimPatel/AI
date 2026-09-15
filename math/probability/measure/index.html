@@ -150,22 +150,22 @@ series: "probability"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">The hypotheses under the theorems</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Probability</div>
         <h3 style="margin:6px 0;">The law of large numbers</h3>
         <p style="margin-bottom:0;">The almost-sure statement in <a href="{{ '/math/probability/lln/' | relative_url }}">Part 17</a> is a statement about a limit of random variables, and both sides must be measurable with respect to the same &sigma;-algebra for the statement to even parse. Filtrations are what make the running average a well-defined process rather than a sequence of unrelated questions.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Recursive estimation</h3>
         <p style="margin-bottom:0;">Every filter in the companion volume conditions on the history of measurements: the belief at time <var>t</var> is the conditional distribution given <var>$\mathcal{F}_t$</var>. The <a href="{{ '/robotics/navigation/odometry/' | relative_url }}">odometry</a> recursion is the Markov assumption &mdash; that <var>$\mathcal{F}_t$</var> can be summarised by the current state &mdash; written as a probabilistic model.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / ML</div>
         <h3 style="margin:6px 0;">Almost-sure guarantees</h3>
         <p style="margin-bottom:0;">Concentration results behind generalisation bounds are tail statements of the kind Borel&ndash;Cantelli upgrades to a statement about all but finitely many training runs &mdash; the difference between "unlikely this time" and "eventually never". The scaling discussion in <a href="{{ '/ai/llm-training/scaling/' | relative_url }}">LLM Training</a> leans on those tail estimates.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">Integration</h3>
         <p style="margin-bottom:0;">The integral that gives a continuous probability its meaning is the <a href="{{ '/math/calculus-in-motion/multiple-integrals/' | relative_url }}">Lebesgue integral</a>, defined by partitioning the range rather than the domain. It is the construction that makes every density in Part 10 and Part 11 an honest average, and it is why measurability is a hypothesis rather than a formality.</p>
@@ -212,7 +212,7 @@ series: "probability"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Every term in the volume, linked to the part that builds it, with the full distribution card.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability/glossary/' | relative_url }}">Next: Glossary and distribution reference →</a>
   </div>

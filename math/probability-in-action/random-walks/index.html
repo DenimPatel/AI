@@ -157,22 +157,22 @@ series: "probability_in_action"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">Accumulated noise everywhere</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Drift in dead reckoning</h3>
         <p style="margin-bottom:0;">When a robot integrates noisy velocity to track its pose, small independent errors pile up exactly like the steps of a walk. The position error grows with the square root of elapsed time, which is why <a href="{{ '/robotics/navigation/odometry/' | relative_url }}">odometry</a> needs periodic correction from a global sensor and why loop closures matter so much.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">The CLT behind the limit</h3>
         <p style="margin-bottom:0;">Brownian motion exists because <var>$S_n/\sqrt n$</var> converges in distribution to a normal. That statement and its hypotheses are the work of the <a href="{{ '/math/probability/clt/' | relative_url }}">central limit theorem</a>, which is the engine converting independent bounded steps into Gaussian noise.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / ML</div>
         <h3 style="margin:6px 0;">Stochastic gradient noise</h3>
         <p style="margin-bottom:0;">Each minibatch gradient is a noisy estimate, so the parameter path under stochastic optimisation is a random walk with drift, and the noise scale falls as batches grow. That relationship between batch size, step size and loss noise is central to <a href="{{ '/ai/llm-training/scaling/' | relative_url }}">training at scale</a>.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Vision</div>
         <h3 style="margin:6px 0;">Inertial integration for SLAM</h3>
         <p style="margin-bottom:0;">An IMU's bias performs a slow random walk, and integrating its measurements compounds that error. Treating bias as a Brownian process and propagating its uncertainty is what makes <a href="{{ '/vision/nonlinear-optimization/slam/' | relative_url }}">visual-inertial SLAM</a> work, and it is the same martingale bookkeeping in a different notation.</p>
@@ -219,7 +219,7 @@ series: "probability_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Drop the coin and keep the state: when the next step depends only on where you are now, you have a Markov chain &mdash; and a stationary distribution to find.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability-in-action/markov-chains/' | relative_url }}">Next: Markov chains →</a>
   </div>

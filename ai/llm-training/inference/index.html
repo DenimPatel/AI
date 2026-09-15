@@ -136,12 +136,12 @@ redirect_from:
     <div class="llmt-step-head"><span class="llmt-step-num">6</span><h2>Further serving techniques</h2></div>
     <p class="llmt-eyebrow">Named, not demoed</p>
     <div class="llmt-grid2">
-      <div class="llmt-card"><b>Speculative decoding</b> — a small "draft" model proposes several tokens ahead; the large model verifies them in one batched forward pass, accepting the correct prefix. When the draft model's guesses are often right, this turns several slow decode steps into one, at the cost of running two models.</div>
-      <div class="llmt-card"><b>Context-length extension</b> — techniques like position interpolation or YaRN rescale RoPE's rotation frequencies so a model trained at, say, 4K context can be used (often with brief fine-tuning) well beyond it, at some quality cost near the new limit.</div>
-      <div class="llmt-card"><b>Constrained / structured decoding</b> — restricting the sampler to only tokens that keep a generation valid against a grammar or JSON schema, by masking out disallowed tokens at each step — how "guaranteed valid JSON" output modes work.</div>
-      <div class="llmt-card"><b>Tool calling</b> — the model emits a structured request (usually constrained-decoded) that the serving stack intercepts, executes against a real function or API, and feeds the result back in as additional context before continuing generation.</div>
-      <div class="llmt-card"><b>RAG (retrieval-augmented generation)</b> — before generation starts, a retrieval system (often the same embedding idea from Part 2, at a much larger scale) finds relevant documents and prepends them to the prompt, so the model can answer from up-to-date or private text it never saw in pretraining.</div>
-      <div class="llmt-card"><b>Beam search</b> — instead of sampling one path, keep the top-B partial sequences by cumulative probability at every step; used less often for open-ended chat (where diverse, sampled text feels better) than for tasks with a single correct answer, like translation.</div>
+      <div class="llmt-card reveal"><b>Speculative decoding</b> — a small "draft" model proposes several tokens ahead; the large model verifies them in one batched forward pass, accepting the correct prefix. When the draft model's guesses are often right, this turns several slow decode steps into one, at the cost of running two models.</div>
+      <div class="llmt-card reveal"><b>Context-length extension</b> — techniques like position interpolation or YaRN rescale RoPE's rotation frequencies so a model trained at, say, 4K context can be used (often with brief fine-tuning) well beyond it, at some quality cost near the new limit.</div>
+      <div class="llmt-card reveal"><b>Constrained / structured decoding</b> — restricting the sampler to only tokens that keep a generation valid against a grammar or JSON schema, by masking out disallowed tokens at each step — how "guaranteed valid JSON" output modes work.</div>
+      <div class="llmt-card reveal"><b>Tool calling</b> — the model emits a structured request (usually constrained-decoded) that the serving stack intercepts, executes against a real function or API, and feeds the result back in as additional context before continuing generation.</div>
+      <div class="llmt-card reveal"><b>RAG (retrieval-augmented generation)</b> — before generation starts, a retrieval system (often the same embedding idea from Part 2, at a much larger scale) finds relevant documents and prepends them to the prompt, so the model can answer from up-to-date or private text it never saw in pretraining.</div>
+      <div class="llmt-card reveal"><b>Beam search</b> — instead of sampling one path, keep the top-B partial sequences by cumulative probability at every step; used less often for open-ended chat (where diverse, sampled text feels better) than for tasks with a single correct answer, like translation.</div>
     </div>
   </section>
 
@@ -198,7 +198,7 @@ redirect_from:
   </section>
 {% endraw %}
 
-  <div class="llmt-next">
+  <div class="llmt-next reveal">
     <span>Speed and cost solved, the remaining question is how anyone knows whether the model is actually any good. <em>The sequel — <a href="{{ '/ai/llm-serving/' | relative_url }}">LLM Serving, Interactively</a> — takes this part's sampler, KV cache and batching and rebuilds them as a quantitative model you plug your own hardware into, all the way out to disaggregated prefill/decode pools and $/M tokens.</em></span>
     <a class="btn btn-secondary" href="{{ '/ai/llm-training/evaluation/' | relative_url }}">Continue: evaluation →</a>
   </div>

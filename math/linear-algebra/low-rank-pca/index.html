@@ -104,12 +104,12 @@ series: "linear_algebra"
     <div class="g-step-head"><span class="g-step-num">5</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">One decomposition, two worlds</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">Embeddings, recommenders and LoRA</h3>
         <p style="margin-bottom:0;">A user&ndash;item rating table is low-rank because tastes are few, and factorising it is recommender systems. Word and token embeddings are compressed the same way. Most strikingly, LoRA fine-tunes a large model by freezing the weights and learning a rank-<var>k</var> update, a product of two skinny matrices &mdash; the exact structure this part builds. See <a href="{{ '/ai/llm-training/scaling/' | relative_url }}">scaling and training at size</a> for where those updates fit.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics / geometry</div>
         <h3 style="margin:6px 0;">Low-dimensional structure in a point cloud</h3>
         <p style="margin-bottom:0;">A laser scan of a wall, a set of matched image features, or a reconstructed set of 3-D points rarely fills space; it lies near a plane or a line. PCA finds that structure, and the small singular values expose the noise. <a href="{{ '/vision/multi-view-geometry/sfm/' | relative_url }}">Structure from motion</a> leans on exactly this: a rigid scene's tracked points form a low-rank measurement matrix, and the rank reveals the motion.</p>
@@ -143,7 +143,7 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Keeping the largest singular values is how you compress; inverting <em>all</em> of them, carefully, is how you solve every version of <var>Ax = b</var>.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/pseudoinverse/' | relative_url }}">Next: The complete picture of Ax = b →</a>
   </div>

@@ -118,22 +118,22 @@ series: "probability"
     <div class="g-step-head"><span class="g-step-num">5</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">The bell curve under the measurements</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / ML</div>
         <h3 style="margin:6px 0;">Scaling laws and averaged gradients</h3>
         <p style="margin-bottom:0;">A training step averages a mini-batch of per-example gradients, each a noisy estimate of the true descent direction. The CLT is what makes the averaged gradient approximately Gaussian with covariance shrinking like <var>1/|B|</var>, which is exactly the noise model behind the <a href="{{ '/ai/llm-training/scaling/' | relative_url }}">scaling laws</a> for learning rate and batch size. Loss curves and benchmark spreads inherit their bell shape from sums over many independent tokens.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics / Vision</div>
         <h3 style="margin:6px 0;">Averaging noisy measurements</h3>
         <p style="margin-bottom:0;">A robot fuses thousands of range readings, and a vision pipeline averages residuals across many correspondences. Each individual measurement has an awkward, non-Gaussian error; the aggregate behaves like Gaussian noise with standard deviation <var>$\sigma/\sqrt n$</var>. That is the licence for the least-squares and gradient-based estimators in <a href="{{ '/vision/nonlinear-optimization/' | relative_url }}">nonlinear optimisation</a> to report parameter uncertainties as ellipses.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Probability</div>
         <h3 style="margin:6px 0;">Why the Gaussian is the default</h3>
         <p style="margin-bottom:0;">The <a href="{{ '/math/probability/continuous-families/' | relative_url }}">continuous families part</a> introduced the Gaussian twice: as the distribution of maximum entropy for a fixed variance, and as the limit selected by convolution. The CLT is the bridge between those two stories, and it is the reason the normal shows up as a modelling default long before any data has been checked against it.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Limits</div>
         <h3 style="margin:6px 0;">From averages to fluctuations</h3>
         <p style="margin-bottom:0;">The <a href="{{ '/math/probability/lln/' | relative_url }}">law of large numbers</a> says the sample mean settles on <var>$\mu$</var>; the CLT magnifies the residual by <var>$\sqrt n$</var> to reveal the shape of the settling. Together they are the two halves of the asymptotic story: where the average goes, and how it wobbles on the way there.</p>
@@ -181,7 +181,7 @@ series: "probability"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>The CLT is a theorem about finite variance. Drop that assumption and the bell dissolves into a heavy tail.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability/tails/' | relative_url }}">Next: Tails, heavy tails, and high dimensions →</a>
   </div>

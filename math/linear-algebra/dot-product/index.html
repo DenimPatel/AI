@@ -122,12 +122,12 @@ series: "linear_algebra"
     <div class="g-step-head"><span class="g-step-num">5</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">One measurement, two worlds</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics / geometry</div>
         <h3 style="margin:6px 0;">Plane normals and signed distance</h3>
         <p style="margin-bottom:0;">A plane through the origin is described by its normal vector <var>n</var>, and the quantity <var>n&middot;x</var> tells you how far along that normal a point <var>x</var> lies; dividing by <var>|n|</var> turns it into the signed distance from the plane. This is the same projection, read as a measurement, and it is how image-to-world geometry checks whether a pixel ray meets a surface. The <a href="{{ '/vision/multi-view-geometry/homography/' | relative_url }}">homography part</a> of the geometry guide uses plane equations exactly this way, and the <a href="{{ '/robotics/' | relative_url }}">robotics notes</a> use normals to keep a robot on the right side of a surface.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">Cosine similarity of embeddings</h3>
         <p style="margin-bottom:0;">A token embedding is a vector, and the usual way to ask whether two tokens mean similar things is to compute the cosine of the angle between their embeddings &mdash; the dot product with lengths divided out. Attention scores, nearest-neighbour retrieval and contrastive training are all built from that one measurement. The <a href="{{ '/ai/llm-training/tokens/' | relative_url }}">tokens chapter</a> builds the vectors that these comparisons run on.</p>
@@ -171,7 +171,7 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Two arrows are perpendicular when their overlap is zero &mdash; and that test is enough to manufacture a whole basis out of nothing.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/orthogonality/' | relative_url }}">Next: Orthonormal bases and Gram–Schmidt →</a>
   </div>

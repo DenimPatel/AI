@@ -105,12 +105,12 @@ series: "statistics"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">Capacity, projection, and the rest of the site</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">Capacity versus data</h3>
         <p style="margin-bottom:0;">The <a href="{{ '/ai/llm-training/scaling/' | relative_url }}">scaling chapter</a> argues about model size, dataset size, and compute, which is this trade writ large: a larger model has lower bias and higher variance, and a larger dataset buys back the variance. Empirical scaling laws are a budget line drawn on a bias&ndash;variance chart you cannot read directly, which is also why training far past the point where the training loss stops improving often still helps the test loss.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Linear algebra</div>
         <h3 style="margin:6px 0;">Fitting as projection</h3>
         <p style="margin-bottom:0;">The <a href="{{ '/math/linear-algebra/least-squares/' | relative_url }}">least-squares part</a> shows the fitted polynomial as the orthogonal projection of the data onto the column space of the design matrix. Higher degree means a larger subspace, which can only reduce the training residual &mdash; and it also means more directions for the noise to project into, which is the variance. Projection onto a bigger subspace explains why training error falls while test error can rise.</p>
@@ -152,7 +152,7 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>The trade-off needs a dial, and the penalty you add to the fit is that dial. The next part reads the penalty as a prior.</span>
     <a class="btn btn-secondary" href="{{ '/math/statistics/regularization-prior/' | relative_url }}">Next: Regularization is a prior →</a>
   </div>

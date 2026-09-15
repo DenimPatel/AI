@@ -120,12 +120,12 @@ series: "statistics"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">Two places a band changes the decision</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">Abstaining when the band is wide</h3>
         <p style="margin-bottom:0;">A deployed assistant should say "I don't know" rather than guess, and the trigger for abstention is a predictive interval that is too wide to act on. The <a href="{{ '/ai/llm-training/guardrails/' | relative_url }}">guardrails chapter</a> builds exactly these thresholds. Strong calibration on the evaluation set is also where the <a href="{{ '/ai/llm-training/evaluation/' | relative_url }}">evaluation chapter's</a> held-out numbers meet this part's machinery: a benchmark score is a point estimate, and a conformal interval is how you report its uncertainty honestly.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Covariance that drives the filter</h3>
         <p style="margin-bottom:0;">Odometry and <a href="{{ '/robotics/navigation/odometry/' | relative_url }}">visual-inertial navigation</a> fuse noisy measurements into a state estimate whose covariance is the epistemic uncertainty &mdash; the same object as the ensemble band here. The <a href="{{ '/math/linear-algebra/numerics/' | relative_url }}">numerics part</a> is the cautionary half: an overconfident covariance, like a conformal interval calibrated on the wrong world, is worse than an honest wide one because the planner trusts it.</p>
@@ -167,7 +167,7 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>A band around one prediction generalises to a distribution over many coupled predictions. The next part makes that joint structure the object of study.</span>
     <a class="btn btn-secondary" href="{{ '/math/statistics/multivariate-gaussian/' | relative_url }}">Next: The multivariate Gaussian →</a>
   </div>

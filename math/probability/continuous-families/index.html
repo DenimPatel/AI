@@ -162,22 +162,22 @@ series: "probability"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">Families under every model</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / ML</div>
         <h3 style="margin:6px 0;">Uncertainty in evaluation</h3>
         <p style="margin-bottom:0;">Confidence intervals for a benchmark score are Student-t intervals whenever the sample is small and the variance is estimated from the same data. Heavy tails are why a handful of outlier examples can move a metric, and why robust losses and trimmed means matter in <a href="{{ '/ai/llm-training/evaluation/' | relative_url }}">model evaluation</a>.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Vision</div>
         <h3 style="margin:6px 0;">Noise models in optimisation</h3>
         <p style="margin-bottom:0;">Least-squares fitting assumes Gaussian residuals, which turns a maximum-likelihood fit into a sum of squares and makes the normal equations linear. When residuals are heavy-tailed, a Student-t or robust kernel is the honest model; that choice is exactly the loss-function trade discussed in <a href="{{ '/vision/nonlinear-optimization/' | relative_url }}">nonlinear optimisation</a>.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Gaussian belief states</h3>
         <p style="margin-bottom:0;">A Kalman filter represents a robot's belief about its pose as a Gaussian, because a Gaussian is closed under the linear updates of prediction and correction. The exponential and gamma families appear on the other side of the same systems, as the waiting times between events in a Poisson arrival process.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">Densities under change of variable</h3>
         <p style="margin-bottom:0;">Pushing a uniform through a map is the standard way to sample any family, and the Jacobian that rescales the density is the bridge between the two views. That computation is developed in <a href="{{ '/math/calculus-in-motion/probability/' | relative_url }}">calculus of probability</a> and used constantly in simulation.</p>
@@ -221,7 +221,7 @@ series: "probability"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Push a density through a map and it squashes by the Jacobian &mdash; which is also how you turn a uniform into any family you like.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability/transformations/' | relative_url }}">Next: Transforming a random variable →</a>
   </div>

@@ -105,12 +105,12 @@ series: "statistics"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">The same contest, wearing other clothes</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Vision &amp; Geometry</div>
         <h3 style="margin:6px 0;">Estimator trade-offs under outliers</h3>
         <p style="margin-bottom:0;">The <a href="{{ '/vision/multi-view-geometry/ransac/' | relative_url }}">RANSAC chapter</a> is a study in exactly this trade-off. Fitting a line to all the correspondences is unbiased when the noise is well behaved but has enormous variance when a few matches are grossly wrong; fitting to a minimal random sample and counting inliers accepts a little bias in exchange for robustness. Choosing the inlier threshold and the number of iterations is a bias&ndash;variance decision, and the guide reasons about it in the same terms the bars use here. The <a href="{{ '/vision/multi-view-geometry/calibration/' | relative_url }}">calibration part</a> makes the same choice when it decides how much to trust a noisy correspondence.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">Benchmarks and regularisation</h3>
         <p style="margin-bottom:0;">A held-out score is an estimator of a model's true error, and its spread across test sets is variance you can measure. The <a href="{{ '/ai/llm-training/evaluation/' | relative_url }}">evaluation chapter</a> is careful about finite test sets for precisely this reason. Regularisation in training is the bias&ndash;variance trade-off chosen on purpose: a model that fits the training data too tightly buys a small bias with a large variance. The <a href="{{ '/math/calculus-in-motion/optimizers/' | relative_url }}">optimizers chapter</a> sees the same tug when it decides how far to move on noisy gradients.</p>
@@ -152,7 +152,7 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>The next part stops asking which rule is fair and starts asking which rule the data prefer, by maximizing the likelihood of what was actually observed.</span>
     <a class="btn btn-secondary" href="{{ '/math/statistics/maximum-likelihood/' | relative_url }}">Next: Maximum likelihood →</a>
   </div>

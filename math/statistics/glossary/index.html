@@ -47,11 +47,11 @@ series: "statistics"
     <p class="g-eyebrow">The conventions every part follows</p>
     <p>A random variable is a capital letter, <var>X</var>, and its observed value a lowercase one, <var>x</var>; the <var>i</var>-th observation is <var>x<sub>i</sub></var> and the sample of <var>n</var> values is <var>x<sub>1</sub>, &hellip;, x<sub>n</sub></var>, drawn i.i.d. An unknown parameter is <var>θ</var> and an estimator of it is <var>θ̂</var> (a random variable before the data arrive, a number afterwards). The population mean and variance are <var>μ</var> and <var>σ²</var>; the sample mean and variance are <var>x̄</var> and <var>s²</var>. A probability density or mass is <var>p(x | θ)</var>, the likelihood is the same function read as <var>L(θ) = p(D | θ)</var>, and its logarithm is <var>ℓ(θ)</var>.</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <h3 style="margin-top:0;">Symbols</h3>
         <p style="margin-bottom:0;font-family:var(--font-mono);font-size:12.5px;">E[X] · Var(X) · Cov(X,Y) · ρ<br>θ̂ · SE(θ̂) · MSE · I(θ) · CRLB<br>α · β · power · p · R²</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <h3 style="margin-top:0;">Reading order</h3>
         <p style="margin-bottom:0;">Acts I&ndash;II are data and estimation, III is uncertainty and testing, IV is Bayesian inference, V is the statistics of learning, VI is estimation over time, and VII is causality. Every core part ends with a "Where this shows up" panel linking into the site's other guides.</p>
       </div>
@@ -109,27 +109,27 @@ series: "statistics"
     <div class="g-step-head"><span class="g-step-num">4</span><h2>Estimator and interval card</h2></div>
     <p class="g-eyebrow">The formulas the series builds, in one place</p>
     <div class="g-grid2">
-      <div class="g-card glo-formula">
+      <div class="g-card glo-formula reveal">
         <div class="g-math g-katex">$$\bar{x} = \frac{1}{n}\sum_{i=1}^n x_i, \qquad s^2 = \frac{1}{n-1}\sum_{i=1}^n (x_i-\bar{x})^2, \qquad \mathrm{SE}(\bar{x}) = \frac{s}{\sqrt{n}}$$</div>
         <p>Sample mean, the unbiased sample variance, and the standard error of the mean. The <var>√n</var> is the whole reason more data helps.</p>
       </div>
-      <div class="g-card glo-formula">
+      <div class="g-card glo-formula reveal">
         <div class="g-math g-katex">$$\bar{x} \pm t_{n-1,\,1-\alpha/2}\,\frac{s}{\sqrt{n}}, \qquad \hat{p} \pm z_{1-\alpha/2}\sqrt{\frac{\hat{p}(1-\hat{p})}{n}}$$</div>
         <p>Confidence intervals for a mean and a proportion. The interval is the random object; the parameter is fixed. Coverage, not probability, is what the <var>1−α</var> names.</p>
       </div>
-      <div class="g-card glo-formula">
+      <div class="g-card glo-formula reveal">
         <div class="g-math g-katex">$$\hat{\theta}_{\text{MLE}} = \arg\max_\theta \ell(\theta), \qquad \mathrm{Var}(\hat{\theta}) \gtrsim \frac{1}{n\,I(\theta)}$$</div>
         <p>Maximum likelihood and the Cramér&ndash;Rao floor. The curvature of <var>ℓ</var> at its peak <em>is</em> the error bar; the MLE attains the floor asymptotically.</p>
       </div>
-      <div class="g-card glo-formula">
+      <div class="g-card glo-formula reveal">
         <div class="g-math g-katex">$$\mathrm{MSE}(\hat{\theta}) = \mathrm{bias}^2 + \mathrm{Var}(\hat{\theta}), \qquad \hat{\theta}_{\text{MAP}} = \arg\max_\theta \big[\ell(\theta) + \log p(\theta)\big]$$</div>
         <p>The error budget split into the part more data cannot fix and the part it can, and the Bayesian point estimate as a penalised likelihood.</p>
       </div>
-      <div class="g-card glo-formula">
+      <div class="g-card glo-formula reveal">
         <div class="g-math g-katex">$$\hat{\beta} = (X^\top X)^{-1}X^\top y, \qquad \mathrm{Var}(\hat{\beta}) = \sigma^2 (X^\top X)^{-1}$$</div>
         <p>Ordinary least squares and the covariance of its coefficients; the confidence band in <a href="{{ '/math/statistics/regression/' | relative_url }}">Part 10</a> is the square root of the diagonal.</p>
       </div>
-      <div class="g-card glo-formula">
+      <div class="g-card glo-formula reveal">
         <div class="g-math g-katex">$$p(\theta \mid D) = \frac{p(D \mid \theta)\,p(\theta)}{p(D)}, \qquad \mu_{\text{post}} = \frac{\mu_0/\sigma_0^2 + \bar{x}/\sigma^2}{1/\sigma_0^2 + 1/\sigma^2}$$</div>
         <p>Bayes' rule, and Gaussian fusion as precision-weighted averaging &mdash; the scalar Kalman update of <a href="{{ '/math/statistics/conjugacy-fusion/' | relative_url }}">Part 17</a>.</p>
       </div>
@@ -322,7 +322,7 @@ series: "statistics"
     </div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>That is the whole series. Go back to the beginning, or open the contents page to jump to any part.</span>
     <a class="btn btn-secondary" href="{{ '/math/statistics/' | relative_url }}">Series contents →</a>
   </div>

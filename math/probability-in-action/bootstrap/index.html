@@ -123,22 +123,22 @@ series: "probability_in_action"
     <div class="g-step-head"><span class="g-step-num">5</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">Error bars for the statistics nobody has a formula for</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Vision</div>
         <h3 style="margin:6px 0;">Robust fitting and RANSAC</h3>
         <p style="margin-bottom:0;">A <a href="{{ '/vision/multi-view-geometry/ransac/' | relative_url }}">RANSAC</a> estimate is built from whichever random minimal sample happened to be all-inlier, so its variability is not a textbook standard error. Resampling the correspondences gives that estimate an honest error bar, and the same block-resampling idea repairs the case where correspondences are correlated across a sequence.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / ML</div>
         <h3 style="margin:6px 0;">Uncertainty on benchmark scores</h3>
         <p style="margin-bottom:0;">An evaluation reports accuracy, an F1, a pass rate on a rubric &mdash; none of which has a clean standard error. Bootstrapping the held-out examples produces the confidence intervals that <a href="{{ '/ai/llm-training/evaluation/' | relative_url }}">evaluation</a> dashboards need, and pairing the resamples across two models gives a test of whether the difference is real.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">The estimators it stands beside</h3>
         <p style="margin-bottom:0;">The bootstrap is the computational sibling of the sampling-distribution theory in <a href="{{ '/math/probability-in-action/estimators/' | relative_url }}">Is this estimator any good?</a>: where that part computes bias and variance from a model, the bootstrap measures them from the data. The two should agree whenever the theory applies, and disagreement is itself diagnostic.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">Intervals, without the algebra</h3>
         <p style="margin-bottom:0;">A confidence interval is a statement about the sampling distribution, which is exactly what the bootstrap constructs. The percentile and basic intervals here are the resampling counterpoints to the Wald and likelihood intervals of <a href="{{ '/math/probability-in-action/intervals/' | relative_url }}">Confidence vs credible</a>, and the BCa correction is what to reach for when the simple ones lean.</p>
@@ -184,7 +184,7 @@ series: "probability_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Resampling assumes you can draw from a distribution &mdash; next we build the machines that do the drawing.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability-in-action/sampling/' | relative_url }}">Next: How to draw a sample →</a>
   </div>

@@ -136,12 +136,12 @@ series: "statistics"
     <div class="g-step-head"><span class="g-step-num">7</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">One distribution, an entire engineering stack</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics &amp; Vision</div>
         <h3 style="margin:6px 0;">Gaussian state estimation</h3>
         <p style="margin-bottom:0;">A robot's belief about its pose is a Gaussian, and every measurement is a slice. SLAM systems keep the joint distribution of the trajectory and the map as a large covariance matrix and update it by conditioning; the <a href="{{ '/vision/nonlinear-optimization/slam/' | relative_url }}">SLAM chapter</a> is this page with thousands of coordinates instead of two. The four closure properties you just watched are exactly what lets those systems keep a single belief rather than a pile of samples.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">The covariance matrix and PCA</h3>
         <p style="margin-bottom:0;">The ellipse on this page is the covariance matrix made visible, and asking for its axes is asking for its eigenvectors. The <a href="{{ '/math/linear-algebra/low-rank-pca/' | relative_url }}">low-rank PCA chapter</a> takes the same matrix and keeps only the widest directions, which is the ellipse's longest axis promoted to a summary of the whole cloud. Dimensionality reduction, whitening and latent-variable models all begin from this object.</p>
@@ -181,7 +181,7 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>A Gaussian belief that is shifted by motion and sliced by a measurement is a filter. The next part makes that recursion something you can watch, one door at a time.</span>
     <a class="btn btn-secondary" href="{{ '/math/statistics/bayes-filter/' | relative_url }}">Next: The Bayes filter →</a>
   </div>

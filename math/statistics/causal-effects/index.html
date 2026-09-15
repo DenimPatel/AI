@@ -121,12 +121,12 @@ series: "statistics"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">The same question, two more worlds</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">Did the model change help?</h3>
         <p style="margin-bottom:0;">Shipping a new model and comparing its logged scores to the old model's is an observational comparison: traffic, time of day, and prompt mix all differ between the two. The <a href="{{ '/ai/llm-training/evaluation/' | relative_url }}">evaluation chapter</a> is where this becomes a causal question, and the answer is an experiment &mdash; randomized traffic, a fixed analysis, and no peeking. The same logic governs comparing two reward models trained on <a href="{{ '/ai/llm-training/rlhf/' | relative_url }}">logged human preferences</a>, which are observational by nature.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Comparing controllers from logs</h3>
         <p style="margin-bottom:0;">A robot's recorded runs are a biased sample: harder terrain, a different operator, or a calibration drift can coincide with whichever controller was installed. The <a href="{{ '/robotics/navigation/odometry/' | relative_url }}">odometry chapter</a> lives with exactly this, and the fix has the same shape as everything here &mdash; match runs on terrain and speed, weight by how likely each run was under each controller, or difference before-and-after segments to cancel a fixed bias. Metrics that ignore assignment are confounded by it, as the <a href="{{ '/ai/llm-serving/metrics/' | relative_url }}">serving metrics chapter</a> warns from the systems side.</p>
@@ -170,7 +170,7 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>That is the last part of the series. The glossary collects the terms and formula cards from every chapter into one place you can return to.</span>
     <a class="btn btn-secondary" href="{{ '/math/statistics/glossary/' | relative_url }}">Next: the glossary and formula cards →</a>
   </div>

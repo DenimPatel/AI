@@ -144,12 +144,12 @@ series: "linear_algebra"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">One idea, two worlds</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Rotations are orthonormal</h3>
         <p style="margin-bottom:0;">A rotation matrix has orthonormal columns, and that is the whole reason it preserves lengths and angles: multiplying by it moves a frame without stretching it. Composing rotations stays in the same family, and the inverse is just the transpose. The <a href="{{ '/vision/nonlinear-optimization/3d-rotations/' | relative_url }}">3D rotations part</a> of the optimization guide builds pose updates on exactly this fact.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">Orthogonal init and stable fitting</h3>
         <p style="margin-bottom:0;">Initialising weight matrices with orthonormal columns keeps signal from shrinking or exploding as it passes through many layers, and QR is the standard way to solve least-squares problems inside training without forming a normal-equation matrix that squares the condition number. The <a href="{{ '/ai/llm-training/architecture/' | relative_url }}">architecture chapter</a> shows where those matrices live.</p>
@@ -174,7 +174,7 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Perpendicular axes make projection easy &mdash; and projection is the answer to the system that has no solution.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/least-squares/' | relative_url }}">Next: Least squares is a projection →</a>
   </div>

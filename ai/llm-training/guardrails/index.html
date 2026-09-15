@@ -163,7 +163,7 @@ redirect_from:
       </tbody>
     </table>
     </div>
-    <p style="margin-top:20px;">Every phase reuses the same underlying machinery — tokens, embeddings, a next-token-shaped loss, gradient-based updates — applied to progressively narrower, more curated, more human-judgment-laden data. OLMo is worth returning to here: because Ai2 publishes every stage's data and code, this entire pipeline is one you can go verify yourself. See the <a href="/ai/llm-training/glossary/">glossary</a> for every bolded term across the series, or the <a href="/ai/llm-training/">series hub</a> to jump anywhere.</p>
+    {% endraw %}<p style="margin-top:20px;">Every phase reuses the same underlying machinery — tokens, embeddings, a next-token-shaped loss, gradient-based updates — applied to progressively narrower, more curated, more human-judgment-laden data. OLMo is worth returning to here: because Ai2 publishes every stage's data and code, this entire pipeline is one you can go verify yourself. See the <a href="{{ '/ai/llm-training/glossary/' | relative_url }}">glossary</a> for every bolded term across the series, or the <a href="{{ '/ai/llm-training/' | relative_url }}">series hub</a> to jump anywhere.</p>{% raw %}
   </section>
 
   <section class="llmt-step" id="refs">
@@ -177,12 +177,12 @@ redirect_from:
       <li>Mazeika et al., <a href="https://arxiv.org/abs/2402.04249">"HarmBench"</a> (2024); Röttger et al., <a href="https://arxiv.org/abs/2308.01263">"XSTest"</a> (2023); Han et al., <a href="https://arxiv.org/abs/2402.16459">"WildGuard"</a> (2024).</li>
       <li>Jiang et al., <a href="https://arxiv.org/abs/2403.00867">"WildTeaming / WildJailbreak"</a> (2024); Souly et al., <a href="https://arxiv.org/abs/2402.10260">"StrongReject"</a> (2024); Li et al., <a href="https://arxiv.org/abs/2403.03218">"WMDP"</a> (2024).</li>
       <li>Lambert et al. (Ai2), <a href="https://arxiv.org/abs/2411.15124">"Tulu 3"</a> — OLMo's safety training approach.</li>
-      <li>This site's own <a href="/ai/benchmarks/">benchmarks page</a>.</li>
+      {% endraw %}      <li>This site's own <a href="{{ '/ai/benchmarks/' | relative_url }}">benchmarks page</a>.</li>{% raw %}
     </ul>
   </section>
 {% endraw %}
 
-  <div class="llmt-next">
+  <div class="llmt-next reveal">
     <span>Guardrails are one axis of capability. The next three parts cover the frontier concerns that decide whether a model can actually be used: how far its context reaches, whether it can call tools, and the full post-training recipe behind a frontier assistant.</span>
     <a class="btn btn-secondary" href="{{ '/ai/llm-training/long-context/' | relative_url }}">Continue: long-context &amp; context extension →</a>
   </div>

@@ -123,12 +123,12 @@ series: "statistics"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">Error bars are intervals, whether or not they say so</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Error bounds on a pose estimate</h3>
         <p style="margin-bottom:0;">A robot estimating its pose reports a covariance, and the associated error ellipse is the multi-dimensional version of the interval on this page. When the <a href="{{ '/robotics/navigation/odometry/' | relative_url }}">odometry chapter</a> accumulates drift and quotes a bound on position error, it is quoting the spread of a random estimate around a fixed true pose. The same coverage question applies: a claimed 95% bound is a statement about the estimator's behaviour over many runs, not a guarantee for the one drive you just completed.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">Intervals on a benchmark score</h3>
         <p style="margin-bottom:0;">A model's accuracy on a finite test set is an estimate of its error on a population of inputs. The <a href="{{ '/ai/llm-training/evaluation/' | relative_url }}">evaluation chapter</a> reports a single number; a confidence interval would report the number plus how much it would move on a different test set. That interval is the precision of the benchmark, and without it a difference of a fraction of a percent between two models is unreadable &mdash; it may be smaller than the interval the benchmark itself carries.</p>
@@ -168,7 +168,7 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>An interval quantifies how large an effect might be. The next part turns it into a decision, by asking how surprising the data would be if nothing were going on.</span>
     <a class="btn btn-secondary" href="{{ '/math/statistics/hypothesis-testing/' | relative_url }}">Next: Null distributions and the p-value →</a>
   </div>

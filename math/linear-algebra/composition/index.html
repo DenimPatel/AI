@@ -163,12 +163,12 @@ series: "linear_algebra"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">One idea, two worlds</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Kinematic chains</h3>
         <p style="margin-bottom:0;">A robot arm is a chain of joints, and each joint contributes a transform from one link's frame to the next. The pose of the end-effector is the product of those transforms, in order from base to tip, so a single matrix captures where the tool is. The <a href="{{ '/vision/nonlinear-optimization/3d-rotations/' | relative_url }}">3D rotations part</a> builds the rotation factors, and the <a href="{{ '/robotics/' | relative_url }}">robotics notes</a> use the same chain to plan motion. Because the factors do not commute, swapping two joints' transforms describes a different arm.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">Stacked layers</h3>
         <p style="margin-bottom:0;">A deep network is a chain of linear maps punctuated by nonlinearities, and each layer's weights are a matrix multiplying the activations from the layer before. Associativity is what lets a compiler fuse adjacent linear layers into one, and the <a href="{{ '/ai/llm-training/architecture/' | relative_url }}">architecture chapter</a> shows the attention and feed-forward blocks where those products live. Training then adjusts each factor by a gradient, which is calculus applied on top of the composition.</p>
@@ -208,7 +208,7 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Every composition has a single number attached to it that measures how much it stretches area &mdash; and whether it flips the plane over.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/determinant/' | relative_url }}">Next: The determinant: signed area →</a>
   </div>

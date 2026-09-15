@@ -140,22 +140,22 @@ series: "probability_in_action"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">The default filter of engineered systems</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Sensor fusion on a moving base</h3>
         <p style="margin-bottom:0;">A mobile robot fuses wheel <a href="{{ '/robotics/navigation/odometry/' | relative_url }}">odometry</a> with an IMU and range readings in a Kalman filter whose state is pose and velocity. The same predict-update split lets it drop a wheel tick while keeping a coherent belief, and the covariance is what tells the planner how much to trust its own location.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Vision</div>
         <h3 style="margin:6px 0;">Landmarks and bundle adjustment</h3>
         <p style="margin-bottom:0;">The range-bearing update here is the front end of visual <a href="{{ '/vision/nonlinear-optimization/slam/' | relative_url }}">SLAM</a>. A camera observes a landmark, the Jacobian <var>H</var> is the derivative of the projection, and the EKF maintains the landmark and camera uncertainty jointly. Large-scale systems replace the recursion with nonlinear least squares, but the linearisation step is the same idea.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">Products of Gaussians</h3>
         <p style="margin-bottom:0;">The update is a product of two Gaussian densities, renormalised. When the two are written as quadratics, the mean of the product is a precision-weighted average and its covariance is the sum of precisions inverted. That is the engine behind <a href="{{ '/math/probability/multivariate-gaussian/' | relative_url }}">conditioning</a> a multivariate Gaussian, and it explains why the gain is an inverse-variance ratio.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Estimation</div>
         <h3 style="margin:6px 0;">The recursive Bayes filter</h3>
         <p style="margin-bottom:0;">This is the Gaussian case of the general <a href="{{ '/math/probability-in-action/bayes-filter/' | relative_url }}">Bayes filter</a>: predict convolves the belief with motion noise, update multiplies it by the measurement likelihood. Swap the Gaussian for a grid and you get Part 16's histogram filter; swap it for a particle cloud and you get Part 18's particle filter. Same loop, different representation.</p>
@@ -202,7 +202,7 @@ series: "probability_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>The Gaussian shortcut runs out when the belief has more than one hill &mdash; then you need a cloud of samples instead of a mean and a covariance.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability-in-action/particle-filter/' | relative_url }}">Next: Particle filters →</a>
   </div>

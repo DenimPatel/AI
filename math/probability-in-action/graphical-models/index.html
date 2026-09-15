@@ -153,22 +153,22 @@ series: "probability_in_action"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">Graphs as the default modelling language</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Vision</div>
         <h3 style="margin:6px 0;">Pose graphs and SLAM</h3>
         <p style="margin-bottom:0;">A simultaneous-localisation-and-mapping problem is a factor graph whose variables are robot poses and landmark positions, and whose factors are the measurements between them. The <a href="{{ '/vision/nonlinear-optimization/pose-graph/' | relative_url }}">pose graph</a> part of the vision guide solves exactly this structure, and the loop-closure problem there is a loopy graph in the sense above; the <a href="{{ '/vision/nonlinear-optimization/slam/' | relative_url }}">SLAM overview</a> places the smoothing and filtering views side by side.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Math</div>
         <h3 style="margin:6px 0;">Conditional independence</h3>
         <p style="margin-bottom:0;">Everything on this page is a machine for generating conditional independence statements. The base case &mdash; what <var>$X\perp Y$</var> means and why it makes the joint a product &mdash; is developed in <a href="{{ '/math/probability/independence/' | relative_url }}">independence</a>. d-separation is the generalisation of that idea from two variables to a whole graph.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Filters as chains</h3>
         <p style="margin-bottom:0;">A hidden Markov model is a chain graph: the hidden state at each step depends only on the previous state, and each observation only on its own state. Forward&ndash;backward is sum-product on that chain, which is why it runs in linear time. The <a href="{{ '/math/probability-in-action/hmm/' | relative_url }}">next part</a> builds it explicitly, and the filtering recurrences there are the messages of this section specialised to a line.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">AI / ML</div>
         <h3 style="margin:6px 0;">Latent-variable models</h3>
         <p style="margin-bottom:0;">Mixture models, variational autoencoders and diffusion models are all graphs in which a small set of latent variables generates the observations. When exact messages are intractable, variational inference replaces them with an optimisation, which is the subject of <a href="{{ '/math/probability-in-action/latent-variables/' | relative_url }}">latent variables</a>.</p>
@@ -214,7 +214,7 @@ series: "probability_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>A chain graph is the one case where the messages are cheap enough to run on every time step &mdash; which is exactly what a hidden Markov model does.</span>
     <a class="btn btn-secondary" href="{{ '/math/probability-in-action/hmm/' | relative_url }}">Next: Hidden Markov models →</a>
   </div>

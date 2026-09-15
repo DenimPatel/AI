@@ -121,19 +121,19 @@ series: "linear_algebra"
       </div>
     </div>
     <div class="g-grid2" style="margin-top:18px;">
-      <div class="g-card">
+      <div class="g-card reveal">
         <h3 style="margin-top:0;">A robot pose</h3>
         <p style="margin-bottom:0;">A mobile robot's state is a vector: two metres east and one north is the arrow <var>(2, 1)</var>, and a heading angle is one more coordinate. Planning is arithmetic on these vectors, and the <a href="{{ '/robotics/' | relative_url }}">robotics notes</a> use exactly that picture when they turn a goal into a path.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <h3 style="margin-top:0;">An RGB pixel</h3>
         <p style="margin-bottom:0;">A colour is a vector <var>(r, g, b)</var>: three coordinates, three axes, an arrow in a cube. Blending two images is a linear combination, and every filter in an image pipeline is a matrix acting on that vector &mdash; the story of <a href="{{ '/vision/multi-view-geometry/' | relative_url }}">multi-view geometry</a> starts here too.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <h3 style="margin-top:0;">A word embedding</h3>
         <p style="margin-bottom:0;">A token's embedding is a vector with hundreds of coordinates, and &ldquo;similar meaning&rdquo; becomes &ldquo;small angle between two arrows&rdquo;. The <a href="{{ '/ai/llm-training/tokens/' | relative_url }}">LLM training guide</a> builds these vectors; <a href="{{ '/math/linear-algebra/dot-product/' | relative_url }}">Part 8</a> explains how the angle is measured.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <h3 style="margin-top:0;">A set of joint torques</h3>
         <p style="margin-bottom:0;">A robot arm with <var>n</var> joints has an <var>n</var>-dimensional torque vector, and the <a href="{{ '/vision/nonlinear-optimization/' | relative_url }}">nonlinear optimization guide</a> searches over exactly such vectors. High-dimensional lists are not exotic; they are what a controller holds in memory every millisecond.</p>
       </div>
@@ -144,12 +144,12 @@ series: "linear_algebra"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">One operation, two worlds</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Poses, twists and Jacobians</h3>
         <p style="margin-bottom:0;">When a robot arm moves, its joint velocities form a vector and its end-effector velocity is a matrix times that vector. The <a href="{{ '/vision/multi-view-geometry/pinhole-camera/' | relative_url }}">pinhole camera part</a> of the geometry guide uses the same object to describe where a camera is looking; <a href="{{ '/math/linear-algebra/optimization/' | relative_url }}">Part 21</a> returns to it with derivatives.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">Embeddings and attention</h3>
         <p style="margin-bottom:0;">Every activation in a transformer is a vector, and the model's whole job is adding and scaling them in clever combinations. The <a href="{{ '/ai/llm-training/architecture/' | relative_url }}">architecture chapter</a> introduces the tensors; <a href="{{ '/ai/llm-serving/decode-loop/' | relative_url }}">LLM Serving Part 1</a> shows why moving them is the expensive part.</p>
@@ -189,7 +189,7 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>One vector is a point; two vectors can be a whole plane &mdash; until they line up and everything collapses.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/span-basis/' | relative_url }}">Next: Span, independence and basis →</a>
   </div>

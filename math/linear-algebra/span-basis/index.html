@@ -144,12 +144,12 @@ series: "linear_algebra"
     <div class="g-step-head"><span class="g-step-num">6</span><h2>Where this shows up</h2></div>
     <p class="g-eyebrow">One idea, two worlds</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Robotics</div>
         <h3 style="margin:6px 0;">Degrees of freedom and lost directions</h3>
         <p style="margin-bottom:0;">A robot arm's joint velocities form a vector, and the Jacobian maps them to the end-effector's velocity. The columns of that Jacobian are the directions of motion each joint can produce. When they become dependent &mdash; at a singular configuration &mdash; the Jacobian loses rank and the arm loses a direction of instantaneous motion, exactly like the collinear pair in the demo above. The <a href="{{ '/vision/nonlinear-optimization/pose-graph/' | relative_url }}">pose-graph part</a> of the optimization guide leans on this: rank and conditioning decide whether a solution is well posed. The broader <a href="{{ '/robotics/' | relative_url }}">robotics notes</a> use the same spanning picture for configuration spaces.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">ML / AI</div>
         <h3 style="margin:6px 0;">Redundant features and collinear embeddings</h3>
         <p style="margin-bottom:0;">In a design matrix, each column is a feature and each row is an example. If one column is a combination of the others, the data carries a redundant direction: the span of the columns is smaller than their count, the model has more parameters than independent directions, and the normal equations become singular. The same thing happens when two learned embeddings drift into near-collinearity &mdash; the effective dimension of the representation drops even though the tensor's shape is unchanged. The <a href="{{ '/ai/llm-training/architecture/' | relative_url }}">architecture chapter</a> builds the linear layers where this shows up.</p>
@@ -174,7 +174,7 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>A basis is a coordinate system; the next step is to move it, and to send the whole plane somewhere else.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/transformations/' | relative_url }}">Next: Linear transformations are matrices →</a>
   </div>

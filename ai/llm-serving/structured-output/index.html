@@ -35,7 +35,7 @@ series: "llm_serving"
     <p class="g-eyebrow">The contract, precisely stated</p>
     <p>Constrained decoding guarantees <em>syntactic</em> validity: every emitted token sequence is accepted by a grammar, regex, or schema. It does not guarantee <em>semantic</em> correctness. A model can produce perfectly valid JSON whose numbers are hallucinated, whose enum value is the wrong one, or whose required field is filled with an empty string. It also does not guarantee termination — a grammar that permits unbounded strings can loop — and it does not make the model faster or smarter; it makes an invalid sample impossible.</p>
     <div class="g-grid2">
-      <div class="g-card"><b>What it does guarantee</b>
+      <div class="g-card reveal"><b>What it does guarantee</b>
         <ul style="margin:8px 0 0; padding-left:18px; font-size:13.5px; line-height:1.7;">
           <li>Every prefix parses under the grammar.</li>
           <li>Required fields and enum sets are respected exactly.</li>
@@ -43,7 +43,7 @@ series: "llm_serving"
           <li>A downstream parser never needs a repair pass.</li>
         </ul>
       </div>
-      <div class="g-card"><b>What it does not guarantee</b>
+      <div class="g-card reveal"><b>What it does not guarantee</b>
         <ul style="margin:8px 0 0; padding-left:18px; font-size:13.5px; line-height:1.7;">
           <li>That the values are true or useful.</li>
           <li>That generation terminates within your token budget.</li>
@@ -163,7 +163,7 @@ series: "llm_serving"
     <p class="g-eyebrow">The grammar is over characters; the model emits tokens</p>
     <p>This is the deepest practical hazard. A grammar is usually defined over characters or bytes, but the model emits tokens that may span several characters and may be partially inside a grammar rule. A correct system must know, for each token, the set of parser states reachable when that token is appended — the mask is a union over all token continuations, not a character-at-a-time check. Get it wrong and you either block valid tokens (a schema that can never complete) or allow invalid ones (a guaranteed-valid claim that is false).</p>
     <div class="g-grid2">
-      <div class="g-card"><b>Common traps</b>
+      <div class="g-card reveal"><b>Common traps</b>
         <ul style="margin:8px 0 0; padding-left:18px; font-size:13.5px; line-height:1.7;">
           <li>A token that contains both a legal and an illegal continuations must be unioned, not judged on its first character.</li>
           <li>Whitespace inside a JSON string is content; outside it is formatting. A schema that ignores this over-constrains.</li>
@@ -171,7 +171,7 @@ series: "llm_serving"
           <li>Unicode combining marks and multi-byte characters can split across tokens.</li>
         </ul>
       </div>
-      <div class="g-card"><b>Mitigations</b>
+      <div class="g-card reveal"><b>Mitigations</b>
         <ul style="margin:8px 0 0; padding-left:18px; font-size:13.5px; line-height:1.7;">
           <li>Precompute a token-to-state-transition table at compile time, over bytes, once.</li>
           <li>Use byte-level grammars so tokenization cannot hide a byte.</li>
@@ -227,7 +227,7 @@ series: "llm_serving"
     </ul>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Structured calls need many tenants sharing one base model — the next part is LoRA, quotas and noisy neighbours.</span>
     <a class="btn btn-secondary" href="{{ '/ai/llm-serving/multi-tenancy/' | relative_url }}">Next: LoRA, quotas and noisy neighbours →</a>
   </div>

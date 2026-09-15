@@ -167,12 +167,12 @@ series: "linear_algebra"
     <p class="g-eyebrow">One decomposition, two worlds</p>
     <p>The ellipse is not a teaching device that gets retired once the chapter ends. It is the shape that shows up, unnamed, inside the failures and the shortcuts of real systems. Here are two places where the singular values are the thing being measured, one in robotics and one in machine learning.</p>
     <div class="g-grid2">
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker">Robotics</div>
         <h3 style="margin:6px 0;">A near-singular Jacobian</h3>
         <p style="margin-bottom:0;">A robot's Jacobian maps joint velocities to end-effector velocity, and its singular values say how much motion each direction buys you. When <var>&sigma;₂</var> shrinks toward zero the arm is near a singular configuration: the ellipse collapses, one Cartesian direction becomes almost unreachable no matter how the joints move, and the inverse step demands huge joint speeds to make up the difference. Pose-graph solvers feel the same effect in their normal equations, where a flat ellipse in the information matrix is the signature of an under-constrained gauge &mdash; a direction the data simply does not pin down. The <a href="{{ '/vision/nonlinear-optimization/pose-graph/' | relative_url }}">pose-graph part</a> of the optimization guide is where this becomes a practical headache.</p>
       </div>
-      <div class="g-card">
+      <div class="g-card reveal">
         <div class="card-kicker">ML / AI</div>
         <h3 style="margin:6px 0;">Low-rank weight matrices and LoRA</h3>
         <p style="margin-bottom:0;">A weight matrix in a transformer has an SVD, and a striking number of them have a spectrum that decays fast: a few large singular values carry most of the action and the rest are small. That is what low-rank approximation exploits &mdash; keep the biggest singular values and the matching directions, throw the rest away, and you have most of the map for a fraction of the storage. Fine-tuning methods such as LoRA freeze the full matrix and learn only a small low-rank correction, which is the same rank-versus-energy trade promoted into a training trick. The <a href="{{ '/ai/llm-training/scaling/' | relative_url }}">scaling chapter</a> of the LLM-training guide picks up the story.</p>
@@ -197,7 +197,7 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next">
+  <div class="g-next reveal">
     <span>Keep only the biggest singular values and the ellipse becomes a good sketch of the data. That is low-rank approximation, and next it becomes PCA.</span>
     <a class="btn btn-secondary" href="{{ '/math/linear-algebra/low-rank-pca/' | relative_url }}">Next: Low-rank approximation and PCA →</a>
   </div>
