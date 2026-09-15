@@ -38,22 +38,75 @@ description: A running record of artificial intelligence — milestones, product
   </p>
   <div class="stats-rule"></div>
   <div class="stats-grid">
-    <p class="stat"><span>Milestones logged</span><span class="stat-fill"></span><span class="stat-value stat-value--accent">{{ site.data.timeline | size }}</span></p>
-    <p class="stat"><span>Product releases tracked</span><span class="stat-fill"></span><span class="stat-value">{{ site.data.products | size }}</span></p>
-    <p class="stat"><span>Voices quoted</span><span class="stat-fill"></span><span class="stat-value">{{ site.data.quotes | size }}</span></p>
-    <p class="stat"><span>Interactive guide parts</span><span class="stat-fill"></span><span class="stat-value">{{ guideparts }}</span></p>
-    <p class="stat"><span>Field notes</span><span class="stat-fill"></span><span class="stat-value">{{ notes | size }}</span></p>
-    <p class="stat"><span>Labs profiled</span><span class="stat-fill"></span><span class="stat-value">{{ site.data.labs | size }}</span></p>
+    <p class="stat"><span>Milestones logged</span><span class="stat-fill"></span><span class="stat-value stat-value--accent js-count" data-count="{{ site.data.timeline | size }}">0</span></p>
+    <p class="stat"><span>Product releases tracked</span><span class="stat-fill"></span><span class="stat-value js-count" data-count="{{ site.data.products | size }}">0</span></p>
+    <p class="stat"><span>Voices quoted</span><span class="stat-fill"></span><span class="stat-value js-count" data-count="{{ site.data.quotes | size }}">0</span></p>
+    <p class="stat"><span>Interactive guide parts</span><span class="stat-fill"></span><span class="stat-value js-count" data-count="{{ guideparts }}">0</span></p>
+    <p class="stat"><span>Field notes</span><span class="stat-fill"></span><span class="stat-value js-count" data-count="{{ notes | size }}">0</span></p>
+    <p class="stat"><span>Labs profiled</span><span class="stat-fill"></span><span class="stat-value js-count" data-count="{{ site.data.labs | size }}">0</span></p>
   </div>
   <div class="stats-rule"></div>
 </section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var reveals = document.querySelectorAll('.reveal');
+  var counters = document.querySelectorAll('.js-count');
+
+  if (reduceMotion) {
+    reveals.forEach(function (el) { el.classList.add('is-visible'); });
+    counters.forEach(function (el) { el.textContent = el.getAttribute('data-count'); });
+    return;
+  }
+
+  var animateCount = function (el) {
+    var target = parseInt(el.getAttribute('data-count'), 10) || 0;
+    var start = performance.now();
+    var duration = 900;
+    var step = function (now) {
+      var progress = Math.min((now - start) / duration, 1);
+      var eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.round(eased * target);
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  };
+
+  if (!('IntersectionObserver' in window)) {
+    reveals.forEach(function (el) { el.classList.add('is-visible'); });
+    counters.forEach(animateCount);
+    return;
+  }
+
+  var revealObserver = new IntersectionObserver(function (entries, obs) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        obs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  reveals.forEach(function (el) { revealObserver.observe(el); });
+
+  var countObserver = new IntersectionObserver(function (entries, obs) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        animateCount(entry.target);
+        obs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.4 });
+  counters.forEach(function (el) { countObserver.observe(el); });
+});
+</script>
 
 <section class="section">
   <span class="section-kicker">Four ways in</span>
   <h2 class="section-title">Start here</h2>
   <div class="card-grid" style="margin-bottom: 8px;">
     {%- for s in site.data.sections %}
-    <a class="card elev-sm" href="{{ s.url | relative_url }}" style="text-decoration:none; color:inherit;">
+    <a class="card elev-sm reveal" style="text-decoration:none; color:inherit; transition-delay: {{ forloop.index0 | times: 0.06 }}s;" href="{{ s.url | relative_url }}">
       <div class="card-kicker">{{ s.kicker }}</div>
       <div class="card-title">{{ s.title }}</div>
       <p class="card-body">{{ s.blurb }}</p>
@@ -81,7 +134,7 @@ description: A running record of artificial intelligence — milestones, product
     {%- assign guide_ids = "llm_training,llm_serving,multi_view_geometry,nonlinear_optimization,linear_algebra,calculus,calculus_in_motion,probability,probability_in_action,statistics" | split: "," %}
     {%- for sid in guide_ids %}
     {%- assign s = site.data.series[sid] %}
-    <a class="card" href="{{ s.hub | relative_url }}" style="text-decoration:none; color:inherit;">
+    <a class="card reveal" style="text-decoration:none; color:inherit; transition-delay: {{ forloop.index0 | times: 0.05 }}s;" href="{{ s.hub | relative_url }}">
       <div class="card-kicker">Interactive &middot; {{ s.parts | size }} parts</div>
       <div class="card-title">{{ s.title }}</div>
       <p class="card-body">{{ s.parts[0].blurb }}</p>
@@ -99,7 +152,7 @@ description: A running record of artificial intelligence — milestones, product
     {%- for q in site.data.quotes %}
     {%- unless shown contains q.category %}
     {%- assign shown = shown | push: q.category %}
-    <div class="card elev-sm">
+    <div class="card elev-sm reveal" style="transition-delay: {{ forloop.index0 | times: 0.04 }}s;">
       <div class="card-kicker">{{ q.category }}</div>
       <blockquote>"{{ q.quote }}"</blockquote>
       <div class="card-meta">{{ q.who }} &middot; {{ q.year }}</div>

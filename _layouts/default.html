@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="{{ '/assets/css/styles.css' | relative_url }}">
 {% include favicon.html %}
 </head>
-<body>
+<body class="layout-{{ page.layout | default: 'page' }}">
 
 {% include site-nav.html %}
 

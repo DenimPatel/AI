@@ -66,6 +66,17 @@
   --shadow-lg: 0 12px 32px color-mix(in srgb, #2d2b2b 22%, transparent);
 
   --content-width: 1200px;
+
+  /* — liquid glass tokens (global nav + homepage) — */
+  --glass-blue: #2b5fff;
+  --glass-blue-dark: #16399e;
+  --glass-blue-100: #eaf0ff;
+  --glass-ink: #0b0d12;
+  --glass-bg: color-mix(in srgb, #ffffff 58%, transparent);
+  --glass-bg-strong: color-mix(in srgb, #ffffff 74%, transparent);
+  --glass-border: color-mix(in srgb, #ffffff 55%, var(--glass-blue) 8%);
+  --glass-shadow: 0 8px 28px color-mix(in srgb, var(--glass-ink) 12%, transparent);
+  --glass-shadow-hover: 0 18px 44px color-mix(in srgb, var(--glass-ink) 18%, transparent);
 }
 
 /* — reset & base — */
@@ -170,17 +181,43 @@ main { display: block; }
 }
 .era-heading:first-of-type { margin-top: var(--space-4); }
 
-/* — navigation — */
+/* — navigation: floating liquid-glass pill, sticky above all content — */
 .nav {
+  position: sticky; top: 14px; z-index: 100;
   display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap;
-  padding: var(--space-3) clamp(20px, 5vw, 72px);
+  margin: 14px clamp(14px, 4vw, 56px) 0;
+  padding: 10px 22px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  box-shadow: var(--glass-shadow);
+  transition: padding .25s ease, box-shadow .25s ease, background .25s ease;
+}
+.nav--condensed {
+  padding-block: 7px;
+  box-shadow: var(--glass-shadow-hover);
+  background: var(--glass-bg-strong);
 }
 .nav-brand {
+  display: inline-flex; align-items: center; gap: 7px;
   font-family: var(--font-heading); font-weight: var(--font-heading-weight);
   font-size: 18px; margin-right: auto; color: var(--color-text); text-decoration: none;
 }
-.nav a { color: inherit; text-decoration: none; font-size: 14px; }
-.nav a:hover, .nav a[aria-current='page'] { color: var(--color-accent); }
+.nav-brand-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--glass-blue);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--glass-blue) 18%, transparent);
+}
+.nav a { color: inherit; text-decoration: none; font-size: 14px; padding: 5px 4px; border-radius: 999px; transition: color .2s ease, background .2s ease; }
+.nav a:hover { color: var(--glass-blue-dark); }
+.nav a[aria-current='page'] {
+  background: var(--glass-blue); color: #fff; padding: 5px 13px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav { transition: none; }
+}
 
 /* — series pill nav: the per-part row under the global nav — */
 .nav--series {
@@ -371,6 +408,113 @@ main { display: block; }
   color: color-mix(in srgb, var(--color-text) 70%, transparent);
 }
 .site-footer .stats-rule { border-top-color: var(--color-divider); margin-bottom: 24px; }
+
+/* ==========================================================================
+   Homepage — liquid glass treatment. Scoped to `.layout-home` so the rest
+   of the site (still on the broadsheet look) is untouched for now.
+   ========================================================================== */
+.layout-home .hero {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+}
+.layout-home .hero::before,
+.layout-home .hero::after {
+  content: ""; position: absolute; z-index: -1; border-radius: 50%;
+  filter: blur(60px); opacity: 0.5;
+}
+.layout-home .hero::before {
+  width: 480px; height: 480px; top: -220px; right: -120px;
+  background: radial-gradient(circle at 30% 30%, var(--glass-blue), transparent 70%);
+  animation: glass-drift-1 22s ease-in-out infinite alternate;
+}
+.layout-home .hero::after {
+  width: 360px; height: 360px; bottom: -200px; left: -80px;
+  background: radial-gradient(circle at 60% 40%, var(--color-accent-2-400), transparent 70%);
+  animation: glass-drift-2 26s ease-in-out infinite alternate;
+}
+@keyframes glass-drift-1 {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(-40px, 30px) scale(1.08); }
+}
+@keyframes glass-drift-2 {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(30px, -20px) scale(1.05); }
+}
+@keyframes glass-fade-up {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.layout-home .hero h1,
+.layout-home .hero p,
+.layout-home .hero-actions {
+  animation: glass-fade-up .7s cubic-bezier(.2,.7,.3,1) both;
+}
+.layout-home .hero p { animation-delay: .08s; }
+.layout-home .hero-actions { animation-delay: .16s; }
+
+.layout-home .btn-primary {
+  background: linear-gradient(135deg, var(--glass-blue), var(--glass-blue-dark));
+  color: #fff; border: 1px solid color-mix(in srgb, var(--glass-blue) 60%, transparent);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--glass-blue) 35%, transparent);
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.layout-home .btn-primary:hover {
+  background: linear-gradient(135deg, var(--glass-blue), var(--glass-blue-dark));
+  transform: translateY(-2px);
+  box-shadow: 0 16px 32px color-mix(in srgb, var(--glass-blue) 45%, transparent);
+}
+.layout-home .btn-ghost {
+  background: var(--glass-bg); border: 1px solid var(--glass-border);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  padding: var(--space-2) calc(var(--space-3) * 1.2); color: var(--glass-blue-dark);
+  transition: transform .25s ease, background .25s ease;
+}
+.layout-home .btn-ghost:hover { background: var(--glass-bg-strong); transform: translateY(-2px); color: var(--glass-blue-dark); }
+
+.layout-home .stats { display: none; }
+.layout-home section:has(> .stats) {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  box-shadow: var(--glass-shadow);
+  padding: 20px clamp(20px, 4vw, 36px) !important;
+}
+.layout-home .stats-rule { display: none; }
+.layout-home .stat-fill { display: none; }
+.layout-home .stat { flex-direction: column; align-items: flex-start; gap: 2px; }
+.layout-home .stat > span:first-child { font-size: 12px; opacity: 0.65; order: 2; }
+.layout-home .stat-value { font-size: 26px; order: 1; }
+
+.layout-home .card {
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(14px) saturate(150%);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+  box-shadow: var(--glass-shadow);
+  transition: transform .35s cubic-bezier(.2,.7,.3,1), box-shadow .35s ease, border-color .35s ease;
+}
+.layout-home .card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--glass-shadow-hover);
+  border-color: color-mix(in srgb, var(--glass-blue) 35%, var(--glass-border));
+}
+.layout-home .card-kicker { color: var(--glass-blue-dark); }
+
+.layout-home .reveal {
+  opacity: 0; transform: translateY(20px);
+  transition: opacity .6s ease, transform .6s ease;
+}
+.layout-home .reveal.is-visible { opacity: 1; transform: translateY(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  .layout-home .hero::before, .layout-home .hero::after { animation: none; }
+  .layout-home .hero h1, .layout-home .hero p, .layout-home .hero-actions { animation: none; }
+  .layout-home .reveal { opacity: 1; transform: none; transition: none; }
+  .layout-home .card, .layout-home .btn-primary, .layout-home .btn-ghost { transition: none; }
+}
 
 @media (max-width: 640px) {
   .nav { gap: var(--space-3); }
