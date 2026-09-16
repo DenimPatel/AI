@@ -35,7 +35,7 @@ series: "multimodal"
   <header class="page-header">
     <span class="section-kicker">Interactive guide · Reference</span>
     <h1>Glossary &amp; numbers to know</h1>
-    <p>This is the multimodal guide's back matter: one alphabetical index that links every term to the part that introduces it, and the three tables the rest of the series leans on &mdash; the architecture eras from two-tower to omni, the token budget each resolution scheme actually spends, and the evaluation benchmarks with their contamination caveats. It is the companion to the <a href="{{ '/ai/llm-serving/glossary/' | relative_url }}">serving guide's glossary</a>, which shares the prefill/decode vocabulary this volume borrows, and to the <a href="{{ '/ai/llm-training/glossary/' | relative_url }}">training guide's glossary</a> for the modelling terms underneath.</p>
+    <p>This is the multimodal guide's back matter: the reference material you keep open beside the parts, rather than a part you read in order. It holds one alphabetical index that links every term to the part that introduces it, plus the three tables the rest of the series leans on &mdash; the architecture eras from two-tower to omni, the token budget each resolution scheme actually spends, and the evaluation benchmarks with their contamination caveats. A contamination caveat is a warning that a benchmark's test items, or things very close to them, may have appeared in a model's training data, which makes a high score easier to earn and harder to trust. It is the companion to the <a href="{{ '/ai/llm-serving/glossary/' | relative_url }}">serving guide's glossary</a>, which shares the prefill/decode vocabulary this volume borrows (prefill reads the prompt in one pass; decode generates the answer one token at a time), and to the <a href="{{ '/ai/llm-training/glossary/' | relative_url }}">training guide's glossary</a> for the modelling terms underneath.</p>
   </header>
   <div class="stats-rule" style="border-top-color: var(--color-divider); margin-bottom: 8px;"></div>
 
@@ -152,7 +152,7 @@ series: "multimodal"
   <section class="g-step" id="eras">
     <div class="g-step-head"><span class="g-step-num">2</span><h2>Architecture eras</h2></div>
     <p class="g-eyebrow">From two towers to one omni trunk</p>
-    <p>The field's five stages are not replacements so much as a widening of what the interface between vision and language is allowed to be. Read the table by asking what each stage actually trains: the earlier the fusion, the more of the model is in the loop, and the more of the model has to be pretrained jointly. Early stages reuse strong pretrained halves; later stages pay for a joint run and buy direct cross-modal mixing.</p>
+    <p>The field's five stages are not replacements so much as a widening of what the interface between vision and language is allowed to be. Fusion here means where the two modalities first meet: in a thin bridge between two separate towers, in every attention layer of one shared trunk, or somewhere in between. Read the table by asking what each stage actually trains. The earlier the fusion, the more of the model is in the loop, meaning the more components receive gradients and can adapt to one another, and the more of the model has to be pretrained jointly. Early stages reuse strong pretrained halves and therefore train comparatively little; later stages pay for a joint run and buy direct cross-modal mixing in return.</p>
     <div class="glo-table-wrap">
       <table class="g-cheat" id="glo-era-table">
         <thead><tr><th>Stage</th><th>Representative models</th><th>What it trains</th><th>What it leaves unsolved</th></tr></thead>
@@ -165,13 +165,13 @@ series: "multimodal"
         </tbody>
       </table>
     </div>
-    <div class="g-goal">💡 <span><b>Read the stage as an answer to "where does modality mixing happen".</b> A bridge mixes in a thin interface; early fusion mixes inside every attention layer; an omni model mixes inside the trunk and across the output modalities as well. Each step widens the loop and raises the pretraining bill.</span></div>
+    <div class="g-goal">💡 <span><b>Read the stage as an answer to "where does modality mixing happen".</b> A bridge mixes in a thin interface; early fusion mixes inside every attention layer; an omni model mixes inside the trunk and across the output modalities as well. The difference is not cosmetic: a thin interface touches only the bridge, while mixing inside attention lets every modality influence every other token at every depth. Each step widens the loop and raises the pretraining bill.</span></div>
   </section>
 
   <section class="g-step" id="budget">
     <div class="g-step-head"><span class="g-step-num">3</span><h2>Token budget cheat card</h2></div>
     <p class="g-eyebrow">What each resolution scheme spends</p>
-    <p>An image is as many tokens as its patch grid says, and every scheme is a different answer to the same question: keep the detail or keep the sequence short. The counts below use a 14-pixel patch, which is the standard CLIP/SigLIP geometry, and a 256-token per-tile block with a thumbnail for AnyRes. The arithmetic comes from <code>Multimodal.tiles.nativeTokens</code>, <code>Multimodal.tiles.anyResTokens</code> and <code>Multimodal.cost.imageTokens</code>; the FLOPs and bytes they imply are worked out in <a href="{{ '/ai/multimodal/resolution/' | relative_url }}">the resolution part</a>.</p>
+    <p>An image is as many tokens as its patch grid says &mdash; the grid being the array of patch positions the encoder cut it into &mdash; and every scheme in the table is a different answer to the same question: keep the detail or keep the sequence short. The counts below use a 14-pixel patch, which is the standard CLIP/SigLIP geometry, and a 256-token per-tile block with a thumbnail for AnyRes, the thumbnail being a downsampled whole-image view that preserves global context while the tiles hold the detail. The arithmetic comes from <code>Multimodal.tiles.nativeTokens</code>, <code>Multimodal.tiles.anyResTokens</code> and <code>Multimodal.cost.imageTokens</code>; the FLOPs and bytes they imply &mdash; floating-point operations and memory traffic, the two quantities a serving bill is actually made of &mdash; are worked out in <a href="{{ '/ai/multimodal/resolution/' | relative_url }}">the resolution part</a>.</p>
     <div class="glo-table-wrap">
       <table class="g-cheat" id="glo-budget-table">
         <thead><tr><th>Scheme</th><th>Input</th><th>Tokens</th><th>Trade</th></tr></thead>
@@ -184,13 +184,13 @@ series: "multimodal"
         </tbody>
       </table>
     </div>
-    <div class="g-warn">⚠ <span><b>The token count is billed twice.</b> It sets the one-time prefill cost and the permanent KV cache the decode reads on every step, which is why compression at the vision side is worth more than the FLOPs alone suggest. See <a href="{{ '/ai/multimodal/serving-and-open-problems/' | relative_url }}">the serving part</a> for the full bill.</span></div>
+    <div class="g-warn">⚠ <span><b>The token count is billed twice.</b> It sets the one-time prefill cost and the permanent KV cache the decode reads on every step, which is why compression at the vision side is worth more than the FLOPs alone suggest. Halving the tokens halves both bills. See <a href="{{ '/ai/multimodal/serving-and-open-problems/' | relative_url }}">the serving part</a> for the full bill.</span></div>
   </section>
 
   <section class="g-step" id="evals">
     <div class="g-step-head"><span class="g-step-num">4</span><h2>Evaluation benchmarks</h2></div>
     <p class="g-eyebrow">What each measures, and how each leaks</p>
-    <p>The scores quoted in model cards come from a handful of benchmarks, and each has a specific way of being easier than the ability it names. A high number with no contamination analysis is weaker evidence than a modest number with one. Treat the middle column as the claim and the caveat column as the reason not to take it at face value.</p>
+    <p>The scores quoted in model cards &mdash; the short summary documents released alongside a model &mdash; come from a handful of benchmarks, where a benchmark is a fixed test set with a scoring rule. Each one has a specific way of being easier than the ability it names: some items can be guessed from the question alone, and some have leaked into training data. A high number with no contamination analysis is weaker evidence than a modest number with one, because the analysis is the only part that checks whether the test was genuinely unseen. Treat the middle column as the claim and the caveat column as the reason not to take it at face value.</p>
     <div class="glo-table-wrap">
       <table class="g-cheat" id="glo-eval-table">
         <thead><tr><th>Benchmark</th><th>What it measures</th><th>Contamination and leakage caveats</th></tr></thead>
@@ -203,7 +203,7 @@ series: "multimodal"
         </tbody>
       </table>
     </div>
-    <div class="g-warn">⚠ <span><b>Direct hallucination measures are the cleaner test.</b> CHAIR and POPE control the image and score the claim, so they isolate whether a model says things the pixels do not support. The benchmark scores above are quoted more often and measure less cleanly; <a href="{{ '/ai/multimodal/hallucination-and-evals/' | relative_url }}">the hallucination part</a> works through why.</span></div>
+    <div class="g-warn">⚠ <span><b>Direct hallucination measures are the cleaner test.</b> CHAIR and POPE control the image and score the claim, so they isolate whether a model says things the pixels do not support; both build images with a known contents list, so a claim can be marked true or false against ground truth. The benchmark scores above are quoted more often and measure less cleanly; <a href="{{ '/ai/multimodal/hallucination-and-evals/' | relative_url }}">the hallucination part</a> works through why.</span></div>
   </section>
 
   <section class="g-step">
@@ -222,7 +222,7 @@ series: "multimodal"
   </section>
 
   <div class="g-next reveal">
-    <span>This page is a reference. The series itself starts with a picture becoming a sequence of patches.</span>
+    <span>This page is a reference, meant to be dipped into rather than read start to finish. The series itself starts with a picture becoming a sequence of patches, and every term in the index above links back to the part where it first appeared.</span>
     <a class="btn btn-secondary" href="{{ '/ai/multimodal/vit/' | relative_url }}">Start with Part 1 →</a>
   </div>
 </main>
