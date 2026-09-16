@@ -210,23 +210,23 @@ if (windowObj.Diffusion) {
   const r = GM.rng(2026);
   const ab = lin.alphaBar[499];
   let m = 0, v = 0, N = 20000;
-  for (let i = 0; i < N; i++) { const xt = D.qSample(r, 1, ab); m += xt; v += xt * xt; }
+  for (let i = 0; i < N; i++) { const x0 = GM.gauss(r); const xt = D.qSample(r, x0, ab); m += xt; v += xt * xt; }
   m /= N; v = v / N - m * m;
   close(v, 1, 0.05, 'q(x_t|x_0) keeps unit marginal variance');
-  close(m, 0, 0.06, 'q(x_t|x_0) has zero mean');
+  close(m, 0, 0.05, 'q(x_t|x_0) has zero mean');
 
   // DDIM is deterministic and round-trips x_T = α_T x_0 + σ_T ε.
-  const eps = D.epsFromX0(1.3, 0.4, 1);
-  close(eps, 0.4, 1e-12, 'ε = (x_t − √ᾱ·x_0)/√(1−ᾱ)');
-  const s1 = D.ddimSample(lin, 4, 1234, { x0: 1.0, deterministic: true });
-  const s2 = D.ddimSample(lin, 4, 1234, { x0: 1.0, deterministic: true });
+  close(D.epsFromX0(0.5, 1.0, 0.64), -0.5, 1e-12, 'ε = (x_t − √ᾱ·x_0)/√(1−ᾱ)');
+  const s1 = D.ddimSample(lin, 4, 1234, { x0: 1.0 });
+  const s2 = D.ddimSample(lin, 4, 1234, { x0: 1.0 });
   eq(s1, s2, 'DDIM with the same seed is deterministic');
   const rt = D.ddimRoundTrip(lin, 50, 1234.5, 77);
   close(rt, 1234.5, 1e-6, 'DDIM round-trips a scalar x_0');
 
   // Flow matching: the straight path and its constant velocity.
-  close(D.flowX(0, 1, 0.2), 0.2, 1e-12, 'flow x_t = (1−t)x_0 + t·x_1 at t=0');
-  close(D.flowX(1, 1, 0.2), 1, 1e-12, 'flow x_t at t=1');
+  close(D.flowX(0, 1, 0.2), 1, 1e-12, 'flow starts at x_0 at t=0');
+  close(D.flowX(1, 1, 0.2), 0.2, 1e-12, 'flow reaches x_1 at t=1');
+  close(D.flowX(0.25, 0, 1), 0.25, 1e-12, 'flow is linear in t');
   close(D.flowVelocity(5, -3), -8, 1e-12, 'flow velocity = x_1 − x_0, constant in t');
 
   // The score of a Gaussian is −(x−μ)/σ².
@@ -234,10 +234,11 @@ if (windowObj.Diffusion) {
   close(D.scoreFromEps(-0.5, 0.25), 0.5 / Math.sqrt(1 - 0.25), 1e-12, 'ε-prediction → score');
 
   // Classifier-free guidance algebra.
-  close(D.cfg(2, 3, 5), 2 * 5 + (3 - 5), 1e-12, 'CFG = w·cond + (1−w)·uncond');
+  close(D.cfg(2, 3, 5), 7, 1e-12, 'CFG = w·cond + (1−w)·uncond');
   close(D.cfg(0, 3, 5), 3, 1e-12, 'CFG at w=0 is the unconditional prediction');
   close(D.cfg(1, 3, 5), 5, 1e-12, 'CFG at w=1 is the conditional prediction');
-  close(D.cfgRescale(2, 3, 5, 0.5, 1.0), 5, 1e-9, 'CFG rescale at std ratio 1 is a no-op');
+  close(D.cfgRescale(5, 1), 5, 1e-12, 'CFG rescale at ratio 1 is a no-op');
+  close(D.cfgRescale(7, 5 / 7), 5, 1e-12, 'CFG rescale matches the conditional std');
 }
 
 // --- optional multimodal layer (present from Act 6 onward) -------------------

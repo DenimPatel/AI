@@ -20,4 +20,34 @@ acts:
     label: "V · Sound"
   - id: ship
     label: "VI · Judging and shipping"
-parts: []
+parts:
+  - num: 1
+    act: noise
+    title: "What a generative model actually is"
+    short: "Part 1"
+    permalink: /ai/generative-media/what-generative-means/
+    blurb: "Sampling from a distribution you never see: a 2D dataset you draw yourself, and the line between memorising it and modelling it."
+  - num: 2
+    act: noise
+    title: "Destroying an image with noise"
+    short: "Part 2"
+    permalink: /ai/generative-media/forward-process/
+    blurb: "The forward process on a procedurally-generated image, q(x_t|x_0) in closed form, and what ᾱ, SNR and the schedule choice actually do."
+  - num: 3
+    act: noise
+    title: "Learning to undo one step"
+    short: "Part 3"
+    permalink: /ai/generative-media/denoiser/
+    blurb: "ε-, x₀- and v-prediction, and a real tiny denoiser trained in the browser with its loss curve live."
+  - num: 4
+    act: noise
+    title: "Sampling: noise to picture"
+    short: "Part 4"
+    permalink: /ai/generative-media/sampling/
+    blurb: "The reverse loop from noise to sample; ancestral DDPM against deterministic DDIM, and a step-count slider that shows the trade."
+  - num: 5
+    act: noise
+    title: "The score function"
+    short: "Part 5"
+    permalink: /ai/generative-media/score-and-sdes/
+    blurb: "The score field as arrows over a density, Langevin dynamics, the SMLD to DDPM equivalence and the VE versus VP SDEs."
