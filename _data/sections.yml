@@ -22,7 +22,7 @@
   title: "AI"
   url: /ai/
   kicker: "The record"
-  blurb: "A running record of the field - milestones, product releases, benchmark scores, the labs building it, and what people said at the time - plus interactive guides to how a language model is actually trained, how one is served at scale, and how models are made to see, hear and generate media."
+  blurb: "A running record of the field - milestones, product releases, benchmark scores, the labs building it, and what people said at the time - plus interactive guides to how a language model is actually trained, how one is served at scale, how to build with LLMs, how agents act in the world, and how models are made to see, hear and generate media."
   pages:
     - title: "History timeline"
       url: /ai/timeline/
@@ -45,6 +45,8 @@
   series:
     - llm_training
     - llm_serving
+    - building_with_llms
+    - agents_in_action
     - generative_media
     - multimodal
 
