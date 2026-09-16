@@ -104,7 +104,13 @@ body {
 }
 html.nav-collapsed body { margin-left: var(--nav-w-collapsed); }
 @media (max-width: 900px) {
-  body { margin-left: 0; }
+  /* No side margin once the sidebar goes off-canvas; padding-top reserves
+     room for the fixed hamburger instead, unconditionally — every guide
+     series repeats its own `<wrapper-class> .page-header { padding-top: … }`
+     idiom inline (.g, .llmt, .mvg, .nlo, …), each with more specificity than
+     anything this stylesheet could add, so clearance has to come from body
+     padding rather than fighting that cascade page by page. */
+  body { margin-left: 0; padding-top: 68px; }
 }
 @media (prefers-reduced-motion: reduce) {
   body { transition: none; }
@@ -185,11 +191,6 @@ tbody tr:hover { background: color-mix(in srgb, var(--color-text) 4%, transparen
 main { display: block; }
 .section { padding: var(--space-8) 0; }
 .section:first-of-type { padding-top: clamp(32px, 6vw, 56px); }
-@media (max-width: 900px) {
-  /* Same hamburger clearance as .page-header, for layouts (home) whose first
-     block is a .section rather than a .page-header. */
-  .section:first-of-type { padding-top: 64px; }
-}
 .section-kicker {
   display: block; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase;
   color: color-mix(in srgb, var(--color-text) 70%, transparent); margin-bottom: 10px;
@@ -354,33 +355,31 @@ html.nav-collapsed .nav-head { justify-content: center; flex-direction: column; 
   .nav--series { padding-left: 62px; }
 }
 
-/* — compact mobile-only bar: current series + part, replaces the full site
-   nav + part ribbon once scrolled past them so reading isn't fighting a
-   pinned header. series-nav.html toggles `.is-visible` on scroll. */
-.nav-compact { display: none; }
-@media (max-width: 640px) {
-  .nav-compact {
-    display: flex; align-items: baseline; gap: 6px;
-    position: fixed; top: 0; left: 0; right: 0; z-index: 200;
-    padding: 10px 16px;
-    background: var(--glass-bg-strong);
-    border-bottom: 1px solid var(--glass-border);
-    backdrop-filter: blur(20px) saturate(160%);
-    -webkit-backdrop-filter: blur(20px) saturate(160%);
-    font-size: 13px;
-    transform: translateY(-100%);
-    transition: transform .2s ease;
-  }
-  .nav-compact.is-visible { transform: translateY(0); }
-  .nav-compact-series {
-    font-family: var(--font-heading); font-weight: 600;
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  }
-  .nav-compact-sep { opacity: 0.4; }
-  .nav-compact-part { opacity: 0.65; white-space: nowrap; }
-  @media (prefers-reduced-motion: reduce) {
-    .nav-compact { transition: none; }
-  }
+/* — series list once series-nav.html's script has moved it into #site-nav:
+   a vertical block in the sidebar instead of a horizontal pill row. The ID
+   selector guarantees this wins over the .nav--series rules above regardless
+   of source order, so a no-JS visitor (who keeps the pill row in place,
+   right above the content) is unaffected. */
+#site-nav .nav--series {
+  position: static; z-index: auto;
+  flex-direction: column; align-items: stretch; flex-wrap: nowrap;
+  gap: 1px; margin: 10px 0 0; padding: 10px 0 0;
+  border-bottom: none; border-top: 1px solid var(--glass-border);
+}
+#site-nav .nav--series a {
+  font-size: 13.5px; padding: 6px 10px; border-radius: var(--radius-md);
+  background: none; border: none; backdrop-filter: none; -webkit-backdrop-filter: none;
+  white-space: normal;
+}
+#site-nav .nav--series a:hover { background: var(--glass-bg); }
+#site-nav .nav--series a[aria-current='page'] { box-shadow: none; }
+#site-nav .nav--series-act {
+  display: block; align-self: auto; margin: 10px 0 2px; padding: 0 10px;
+  white-space: normal;
+}
+html.nav-collapsed #site-nav .nav--series { display: none; }
+@media (max-width: 900px) {
+  html.nav-collapsed #site-nav .nav--series { display: flex; }
 }
 
 /* — prev/next footer for a series part — */
@@ -533,12 +532,6 @@ html.nav-collapsed .nav-head { justify-content: center; flex-direction: column; 
   font-size: clamp(32px, 5vw, 52px); line-height: 1.1; margin: 0;
 }
 .page-header p { font-size: 16px; line-height: 1.6; max-width: 60ch; margin: 16px 0 0; opacity: 0.85; }
-@media (max-width: 900px) {
-  /* Clear the fixed mobile hamburger (top-left, ~54px tall) so a page's own
-     heading — which has no series ribbon above it to push it down — never
-     starts underneath the button. */
-  .page-header { padding-top: 64px; }
-}
 
 /* — robotics listing rows — */
 .note-row {
