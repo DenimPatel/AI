@@ -372,13 +372,163 @@
   function adaLNZero(x, gamma, beta) { return x * (1 + gamma) + beta; }
 
   // =========================================================================
-  // guidance helpers
+  // solvers on the probability-flow ODE
   // =========================================================================
   // The actual guided prediction plus a simple "how far past the conditional
   // prediction are we extrapolating" measure, for the oversaturation demo.
   function guidanceEffect(w, uncond, cond) {
     var value = cfg(w, uncond, cond);
     return { value: value, extrapolation: (w - 1) * (cond - uncond), excess: Math.abs((w - 1) * (cond - uncond)) };
+  }
+  // σ_t = √((1−ᾱ_t)/ᾱ_t), the noise-to-signal ratio a Karras-style sampler
+  // actually integrates in. σ decreases from a large value to 0 during sampling.
+  function sigmaOf(ab) { return Math.sqrt(Math.max(0, 1 - ab) / Math.max(1e-12, ab)); }
+  function sigmaAt(sch, t) { return sigmaOf(abAt(sch, t)); }
+
+  // Karras et al.'s non-uniform spacing: dense near σ_min, sparse near σ_max.
+  function karrasSigmas(n, sigmaMin, sigmaMax, rho) {
+    n = n || 10; sigmaMin = sigmaMin == null ? 0.002 : sigmaMin;
+    sigmaMax = sigmaMax == null ? 80 : sigmaMax; rho = rho || 7;
+    var out = [], inv = 1 / rho;
+    for (var i = 0; i < n; i++) {
+      var a = Math.pow(sigmaMax, inv), b = Math.pow(sigmaMin, inv);
+      out.push(Math.pow(a + i / (n - 1) * (b - a), rho));
+    }
+    return out;
+  }
+
+  // Integrate dx/dσ = (x − x̂_0(x, t))/σ with Euler or Heun. `predict(x, t)`
+  // returns ε (t is a schedule index in 1..T). Because the model is imperfect
+  // this converges to the ODE solution as steps grow — the page's whole point.
+  function odeSolve(sch, opts) {
+    opts = opts || {};
+    var method = opts.method || 'euler';
+    var steps = opts.steps || 50;
+    var x = opts.start == null ? 0 : opts.start;
+    var ts = timesteps(sch.T, steps);
+    for (var i = 0; i + 1 < ts.length; i++) {
+      var t = ts[i], tPrev = ts[i + 1];
+      var abT = abAt(sch, t);
+      var abPrev = tPrev <= 0 ? 1 : abAt(sch, tPrev);
+      var sigT = sigmaOf(abT), sigPrev = sigmaOf(abPrev);
+      var dS = sigPrev - sigT;
+      if (method === 'heun') {
+        var k1 = pfDerivative(x, opts.predict(x, t), abT, sigT);
+        var xp = x + dS * k1;
+        var k2 = pfDerivative(xp, opts.predict(xp, t), abT, sigT);
+        x = x + dS * (k1 + k2) / 2;
+      } else {
+        x = x + dS * pfDerivative(x, opts.predict(x, t), abT, sigT);
+      }
+    }
+    return x;
+  }
+
+  function pfDerivative(x, eps, abT, sigT) {
+    var x0 = x0FromEps(x, eps, abT);
+    return (x - x0) / Math.max(1e-9, sigT);
+  }
+
+  // Distance from x to the target, the error a solver plot traces.
+  function solverError(sch, x0, opts) {
+    opts = opts || {};
+    var start = forwardX(sch, x0, sch.T, opts.eps == null ? 0 : opts.eps);
+    var x = odeSolve(sch, { method: opts.method, steps: opts.steps, start: start, predict: oraclePredict(sch, x0) });
+    return Math.abs(x - x0);
+  }
+
+  // =========================================================================
+  // distillation toys
+  // =========================================================================
+  // A teacher trajectory for a scalar x0 (oracle), and a one-step "student"
+  // target: given x_t, predict x_0 directly. This is the consistency objective.
+  function teacherTrajectory(sch, x0, steps, eps) {
+    var start = forwardX(sch, x0, sch.T, eps == null ? 1 : eps);
+    var ts = timesteps(sch.T, steps), path = [{ t: sch.T, x: start }];
+    for (var i = 0; i + 1 < ts.length; i++) {
+      var t = ts[i], tPrev = ts[i + 1];
+      var abT = abAt(sch, t), abPrev = tPrev <= 0 ? 1 : abAt(sch, tPrev);
+      var epsP = epsFromX0(path[path.length - 1].x, x0, abT);
+      path.push({ t: tPrev, x: ddimStep(path[path.length - 1].x, abT, abPrev, epsP) });
+    }
+    return path;
+  }
+
+  // A training pair for a one-step student: (x_t, x_0).
+  function distillPair(sch, x0, t, r) {
+    var ab = abAt(sch, t);
+    return { xt: qSample(r, x0, ab), x0: x0, t: t, ab: ab };
+  }
+
+  // =========================================================================
+  // control: LoRA, inpainting, SDEdit
+  // =========================================================================
+  // LoRA's low-rank weight update: ΔW = (alpha/rank)·B·A, added to a frozen W.
+  function loraDelta(W, A, B, alpha) {
+    var rank = B[0].length;
+    var scale = (alpha == null ? 1 : alpha) / rank;
+    var out = W.map(function (row) { return row.slice(); });
+    for (var i = 0; i < W.length; i++) {
+      for (var j = 0; j < W[0].length; j++) {
+        var s = 0;
+        for (var k = 0; k < rank; k++) s += B[i][k] * A[k][j];
+        out[i][j] += scale * s;
+      }
+    }
+    return out;
+  }
+
+  // Inpainting: keep the known pixels, replace the masked ones.
+  function inpaintMix(known, generated, mask) {
+    var out = new Array(known.length);
+    for (var i = 0; i < known.length; i++) out[i] = mask[i] ? generated[i] : known[i];
+    return out;
+  }
+
+  // SDEdit: add noise to time t0, then denoise with the model. `predict` is the
+  // denoiser; the result is an edit that stays near x0 without an inversion.
+  function sdeditPath(sch, x0, t0, steps, predict, r) {
+    var start = qSample(r, x0, abAt(sch, t0));
+    var ts = timesteps(t0, steps), path = [{ t: t0, x: start }];
+    for (var i = 0; i + 1 < ts.length; i++) {
+      var t = ts[i], tPrev = ts[i + 1];
+      var abT = abAt(sch, t), abPrev = abAt(sch, tPrev);
+      path.push({ t: tPrev, x: ddimStep(path[path.length - 1].x, abT, abPrev, predict(path[path.length - 1].x, t)) });
+    }
+    return path;
+  }
+
+  // =========================================================================
+  // video: attention cost, temporal drift, autoregressive rollout
+  // =========================================================================
+  // Full 3-D attention against the factorised (spatial then temporal) form that
+  // makes video diffusion tractable. Doubles as a token-budget calculator.
+  function videoAttentionCost(o) {
+    var th = Math.floor(o.h / o.patch), tw = Math.floor(o.w / o.patch);
+    var perFrame = th * tw, n = o.frames * perFrame;
+    var full = n * n;
+    var spatial = o.frames * (perFrame * perFrame);
+    var temporal = o.frames * o.frames * perFrame;
+    var factorized = spatial + temporal;
+    return {
+      tokens: n, perFrame: perFrame, full: full, spatial: spatial,
+      temporal: temporal, factorized: factorized, ratio: factorized ? full / factorized : 1
+    };
+  }
+
+  // Per-frame drift magnitude for an autoregressive rollout: each new frame
+  // inherits a fraction `decay` of the previous drift plus a fresh error.
+  function temporalDrift(frames, decay, seed) {
+    var r = GM().rng(seed == null ? 1 : seed), out = [], acc = 0;
+    for (var i = 0; i < frames; i++) { acc = acc * decay + Math.abs(GM().gauss(r)); out.push(acc); }
+    return out;
+  }
+
+  // Roll an autoregressive model out step by step, returning every frame.
+  function arRollout(init, steps, stepFn) {
+    var out = [init];
+    for (var i = 0; i < steps; i++) out.push(stepFn(out[out.length - 1], i));
+    return out;
   }
 
   // =========================================================================
@@ -465,6 +615,11 @@
     ditCost: ditCost, unetCost: unetCost,
     vaeRoundTrip: vaeRoundTrip, unetBreakdown: unetBreakdown, ditBreakdown: ditBreakdown,
     adaLNZero: adaLNZero, guidanceEffect: guidanceEffect,
+    sigmaOf: sigmaOf, sigmaAt: sigmaAt, karrasSigmas: karrasSigmas,
+    odeSolve: odeSolve, solverError: solverError,
+    teacherTrajectory: teacherTrajectory, distillPair: distillPair,
+    loraDelta: loraDelta, inpaintMix: inpaintMix, sdeditPath: sdeditPath,
+    videoAttentionCost: videoAttentionCost, temporalDrift: temporalDrift, arRollout: arRollout,
     toy2d: toy2d, mixturePosteriorMean: mixturePosteriorMean,
     drawPath: drawPath, drawSchedule: drawSchedule
   };

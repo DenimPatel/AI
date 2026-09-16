@@ -81,3 +81,33 @@ parts:
     short: "Part 10"
     permalink: /ai/generative-media/guidance/
     blurb: "Text encoders and cross- against joint attention, CFG as extrapolation, and what guidance scale costs in diversity."
+  - num: 11
+    act: control
+    title: "Samplers and schedulers"
+    short: "Part 11"
+    permalink: /ai/generative-media/samplers/
+    blurb: "Euler, Heun and multistep solvers against the ancestral sampler, timestep spacing as a design choice, and step budget against error."
+  - num: 12
+    act: control
+    title: "Few-step generation"
+    short: "Part 12"
+    permalink: /ai/generative-media/distillation/
+    blurb: "Progressive, consistency, adversarial and shortcut distillation, and what collapsing fifty steps into one or four costs in diversity."
+  - num: 13
+    act: control
+    title: "Steering a frozen model"
+    short: "Part 13"
+    permalink: /ai/generative-media/control/
+    blurb: "LoRA and DreamBooth, ControlNet and IP-Adapter, inpainting and SDEdit editing, and where along the trajectory each intervention bites."
+  - num: 14
+    act: video
+    title: "Video as a 3D signal"
+    short: "Part 14"
+    permalink: /ai/generative-media/video-basics/
+    blurb: "The causal 3-D VAE, spatiotemporal patches, 3-D against factorised attention, and the token budget a clip really costs."
+  - num: 15
+    act: video
+    title: "Coherent and long"
+    short: "Part 15"
+    permalink: /ai/generative-media/video-coherence/
+    blurb: "Image and keyframe conditioning, temporal cascades, autoregressive rollout against full-sequence diffusion, drift, and the world-model claim."

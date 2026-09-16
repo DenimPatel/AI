@@ -254,6 +254,35 @@ if (windowObj.Diffusion) {
   close(D.curvedPath(0, 1, 0.2, 0.6), 1, 1e-12, 'curved path shares x_0 at t=0');
   close(D.curvedPath(1, 1, 0.2, 0.6), 0.2, 1e-12, 'curved path shares x_1 at t=1');
   close(D.guidanceEffect(2, 3, 5).extrapolation, 2, 1e-12, 'guidance extrapolation = (w−1)(cond−uncond)');
+
+  // Solvers, control and video.
+  const sig = D.karrasSigmas(8, 0.01, 80, 7);
+  eq(sig.length, 8, 'Karras sigma list length');
+  truthy(sig.every((s, i) => i === 0 || s <= sig[i - 1] + 1e-12), 'Karras sigmas are non-increasing');
+  close(sig[0], 80, 1e-9, 'Karras starts at sigma_max');
+  close(sig[7], 0.01, 1e-9, 'Karras ends at sigma_min');
+
+  const x0s = 1.0, start = D.forwardX(lin, x0s, lin.T, 0.7);
+  const nearOracle = (x, t) => { const ab = D.abAt(lin, t); return D.epsFromX0(x, x0s, ab) * (1 + 0.15 * (1 - ab)); };
+  const solve = (method, steps) => D.odeSolve(lin, { method: method, steps: steps, start: start, predict: nearOracle });
+  const ref = solve('euler', 20000);
+  const e4 = solve('euler', 4), e128 = solve('euler', 128);
+  truthy(Math.abs(e128 - ref) < Math.abs(e4 - ref), 'Euler converges as the step count grows');
+  const h16 = solve('heun', 16), h256 = solve('heun', 256);
+  truthy(Math.abs(h256 - ref) < Math.abs(h16 - ref), 'Heun converges as the step count grows');
+
+  const vac = D.videoAttentionCost({ frames: 8, h: 8, w: 8, patch: 2 });
+  eq(vac.tokens, 128, 'video token count');
+  eq(vac.full, 16384, 'full 3-D attention cost');
+  eq(vac.factorized, 3072, 'factorized attention cost');
+  close(vac.ratio, 16384 / 3072, 1e-9, '3-D / factorized attention ratio');
+
+  const dW = D.loraDelta([[0, 0], [0, 0]], [[1, 0]], [[1], [0]], 2);
+  close(dW[0][0], 2, 1e-12, 'LoRA delta = (alpha/rank)·B·A');
+  eq(dW[0][1], 0, 'LoRA delta leaves the other entries alone');
+
+  const drift = D.temporalDrift(12, 0.9, 5);
+  truthy(drift[11] > drift[0], 'autoregressive drift grows over the rollout');
 }
 
 // --- optional multimodal layer (present from Act 6 onward) -------------------
