@@ -29,20 +29,20 @@ numbers, and series-prevnext.html still walks parts + appendix in flat order).
     <span class="nav--series-act">{{ act.label }}</span>
     {%- for part in include.series.parts -%}
     {%- if part.act == act.id -%}
-    <a href="{{ part.permalink | relative_url }}"{% if page.url == part.permalink or page.permalink == part.permalink %} aria-current="page"{% endif %}>{{ part.short }}</a>
+    <a href="{{ part.permalink | relative_url }}" title="{{ part.short }} &middot; {{ part.title }}"{% if page.url == part.permalink or page.permalink == part.permalink %} aria-current="page"{% endif %}><span class="nav--series-short">{{ part.short }}</span><span class="nav--series-title">{{ part.title }}</span></a>
     {%- endif -%}
     {%- endfor -%}
   </span>
   {%- endfor -%}
   {%- for extra in include.series.appendix -%}
-  <a href="{{ extra.permalink | relative_url }}"{% if page.url == extra.permalink or page.permalink == extra.permalink %} aria-current="page"{% endif %}>{{ extra.short }}</a>
+  <a href="{{ extra.permalink | relative_url }}" title="{{ extra.short }} &middot; {{ extra.title }}"{% if page.url == extra.permalink or page.permalink == extra.permalink %} aria-current="page"{% endif %}><span class="nav--series-short">{{ extra.short }}</span><span class="nav--series-title">{{ extra.title }}</span></a>
   {%- endfor -%}
   {%- else -%}
   {%- for part in include.series.parts %}
-  <a href="{{ part.permalink | relative_url }}"{% if page.url == part.permalink or page.permalink == part.permalink %} aria-current="page"{% endif %}>{{ part.short }}</a>
+  <a href="{{ part.permalink | relative_url }}" title="{{ part.short }} &middot; {{ part.title }}"{% if page.url == part.permalink or page.permalink == part.permalink %} aria-current="page"{% endif %}><span class="nav--series-short">{{ part.short }}</span><span class="nav--series-title">{{ part.title }}</span></a>
   {%- endfor %}
   {%- for extra in include.series.appendix %}
-  <a href="{{ extra.permalink | relative_url }}"{% if page.url == extra.permalink or page.permalink == extra.permalink %} aria-current="page"{% endif %}>{{ extra.short }}</a>
+  <a href="{{ extra.permalink | relative_url }}" title="{{ extra.short }} &middot; {{ extra.title }}"{% if page.url == extra.permalink or page.permalink == extra.permalink %} aria-current="page"{% endif %}><span class="nav--series-short">{{ extra.short }}</span><span class="nav--series-title">{{ extra.title }}</span></a>
   {%- endfor %}
   {%- endif %}
 </nav>
