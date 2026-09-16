@@ -41,3 +41,27 @@ parts:
     short: "Part 4"
     permalink: /ai/multimodal/modalities/
     blurb: "Audio, video and 3D encoders aligned into one space, what a hub modality binds, and what aligned does and does not mean."
+  - num: 5
+    act: gluing
+    title: "Bolting an encoder onto a language model"
+    short: "Part 5"
+    permalink: /ai/multimodal/adapters/
+    blurb: "Linear and MLP projectors, the Q-Former and cross-attention bridges, where image tokens sit, and what each option trains."
+  - num: 6
+    act: gluing
+    title: "Resolution and the token budget"
+    short: "Part 6"
+    permalink: /ai/multimodal/resolution/
+    blurb: "Fixed patches, AnyRes tiling and native dynamic resolution, the merge that compresses tokens, and the image's prefill cost."
+  - num: 7
+    act: gluing
+    title: "Training a vision-language model"
+    short: "Part 7"
+    permalink: /ai/multimodal/training-a-vlm/
+    blurb: "The staged recipe, freezing schedules and data mixtures, what breaks along the way, and preference tuning on multimodal pairs."
+  - num: 8
+    act: gluing
+    title: "Why VLMs hallucinate"
+    short: "Part 8"
+    permalink: /ai/multimodal/hallucination-and-evals/
+    blurb: "Objects that were never there, attention sinks on image tokens, the language prior overriding pixels, and the benchmarks that measure it."
