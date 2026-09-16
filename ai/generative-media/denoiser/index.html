@@ -107,12 +107,12 @@ series: "generative_media"
       <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Optimisation</div>
         <h3 style="margin:6px 0;">Gradient descent with a schedule</h3>
-        <p style="margin-bottom:0;">The training loop here is plain stochastic gradient descent with a hand-written backward pass. The <a href="{{ '/math/nonlinear-optimization/' | relative_url }}">nonlinear optimisation guide</a> covers why the learning rate and the loss scale interact the way they do &mdash; the same reason $\varepsilon$-prediction is easier to train than $x_0$-prediction.</p>
+        <p style="margin-bottom:0;">The training loop here is plain stochastic gradient descent with a hand-written backward pass. The <a href="{{ '/vision/nonlinear-optimization/' | relative_url }}">nonlinear optimisation guide</a> covers why the learning rate and the loss scale interact the way they do &mdash; the same reason $\varepsilon$-prediction is easier to train than $x_0$-prediction.</p>
       </div>
       <div class="g-card reveal">
         <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Probability</div>
         <h3 style="margin:6px 0;">Regression to a conditional mean</h3>
-        <p style="margin-bottom:0;">Minimising squared error makes the network converge to $\mathbb{E}[\varepsilon\mid x_t]$, the posterior mean. The <a href="{{ '/math/statistics/estimators/' | relative_url }}">estimators chapter</a> develops the same fact for ordinary least squares: the cheapest thing to learn is always an expectation.</p>
+        <p style="margin-bottom:0;">Minimising squared error makes the network converge to $\mathbb{E}[\varepsilon\mid x_t]$, the posterior mean. The <a href="{{ '/math/statistics/regression/' | relative_url }}">linear regression chapter</a> develops the same fact for ordinary least squares: the cheapest thing to learn is always an expectation.</p>
       </div>
     </div>
     <p>Once a denoiser exists, sampling is a loop: start from noise, ask the network for its noise estimate, subtract a fraction of it, and repeat. The next part runs that loop two ways &mdash; one ancestral and stochastic, one deterministic &mdash; and counts what each costs.</p>
