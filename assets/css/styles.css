@@ -88,7 +88,6 @@ html {
      guide's table of contents) lands the target heading right under it. */
   scroll-padding-top: 64px;
   --nav-w: 220px;
-  --nav-w-collapsed: 64px;
 }
 body {
   margin: 0;
@@ -102,7 +101,10 @@ body {
   margin-left: var(--nav-w);
   transition: margin-left .2s ease;
 }
-html.nav-collapsed body { margin-left: var(--nav-w-collapsed); }
+/* Collapsed sidebar shrinks to just its floating toggle button (see #site-nav
+   below), so content reclaims the full width rather than leaving room for a
+   64px icon rail. */
+html.nav-collapsed body { margin-left: 0; }
 @media (max-width: 900px) {
   /* No side margin once the sidebar goes off-canvas; padding-top reserves
      room for the fixed hamburger instead, unconditionally — every guide
@@ -234,13 +236,13 @@ main { display: block; }
   margin-bottom: 10px; padding-bottom: 4px;
 }
 .nav-collapse-toggle {
-  display: inline-flex; align-items: center; justify-content: center;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
   width: 26px; height: 26px; padding: 0; margin: 0;
-  font-size: 14px; line-height: 1; color: var(--color-text);
   background: transparent; border: 1px solid var(--glass-border); border-radius: var(--radius-md);
   cursor: pointer;
 }
 .nav-collapse-toggle:hover { background: var(--glass-bg); }
+.nav-collapse-toggle .nav-mobile-toggle-bar { width: 14px; }
 #site-nav a {
   font-size: 14.5px; padding: 8px 10px; border-radius: var(--radius-md);
   transition: color .15s ease, background .15s ease;
@@ -248,22 +250,28 @@ main { display: block; }
 #site-nav a:hover { background: var(--glass-bg); color: var(--glass-blue-dark); }
 #site-nav a[aria-current='page'] { background: var(--glass-blue); color: #fff; }
 
-/* — collapsed state: icon-rail only, labels hidden, native title tooltip — */
-.nav-icon {
-  display: none; width: 26px; height: 26px; border-radius: 50%;
-  align-items: center; justify-content: center;
-  font-family: var(--font-heading); font-weight: 600; font-size: 12px;
-  background: var(--glass-bg); border: 1px solid var(--glass-border);
+/* — collapsed state: the sidebar shrinks to just its hamburger toggle,
+   floating top-left like the mobile one, instead of an icon rail. Desktop
+   only — the mobile drawer below always shows the full nav regardless of
+   this (persisted) flag, since there's no icon rail to collapse to there. */
+@media (min-width: 901px) {
+  html.nav-collapsed #site-nav {
+    width: auto; height: auto; inset: 14px auto auto 14px;
+    padding: 8px; gap: 0;
+    border-right: none; border-radius: var(--radius-md);
+    box-shadow: var(--glass-shadow);
+  }
+  html.nav-collapsed .nav-head { margin: 0; padding: 0; }
+  html.nav-collapsed #site-nav .nav-brand,
+  html.nav-collapsed #site-nav > a { display: none; }
 }
-[aria-current='page'] .nav-icon { background: rgba(255,255,255,0.25); border-color: transparent; }
-html.nav-collapsed #site-nav { width: var(--nav-w-collapsed); }
-html.nav-collapsed #site-nav .nav-label { display: none; }
-html.nav-collapsed #site-nav .nav-icon { display: flex; }
-html.nav-collapsed #site-nav a {
-  display: flex; align-items: center; justify-content: center; padding: 8px 0;
+
+/* — hamburger bars: shared by the mobile toggle and the desktop collapse
+   toggle, so both read as the same control. — */
+.nav-mobile-toggle-bar {
+  display: block; width: 18px; height: 2px; margin: 0 auto;
+  background: var(--color-text); border-radius: 1px;
 }
-html.nav-collapsed #site-nav .nav-brand { justify-content: center; }
-html.nav-collapsed .nav-head { justify-content: center; flex-direction: column; gap: 8px; }
 
 /* — mobile: sidebar becomes an off-canvas drawer; a fixed hamburger opens it — */
 .nav-mobile-toggle { display: none; }
@@ -275,10 +283,6 @@ html.nav-collapsed .nav-head { justify-content: center; flex-direction: column; 
     box-shadow: var(--glass-shadow-hover);
   }
   html.nav-open #site-nav { transform: translateX(0); }
-  html.nav-collapsed #site-nav .nav-label { display: inline; }
-  html.nav-collapsed #site-nav .nav-icon { display: none; }
-  html.nav-collapsed #site-nav a { display: block; padding: 8px 10px; }
-  html.nav-collapsed .nav-head { flex-direction: row; justify-content: space-between; }
   .nav-collapse-toggle { display: none; }
   .nav-mobile-toggle {
     display: flex; flex-direction: column; justify-content: center; gap: 4px;
@@ -289,10 +293,6 @@ html.nav-collapsed .nav-head { justify-content: center; flex-direction: column; 
     -webkit-backdrop-filter: blur(20px) saturate(160%);
     box-shadow: var(--glass-shadow);
     cursor: pointer;
-  }
-  .nav-mobile-toggle-bar {
-    display: block; width: 18px; height: 2px; margin: 0 auto;
-    background: var(--color-text); border-radius: 1px;
   }
   html.nav-open .nav-scrim {
     display: block; position: fixed; inset: 0; z-index: 320;
