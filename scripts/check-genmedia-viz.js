@@ -302,6 +302,40 @@ if (windowObj.Multimodal) {
   truthy(typeof M.vit.tokens === 'function', 'Multimodal.vit.tokens exists');
   eq(M.vit.tokens(224, 16), 196, 'ViT token count 224/16');
   eq(M.tiles.tiles(672, 336, 336), 2, 'AnyRes tiling divides an image into crops');
+
+  const im = GM.img.checkerboard(8, 2);
+  const pk = M.vit.patchify(im, 4);
+  eq(pk.patches.length, 4, 'a 8² image with 4² patches yields 4 tokens');
+  eq(pk.patches[0].length, 4 * 4 * 3, 'each patch vector is patch²·channels');
+  const pe = M.vit.positional(4, 8);
+  eq(pe.length, 4, 'positional embeddings: one row per token');
+  eq(pe[0].length, 8, 'positional embedding dimension');
+
+  const zs = M.contrastive.zeroShot([1, 0], [[1, 0], [0, 1], [1, 1]], 0.07);
+  close(zs.probs.reduce((a, b) => a + b, 0), 1, 1e-12, 'zero-shot probabilities sum to 1');
+  truthy(zs.probs[0] > zs.probs[1], 'zero-shot favours the aligned class');
+  const sim = [[1, 0.2], [0.1, 0.9]];
+  truthy(M.contrastive.infoNCE(sim, 0.1) > 0, 'InfoNCE is positive');
+  truthy(M.contrastive.sigmoidLoss(sim, {}) > 0, 'SigLIP loss is positive');
+
+  const ranked = M.retrieval.rank([1, 0], [[0, 1], [1, 0], [0.7, 0.1]]);
+  eq(ranked[0].index, 1, 'retrieval ranks the nearest gallery item first');
+  eq(M.retrieval.topK([1, 0], [[0, 1], [1, 0]], 1).length, 1, 'topK returns k items');
+
+  const rc = M.gen.rasterCells(3);
+  eq(rc.length, 9, 'raster order enumerates a 3×3 grid');
+  eq(rc[0].step, 0, 'raster order starts top-left');
+  eq(rc[8].step, 8, 'raster order ends bottom-right');
+  const ns = M.gen.nextScaleCells(4, 2);
+  truthy(ns.every((c, i) => i === 0 || c.level >= ns[i - 1].level), 'next-scale order is coarse-to-fine');
+  eq(ns.filter((c) => c.level === 0).length, 4, 'next-scale level 0 is the 2×2 coarse pass');
+  const mc = M.gen.maskedCells(3, 7);
+  eq(new Set(mc.map((c) => c.step)).size, 9, 'masked order permutes every cell exactly once');
+
+  eq(M.cost.imageTokens(224, 16, 1), 196, 'image token cost at patch 16');
+  eq(M.cost.imageTokens(224, 16, 2), 49, 'a 2×2 merge quarters the token budget');
+  truthy(M.cost.kvBytes(196, 32, 8, 128, 2) > 0, 'image tokens add to the KV cache');
+  eq(M.modalities.length, 5, 'the modality zoo lists five modalities');
 }
 
 // --- report ------------------------------------------------------------------

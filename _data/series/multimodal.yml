@@ -16,4 +16,28 @@ acts:
     label: "III · One trunk, many modalities"
   - id: beyond
     label: "IV · Beyond text out"
-parts: []
+parts:
+  - num: 1
+    act: seeing
+    title: "Pixels into tokens"
+    short: "Part 1"
+    permalink: /ai/multimodal/vit/
+    blurb: "Patching an image into a sequence, position embeddings and the class token, and what a vision transformer gives up against a convolution."
+  - num: 2
+    act: seeing
+    title: "Caption matches picture"
+    short: "Part 2"
+    permalink: /ai/multimodal/contrastive/
+    blurb: "InfoNCE on the similarity matrix, the temperature and batch size it needs, and SigLIP's pairwise sigmoid alternative."
+  - num: 3
+    act: seeing
+    title: "What a shared space buys"
+    short: "Part 3"
+    permalink: /ai/multimodal/shared-embedding-space/
+    blurb: "Zero-shot classification, retrieval and prompt templates, and the compositionality, counting and typographic failures the space inherits."
+  - num: 4
+    act: seeing
+    title: "The modality zoo"
+    short: "Part 4"
+    permalink: /ai/multimodal/modalities/
+    blurb: "Audio, video and 3D encoders aligned into one space, what a hub modality binds, and what aligned does and does not mean."
