@@ -104,22 +104,34 @@ parts:
     blurb: "Why a third camera view is fully predictable from the first two, and the trifocal tensor that captures three-view geometry directly."
   - num: 13
     act: n-view
-    title: "Bundle adjustment & structure from motion"
+    title: "The five-point algorithm & minimal relative-pose solvers"
     short: "Part 13"
+    permalink: /vision/multi-view-geometry/five-point/
+    blurb: "Why a calibrated pair needs only five correspondences: the essential matrix's equal-singular-value and rank-2 constraints, Nister's solver, and how it beats the eight-point fit on difficult scenes."
+  - num: 14
+    act: n-view
+    title: "Affine factorization: the Tomasi-Kanade method"
+    short: "Part 14"
+    permalink: /vision/multi-view-geometry/factorization/
+    blurb: "Under weak perspective the tracked features form a rank-3 measurement matrix; one SVD factors it into camera motion and 3D shape, with the affine gauge fixed by rotation orthonormality."
+  - num: 15
+    act: n-view
+    title: "Bundle adjustment & structure from motion"
+    short: "Part 15"
     permalink: /vision/multi-view-geometry/sfm/
     legacy: /multi-view-geometry-sfm.html
     blurb: "The reprojection-error cost over every camera and every point, why it connects straight back to Gauss-Newton and Levenberg-Marquardt, and a toy SfM demo you run yourself."
-  - num: 14
+  - num: 16
     act: n-view
     title: "SfM pipelines"
-    short: "Part 14"
+    short: "Part 16"
     permalink: /vision/multi-view-geometry/sfm-pipelines/
     legacy: /multi-view-geometry-sfm-pipelines.html
     blurb: "Incremental structure-from-motion (COLMAP-style) versus global SfM, self-calibration, and the stratified projective to affine to metric upgrade."
-  - num: 15
+  - num: 17
     act: advanced
     title: "Beyond multi-view geometry"
-    short: "Part 15"
+    short: "Part 17"
     permalink: /vision/multi-view-geometry/beyond/
     legacy: /multi-view-geometry-beyond.html
     blurb: "Where the field goes next: SLAM, dense multi-view stereo, and the learned successors (NeRF, 3D Gaussian Splatting, DUSt3R/VGGT), framed as the same geometry in new representations."
