@@ -226,9 +226,29 @@
   function flowVelocity(x0, x1) { return x1 - x0; }
   // Training loss for the velocity field: (v_θ(x_t, t) − (x_1 − x_0))².
   function flowLoss(vPred, x0, x1) { var d = vPred - flowVelocity(x0, x1); return d * d; }
-  // A rectified-flow (reflow) straightening step: average the endpoints of the
-  // pairs a curved flow maps to each other, then re-fit the straight path.
+  // A curved path with the same endpoints, to show what rectified flow straightens:
+  // x_t = (1−t)x_0 + t·x_1 + bend·sin(πt).
+  function curvedPath(t, x0, x1, bend) {
+    bend = bend == null ? 0.6 : bend;
+    return flowX(t, x0, x1) + bend * Math.sin(Math.PI * t);
+  }
+  // The tangent of the curved path, for the velocity-field comparison.
+  function curvedVelocity(t, x0, x1, bend) {
+    bend = bend == null ? 0.6 : bend;
+    return flowVelocity(x0, x1) + bend * Math.PI * Math.cos(Math.PI * t);
+  }
+  // A reflow straightening step: average the endpoint velocities a curved flow
+  // maps to each other, then re-fit the straight path.
   function reflowPair(x0, x1, t) { return [flowX(t, x0, x1), flowVelocity(x0, x1)]; }
+  function straightenPairs(n, seed) {
+    var r = GM().rng(seed == null ? 1 : seed), pairs = [], i;
+    for (i = 0; i < n; i++) {
+      var x0 = GM().gauss(r), x1 = GM().gauss(r);
+      var t = r();
+      pairs.push([x0, x1, t, curvedVelocity(t, x0, x1)]);
+    }
+    return pairs;
+  }
 
   // =========================================================================
   // score functions and SDEs
@@ -303,6 +323,62 @@
 
   function unetCost(opts) {
     return { params: GM().cost.unetParams(opts) };
+  }
+
+  // A round trip through the toy compressor: pool to the latent, upsample back.
+  // Returns {latent, recon, mse} — the demonstrable cost of 8× downsampling.
+  function vaeRoundTrip(image, factor) {
+    var latent = pool(image, factor);
+    var recon = upsample(latent, factor);
+    var n = Math.min(recon.data.length, image.data.length), err = 0, i;
+    for (i = 0; i < n; i++) { var d = recon.data[i] - image.data[i]; err += d * d; }
+    return { latent: latent, recon: recon, mse: n ? err / n : 0 };
+  }
+
+  // Parameter/FLOP count per resolution level for a U-Net-ish denoiser. The
+  // numbers are the envelope, not a specific checkpoint: two residual blocks
+  // (4·c_in·c_out convs) plus a self-attention block at the two lowest levels.
+  function unetBreakdown(opts) {
+    opts = opts || {};
+    var channels = opts.channels || [320, 640, 1280, 1280];
+    var blocks = opts.blocks || 2;
+    var levels = [], totalParams = 0, i;
+    for (i = 0; i < channels.length; i++) {
+      var cin = i === 0 ? channels[0] : channels[i - 1];
+      var cout = channels[i];
+      var res = blocks * 4 * cin * cout;
+      var attn = i <= 1 ? 2 * cout * cout : 0;
+      var p = res + attn + 2 * cout; // + time embedding projection
+      levels.push({ level: i, channels: cout, params: p, res: res, attn: attn });
+      totalParams += p;
+    }
+    return { levels: levels, params: totalParams };
+  }
+
+  // Parameter/FLOP count for a DiT block stack, including the adaLN-Zero
+  // modulation parameters (6·d per block) that make conditioning cheap.
+  function ditBreakdown(opts) {
+    var tokens = GM().cost.patchify(opts.imageSize, opts.patch).tokens;
+    var perLayer = GM().cost.transformerParams({ layers: 1, d: opts.d, ff: opts.ff });
+    var adaLN = opts.layers * 6 * opts.d;
+    var params = GM().cost.transformerParams({ layers: opts.layers, d: opts.d, ff: opts.ff }) + adaLN;
+    var flops = GM().cost.transformerFlops({ layers: opts.layers, d: opts.d, ff: opts.ff, seq: tokens });
+    return { tokens: tokens, params: params, flops: flops, perLayer: perLayer, adaLN: adaLN };
+  }
+
+  // adaLN-Zero: x ← x·(1 + γ(c)) + β(c), with γ and β produced by a small MLP
+  // from the conditioning vector. At initialisation γ = β = 0, so the block is
+  // the identity — the trick that made deep DiTs trainable.
+  function adaLNZero(x, gamma, beta) { return x * (1 + gamma) + beta; }
+
+  // =========================================================================
+  // guidance helpers
+  // =========================================================================
+  // The actual guided prediction plus a simple "how far past the conditional
+  // prediction are we extrapolating" measure, for the oversaturation demo.
+  function guidanceEffect(w, uncond, cond) {
+    var value = cfg(w, uncond, cond);
+    return { value: value, extrapolation: (w - 1) * (cond - uncond), excess: Math.abs((w - 1) * (cond - uncond)) };
   }
 
   // =========================================================================
@@ -381,11 +457,14 @@
     timesteps: timesteps, ddimStep: ddimStep, ddpmStep: ddpmStep, sampler: sampler,
     ddimSample: ddimSample, ddimRoundTrip: ddimRoundTrip, oraclePredict: oraclePredict,
     flowX: flowX, flowVelocity: flowVelocity, flowLoss: flowLoss, reflowPair: reflowPair,
+    curvedPath: curvedPath, curvedVelocity: curvedVelocity, straightenPairs: straightenPairs,
     gaussScore: gaussScore, scoreFromEps: scoreFromEps, langevinStep: langevinStep,
     veDiffusion: veDiffusion, vpDrift: vpDrift, vpDiffusion: vpDiffusion,
     cfg: cfg, cfgRescale: cfgRescale, cfgInterval: cfgInterval,
     pool: pool, upsample: upsample,
     ditCost: ditCost, unetCost: unetCost,
+    vaeRoundTrip: vaeRoundTrip, unetBreakdown: unetBreakdown, ditBreakdown: ditBreakdown,
+    adaLNZero: adaLNZero, guidanceEffect: guidanceEffect,
     toy2d: toy2d, mixturePosteriorMean: mixturePosteriorMean,
     drawPath: drawPath, drawSchedule: drawSchedule
   };

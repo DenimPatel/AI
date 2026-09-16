@@ -239,6 +239,21 @@ if (windowObj.Diffusion) {
   close(D.cfg(1, 3, 5), 5, 1e-12, 'CFG at w=1 is the conditional prediction');
   close(D.cfgRescale(5, 1), 5, 1e-12, 'CFG rescale at ratio 1 is a no-op');
   close(D.cfgRescale(7, 5 / 7), 5, 1e-12, 'CFG rescale matches the conditional std');
+
+  // Backbone and latent helpers.
+  const bd = D.ditBreakdown({ imageSize: 32, patch: 2, layers: 2, d: 8, ff: 32 });
+  eq(bd.tokens, 256, 'DiT breakdown patchifies 32² into 256 tokens');
+  eq(bd.adaLN, 96, 'adaLN-Zero costs 6·d per block');
+  close(D.adaLNZero(2, 0, 0), 2, 1e-12, 'adaLN-Zero is the identity at γ=β=0');
+  const u = D.unetBreakdown({ channels: [32, 64], blocks: 2 });
+  truthy(u.params > 0 && u.levels.length === 2, 'U-Net breakdown reports a positive count per level');
+  const chk = GM.img.checkerboard(16, 4);
+  const vaeRt = D.vaeRoundTrip(chk, 4);
+  eq(vaeRt.latent.w, 4, 'VAE round trip pools a 16² image to 4×4');
+  truthy(vaeRt.mse >= 0 && vaeRt.mse < 0.05, 'checkerboard survives a 4× pool/upsample with small error');
+  close(D.curvedPath(0, 1, 0.2, 0.6), 1, 1e-12, 'curved path shares x_0 at t=0');
+  close(D.curvedPath(1, 1, 0.2, 0.6), 0.2, 1e-12, 'curved path shares x_1 at t=1');
+  close(D.guidanceEffect(2, 3, 5).extrapolation, 2, 1e-12, 'guidance extrapolation = (w−1)(cond−uncond)');
 }
 
 // --- optional multimodal layer (present from Act 6 onward) -------------------

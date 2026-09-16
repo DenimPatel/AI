@@ -51,3 +51,33 @@ parts:
     short: "Part 5"
     permalink: /ai/generative-media/score-and-sdes/
     blurb: "The score field as arrows over a density, Langevin dynamics, the SMLD to DDPM equivalence and the VE versus VP SDEs."
+  - num: 6
+    act: stack
+    title: "Flow matching and rectified flow"
+    short: "Part 6"
+    permalink: /ai/generative-media/flow-matching/
+    blurb: "Curved paths against straight ones, the velocity-field view of an ODE, and why the frontier trainers made flow matching the default."
+  - num: 7
+    act: stack
+    title: "Latent diffusion"
+    short: "Part 7"
+    permalink: /ai/generative-media/latent-diffusion/
+    blurb: "The VAE compressor that shrinks an image before it is diffused, the cost of an eight-times downsample, and the pixel versus latent budget."
+  - num: 8
+    act: stack
+    title: "The U-Net backbone"
+    short: "Part 8"
+    permalink: /ai/generative-media/unet/
+    blurb: "The resolution pyramid and its skips, residual blocks, where self- and cross-attention sit, and interactive parameter counts."
+  - num: 9
+    act: stack
+    title: "The DiT backbone"
+    short: "Part 9"
+    permalink: /ai/generative-media/dit/
+    blurb: "Patching a latent into tokens, plain transformer blocks with adaLN-Zero conditioning, and U-Net against DiT."
+  - num: 10
+    act: stack
+    title: "Conditioning and classifier-free guidance"
+    short: "Part 10"
+    permalink: /ai/generative-media/guidance/
+    blurb: "Text encoders and cross- against joint attention, CFG as extrapolation, and what guidance scale costs in diversity."
