@@ -372,7 +372,13 @@ html.nav-collapsed .nav-head { justify-content: center; flex-direction: column; 
   white-space: normal;
 }
 #site-nav .nav--series a:hover { background: var(--glass-bg); }
-#site-nav .nav--series a[aria-current='page'] { box-shadow: none; }
+/* Specificity note: this must out-rank #site-nav .nav--series a above (same
+   0 classes + 1 attribute vs 1 class, same id/type count — a tie that the
+   plain rule was winning by source order, silently dropping the blue
+   background and leaving white current-part text on the page background). */
+#site-nav .nav--series a[aria-current='page'] {
+  background: var(--color-accent); color: #fff; box-shadow: none;
+}
 #site-nav .nav--series-act {
   display: block; align-self: auto; margin: 10px 0 2px; padding: 0 10px;
   white-space: normal;
