@@ -736,6 +736,37 @@
     return out;
   }
 
+  // A full mel spectrogram: STFT, then the filterbank. Returns
+  // {frames: [t][mels], nMels, bins, sr, winSize, hop} — what an audio page
+  // draws as a heatmap.
+  function melSpectrogram(x, opts) {
+    opts = opts || {};
+    var st = stft(x, opts);
+    var bank = melFilterbank(opts.nMels || 24, st.bins, st.sr);
+    var frames = st.mag.map(function (f) { return melEnergies(f, bank); });
+    return { frames: frames, nMels: bank.nMels, bins: st.bins, sr: st.sr, winSize: st.winSize, hop: st.hop };
+  }
+
+  // Short-time RMS energy, the signal a voice-activity detector thresholds.
+  function frameEnergy(x, frameSize, hop) {
+    frameSize = frameSize || 256; hop = hop || (frameSize >> 1);
+    var out = [];
+    for (var start = 0; start + frameSize <= x.length; start += hop) {
+      var s = 0;
+      for (var i = 0; i < frameSize; i++) { var v = x[start + i]; s += v * v; }
+      out.push(Math.sqrt(s / frameSize));
+    }
+    return out;
+  }
+
+  // Token rate and bitrate of a neural codec: `frameRate` frames/s, `codebooks`
+  // residual stages, `codebookBits` bits per stage. At 75 Hz, 8 books and 10
+  // bits this is the EnCodec-style ~6 kbps the audio pages quote.
+  function tokenRate(frameRate, codebooks) { return frameRate * codebooks; }
+  function bitrateKbps(frameRate, codebooks, codebookBits) {
+    return frameRate * codebooks * codebookBits / 1000;
+  }
+
   // Residual vector quantisation with per-stage uniform scalar quantisers.
   // x: array of values (any range; each stage re-fits its own step). Returns
   // {recon, errors:[e0,e1,...], codes:[...]}, where errors[0] is the variance of
@@ -776,7 +807,9 @@
   var dsp = {
     fft: fft, hann: hann, tone: tone, chirp: chirp, silence: silence, add: add, normalize: normalize,
     stft: stft, argmax: argmax, hzToMel: hzToMel, melToHz: melToHz,
-    melFilterbank: melFilterbank, melEnergies: melEnergies, rvq: rvq,
+    melFilterbank: melFilterbank, melEnergies: melEnergies,
+    melSpectrogram: melSpectrogram, frameEnergy: frameEnergy,
+    tokenRate: tokenRate, bitrateKbps: bitrateKbps, rvq: rvq,
     mean: mean, variance: variance, mse: mse
   };
 

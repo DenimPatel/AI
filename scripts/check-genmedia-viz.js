@@ -132,6 +132,16 @@ section('DSP');
   close(q.errors[0], 0.145, 1e-9, 'RVQ stage-0 error = input variance');
   truthy(q.errors[1] < q.errors[0] && q.errors[2] < q.errors[1] && q.errors[3] < q.errors[2], 'RVQ error strictly decreases with stages');
   truthy(GM.dsp.mse(q.recon, x) < q.errors[0] && GM.dsp.mse(q.recon, x) < q.errors[1], 'RVQ reconstruction beats its first two stages');
+
+  // Mel spectrogram, frame energy and codec rates.
+  const mixed = GM.dsp.add(GM.dsp.tone(600, sr, 512, 0.9), GM.dsp.silence(512));
+  const ms = GM.dsp.melSpectrogram(mixed, { winSize: 256, hop: 128, sr: sr, nMels: 16 });
+  truthy(ms.frames.length > 0 && ms.frames[0].length === 16, 'mel spectrogram has one row per mel band');
+  truthy(ms.frames[0].some((v) => v > 0), 'mel spectrogram of a tone is non-zero');
+  const energy = GM.dsp.frameEnergy(GM.dsp.add(GM.dsp.tone(600, sr, 512, 0.9), GM.dsp.silence(512)), 128, 64);
+  truthy(energy.every((v) => v >= 0), 'frame energy is non-negative');
+  eq(GM.dsp.tokenRate(75, 8), 600, 'EnCodec-style token rate = frame rate × codebooks');
+  close(GM.dsp.bitrateKbps(75, 8, 10), 6, 1e-12, '75 Hz × 8 codebooks × 10 bits = 6 kbps');
 }
 
 // --- cost arithmetic ---------------------------------------------------------

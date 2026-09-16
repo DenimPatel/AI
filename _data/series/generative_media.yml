@@ -111,3 +111,38 @@ parts:
     short: "Part 15"
     permalink: /ai/generative-media/video-coherence/
     blurb: "Image and keyframe conditioning, temporal cascades, autoregressive rollout against full-sequence diffusion, drift, and the world-model claim."
+  - num: 16
+    act: sound
+    title: "What audio is, numerically"
+    short: "Part 16"
+    permalink: /ai/generative-media/audio-basics/
+    blurb: "A waveform, its sample rate, the STFT and the mel scale, and the token-rate arithmetic that makes raw waveform generation hopeless."
+  - num: 17
+    act: sound
+    title: "Neural audio codecs"
+    short: "Part 17"
+    permalink: /ai/generative-media/audio-codecs/
+    blurb: "The encoder, residual vector quantiser and decoder that turn sound into a few hundred discrete tokens a second."
+  - num: 18
+    act: sound
+    title: "Text to speech"
+    short: "Part 18"
+    permalink: /ai/generative-media/tts/
+    blurb: "From alignment and duration models to codec language models and two-stage synthesis, with cloning and streaming first-chunk latency."
+  - num: 19
+    act: sound
+    title: "Speech to text, and answering out loud"
+    short: "Part 19"
+    permalink: /ai/generative-media/asr-and-duplex/
+    blurb: "CTC, RNN-T and Whisper, why streaming is hard and the two-pass fix, then voice activity, barge-in and the realtime duplex budget."
+  - num: 20
+    act: ship
+    title: "Evaluating and shipping"
+    short: "Part 20"
+    permalink: /ai/generative-media/evaluation-and-provenance/
+    blurb: "FID, FVD and CLIPScore and what each misses, preference models and Elo arenas, memorisation, and provenance under the EU AI Act."
+appendix:
+  - title: "Glossary & numbers to know"
+    short: "Reference"
+    permalink: /ai/generative-media/glossary/
+    blurb: "Every term linked back to the part that introduces it, plus the model, sampler and formula tables."
