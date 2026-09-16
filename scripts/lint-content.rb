@@ -213,7 +213,12 @@ SERIES_NAME_HINTS = {
   # The two LLM-application volumes are named by their full titles so an
   # "N-part" counter is attributed to the right one.
   'building_with_llms' => /building\s+with\s+llms/i,
-  'agents_in_action' => /agents\s+in\s+action/i
+  'agents_in_action' => /agents\s+in\s+action/i,
+  # The generative-media and multimodal volumes share the phrase "interactively"
+  # with every other volume title, so their hints are deliberately disjoint and
+  # match only the full volume titles.
+  'generative_media' => /generative\s+media,\s*interactively/i,
+  'multimodal' => /multimodal\s+models,\s*interactively/i
 }.freeze
 
 Find.find('.') do |path|

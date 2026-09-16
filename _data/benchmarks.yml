@@ -84,3 +84,82 @@
   - model: Frontier models through 2025
     released: '2025'
     score: closing on that range, prompting a harder ARC-AGI-2
+- name: MMMU
+  subtitle: multimodal reasoning
+  note: College-level questions across six disciplines that require reading a diagram, chart or image alongside the text. Scores are approximate and move with prompting and harness; image-heavy benchmarks are especially sensitive to resolution and token budget, and several items have been found to be answerable from the text alone.
+  rows:
+  - model: GPT-4V
+    released: '2023'
+    score: ~56%
+  - model: Gemini Ultra
+    released: Dec 2023
+    score: ~59%
+  - model: Claude 3.5 Sonnet
+    released: Jun 2024
+    score: ~68%
+  - model: GPT-4o
+    released: '2024'
+    score: ~69%
+  - model: OpenAI o1
+    released: Dec 2024
+    score: ~78%
+  - model: Frontier models per 2026 aggregators
+    released: '2026'
+    score: ~85%
+- name: DocVQA
+  subtitle: document understanding
+  note: Questions over scanned documents and forms, scored as average normalised Levenshtein similarity (ANLS). The benchmark is close to saturation for frontier multimodal models, so treat any remaining gap as noise and treat high scores as a floor rather than a signal; OCR-heavy training data is now common enough that contamination is a live concern.
+  rows:
+  - model: GPT-4V
+    released: '2023'
+    score: ~88% ANLS
+  - model: Gemini 1.5 Pro
+    released: '2024'
+    score: ~93% ANLS
+  - model: Claude 3.5 Sonnet
+    released: '2024'
+    score: ~95% ANLS
+  - model: Frontier models through 2026
+    released: '2026'
+    score: ~96%+ ANLS
+- name: MathVista
+  subtitle: visual mathematical reasoning
+  note: Mathematical problems that require reading a figure — geometry diagrams, plots, tables and puzzles. Harder to saturate than document QA because the visual structure carries the reasoning, not just the text.
+  rows:
+  - model: GPT-4V
+    released: '2023'
+    score: ~49%
+  - model: Gemini Ultra
+    released: '2024'
+    score: ~53%
+  - model: GPT-4o
+    released: '2024'
+    score: ~63%
+  - model: OpenAI o1
+    released: Dec 2024
+    score: ~73%
+  - model: Frontier models through 2026
+    released: '2026'
+    score: ~82%
+- name: Text-to-image Elo
+  subtitle: human preference
+  note: Pairwise human votes on generated images, aggregated into an Elo rating by an arena. It is the closest thing the field has to a human anchor, and it is expensive to maintain — ratings depend on the prompt distribution, the voter population and the comparison budget, and they say nothing about whether a particular prompt was followed. Numbers here are illustrative of the ordering, not a leaderboard snapshot.
+  rows:
+  - model: Stable Diffusion XL
+    released: '2023'
+    score: ~1050 Elo
+  - model: Stable Diffusion 3 Medium
+    released: '2024'
+    score: ~1075 Elo
+  - model: FLUX.1 dev
+    released: '2024'
+    score: ~1120 Elo
+  - model: Imagen 3
+    released: '2024'
+    score: ~1140 Elo
+  - model: GPT-4o image generation
+    released: '2025'
+    score: ~1150 Elo
+  - model: Leading arena models
+    released: '2026'
+    score: ~1170 Elo

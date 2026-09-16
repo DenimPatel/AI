@@ -1,0 +1,415 @@
+---
+title: "Listening models"
+description: "Speech as an encoder's output or as native audio tokens in the trunk, speech instruction following, paralinguistics, and the contrast with from-scratch speech recognition."
+permalink: "/ai/multimodal/audio-in/"
+section: "ai"
+series: "multimodal"
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{% include guide-head.html katex=true %}
+<style>
+  .g-mini { font-size: 11.5px; opacity: 0.65; margin-top: 6px; }
+  .g-demo-stack { display: flex; flex-direction: column; gap: 14px; }
+  .g-swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; vertical-align: middle; margin-right: 5px; }
+</style>
+</head>
+<body>
+
+{% include site-nav.html %}
+{% include series-nav.html series=site.data.series.multimodal %}
+
+<main class="wrap g">
+  <header class="page-header">
+    <span class="section-kicker">Interactive guide · Multimodal Models</span>
+    <h1>Listening models</h1>
+    <p>A waveform is the least token-shaped signal in the zoo: it is continuous, it has no natural frame boundaries, and the same sentence can be spoken in a whisper, a shout or a monotone without changing a word of it. A model that listens has to choose between two front ends. It can run a speech recogniser first and feed the trunk a transcript &mdash; cheap, readable, and deaf to how the words were said &mdash; or it can learn a vocabulary of audio tokens and put them straight into the trunk, so the model hears the sigh as well as the sentence. This part builds both routes and measures the difference.</p>
+  </header>
+  <div class="stats-rule" style="border-top-color: var(--color-divider); margin-bottom: 8px;"></div>
+
+  <section class="g-step" id="input">
+    <div class="g-step-head"><span class="g-step-num">1</span><h2>Audio as input</h2></div>
+    <p class="g-eyebrow">A time-frequency picture</p>
+    <p>Nothing in a transformer wants a waveform. The conventional first move is the one signal processing has used for decades: cut the samples into overlapping windows, take a short-time Fourier transform of each, and stack the magnitude spectra into a <em>spectrogram</em>. Warp the frequency axis onto the mel scale, which matches how hearing allocates resolution, and the result is a two-dimensional picture &mdash; time along one axis, frequency along the other, energy as brightness. That picture is what audio encoders consume: a mel spectrogram of a 16 kHz signal at a 25 ms window and a 10 ms hop is a hundred frames per second, each a short vector of mel bands.</p>
+    <p>The sliders change the analysis window and the hop, which decide the trade every spectrogram makes: a long window resolves frequency finely but smears time, a short one does the reverse, and the number of frames per second of audio &mdash; the token count a native model will eventually pay &mdash; is set entirely by the hop.</p>
+    <div class="g-demo">
+      <div class="g-canvas-wrap">
+        <canvas id="au-mel-canvas" width="500" height="300"></canvas>
+        <p class="g-canvas-hint">A mel spectrogram of a chirp plus a tone, computed with <code>GenMedia.dsp.melSpectrogram</code> and drawn with <code>Guide.drawHeatmap</code>. The rising band is the chirp; the straight line is the tone.</p>
+      </div>
+      <div class="g-controls">
+        <div class="g-field"><label>Window <span class="val">256</span> samples</label><input type="range" id="au-win" min="0" max="2" step="1" value="1"></div>
+        <div class="g-field"><label>Hop <span class="val">64</span> samples</label><input type="range" id="au-hop" min="0" max="2" step="1" value="0"></div>
+        <div class="g-readout" id="au-mel-readout"></div>
+      </div>
+    </div>
+    <div class="g-goal">💡 <span><b>By the end of this part you'll be able to</b> read a mel spectrogram as a token grid, describe the encoder route and the native-token route and what each one costs, name what a transcript throws away, and say why speech instruction following is a different task from speech recognition.</span></div>
+    <div class="g-toc">
+      <a href="#encoder">2 · The encoder route</a>
+      <a href="#tokens">3 · The native-token route</a>
+      <a href="#para">4 · Paralinguistics</a>
+      <a href="#shows">5 · Where this shows up</a>
+    </div>
+  </section>
+
+  <section class="g-step" id="encoder">
+    <div class="g-step-head"><span class="g-step-num">2</span><h2>The encoder route</h2></div>
+    <p class="g-eyebrow">Hear words, then read them</p>
+    <p>The encoder route is the pipeline this site already treats in full elsewhere: a trained speech recogniser consumes the spectrogram and emits text, and the trunk receives that text as ordinary subwords. It is the cheapest possible interface to a language model, because the sequence it produces is tiny &mdash; a few subword tokens per second of speech, compared to the hundreds of frames the recogniser itself looked at. It is also lossy in a specific and important way. A transcript preserves <em>what was said</em> and discards <em>how it was said</em>: pitch, loudness, tempo, hesitations, laughter and the identity of the speaker are all squeezed out by a model trained to be invariant to exactly those things.</p>
+    <p>The diagram shows the route end to end. Everything to the left of the transcript is recogniser work, and everything to the right is ordinary language modelling; the interface between them is a string.</p>
+    <div class="g-demo">
+      <div class="g-canvas-wrap">
+        <canvas id="au-enc-canvas" width="500" height="230"></canvas>
+        <p class="g-canvas-hint">The encoder route: waveform, mel spectrogram, recogniser, transcript, trunk. The transcript is a handful of subword tokens per second; the spectrogram underneath was a hundred frames per second.</p>
+      </div>
+      <div class="g-controls">
+        <div class="g-readout" id="au-enc-readout"></div>
+        <p class="g-mini">The recogniser is a strong, separately trained model. Using it as the interface means the trunk inherits its errors and its invariances, and never sees the signal it threw away.</p>
+      </div>
+    </div>
+    <div class="g-warn">⚠ <span><b>Text is a bottleneck with a loss function.</b> An automatic recogniser is optimised to output the correct words, so it is trained to erase the paralinguistic channel. Any model built on its transcript has already lost emotion, emphasis and speaker before the trunk sees a single token.</span></div>
+  </section>
+
+  <section class="g-step" id="tokens">
+    <div class="g-step-head"><span class="g-step-num">3</span><h2>The native-token route</h2></div>
+    <p class="g-eyebrow">Give the trunk a vocabulary for sound</p>
+    <p>The native-token route replaces the recogniser with a <em>neural audio codec</em>: an encoder maps the spectrogram to a small number of discrete tokens per frame, and a residual vector quantiser supplies the vocabulary. The token rate is a choice, not a property of the signal. A codec at 75 frames per second with eight residual codebooks emits 600 tokens per second; drop to 50 frames and four books and it is 200. The bitrate follows the same arithmetic, and the codec's job is to keep the audio recognisable at whatever rate you pick.</p>
+    <p>Those tokens go into the same trunk as the text, through an audio embedder, which is what makes a model <em>native</em> rather than cascaded. The bars compare the token rates of the three front ends on the same axis: subword transcripts, mel frames and codec tokens. Native audio is one to two orders of magnitude more tokens than the transcript for the same second of speech, and in exchange the trunk can hear prosody, background sound and speaker identity because nothing discarded them.</p>
+    <div class="g-demo">
+      <div class="g-canvas-wrap">
+        <canvas id="au-tok-canvas" width="480" height="250"></canvas>
+        <p class="g-canvas-hint">Tokens per second of speech for the three front ends. Codec rates come from <code>GenMedia.dsp.tokenRate</code> and the bitrate from <code>GenMedia.dsp.bitrateKbps</code>.</p>
+      </div>
+      <div class="g-controls">
+        <div class="g-field"><label>Codec frame rate <span class="val">75</span> Hz</label><input type="range" id="au-hz" min="12" max="100" step="1" value="75"></div>
+        <div class="g-field"><label>Residual codebooks <span class="val">8</span></label><input type="range" id="au-books" min="1" max="12" step="1" value="8"></div>
+        <div class="g-readout" id="au-tok-readout"></div>
+      </div>
+    </div>
+    <div class="g-goal">💡 <span>The two routes are not rivals so much as a dial. A transcript is the cheapest way to get meaning into a language model; native tokens are the only way to get sound. Models that do both often run a transcript for reasoning and audio tokens for delivery, which is close to the thinker-and-talker split of the omni models in the next part.</span></div>
+  </section>
+
+  <section class="g-step" id="para">
+    <div class="g-step-head"><span class="g-step-num">4</span><h2>Paralinguistics</h2></div>
+    <p class="g-eyebrow">What the words do not carry</p>
+    <p>Paralinguistics is everything about speech that is not the words: pitch and its movement, loudness, speaking rate, pauses, laughter, sighs, and the voice characteristics that identify a speaker. A recognition model is built to be invariant to all of it, so a cascade literally cannot represent it. A native audio model can, because the prosodic information is still in the tokens it was given &mdash; but "can" is doing work. Whether the model uses that channel depends on the data it was trained on, and on whether anyone asked it to.</p>
+    <p>Speech <em>instruction following</em> is the task that tests this. Give the model a spoken question and ask it to answer in a particular tone, or have it describe the emotion in a recording, or whisper back, and a transcript-only model fails at the first hurdle because the instruction is in the delivery. The contours below are a schematic of the channel: two prosodic tracks over one utterance, flattened as the expressiveness slider goes down, until what is left is barely more than a transcript in the shape of a curve.</p>
+    <div class="g-demo">
+      <div class="g-canvas-wrap">
+        <canvas id="au-para-canvas" width="480" height="250"></canvas>
+        <p class="g-canvas-hint">Two prosodic contours over one utterance &mdash; pitch and energy &mdash; from a seeded stream, with the expressiveness slider flattening both. A transcript keeps the words and discards every point on these lines.</p>
+      </div>
+      <div class="g-controls">
+        <div class="g-field"><label>Expressiveness <span class="val">2</span></label><input type="range" id="au-exp" min="0" max="4" step="1" value="2"></div>
+        <div class="g-readout" id="au-para-readout"></div>
+      </div>
+    </div>
+    <div class="g-warn">⚠ <span><b>Native tokens are necessary, not sufficient.</b> Having prosody in the sequence does not mean the model attends to it. Systems that answer spoken questions with tone and emphasis are trained on data where tone matters, and the same architecture trained only on transcription-style pairs will happily ignore the channel it was given.</span></div>
+  </section>
+
+  <section class="g-step" id="shows">
+    <div class="g-step-head"><span class="g-step-num">5</span><h2>Where this shows up</h2></div>
+    <p class="g-eyebrow">Recognition is one use of a listening model</p>
+    <div class="g-grid2">
+      <div class="g-card reveal">
+        <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">From scratch</div>
+        <h3 style="margin:6px 0;">Recognisers trained on audio alone</h3>
+        <p style="margin-bottom:0;">The pure recognition task is the domain of models trained end to end on audio and transcripts, with no language model in the loop: frame classifiers with a CTC objective, transducers, and encoder-decoder recognisers such as Whisper. That treatment, and the streaming and duplex machinery built on top of it, lives in <a href="{{ '/ai/generative-media/asr-and-duplex/' | relative_url }}">the audio volume</a>.</p>
+      </div>
+      <div class="g-card reveal">
+        <div class="card-kicker" style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);">Instruction following</div>
+        <h3 style="margin:6px 0;">Spoken questions, spoken answers</h3>
+        <p style="margin-bottom:0;">A multimodal trunk that accepts audio tokens can be asked questions about a recording, told to summarise a meeting, or handed a spoken instruction about the sound in front of it. The transcript interface is a special case of this, and a lossy one, which is why the interesting systems keep the audio tokens rather than only their words.</p>
+      </div>
+    </div>
+    <p>Once a model can hear and speak in the same token space, the remaining problem is timing: two streams have to be produced and consumed at once, the user has to be interruptible, and the reply has to start inside a few hundred milliseconds. That is the real-time loop, and it is the last part of this volume.</p>
+  </section>
+
+  <section class="g-step">
+    <h2>Further reading</h2>
+    <p>These papers cover the two front ends: self-supervised encoders that learned speech representations before recognition, the recogniser that made attention the default, and the audio token models that let a language model hear the signal itself.</p>
+    <ul class="g-refs">
+      <li>Alexei Baevski, Henry Zhou, Abdelrahman Mohamed and Michael Auli, <a href="https://arxiv.org/abs/2006.11477">"wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations"</a>, 2020 &mdash; pretraining an encoder on raw audio before any transcript exists.</li>
+      <li>Wei-Ning Hsu, Benjamin Bolte, Yao-Hung Hubert Tsai and coauthors, <a href="https://arxiv.org/abs/2106.07447">"HuBERT: Self-Supervised Speech Representation Learning by Masked Prediction of Hidden Units"</a>, 2021 &mdash; discrete speech units learned without text, the ancestor of codec tokens.</li>
+      <li>Alec Radford, Jong Wook Kim, Tao Xu and coauthors, <a href="https://arxiv.org/abs/2212.04356">"Robust Speech Recognition via Large-Scale Weak Supervision"</a>, 2022 &mdash; Whisper, the encoder-decoder recogniser whose output is the encoder route's transcript.</li>
+      <li>Zalán Borsos, Raphaël Marinier, Damien Vincent and coauthors, <a href="https://arxiv.org/abs/2209.03143">"AudioLM: a Language Modeling Approach to Audio Generation"</a>, 2022 &mdash; audio and speech as token streams a language model can predict.</li>
+      <li>Yunfei Chu, Jin Xu, Xiaohuan Zhou and coauthors, <a href="https://arxiv.org/abs/2309.10706">"Qwen-Audio: Advancing Universal Audio Understanding via Unified Large-Scale Audio-Language Models"</a>, 2023 &mdash; an audio-language trunk and the instruction-following tasks a transcript interface cannot express.</li>
+    </ul>
+    <h3 style="margin:26px 0 6px;">Cheat sheet</h3>
+    <table class="g-cheat">
+      <thead><tr><th>Term</th><th>Meaning here</th></tr></thead>
+      <tbody>
+        <tr><td>Mel spectrogram</td><td>STFT magnitude on a mel frequency axis; the standard audio token grid</td></tr>
+        <tr><td>Window and hop</td><td>Analysis trade of frequency against time resolution; the hop sets frames per second</td></tr>
+        <tr><td>Encoder route</td><td>A recogniser transcribes first; the trunk receives subwords of text</td></tr>
+        <tr><td>Native-token route</td><td>A neural codec emits discrete audio tokens that go into the trunk itself</td></tr>
+        <tr><td>Token rate</td><td>frame rate &times; codebooks; a codec choice, not a property of sound</td></tr>
+        <tr><td>Bitrate</td><td>frame rate &times; codebooks &times; bits; 75&nbsp;Hz &times; 8 &times; 10 is about 6 kbps</td></tr>
+        <tr><td>Paralinguistics</td><td>Pitch, loudness, tempo, pauses, emotion, speaker: everything a transcript discards</td></tr>
+        <tr><td>Speech instruction following</td><td>Answering a spoken instruction about a recording, often about its delivery</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="g-step" id="check-yourself">
+    <div class="g-step-head"><span class="g-step-num">7</span><h2>Check your understanding</h2></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz" id="quiz-root"></div>
+  </section>
+
+  <div class="g-next reveal">
+    <span>A model that hears audio tokens and emits audio tokens can hold a conversation in one sequence, if the timing works. The final part assembles the omni model: interleaved streams, a thinker and a talker, listening while speaking, and the latency budget that decides whether it feels alive.</span>
+    <a class="btn btn-secondary" href="{{ '/ai/multimodal/omni/' | relative_url }}">Next: Omni models and the real-time loop →</a>
+  </div>
+</main>
+
+{% include series-prevnext.html series=site.data.series.multimodal %}
+{% include guide-footer.html %}
+
+<script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/guide-quiz.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/genmedia-viz.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/multimodal-viz.js' | relative_url }}"></script>
+<script>window.__GUIDE_PAGE_ID__ = {{ page.permalink | jsonify }};</script>
+{% raw %}
+<script>
+(function () {
+  "use strict";
+  var GM = GenMedia, MM = Multimodal, c = Guide.colors();
+
+  var SR = 8000;
+  var WINS = [128, 256, 512];
+  var HOPS = [32, 64, 128];
+  var winIdx = 1, hopIdx = 0;
+  var codecHz = 75, codecBooks = 8;
+  var express = 2;
+
+  function clamp(v, lo, hi) { return v < lo ? lo : (v > hi ? hi : v); }
+
+  // ---- 1. mel spectrogram --------------------------------------------------
+  function signal() {
+    var n = Math.round(SR * 1.2);
+    var a = GM.dsp.chirp(220, 3000, SR, n, 0.7);
+    var b = GM.dsp.tone(700, SR, n, 0.4);
+    return GM.dsp.normalize(GM.dsp.add(a, b));
+  }
+  var SIG = signal();
+  var melSetup = Guide.setupCanvas(document.getElementById('au-mel-canvas'), 500, 300, function () { drawMel(); });
+  function drawMel() {
+    if (!melSetup) return;
+    var winSize = WINS[winIdx], hop = HOPS[hopIdx];
+    var ms = GM.dsp.melSpectrogram(SIG, { winSize: winSize, hop: hop, sr: SR, nMels: 24 });
+    var logFrames = ms.frames.map(function (f) {
+      return f.map(function (e) { return Math.log(1 + 60 * e); });
+    });
+    var lo = Infinity, hi = -Infinity;
+    logFrames.forEach(function (row) { row.forEach(function (v) { if (v < lo) lo = v; if (v > hi) hi = v; }); });
+    Guide.drawHeatmap(melSetup.ctx, 500, 300, logFrames, {
+      min: lo, max: hi || 1, colorLow: [248, 246, 240], colorHigh: [43, 95, 255], fontSize: 9
+    });
+    var ctx = melSetup.ctx;
+    ctx.fillStyle = c.text;
+    ctx.font = '10px ' + c.font;
+    ctx.textAlign = 'left';
+    ctx.fillText('24 mel bands × ' + ms.frames.length + ' frames', 6, 12);
+    var el = document.getElementById('au-mel-readout');
+    if (el) {
+      var fpsFrames = SR / hop;
+      el.innerHTML =
+        '<div><span class="k">window</span> ' + winSize + ' samples (' + (1000 * winSize / SR).toFixed(0) + ' ms)</div>' +
+        '<div><span class="k">hop</span> ' + hop + ' samples (' + (1000 * hop / SR).toFixed(1) + ' ms)</div>' +
+        '<div><span class="k">mel bands</span> ' + ms.nMels + '</div>' +
+        '<div><span class="k">frames shown</span> ' + ms.frames.length + '</div>' +
+        '<div><span class="k">frames per second</span> <span class="hi">' + Guide.fmtNum(fpsFrames) + '</span></div>' +
+        '<div class="g-mini">A shorter hop is more frames and more tokens for the same audio; a longer window resolves pitch better but blurs fast events.</div>';
+    }
+  }
+
+  // ---- 2. encoder route diagram --------------------------------------------
+  function chip(ctx, x, y, w, h, fill, label, sub) {
+    ctx.fillStyle = fill;
+    ctx.fillRect(x, y, w, h);
+    ctx.fillStyle = '#fff';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = 'bold 11px ' + c.font;
+    ctx.fillText(label, x + w / 2, y + h / 2 - (sub ? 6 : 0));
+    if (sub) {
+      ctx.font = '9.5px ' + c.font;
+      ctx.fillText(sub, x + w / 2, y + h / 2 + 8);
+    }
+  }
+  var encSetup = Guide.setupCanvas(document.getElementById('au-enc-canvas'), 500, 230, function () { drawEnc(); });
+  function drawEnc() {
+    if (!encSetup) return;
+    var ctx = encSetup.ctx, W = 500, H = 230;
+    ctx.clearRect(0, 0, W, H);
+    var y = 40, h = 46;
+    chip(ctx, 10, y, 74, h, c.accent400, 'waveform', 'continuous');
+    chip(ctx, 104, y, 90, h, c.accent700, 'mel spectrogram', '100 frames/s');
+    chip(ctx, 214, y, 92, h, c.accent2, 'recogniser', 'audio → text');
+    chip(ctx, 326, y, 74, h, c.accent400, 'transcript', 'subwords');
+    chip(ctx, 420, y, 70, h, c.accent, 'trunk', null);
+    Guide.drawArrow(ctx, 84, y + h / 2, 104, y + h / 2, { color: c.text, width: 1.6, head: 8 });
+    Guide.drawArrow(ctx, 194, y + h / 2, 214, y + h / 2, { color: c.text, width: 1.6, head: 8 });
+    Guide.drawArrow(ctx, 306, y + h / 2, 326, y + h / 2, { color: c.text, width: 1.6, head: 8 });
+    Guide.drawArrow(ctx, 400, y + h / 2, 420, y + h / 2, { color: c.text, width: 1.6, head: 8 });
+    ctx.fillStyle = c.text;
+    ctx.textAlign = 'center';
+    ctx.font = '10px ' + c.font;
+    ctx.fillText('recogniser work', 158, y + h + 22);
+    ctx.fillText('language modelling', 405, y + h + 22);
+    ctx.fillStyle = c.accent2;
+    ctx.font = '10px ' + c.font;
+    ctx.fillText('the interface is a string', 250, y - 16);
+    var el = document.getElementById('au-enc-readout');
+    if (el) {
+      var textRate = 4;
+      var frameRate = SR / HOPS[hopIdx];
+      el.innerHTML =
+        '<div><span class="k">interface</span> transcript (text)</div>' +
+        '<div><span class="k">spectrogram frames/s</span> ' + Guide.fmtNum(frameRate) + '</div>' +
+        '<div><span class="k">subwords/s</span> <span class="hi">~' + textRate + '</span></div>' +
+        '<div><span class="k">compression</span> ' + Math.round(frameRate / textRate) + '×</div>' +
+        '<div class="g-mini">The recogniser already did the hard part, and in doing it erased pitch, energy, tempo, pauses and speaker. The trunk inherits a clean string and none of the sound.</div>';
+    }
+  }
+
+  // ---- 3. native token rates ------------------------------------------------
+  var tokSetup = Guide.setupCanvas(document.getElementById('au-tok-canvas'), 480, 250, function () { drawTok(); });
+  function drawTok() {
+    if (!tokSetup) return;
+    var textRate = 4;
+    var melRate = SR / HOPS[hopIdx];
+    var nativeRate = GM.dsp.tokenRate(codecHz, codecBooks);
+    var data = [
+      { label: 'transcript subwords', value: textRate, valueLabel: '~' + textRate + '/s', color: c.accent },
+      { label: 'mel frames', value: melRate, valueLabel: Guide.fmtNum(melRate) + '/s', color: c.accent400 },
+      { label: 'codec audio tokens', value: nativeRate, valueLabel: Guide.fmtNum(nativeRate) + '/s', color: c.accent2 }
+    ];
+    Guide.drawBars(tokSetup.ctx, 480, 250, data, { padL: 140, gap: 18, fontSize: 11 });
+    var el = document.getElementById('au-tok-readout');
+    if (el) {
+      el.innerHTML =
+        '<div><span class="k">token rate</span> <span class="hi">' + Guide.fmtNum(nativeRate) + '</span> tokens/s</div>' +
+        '<div><span class="k">bitrate</span> ' + GM.dsp.bitrateKbps(codecHz, codecBooks, 10).toFixed(1) + ' kbps at 10 bits</div>' +
+        '<div><span class="k">vs transcript</span> ' + Math.round(nativeRate / textRate) + '× more tokens</div>' +
+        '<div class="g-mini">Rate = frame rate × codebooks. At 75 Hz and 8 books a second of speech is 600 tokens; dial the codebooks down and the model hears less detail for less context.</div>';
+    }
+  }
+
+  // ---- 4. prosody contours -------------------------------------------------
+  var paraSetup = Guide.setupCanvas(document.getElementById('au-para-canvas'), 480, 250, function () { drawPara(); });
+  function contours() {
+    var r = GM.rng(3), pitch = [], energy = [];
+    for (var i = 0; i < 20; i++) {
+      var p = 0.5 + 0.20 * Math.sin(i * 0.65) + express * 0.08 * (r() - 0.5);
+      var e = 0.45 + 0.16 * Math.sin(i * 0.9 + 1.2) + express * 0.07 * (r() - 0.5);
+      pitch.push({ x: i, y: clamp(p, 0.03, 0.97) });
+      energy.push({ x: i, y: clamp(e, 0.03, 0.97) });
+    }
+    return { pitch: pitch, energy: energy };
+  }
+  function drawPara() {
+    if (!paraSetup) return;
+    var con = contours();
+    Guide.drawLines(paraSetup.ctx, 480, 250, [
+      { points: con.pitch, color: c.accent, width: 2.2 },
+      { points: con.energy, color: c.accent2, width: 2.2 }
+    ], [0, 19], [0, 1], { xLabel: 'time within one utterance', yLabel: 'normalised value' });
+    var ctx = paraSetup.ctx;
+    ctx.fillStyle = c.accent;
+    ctx.fillRect(58, 16, 10, 10);
+    ctx.fillStyle = c.text;
+    ctx.font = '10px ' + c.font;
+    ctx.textAlign = 'left';
+    ctx.fillText('pitch', 72, 25);
+    ctx.fillStyle = c.accent2;
+    ctx.fillRect(118, 16, 10, 10);
+    ctx.fillStyle = c.text;
+    ctx.fillText('energy', 132, 25);
+    var el = document.getElementById('au-para-readout');
+    if (el) {
+      el.innerHTML =
+        '<div><span class="k">expressiveness</span> <span class="hi">' + express + '</span> / 4</div>' +
+        '<div><span class="k">prosodic channel</span> ' + (express === 0 ? 'flat, near-transcript' : 'present') + '</div>' +
+        '<div class="g-mini">At zero the contours are almost level, which is what a recogniser is trained to listen through. At four they swing, carrying emphasis and emotion a transcript cannot hold.</div>';
+    }
+  }
+
+  function redraw() { drawMel(); drawEnc(); drawTok(); drawPara(); }
+
+  Guide.bindSliders(document.querySelectorAll('#au-win'), function (el) {
+    winIdx = parseInt(el.value, 10);
+    redraw();
+  });
+  Guide.bindSliders(document.querySelectorAll('#au-hop'), function (el) {
+    hopIdx = parseInt(el.value, 10);
+    redraw();
+  });
+  Guide.bindSliders(document.querySelectorAll('#au-hz'), function (el) {
+    codecHz = parseInt(el.value, 10);
+    redraw();
+  });
+  Guide.bindSliders(document.querySelectorAll('#au-books'), function (el) {
+    codecBooks = parseInt(el.value, 10);
+    redraw();
+  });
+  Guide.bindSliders(document.querySelectorAll('#au-exp'), function (el) {
+    express = parseInt(el.value, 10);
+    redraw();
+  });
+
+  redraw();
+
+  var QUIZ_QUESTIONS = [
+    {
+      id: 'audio-bitrate',
+      kind: 'numeric',
+      prompt: 'A neural codec runs at 75 frames per second with 8 residual codebooks of 10 bits each. What is its bitrate in kbps?',
+      answer: 6,
+      tolerance: 0.1,
+      explanation: 'Bitrate = frame rate × codebooks × bits = 75 × 8 × 10 = 6000 bits/s, which is 6 kbps. The token rate is the same product without the bits: 75 × 8 = 600 tokens per second.'
+    },
+    {
+      id: 'audio-transcript-loss',
+      kind: 'choice',
+      prompt: 'What does routing speech through a recogniser transcript lose?',
+      options: [
+        { label: 'The paralinguistic channel: pitch, loudness, tempo, pauses, emotion and speaker identity.', correct: true },
+        { label: 'The word order, because recognition reorders tokens.', correct: false },
+        { label: 'Nothing important — the transcript is a lossless interface.', correct: false }
+      ],
+      explanation: 'A recogniser is optimised to output the right words, so it is trained to be invariant to how they were said. Pitch, energy, tempo, hesitations and speaker identity are erased, and a trunk reading the transcript never sees them.'
+    },
+    {
+      id: 'audio-native-route',
+      kind: 'choice',
+      prompt: 'What makes a model "native" for audio rather than cascaded?',
+      options: [
+        { label: 'Discrete audio tokens from a codec go into the same trunk as text, through an audio embedder.', correct: true },
+        { label: 'It uses a larger spectrogram window than a recogniser does.', correct: false },
+        { label: 'It runs a separate speech model whose text output is appended to the prompt.', correct: false }
+      ],
+      explanation: 'A cascaded model puts a recogniser in front and passes text. A native model tokenises audio with a codec and feeds those tokens to the trunk alongside text, which is the only way prosody and non-speech sound survive to the transformer.'
+    },
+    {
+      id: 'audio-paralinguistics',
+      kind: 'choice',
+      prompt: 'Why is speech instruction following a different task from speech recognition?',
+      options: [
+        { label: 'The instruction or the object of the question is often in the delivery, so a transcript is not enough.', correct: true },
+        { label: 'It requires a larger vocabulary than recognition does.', correct: false },
+        { label: 'It only works on audio that has no background noise.', correct: false }
+      ],
+      explanation: 'Asking a model to answer in a tone, say whether a recording sounds happy, or read the emotion in a voice puts the information in the prosody. Recognition deliberately removes that channel, so instruction following needs audio tokens or a separate paralinguistic model.'
+    }
+  ];
+  GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
+})();
+</script>
+{% endraw %}
+
+</body>
+</html>

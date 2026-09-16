@@ -49,3 +49,23 @@
   meta: Beijing · Zhipu AI
   focus: The GLM family, shipped open-weight and iterated quickly alongside China's other open labs.
   defining: GLM-5.3 (2026)
+- name: Black Forest Labs
+  group: Open-weight challengers
+  meta: Freiburg · Founded 2024
+  focus: The FLUX family, from the researchers who wrote the original Stable Diffusion, now the open image-generation frontier.
+  defining: FLUX.1 (2024)
+- name: Runway
+  group: Generative media
+  meta: New York · Founded 2018
+  focus: Video generation aimed at filmmakers and studios, from the early Gen models to its 2026 line.
+  defining: Gen-3 Alpha (2024)
+- name: Luma AI
+  group: Generative media
+  meta: Palo Alto · Founded 2021
+  focus: The Dream Machine video model, built on the neural capture and Gaussian-splatting tools it started with.
+  defining: Dream Machine (2024)
+- name: Physical Intelligence
+  group: Robotics
+  meta: San Francisco · Founded 2024
+  focus: Foundation models for robot control, the π (pi) vision-language-action series built on a pretrained VLM.
+  defining: π₀ (2024)
