@@ -130,8 +130,20 @@ parts:
     blurb: "Incremental structure-from-motion (COLMAP-style) versus global SfM, self-calibration, and the stratified projective to affine to metric upgrade."
   - num: 17
     act: advanced
-    title: "Beyond multi-view geometry"
+    title: "Self-calibration & Kruppa's equations"
     short: "Part 17"
+    permalink: /vision/multi-view-geometry/self-calibration/
+    blurb: "Recovering the image of the absolute conic from images alone: Kruppa's equations, the absolute dual quadric, and the linear solve that upgrades a projective reconstruction to a metric one."
+  - num: 18
+    act: advanced
+    title: "Degenerate configurations"
+    short: "Part 18"
+    permalink: /vision/multi-view-geometry/degeneracies/
+    blurb: "Planar scenes, pure rotation, critical surfaces and near-degenerate baselines: the geometric coincidences that break the estimators, and how pipelines detect them."
+  - num: 19
+    act: advanced
+    title: "Beyond multi-view geometry"
+    short: "Part 19"
     permalink: /vision/multi-view-geometry/beyond/
     legacy: /multi-view-geometry-beyond.html
     blurb: "Where the field goes next: SLAM, dense multi-view stereo, and the learned successors (NeRF, 3D Gaussian Splatting, DUSt3R/VGGT), framed as the same geometry in new representations."
