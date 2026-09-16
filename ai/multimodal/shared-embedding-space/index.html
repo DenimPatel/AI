@@ -154,13 +154,10 @@ series: "multimodal"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Images are only the first tower. The last part generalises the shared space to audio, video and 3-D, and asks what it means for five modalities to agree on a hub &mdash; one city map that every kind of signal has to share.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/multimodal/modalities/' | relative_url }}">Next: The modality zoo →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.multimodal %}
+{% capture next_teaser %}Images are only the first tower. The last part generalises the shared space to audio, video and 3-D, and asks what it means for five modalities to agree on a hub &mdash; one city map that every kind of signal has to share.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.multimodal teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

@@ -221,13 +221,10 @@ series: "probability"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Push a density through a map and it squashes by the Jacobian &mdash; which is also how you turn a uniform into any family you like.</span>
-    <a class="btn btn-secondary" href="{{ '/math/probability/transformations/' | relative_url }}">Next: Transforming a random variable →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.probability %}
+{% capture next_teaser %}Push a density through a map and it squashes by the Jacobian &mdash; which is also how you turn a uniform into any family you like.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.probability teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

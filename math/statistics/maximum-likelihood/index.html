@@ -164,13 +164,10 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>The peak of the log-likelihood tells you where the estimate is; the sharpness of that peak tells you how much to trust it. Next, that curvature becomes a bound.</span>
-    <a class="btn btn-secondary" href="{{ '/math/statistics/fisher-information/' | relative_url }}">Next: Fisher information and the Cramér–Rao bound →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.statistics %}
+{% capture next_teaser %}The peak of the log-likelihood tells you where the estimate is; the sharpness of that peak tells you how much to trust it. Next, that curvature becomes a bound.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.statistics teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

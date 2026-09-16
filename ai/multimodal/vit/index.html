@@ -154,13 +154,10 @@ series: "multimodal"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>The encoder now turns a picture into a sequence of vectors, and those vectors capture visual content. Nothing yet ties them to language, so a language model cannot read them and a sentence cannot point at them. The next part trains a matching text tower with a contrastive objective, so that a picture and its caption land in the same place in a shared space &mdash; the point where the visual and the verbal finally meet.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/multimodal/contrastive/' | relative_url }}">Next: Caption matches picture →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.multimodal %}
+{% capture next_teaser %}The encoder now turns a picture into a sequence of vectors, and those vectors capture visual content. Nothing yet ties them to language, so a language model cannot read them and a sentence cannot point at them. The next part trains a matching text tower with a contrastive objective, so that a picture and its caption land in the same place in a shared space &mdash; the point where the visual and the verbal finally meet.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.multimodal teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

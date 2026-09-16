@@ -164,13 +164,10 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Once the graph tells you which variables block the back doors, the next question is how to turn an adjustment set into a number and how much to trust it.</span>
-    <a class="btn btn-secondary" href="{{ '/math/statistics/causal-effects/' | relative_url }}">Next: Estimating causal effects →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.statistics %}
+{% capture next_teaser %}Once the graph tells you which variables block the back doors, the next question is how to turn an adjustment set into a number and how much to trust it.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.statistics teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

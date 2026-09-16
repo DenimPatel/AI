@@ -227,13 +227,10 @@ series: "llm_serving"
     </ul>
   </section>
 
-  <div class="g-next reveal">
-    <span>Structured calls need many tenants sharing one base model — the next part is LoRA, quotas and noisy neighbours.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/llm-serving/multi-tenancy/' | relative_url }}">Next: LoRA, quotas and noisy neighbours →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.llm_serving %}
+{% capture next_teaser %}Structured calls need many tenants sharing one base model — the next part is LoRA, quotas and noisy neighbours.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.llm_serving teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

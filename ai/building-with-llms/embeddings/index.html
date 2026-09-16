@@ -162,13 +162,10 @@ series: "building_with_llms"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>An embedding is per passage, so the passage is the unit that can be retrieved. Next: chunking — how splitting documents trades retrieval precision against context cost, and the four strategies worth knowing.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/building-with-llms/chunking/' | relative_url }}">Next: Chunking →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.building_with_llms %}
+{% capture next_teaser %}An embedding is per passage, so the passage is the unit that can be retrieved. Next: chunking — how splitting documents trades retrieval precision against context cost, and the four strategies worth knowing.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.building_with_llms teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

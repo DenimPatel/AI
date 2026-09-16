@@ -139,13 +139,10 @@ series: "generative_media"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>A distilled student is faster but no more steerable than the model it came from. The next part keeps the model frozen and moves the control outside it &mdash; low-rank adapters, structural conditioning and image-space editing.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/generative-media/control/' | relative_url }}">Next: Steering a frozen model →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.generative_media %}
+{% capture next_teaser %}A distilled student is faster but no more steerable than the model it came from. The next part keeps the model frozen and moves the control outside it &mdash; low-rank adapters, structural conditioning and image-space editing.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.generative_media teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

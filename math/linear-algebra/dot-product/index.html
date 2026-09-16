@@ -171,13 +171,10 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Two arrows are perpendicular when their overlap is zero &mdash; and that test is enough to manufacture a whole basis out of nothing.</span>
-    <a class="btn btn-secondary" href="{{ '/math/linear-algebra/orthogonality/' | relative_url }}">Next: Orthonormal bases and Gram–Schmidt →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.linear_algebra %}
+{% capture next_teaser %}Two arrows are perpendicular when their overlap is zero &mdash; and that test is enough to manufacture a whole basis out of nothing.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.linear_algebra teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

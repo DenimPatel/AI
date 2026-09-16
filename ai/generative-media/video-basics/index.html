@@ -146,13 +146,10 @@ series: "generative_media"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Tiling and factorising attention makes a single clip affordable, but nothing yet makes a long one coherent. The final part is about the temporal axis as a modelling problem: conditioning, drift, cascades, and the claim that these models are world simulators.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/generative-media/video-coherence/' | relative_url }}">Next: Coherent and long →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.generative_media %}
+{% capture next_teaser %}Tiling and factorising attention makes a single clip affordable, but nothing yet makes a long one coherent. The final part is about the temporal axis as a modelling problem: conditioning, drift, cascades, and the claim that these models are world simulators.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.generative_media teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

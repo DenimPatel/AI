@@ -168,13 +168,10 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>One cloud of two variables is a single sample. The next part asks what happens when you draw samples over and over and look at the distribution of a summary itself.</span>
-    <a class="btn btn-secondary" href="{{ '/math/statistics/sampling-distribution/' | relative_url }}">Next: The sampling distribution →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.statistics %}
+{% capture next_teaser %}One cloud of two variables is a single sample. The next part asks what happens when you draw samples over and over and look at the distribution of a summary itself.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.statistics teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

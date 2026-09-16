@@ -162,13 +162,10 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>A standard error is one number of uncertainty. The next part turns it into an interval you can carry around and interpret.</span>
-    <a class="btn btn-secondary" href="{{ '/math/statistics/confidence-intervals/' | relative_url }}">Next: Confidence intervals →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.statistics %}
+{% capture next_teaser %}A standard error is one number of uncertainty. The next part turns it into an interval you can carry around and interpret.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.statistics teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

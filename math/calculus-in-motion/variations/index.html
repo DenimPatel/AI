@@ -181,13 +181,10 @@ series: "calculus_in_motion"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>That closes the volume: from a slope at a point to the best of all possible paths. The routing table maps every idea back onto the pages that use it.</span>
-    <a class="btn btn-secondary" href="{{ '/math/calculus-in-motion/' | relative_url }}">Back to the series contents →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.calculus_in_motion %}
+{% capture next_teaser %}That closes the volume: from a slope at a point to the best of all possible paths. The routing table maps every idea back onto the pages that use it.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.calculus_in_motion teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

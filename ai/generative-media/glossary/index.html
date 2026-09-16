@@ -249,13 +249,10 @@ series: "generative_media"
     </div>
   </section>
 
-  <div class="g-next reveal">
-    <span>This page is a reference. The series itself starts with what a generative model actually is.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/generative-media/' | relative_url }}">Back to the series contents →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.generative_media %}
+{% capture next_teaser %}This page is a reference. The series itself starts with what a generative model actually is.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.generative_media teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

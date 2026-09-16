@@ -163,13 +163,10 @@ series: "building_with_llms"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Examples pin the format. The next lever is getting the model to spend tokens on thinking before it answers — and knowing when that helps and when it hurts.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/building-with-llms/reasoning/' | relative_url }}">Next: Reasoning, chains and budgets →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.building_with_llms %}
+{% capture next_teaser %}Examples pin the format. The next lever is getting the model to spend tokens on thinking before it answers — and knowing when that helps and when it hurts.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.building_with_llms teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

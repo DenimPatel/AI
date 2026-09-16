@@ -174,13 +174,10 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>In the eigenbasis a matrix is nothing but its stretch factors &mdash; which is why powers of a matrix settle, cycle or explode.</span>
-    <a class="btn btn-secondary" href="{{ '/math/linear-algebra/diagonalization/' | relative_url }}">Next: Matrix powers and dynamical systems →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.linear_algebra %}
+{% capture next_teaser %}In the eigenbasis a matrix is nothing but its stretch factors &mdash; which is why powers of a matrix settle, cycle or explode.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.linear_algebra teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

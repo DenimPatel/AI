@@ -165,13 +165,10 @@ series: "agents_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>A working, affordable, reliable agent is still not a product. The last step is the one most teams skip: shipping it as software, where a prompt is a deploy and uncertainty is a user-interface problem. Next: shipping probabilistic products.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/agents-in-action/shipping/' | relative_url }}">Next: Shipping probabilistic products →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.agents_in_action %}
+{% capture next_teaser %}A working, affordable, reliable agent is still not a product. The last step is the one most teams skip: shipping it as software, where a prompt is a deploy and uncertainty is a user-interface problem. Next: shipping probabilistic products.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.agents_in_action teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

@@ -165,13 +165,10 @@ series: "calculus"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Integration is done. The next part lifts every idea so far from one variable to several, and surfaces replace curves.</span>
-    <a class="btn btn-secondary" href="{{ '/math/calculus/multivariable/' | relative_url }}">Next: Functions of several variables →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.calculus %}
+{% capture next_teaser %}Integration is done. The next part lifts every idea so far from one variable to several, and surfaces replace curves.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.calculus teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

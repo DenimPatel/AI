@@ -181,13 +181,10 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>That is the series. Every idea in it &mdash; span, rank, projection, eigenvector, SVD &mdash; is now something a model computes, in a loop, billions of times.</span>
-    <a class="btn btn-secondary" href="{{ '/math/linear-algebra/glossary/' | relative_url }}">Reference: Glossary and identities →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.linear_algebra %}
+{% capture next_teaser %}That is the series. Every idea in it &mdash; span, rank, projection, eigenvector, SVD &mdash; is now something a model computes, in a loop, billions of times.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.linear_algebra teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

@@ -174,13 +174,10 @@ send_email(to, body:user)      -&gt; allowed               <span class="k"># the
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Defenses decide what must never happen. The next question is what happens on an ordinary bad day — a slow dependency, a retry storm, a bill that grew while you were not looking. Next: reliability, cost and latency engineering.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/agents-in-action/reliability-cost/' | relative_url }}">Next: Reliability, cost and latency engineering →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.agents_in_action %}
+{% capture next_teaser %}Defenses decide what must never happen. The next question is what happens on an ordinary bad day — a slow dependency, a retry storm, a bill that grew while you were not looking. Next: reliability, cost and latency engineering.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.agents_in_action teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

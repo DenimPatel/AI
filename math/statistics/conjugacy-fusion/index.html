@@ -145,13 +145,10 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>The posterior is a distribution, not a decision. The next part turns it into an interval you can report and a number you should act on.</span>
-    <a class="btn btn-secondary" href="{{ '/math/statistics/credible-intervals/' | relative_url }}">Next: Credible intervals and decision theory →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.statistics %}
+{% capture next_teaser %}The posterior is a distribution, not a decision. The next part turns it into an interval you can report and a number you should act on.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.statistics teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

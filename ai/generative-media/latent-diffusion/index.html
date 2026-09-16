@@ -154,13 +154,10 @@ series: "generative_media"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>The latent made generation affordable, but something still has to denoise it. For a decade the answer was a U-Net: a resolution pyramid with skip connections and attention bolted in at the coarse levels. The next part draws that architecture and lets you change its width.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/generative-media/unet/' | relative_url }}">Next: The U-Net backbone →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.generative_media %}
+{% capture next_teaser %}The latent made generation affordable, but something still has to denoise it. For a decade the answer was a U-Net: a resolution pyramid with skip connections and attention bolted in at the coarse levels. The next part draws that architecture and lets you change its width.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.generative_media teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

@@ -162,13 +162,10 @@ series: "generative_media"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>The model you just built works because a plane is small enough to cover with bumps. In 12,288 dimensions it is hopeless, so the next part replaces the bumps with a process that first destroys the data with noise.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/generative-media/forward-process/' | relative_url }}">Next: Destroying an image with noise →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.generative_media %}
+{% capture next_teaser %}The model you just built works because a plane is small enough to cover with bumps. In 12,288 dimensions it is hopeless, so the next part replaces the bumps with a process that first destroys the data with noise.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.generative_media teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

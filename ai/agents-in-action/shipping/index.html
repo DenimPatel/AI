@@ -172,13 +172,10 @@ series: "agents_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Shipping is the discipline that turns a demo into a product. The last part looks at what is arriving rather than what has arrived: computer use, long-running autonomous work, and the evaluation problems that come with systems that act for days.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/agents-in-action/frontier/' | relative_url }}">Next: The frontier →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.agents_in_action %}
+{% capture next_teaser %}Shipping is the discipline that turns a demo into a product. The last part looks at what is arriving rather than what has arrived: computer use, long-running autonomous work, and the evaluation problems that come with systems that act for days.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.agents_in_action teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

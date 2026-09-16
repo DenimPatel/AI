@@ -191,13 +191,10 @@ series: "calculus_in_motion"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>A density is a function you integrate, and a derivative is a slope you follow. The next part joins the two: an equation relating a function to its own derivative, solved one small step at a time.</span>
-    <a class="btn btn-secondary" href="{{ '/math/calculus-in-motion/odes/' | relative_url }}">Next: Differential equations →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.calculus_in_motion %}
+{% capture next_teaser %}A density is a function you integrate, and a derivative is a slope you follow. The next part joins the two: an equation relating a function to its own derivative, solved one small step at a time.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.calculus_in_motion teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

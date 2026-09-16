@@ -144,13 +144,10 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Randomization keeps confounders from creeping in. The next part is about what happens when it is absent &mdash; and how a DAG tells you which variables to adjust for.</span>
-    <a class="btn btn-secondary" href="{{ '/math/statistics/confounding/' | relative_url }}">Next: Confounding, Simpson's paradox, and DAGs →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.statistics %}
+{% capture next_teaser %}Randomization keeps confounders from creeping in. The next part is about what happens when it is absent &mdash; and how a DAG tells you which variables to adjust for.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.statistics teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

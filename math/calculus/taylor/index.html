@@ -175,13 +175,10 @@ series: "calculus"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>The local model is now complete: match value and derivatives, and you can approximate or solve. The next part reverses the question and asks how a curve accumulates area.</span>
-    <a class="btn btn-secondary" href="{{ '/math/calculus/integral/' | relative_url }}">Next: The integral as accumulation →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.calculus %}
+{% capture next_teaser %}The local model is now complete: match value and derivatives, and you can approximate or solve. The next part reverses the question and asks how a curve accumulates area.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.calculus teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

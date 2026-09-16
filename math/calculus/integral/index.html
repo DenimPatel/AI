@@ -159,13 +159,10 @@ series: "calculus"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Once an integral is an accumulated area, the natural question is how that area changes — and the answer is the original function.</span>
-    <a class="btn btn-secondary" href="{{ '/math/calculus/ftc/' | relative_url }}">Next: The Fundamental Theorem →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.calculus %}
+{% capture next_teaser %}Once an integral is an accumulated area, the natural question is how that area changes — and the answer is the original function.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.calculus teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

@@ -196,13 +196,10 @@ series: "llm_serving"
     </ul>
   </section>
 
-  <div class="g-next reveal">
-    <span>Shape tells you what to run. The next part is how to keep it running: gateways, autoscaling, cold starts and routing.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/llm-serving/cluster/' | relative_url }}">Next: Kubernetes, autoscaling, cold starts and routing →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.llm_serving %}
+{% capture next_teaser %}Shape tells you what to run. The next part is how to keep it running: gateways, autoscaling, cold starts and routing.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.llm_serving teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script>

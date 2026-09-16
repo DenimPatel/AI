@@ -157,13 +157,10 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>A ratio tells you how far a small error can travel &mdash; but the maps that never amplify it at all are the ones built from length-preserving rotations.</span>
-    <a class="btn btn-secondary" href="{{ '/math/linear-algebra/rotations/' | relative_url }}">Next: Rotations, SO(3) and the exponential map →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.linear_algebra %}
+{% capture next_teaser %}A ratio tells you how far a small error can travel &mdash; but the maps that never amplify it at all are the ones built from length-preserving rotations.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.linear_algebra teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

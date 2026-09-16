@@ -214,13 +214,10 @@ series: "probability_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>A chain graph is the one case where the messages are cheap enough to run on every time step &mdash; which is exactly what a hidden Markov model does.</span>
-    <a class="btn btn-secondary" href="{{ '/math/probability-in-action/hmm/' | relative_url }}">Next: Hidden Markov models →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.probability_in_action %}
+{% capture next_teaser %}A chain graph is the one case where the messages are cheap enough to run on every time step &mdash; which is exactly what a hidden Markov model does.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.probability_in_action teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

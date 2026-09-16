@@ -202,13 +202,10 @@ series: "probability_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>The Gaussian shortcut runs out when the belief has more than one hill &mdash; then you need a cloud of samples instead of a mean and a covariance.</span>
-    <a class="btn btn-secondary" href="{{ '/math/probability-in-action/particle-filter/' | relative_url }}">Next: Particle filters →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.probability_in_action %}
+{% capture next_teaser %}The Gaussian shortcut runs out when the belief has more than one hill &mdash; then you need a cloud of samples instead of a mean and a covariance.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.probability_in_action teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

@@ -185,13 +185,10 @@ series: "llm_serving"
     </ul>
   </section>
 
-  <div class="g-next reveal">
-    <span>Two dense jobs, two pools. Next: models where only a few experts work per token — and the collective that dominates them.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/llm-serving/moe/' | relative_url }}">Next: Serving mixture-of-experts at scale →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.llm_serving %}
+{% capture next_teaser %}Two dense jobs, two pools. Next: models where only a few experts work per token — and the collective that dominates them.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.llm_serving teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

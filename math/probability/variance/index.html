@@ -184,13 +184,10 @@ series: "probability"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>The spread of a sum is settled; now meet the individual distributions that supply those spreads, family by family.</span>
-    <a class="btn btn-secondary" href="{{ '/math/probability/discrete-families/' | relative_url }}">Next: The discrete families →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.probability %}
+{% capture next_teaser %}The spread of a sum is settled; now meet the individual distributions that supply those spreads, family by family.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.probability teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

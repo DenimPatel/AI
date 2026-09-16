@@ -173,13 +173,10 @@ series: "calculus_in_motion"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>The stationarity conditions we just wrote are equations in vectors of partials. The next part turns those into matrix algebra.</span>
-    <a class="btn btn-secondary" href="{{ '/math/calculus-in-motion/matrix-calculus/' | relative_url }}">Next: Matrix calculus →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.calculus_in_motion %}
+{% capture next_teaser %}The stationarity conditions we just wrote are equations in vectors of partials. The next part turns those into matrix algebra.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.calculus_in_motion teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

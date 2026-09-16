@@ -186,13 +186,10 @@ series: "llm_serving"
     <p class="g-source" id="bt-source"></p>
   </section>
 
-  <div class="g-next reveal">
-    <span>The batch is now full and the budget is set. Next: who gets in, who waits, and who is dropped when the queue cannot drain.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/llm-serving/scheduling/' | relative_url }}">Next: The scheduler — queues, fairness and admission control →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.llm_serving %}
+{% capture next_teaser %}The batch is now full and the budget is set. Next: who gets in, who waits, and who is dropped when the queue cannot drain.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.llm_serving teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

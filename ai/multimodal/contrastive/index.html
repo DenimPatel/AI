@@ -150,13 +150,10 @@ series: "multimodal"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>An aligned space is only useful if you do something with it. The next part spends the alignment on zero-shot classification and retrieval, then catalogs the things it cannot do. Those two abilities are the everyday payoff of the loss you just read about, and the same geometry that makes them work is also what explains when they fail.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/multimodal/shared-embedding-space/' | relative_url }}">Next: What a shared space buys →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.multimodal %}
+{% capture next_teaser %}An aligned space is only useful if you do something with it. The next part spends the alignment on zero-shot classification and retrieval, then catalogs the things it cannot do. Those two abilities are the everyday payoff of the loss you just read about, and the same geometry that makes them work is also what explains when they fail.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.multimodal teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

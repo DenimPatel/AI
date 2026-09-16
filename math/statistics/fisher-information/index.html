@@ -167,13 +167,10 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>The bound needs the information, and the information needs a closed form. The next part gets an interval without either, by resampling the data in front of you.</span>
-    <a class="btn btn-secondary" href="{{ '/math/statistics/bootstrap/' | relative_url }}">Next: The bootstrap and the plug-in principle →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.statistics %}
+{% capture next_teaser %}The bound needs the information, and the information needs a closed form. The next part gets an interval without either, by resampling the data in front of you.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.statistics teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

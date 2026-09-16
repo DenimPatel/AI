@@ -157,13 +157,10 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>The last act has one more stop: the matrices a transformer actually multiplies.</span>
-    <a class="btn btn-secondary" href="{{ '/math/linear-algebra/ml-ai/' | relative_url }}">Next: Linear algebra in ML and AI →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.linear_algebra %}
+{% capture next_teaser %}The last act has one more stop: the matrices a transformer actually multiplies.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.linear_algebra teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

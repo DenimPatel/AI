@@ -145,13 +145,10 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>A Beta prior plus Binomial data gave a Beta posterior because the families matched. The next part makes that match a method, and fuses two Gaussians into one.</span>
-    <a class="btn btn-secondary" href="{{ '/math/statistics/conjugacy-fusion/' | relative_url }}">Next: Conjugacy and Gaussian fusion →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.statistics %}
+{% capture next_teaser %}A Beta prior plus Binomial data gave a Beta posterior because the families matched. The next part makes that match a method, and fuses two Gaussians into one.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.statistics teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

@@ -174,13 +174,10 @@ series: "probability_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>The ELBO needed a KL divergence to measure the gap; entropy, cross-entropy and mutual information turn out to be the same quantity wearing different clothes.</span>
-    <a class="btn btn-secondary" href="{{ '/math/probability-in-action/information/' | relative_url }}">Next: Entropy, cross-entropy, KL, mutual information →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.probability_in_action %}
+{% capture next_teaser %}The ELBO needed a KL divergence to measure the gap; entropy, cross-entropy and mutual information turn out to be the same quantity wearing different clothes.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.probability_in_action teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

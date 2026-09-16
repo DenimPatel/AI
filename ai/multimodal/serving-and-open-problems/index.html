@@ -176,13 +176,10 @@ series: "multimodal"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>That is the end of the volume: seeing, gluing, one trunk, and then grounding, acting and serving. You have followed an image from pixels to tokens, from tokens into a shared space with language, and from there into a system that reasons, points and acts, and at each stage you have seen what the work costs and where it can go wrong. The glossary collects every term and the tables behind the numbers, so the definitions and the arithmetic sit in one place when you come back to them.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/multimodal/' | relative_url }}">Back to the series contents →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.multimodal %}
+{% capture next_teaser %}That is the end of the volume: seeing, gluing, one trunk, and then grounding, acting and serving. You have followed an image from pixels to tokens, from tokens into a shared space with language, and from there into a system that reasons, points and acts, and at each stage you have seen what the work costs and where it can go wrong. The glossary collects every term and the tables behind the numbers, so the definitions and the arithmetic sit in one place when you come back to them.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.multimodal teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

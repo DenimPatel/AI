@@ -166,13 +166,10 @@ series: "multimodal"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>A fused trunk reads a frame like it reads a word, which is exactly what makes video so expensive: a clip is thousands of tokens in a row, and every one of them is a row of the attention matrix. The next part does the arithmetic a minute of video implies for the context window and the KV cache &mdash; the running notebook of earlier keys and values the model keeps so it does not reread the whole prompt for every new token. Once the modalities share one sequence, length stops being a per-tower detail and becomes the thing that decides what the model can afford to look at.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/multimodal/video-in/' | relative_url }}">Next: Video in, long context →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.multimodal %}
+{% capture next_teaser %}A fused trunk reads a frame like it reads a word, which is exactly what makes video so expensive: a clip is thousands of tokens in a row, and every one of them is a row of the attention matrix. The next part does the arithmetic a minute of video implies for the context window and the KV cache &mdash; the running notebook of earlier keys and values the model keeps so it does not reread the whole prompt for every new token. Once the modalities share one sequence, length stops being a per-tower detail and becomes the thing that decides what the model can afford to look at.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.multimodal teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

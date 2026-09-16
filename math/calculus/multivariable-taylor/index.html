@@ -153,13 +153,10 @@ series: "calculus"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>That completes the differential half of the volume. Volume II picks the story up where a landscape becomes a trajectory.</span>
-    <a class="btn btn-secondary" href="{{ '/math/calculus-in-motion/' | relative_url }}">Continue: Calculus in Motion →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.calculus %}
+{% capture next_teaser %}That completes the differential half of the volume. Volume II picks the story up where a landscape becomes a trajectory.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.calculus teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

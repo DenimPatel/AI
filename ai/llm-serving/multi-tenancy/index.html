@@ -182,13 +182,10 @@ series: "llm_serving"
     </ul>
   </section>
 
-  <div class="g-next reveal">
-    <span>Isolation and quotas decide who shares a pool. The next part decides what the pool is even being asked to serve.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/llm-serving/workloads/' | relative_url }}">Next: Reasoning, agents and multimodal →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.llm_serving %}
+{% capture next_teaser %}Isolation and quotas decide who shares a pool. The next part decides what the pool is even being asked to serve.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.llm_serving teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script>

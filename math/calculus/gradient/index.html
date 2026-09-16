@@ -175,13 +175,10 @@ series: "calculus"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>The gradient is the derivative when the input is a vector. Next, let the output be a vector too, and the derivative becomes a matrix.</span>
-    <a class="btn btn-secondary" href="{{ '/math/calculus/jacobian-hessian/' | relative_url }}">Next: The derivative as a matrix →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.calculus %}
+{% capture next_teaser %}The gradient is the derivative when the input is a vector. Next, let the output be a vector too, and the derivative becomes a matrix.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.calculus teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

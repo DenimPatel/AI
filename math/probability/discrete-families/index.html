@@ -178,13 +178,10 @@ series: "probability"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>A PMF puts probability on separate points; a density smears it over a continuum &mdash; and a density is not a probability.</span>
-    <a class="btn btn-secondary" href="{{ '/math/probability/densities/' | relative_url }}">Next: From mass to density →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.probability %}
+{% capture next_teaser %}A PMF puts probability on separate points; a density smears it over a continuum &mdash; and a density is not a probability.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.probability teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

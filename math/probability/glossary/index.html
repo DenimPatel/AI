@@ -131,13 +131,10 @@ series: "probability"
     <p>This volume ends at the limit theorems. The algorithms those theorems justify &mdash; maximum likelihood, intervals, sampling, Markov chains, MCMC, and the Bayes, Kalman and particle filters &mdash; are the companion volume, <a href="{{ '/math/probability-in-action/' | relative_url }}">Probability in Action, Interactively</a>. Its own <a href="{{ '/math/probability-in-action/glossary/' | relative_url }}">routing table</a> maps each of those ideas to the AI, vision and robotics page that consumes it.</p>
   </section>
 
-  <div class="g-next reveal">
-    <span>You have reached the end of the volume's reference appendix. The series contents are one click away.</span>
-    <a class="btn btn-secondary" href="{{ '/math/probability/' | relative_url }}">Series contents →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.probability %}
+{% capture next_teaser %}You have reached the end of the volume's reference appendix. The series contents are one click away.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.probability teaser=next_teaser %}
 {% include guide-footer.html %}
 
 {% raw %}

@@ -159,13 +159,10 @@ series: "agents_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>The loop can reason, plan and retry. Next: what it connects to — the Model Context Protocol, skill loading, and the rule that stops the window from becoming a data bus.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/agents-in-action/mcp-and-code/' | relative_url }}">Next: MCP, skills, and code execution →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.agents_in_action %}
+{% capture next_teaser %}The loop can reason, plan and retry. Next: what it connects to — the Model Context Protocol, skill loading, and the rule that stops the window from becoming a data bus.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.agents_in_action teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

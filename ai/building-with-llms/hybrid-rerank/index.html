@@ -172,13 +172,10 @@ series: "building_with_llms"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Chunks, an index and a reranker cover the common case. Next: what to do when the answer is not in any chunk at all — structural retrieval, graph retrieval, multimodal pages, and the questions flat retrieval cannot answer.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/building-with-llms/beyond-chunks/' | relative_url }}">Next: Beyond chunks →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.building_with_llms %}
+{% capture next_teaser %}Chunks, an index and a reranker cover the common case. Next: what to do when the answer is not in any chunk at all — structural retrieval, graph retrieval, multimodal pages, and the questions flat retrieval cannot answer.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.building_with_llms teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

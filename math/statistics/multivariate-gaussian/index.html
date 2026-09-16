@@ -181,13 +181,10 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>A Gaussian belief that is shifted by motion and sliced by a measurement is a filter. The next part makes that recursion something you can watch, one door at a time.</span>
-    <a class="btn btn-secondary" href="{{ '/math/statistics/bayes-filter/' | relative_url }}">Next: The Bayes filter →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.statistics %}
+{% capture next_teaser %}A Gaussian belief that is shifted by motion and sliced by a measurement is a filter. The next part makes that recursion something you can watch, one door at a time.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.statistics teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

@@ -163,13 +163,10 @@ series: "building_with_llms"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Every token you send is billed, and a byte-identical prefix can be billed at a fraction of it. Next: laying out the prompt so the stable parts stay stable and the cache keeps hitting.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/building-with-llms/caching-layout/' | relative_url }}">Next: Caching-aware prompt layout →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.building_with_llms %}
+{% capture next_teaser %}Every token you send is billed, and a byte-identical prefix can be billed at a fraction of it. Next: laying out the prompt so the stable parts stay stable and the cache keeps hitting.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.building_with_llms teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

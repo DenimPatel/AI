@@ -229,13 +229,10 @@ series: "probability_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Every idea in this volume, mapped to the AI, vision and robotics guide that puts it to work.</span>
-    <a class="btn btn-secondary" href="{{ '/math/probability-in-action/glossary/' | relative_url }}">Next: Where each idea is used on this site →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.probability_in_action %}
+{% capture next_teaser %}Every idea in this volume, mapped to the AI, vision and robotics guide that puts it to work.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.probability_in_action teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

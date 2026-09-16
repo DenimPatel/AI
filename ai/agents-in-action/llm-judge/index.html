@@ -150,13 +150,10 @@ series: "agents_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>A calibrated judge grades one answer. The harder job is evaluating a pipeline and an agent — localising a failure to a stage, and separating a good end state from a good trajectory. Next: evaluating RAG and agents.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/agents-in-action/eval-rag-agents/' | relative_url }}">Next: Evaluating RAG and agents →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.agents_in_action %}
+{% capture next_teaser %}A calibrated judge grades one answer. The harder job is evaluating a pipeline and an agent — localising a failure to a stage, and separating a good end state from a good trajectory. Next: evaluating RAG and agents.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.agents_in_action teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

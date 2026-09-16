@@ -174,13 +174,10 @@ draft = llm("draft the section", brief)
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Once you have decided a workflow is not enough, the model still has to act on the world. Next: the tool-use loop, and tool design as the craft that decides whether the loop works.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/agents-in-action/tool-use/' | relative_url }}">Next: Tool use →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.agents_in_action %}
+{% capture next_teaser %}Once you have decided a workflow is not enough, the model still has to act on the world. Next: the tool-use loop, and tool design as the craft that decides whether the loop works.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.agents_in_action teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

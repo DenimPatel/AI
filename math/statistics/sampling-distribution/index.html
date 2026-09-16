@@ -167,13 +167,10 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>The sampling distribution is centred near the truth and narrows like <var>1/&radic;n</var>. The next part explains why it keeps approaching a normal curve even when the population it came from is nothing like one.</span>
-    <a class="btn btn-secondary" href="{{ '/math/statistics/clt-standard-error/' | relative_url }}">Next: The CLT you can feel →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.statistics %}
+{% capture next_teaser %}The sampling distribution is centred near the truth and narrows like <var>1/&radic;n</var>. The next part explains why it keeps approaching a normal curve even when the population it came from is nothing like one.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.statistics teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

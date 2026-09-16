@@ -174,13 +174,10 @@ series: "multimodal"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>The bridge decides how image vectors become tokens. The next part is about how many of those tokens there are, what resolution buys, and what the prefill bill looks like when an image joins the prompt. A bridge that looks cheap in parameters can turn out to be expensive in sequence length, and that trade is where much of the practical engineering happens.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/multimodal/resolution/' | relative_url }}">Next: Resolution and the token budget →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.multimodal %}
+{% capture next_teaser %}The bridge decides how image vectors become tokens. The next part is about how many of those tokens there are, what resolution buys, and what the prefill bill looks like when an image joins the prompt. A bridge that looks cheap in parameters can turn out to be expensive in sequence length, and that trade is where much of the practical engineering happens.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.multimodal teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

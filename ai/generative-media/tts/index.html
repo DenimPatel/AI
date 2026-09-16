@@ -149,13 +149,10 @@ series: "generative_media"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Synthesis is only half a conversation. The next part is the listening half: how recognisers align text to audio, why streaming is hard for them too, and what a full-duplex turn budget really contains.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/generative-media/asr-and-duplex/' | relative_url }}">Next: Speech to text, and answering out loud →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.generative_media %}
+{% capture next_teaser %}Synthesis is only half a conversation. The next part is the listening half: how recognisers align text to audio, why streaming is hard for them too, and what a full-duplex turn budget really contains.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.generative_media teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

@@ -187,13 +187,10 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>A cross product is a matrix in disguise, and so is every linear map &mdash; change the basis and the same transformation wears a different matrix.</span>
-    <a class="btn btn-secondary" href="{{ '/math/linear-algebra/change-of-basis/' | relative_url }}">Next: Same map, different coordinates →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.linear_algebra %}
+{% capture next_teaser %}A cross product is a matrix in disguise, and so is every linear map &mdash; change the basis and the same transformation wears a different matrix.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.linear_algebra teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

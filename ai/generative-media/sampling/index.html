@@ -150,13 +150,10 @@ series: "generative_media"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>The network's noise estimate turns out to be a gradient &mdash; the gradient of the log density with respect to the input. The next part draws that field as arrows and follows it to the modes.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/generative-media/score-and-sdes/' | relative_url }}">Next: The score function →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.generative_media %}
+{% capture next_teaser %}The network's noise estimate turns out to be a gradient &mdash; the gradient of the log density with respect to the input. The next part draws that field as arrows and follows it to the modes.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.generative_media teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

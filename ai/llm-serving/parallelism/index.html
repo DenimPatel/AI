@@ -196,13 +196,10 @@ series: "llm_serving"
     </ul>
   </section>
 
-  <div class="g-next reveal">
-    <span>Splitting one model was step one. Next: splitting the two jobs it does into separate pools.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/llm-serving/disaggregation/' | relative_url }}">Next: Prefill/decode disaggregation →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.llm_serving %}
+{% capture next_teaser %}Splitting one model was step one. Next: splitting the two jobs it does into separate pools.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.llm_serving teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

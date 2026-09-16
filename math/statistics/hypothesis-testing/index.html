@@ -154,13 +154,10 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>A p-value tells you how surprising the data are under the null. The next part asks the complementary question: if an effect is really there, how often will the test find it?</span>
-    <a class="btn btn-secondary" href="{{ '/math/statistics/power/' | relative_url }}">Next: Errors, power, and sample size →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.statistics %}
+{% capture next_teaser %}A p-value tells you how surprising the data are under the null. The next part asks the complementary question: if an effect is really there, how often will the test find it?{% endcapture %}
+{% include series-prevnext.html series=site.data.series.statistics teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

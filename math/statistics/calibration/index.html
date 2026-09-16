@@ -191,13 +191,10 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>A score that is calibrated gives you a probability. The next part turns that probability into a range for the quantity you actually care about, and shows what coverage means when the world shifts.</span>
-    <a class="btn btn-secondary" href="{{ '/math/statistics/predictive-uncertainty/' | relative_url }}">Next: Predictive uncertainty →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.statistics %}
+{% capture next_teaser %}A score that is calibrated gives you a probability. The next part turns that probability into a range for the quantity you actually care about, and shows what coverage means when the world shifts.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.statistics teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

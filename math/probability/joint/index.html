@@ -185,13 +185,10 @@ series: "probability"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Independence rules out every relationship; the covariance rules out only the linear ones &mdash; and that difference is where the ellipse comes from.</span>
-    <a class="btn btn-secondary" href="{{ '/math/probability/covariance/' | relative_url }}">Next: Covariance, correlation and Σ →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.probability %}
+{% capture next_teaser %}Independence rules out every relationship; the covariance rules out only the linear ones &mdash; and that difference is where the ellipse comes from.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.probability teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

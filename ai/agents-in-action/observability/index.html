@@ -171,13 +171,10 @@ series: "agents_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Observability and evals tell you whether a change helped. The next question is whether fine-tuning is the change to make at all — and when the honest answer is that a better prompt, a better retriever or a better harness will do the job for a fraction of the cost.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/agents-in-action/when-not-to-tune/' | relative_url }}">Next: When not to tune →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.agents_in_action %}
+{% capture next_teaser %}Observability and evals tell you whether a change helped. The next question is whether fine-tuning is the change to make at all — and when the honest answer is that a better prompt, a better retriever or a better harness will do the job for a fraction of the cost.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.agents_in_action teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

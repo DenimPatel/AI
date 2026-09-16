@@ -181,13 +181,10 @@ series: "probability"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Once you have a mean vector and a covariance matrix, the Gaussian writes itself &mdash; and conditioning becomes slicing an ellipse.</span>
-    <a class="btn btn-secondary" href="{{ '/math/probability/multivariate-gaussian/' | relative_url }}">Next: The multivariate Gaussian →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.probability %}
+{% capture next_teaser %}Once you have a mean vector and a covariance matrix, the Gaussian writes itself &mdash; and conditioning becomes slicing an ellipse.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.probability teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

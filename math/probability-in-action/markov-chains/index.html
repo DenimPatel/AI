@@ -196,13 +196,10 @@ series: "probability_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>The chain gives you a stationary distribution for a matrix you can write down. MCMC turns that around: start from a distribution you cannot sample and build a chain whose stationary distribution is the one you want.</span>
-    <a class="btn btn-secondary" href="{{ '/math/probability-in-action/mcmc/' | relative_url }}">Next: MCMC →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.probability_in_action %}
+{% capture next_teaser %}The chain gives you a stationary distribution for a matrix you can write down. MCMC turns that around: start from a distribution you cannot sample and build a chain whose stationary distribution is the one you want.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.probability_in_action teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

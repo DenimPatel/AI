@@ -170,13 +170,10 @@ series: "calculus"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>With the limit pinned down, the next part uses it to build a slope — and turns the difference quotient into the derivative.</span>
-    <a class="btn btn-secondary" href="{{ '/math/calculus/derivative/' | relative_url }}">Next: The derivative →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.calculus %}
+{% capture next_teaser %}With the limit pinned down, the next part uses it to build a slope — and turns the difference quotient into the derivative.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.calculus teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

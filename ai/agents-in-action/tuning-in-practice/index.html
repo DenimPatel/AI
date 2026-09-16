@@ -151,13 +151,10 @@ series: "agents_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>The model is tuned, but the agent reads untrusted documents and holds private data. Next: direct and indirect prompt injection, the lethal trifecta, and why no system prompt fixes it.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/agents-in-action/prompt-injection/' | relative_url }}">Next: Prompt injection and the lethal trifecta →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.agents_in_action %}
+{% capture next_teaser %}The model is tuned, but the agent reads untrusted documents and holds private data. Next: direct and indirect prompt injection, the lethal trifecta, and why no system prompt fixes it.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.agents_in_action teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

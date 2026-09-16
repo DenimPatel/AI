@@ -196,13 +196,10 @@ series: "calculus"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>The Jacobian and Hessian are the raw material; the last part assembles them into the local quadratic model and the matrix second-derivative test.</span>
-    <a class="btn btn-secondary" href="{{ '/math/calculus/multivariable-taylor/' | relative_url }}">Next: Multivariable Taylor &amp; critical points →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.calculus %}
+{% capture next_teaser %}The Jacobian and Hessian are the raw material; the last part assembles them into the local quadratic model and the matrix second-derivative test.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.calculus teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

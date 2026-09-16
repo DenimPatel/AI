@@ -156,13 +156,10 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Regularisation is one penalty with one dial. Choosing which model to keep, and how strong the penalty should be, is the next part's job.</span>
-    <a class="btn btn-secondary" href="{{ '/math/statistics/model-selection/' | relative_url }}">Next: Cross-validation, AIC and BIC →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.statistics %}
+{% capture next_teaser %}Regularisation is one penalty with one dial. Choosing which model to keep, and how strong the penalty should be, is the next part's job.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.statistics teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

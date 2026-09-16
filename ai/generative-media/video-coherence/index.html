@@ -150,13 +150,10 @@ series: "generative_media"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>That is the end of the guide's video arc: conditioning, drift, cascades, audio and the world-model claim. The series continues with the remaining parts on judging and shipping these systems.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/generative-media/' | relative_url }}">Back to the series contents →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.generative_media %}
+{% capture next_teaser %}That is the end of the guide's video arc: conditioning, drift, cascades, audio and the world-model claim. The series continues with the remaining parts on judging and shipping these systems.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.generative_media teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

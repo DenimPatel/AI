@@ -169,13 +169,10 @@ series: "calculus"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Now that a slope exists, the next part builds a toolbox for computing slopes without taking a limit every time.</span>
-    <a class="btn btn-secondary" href="{{ '/math/calculus/rules/' | relative_url }}">Next: A toolbox of derivatives →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.calculus %}
+{% capture next_teaser %}Now that a slope exists, the next part builds a toolbox for computing slopes without taking a limit every time.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.calculus teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

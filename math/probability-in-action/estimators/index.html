@@ -188,13 +188,10 @@ series: "probability_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>An estimate and its standard error are two numbers. Put them together four different ways and you get an interval &mdash; and two schools disagree loudly about what it means.</span>
-    <a class="btn btn-secondary" href="{{ '/math/probability-in-action/intervals/' | relative_url }}">Next: Confidence vs credible →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.probability_in_action %}
+{% capture next_teaser %}An estimate and its standard error are two numbers. Put them together four different ways and you get an interval &mdash; and two schools disagree loudly about what it means.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.probability_in_action teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

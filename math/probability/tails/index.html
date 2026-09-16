@@ -187,13 +187,10 @@ series: "probability"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>What does it mean to say an event has probability zero when the sequence can still visit it?</span>
-    <a class="btn btn-secondary" href="{{ '/math/probability/measure/' | relative_url }}">Next: A measure-theoretic aside →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.probability %}
+{% capture next_teaser %}What does it mean to say an event has probability zero when the sequence can still visit it?{% endcapture %}
+{% include series-prevnext.html series=site.data.series.probability teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

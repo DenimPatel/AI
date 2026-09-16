@@ -158,13 +158,10 @@ series: "multimodal"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>That is the vision-and-language half of the volume. You have followed an image from pixels to tokens, from tokens to a shared space with language, and now to the failure modes that survive the whole pipeline. The series contents page collects every part alongside the modality zoo, the generation material and the appendix glossary.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/multimodal/' | relative_url }}">Back to the series contents →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.multimodal %}
+{% capture next_teaser %}That is the vision-and-language half of the volume. You have followed an image from pixels to tokens, from tokens to a shared space with language, and now to the failure modes that survive the whole pipeline. The series contents page collects every part alongside the modality zoo, the generation material and the appendix glossary.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.multimodal teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

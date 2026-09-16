@@ -193,13 +193,10 @@ series: "calculus_in_motion"
     <p>If you came here from <a href="{{ '/vision/nonlinear-optimization/' | relative_url }}">Nonlinear Optimization</a>, start with <a href="{{ '/math/calculus-in-motion/optimizers/' | relative_url }}">Part 10</a> and <a href="{{ '/math/calculus-in-motion/matrix-calculus/' | relative_url }}">Part 8</a> — curvature explains the convergence races, and matrix calculus supplies the $J^{\top}J$ that Gauss–Newton is built on. If you came from <a href="{{ '/ai/llm-training/' | relative_url }}">LLM Training</a>, start with <a href="{{ '/math/calculus-in-motion/backprop/' | relative_url }}">Part 9</a>: reverse-mode differentiation is the one idea that turns every other row of this card into a training step.</p>
   </section>
 
-  <div class="g-next reveal">
-    <span>You have reached the end of the volume's reference appendix. The series contents are one click away.</span>
-    <a class="btn btn-secondary" href="{{ '/math/calculus-in-motion/' | relative_url }}">Series contents →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.calculus_in_motion %}
+{% capture next_teaser %}You have reached the end of the volume's reference appendix. The series contents are one click away.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.calculus_in_motion teaser=next_teaser %}
 {% include guide-footer.html %}
 
 {% raw %}

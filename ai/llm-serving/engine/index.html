@@ -184,13 +184,10 @@ series: "llm_serving"
     </ul>
   </section>
 
-  <div class="g-next reveal">
-    <span>The engine is built. The next part asks what happens when its weights get smaller than 16 bits.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/llm-serving/quantization/' | relative_url }}">Next: Quantization and numerics →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.llm_serving %}
+{% capture next_teaser %}The engine is built. The next part asks what happens when its weights get smaller than 16 bits.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.llm_serving teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script>

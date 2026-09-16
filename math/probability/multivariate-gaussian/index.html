@@ -224,13 +224,10 @@ series: "probability"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Two Gaussians added together stay Gaussian; two arbitrary densities do not &mdash; and the operation that combines them is a convolution.</span>
-    <a class="btn btn-secondary" href="{{ '/math/probability/sums/' | relative_url }}">Next: Sums, convolution and generating functions →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.probability %}
+{% capture next_teaser %}Two Gaussians added together stay Gaussian; two arbitrary densities do not &mdash; and the operation that combines them is a convolution.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.probability teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

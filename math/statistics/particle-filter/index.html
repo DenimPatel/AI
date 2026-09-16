@@ -165,13 +165,10 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>The cloud has tracked one robot through one corridor. The next part turns to a different kind of measurement &mdash; deciding which of two versions of a page actually works.</span>
-    <a class="btn btn-secondary" href="{{ '/math/statistics/ab-testing/' | relative_url }}">Next: A/B testing →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.statistics %}
+{% capture next_teaser %}The cloud has tracked one robot through one corridor. The next part turns to a different kind of measurement &mdash; deciding which of two versions of a page actually works.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.statistics teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

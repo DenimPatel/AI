@@ -152,13 +152,10 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>The next part stops asking which rule is fair and starts asking which rule the data prefer, by maximizing the likelihood of what was actually observed.</span>
-    <a class="btn btn-secondary" href="{{ '/math/statistics/maximum-likelihood/' | relative_url }}">Next: Maximum likelihood →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.statistics %}
+{% capture next_teaser %}The next part stops asking which rule is fair and starts asking which rule the data prefer, by maximizing the likelihood of what was actually observed.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.statistics teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

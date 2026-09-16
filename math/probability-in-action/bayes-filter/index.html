@@ -216,13 +216,10 @@ series: "probability_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Keep the belief Gaussian and both steps collapse to closed-form updates of a mean and a covariance &mdash; that is the Kalman filter, and its nonlinear cousin the EKF.</span>
-    <a class="btn btn-secondary" href="{{ '/math/probability-in-action/kalman/' | relative_url }}">Next: The Kalman filter and EKF →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.probability_in_action %}
+{% capture next_teaser %}Keep the belief Gaussian and both steps collapse to closed-form updates of a mean and a covariance &mdash; that is the Kalman filter, and its nonlinear cousin the EKF.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.probability_in_action teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
