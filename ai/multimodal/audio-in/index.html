@@ -331,17 +331,15 @@ series: "multimodal"
     var p = rvqPlot;
     p.clear();
     p.axes({ xLabel: 'RVQ stages applied', yLabel: 'residual error (dB below input)', xTicks: RVQ_TICKS });
-    // Draw the bars by hand: GenMedia.plot.columns silently skips any bin whose
-    // top value is <= 0, and the residual is plotted here as a positive
-    // attenuation (dB below the input), so each bar is -rvqDb(i) tall.
-    p.raw(function (ctx) {
-      for (var i = 0; i < RVQ_TICKS.length; i++) {
-        var x0 = p.px(i + 0.15), x1 = p.px(i + 0.85);
-        var yBase = p.py(0), yTop = p.py(-rvqDb(i));
-        ctx.fillStyle = i <= rvqStages ? c.accent : 'rgba(120,120,120,0.35)';
-        ctx.fillRect(x0, yTop, Math.max(1, x1 - x0), Math.max(1, yBase - yTop));
-      }
-    });
+    // Residual is plotted as a positive attenuation (dB below the input), so
+    // each bar is -rvqDb(i) tall; stage 0 is 0 dB and columns() skips it, which
+    // draws nothing — visually identical to a zero-height bar.
+    p.columns(RVQ_TICKS.map(function (i) {
+      return {
+        x0: i + 0.15, x1: i + 0.85, h: -rvqDb(i),
+        color: i <= rvqStages ? c.accent : 'rgba(120,120,120,0.35)'
+      };
+    }), { alpha: 1 });
     p.hline(20, { color: c.accent2, dashed: true, label: '20 dB below input', labelX: 5.2 });
     p.legend([
       { label: 'applied codebooks', color: c.accent, fill: true },
