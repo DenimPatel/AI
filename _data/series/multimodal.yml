@@ -65,3 +65,56 @@ parts:
     short: "Part 8"
     permalink: /ai/multimodal/hallucination-and-evals/
     blurb: "Objects that were never there, attention sinks on image tokens, the language prior overriding pixels, and the benchmarks that measure it."
+  - num: 9
+    act: trunk
+    title: "One trunk, many modalities"
+    short: "Part 9"
+    permalink: /ai/multimodal/early-fusion/
+    blurb: "Dropping the bridge between towers, native multimodal pretraining, modality embedders into one stream, and modality-aware experts."
+  - num: 10
+    act: trunk
+    title: "Video in, long context"
+    short: "Part 10"
+    permalink: /ai/multimodal/video-in/
+    blurb: "Frame sampling against a token budget, temporal position encoding, streaming memory, and the KV arithmetic a clip implies."
+  - num: 11
+    act: trunk
+    title: "Listening models"
+    short: "Part 11"
+    permalink: /ai/multimodal/audio-in/
+    blurb: "Speech as an encoder's output or as native audio tokens in the trunk, speech instruction following, and paralinguistics."
+  - num: 12
+    act: trunk
+    title: "Omni models and the real-time loop"
+    short: "Part 12"
+    permalink: /ai/multimodal/omni/
+    blurb: "Interleaved token streams, the thinker-and-talker split, listening while speaking, barge-in, and the realtime budget."
+  - num: 13
+    act: beyond
+    title: "Understanding and generating"
+    short: "Part 13"
+    permalink: /ai/multimodal/unified-models/
+    blurb: "One model that reads and makes images, the tokenizer choice that decides whether it works, and three generation orders."
+  - num: 14
+    act: beyond
+    title: "Grounding"
+    short: "Part 14"
+    permalink: /ai/multimodal/grounding/
+    blurb: "Detection and segmentation as coordinate tokens, promptable segmentation, referring expressions, and grounding an interface."
+  - num: 15
+    act: beyond
+    title: "Vision-language-action"
+    short: "Part 15"
+    permalink: /ai/multimodal/vla/
+    blurb: "Actions as text tokens, a flow-matching action expert, chunking, and the latent world models that predict what happens next."
+  - num: 16
+    act: beyond
+    title: "Serving and evaluating multimodal systems"
+    short: "Part 16"
+    permalink: /ai/multimodal/serving-and-open-problems/
+    blurb: "Encoder disaggregation and caching, the prefill-and-decode inversion an image causes, safety, and the open problems."
+appendix:
+  - title: "Glossary & numbers to know"
+    short: "Reference"
+    permalink: /ai/multimodal/glossary/
+    blurb: "Every term linked back to the part that introduces it, plus the architecture-era, token-budget and evaluation tables."
