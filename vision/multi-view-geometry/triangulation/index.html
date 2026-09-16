@@ -101,9 +101,9 @@ redirect_from:
 <main>
 <div class="wrap mvg">
   <section class="page-header">
-    <span class="section-kicker">Interactive guide · Part 7 of 13</span>
+    <span class="section-kicker">Interactive guide · Part 10 of {{ site.data.series.multi_view_geometry.parts | size }}</span>
     <h1>Triangulation &amp; Recovering Pose</h1>
-    <p>Epipolar geometry (<a href="{{ '/vision/multi-view-geometry/epipolar/' | relative_url }}">Part 2</a>) tells you where a match <em>could</em> be; homographies (<a href="{{ '/vision/multi-view-geometry/homography/' | relative_url }}">Part 3</a>) only work on flat scenes. This part closes the loop for the general case: given two cameras and a correspondence, actually compute the 3D point — the first real moment of 3D reconstruction in this series.</p>
+    <p>Epipolar geometry (<a href="{{ '/vision/multi-view-geometry/epipolar/' | relative_url }}">Part 6</a>) tells you where a match <em>could</em> be; homographies (<a href="{{ '/vision/multi-view-geometry/homography/' | relative_url }}">Part 8</a>) only work on flat scenes. This part closes the loop for the general case: given two cameras and a correspondence, actually compute the 3D point — the first real moment of 3D reconstruction in this series.</p>
   </section>
   <div class="stats-rule" style="border-top-color: var(--color-divider); margin-bottom: 8px;"></div>
 
@@ -111,7 +111,7 @@ redirect_from:
   <section class="mvg-step" id="setup">
     <div class="mvg-step-head"><span class="mvg-step-num">0</span><h2>Two problems, in order</h2></div>
     <p class="mvg-eyebrow">Setup</p>
-    <p>Reconstructing a scene from two images is really two separate problems, solved in order: <strong>(1)</strong> figure out where camera 2 is relative to camera 1 (its relative pose), then <strong>(2)</strong> given both poses, work out where each matched point actually is in 3D. Part 2 already got us the essential matrix <var>E</var> from correspondences; this page turns <var>E</var> into an actual pose, and then turns rays into points.</p>
+    <p>Reconstructing a scene from two images is really two separate problems, solved in order: <strong>(1)</strong> figure out where camera 2 is relative to camera 1 (its relative pose), then <strong>(2)</strong> given both poses, work out where each matched point actually is in 3D. Part 6 already got us the essential matrix <var>E</var> from correspondences; this page turns <var>E</var> into an actual pose, and then turns rays into points.</p>
   </section>
 
   <section class="mvg-step" id="posefromE">
@@ -274,7 +274,7 @@ redirect_from:
   <section class="mvg-step" id="scaleambiguity">
     <div class="mvg-step-head"><span class="mvg-step-num">9</span><h2>Scale ambiguity: the metric you never measured</h2></div>
     <p class="mvg-eyebrow">Foundations</p>
-    <p>Trace the scale of every quantity on this page back to its source. <var>E</var> is defined only up to an overall scale — it's built from correspondences alone, and <var>E</var> and <var>&#955;E</var> satisfy the identical epipolar constraint for any <var>&#955; &#8800; 0</var>. The SVD recipe above hands back a unit-length <var>t</var> by construction. Every triangulated point inherits that same unknown scale. Nowhere in this entire pipeline — Part 2's essential matrix, this page's pose recovery, this page's triangulation — does an actual physical measurement (meters, millimeters, anything) ever enter. Two uncalibrated-scale images simply cannot tell you whether you're looking at a dollhouse or a house.</p>
+    <p>Trace the scale of every quantity on this page back to its source. <var>E</var> is defined only up to an overall scale — it's built from correspondences alone, and <var>E</var> and <var>&#955;E</var> satisfy the identical epipolar constraint for any <var>&#955; &#8800; 0</var>. The SVD recipe above hands back a unit-length <var>t</var> by construction. Every triangulated point inherits that same unknown scale. Nowhere in this entire pipeline — Part 6's essential matrix, this page's pose recovery, this page's triangulation — does an actual physical measurement (meters, millimeters, anything) ever enter. Two uncalibrated-scale images simply cannot tell you whether you're looking at a dollhouse or a house.</p>
     <p>What you get instead is a reconstruction correct up to a <strong>similarity transform</strong> — a global rotation, a global translation, and a single global scale factor applied to every camera and every point simultaneously, with no way to distinguish the true reconstruction from any rescaled copy of it:</p>
     <div class="mvg-math">(R, t, {X&#8305;}) &nbsp;and&nbsp; (R, s&#183;t, {s&#183;X&#8305;}) &nbsp;are indistinguishable, for any s &gt; 0</div>
 {% endraw %}    <p>That's <strong>7 degrees of freedom</strong> (3 rotation + 3 translation + 1 scale) that no amount of additional two-view geometry can pin down — a <strong>gauge freedom</strong>, not a solvable unknown. The only way out is an external reference: a known physical size somewhere in the scene, a second sensor with its own metric ground truth (IMU, GPS, LIDAR), or a stereo rig with a physically-measured baseline (which is exactly why Section 7's <var>B</var> has to be a real, known number — that's where the metric scale that monocular two-view geometry can't supply comes from). This same 7-DOF freedom reappears, unchanged, as the gauge freedom that has to be fixed (usually by anchoring one camera and one distance) in bundle adjustment when reconstructing from many views in <a href="{{ '/vision/multi-view-geometry/sfm/' | relative_url }}">Structure from Motion</a>.</p>{% raw %}
@@ -632,7 +632,7 @@ redirect_from:
     for (var i=0;i<3;i++) for (var j=0;j<4;j++){ var s=0; for (var k=0;k<3;k++) s+=Kmat[i][k]*Rt34[k][j]; P[i][j]=s; }
     return P;
   }
-  // Wireframe frustum for a camera (matches Part 1's style).
+  // Wireframe frustum for a camera (matches Part 4's style).
   function cameraFrustumTrace(cam, color, size){
     size = size || 0.45;
     var right = cam.R[0], down = cam.R[1], fwd = cam.R[2];

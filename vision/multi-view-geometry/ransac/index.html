@@ -110,7 +110,7 @@ redirect_from:
 <main>
 <div class="wrap mvg">
   <section class="page-header">
-    <span class="section-kicker">Interactive guide &middot; Part 4 of 13</span>
+    <span class="section-kicker">Interactive guide · Part 7 of {{ site.data.series.multi_view_geometry.parts | size }}</span>
     <h1>Robust Estimation: RANSAC &amp; Friends</h1>
     <p>Every estimator this series has built so far — the eight-point algorithm for <var>F</var>, DLT for a homography <var>H</var>, Nist&#233;r's five-point solver for <var>E</var> — quietly assumed the input correspondences were correct. In practice they never all are: SIFT, ORB, and even learned feature matchers produce plenty of wrong matches, and a least-squares fit has no defense against them. <strong>RANSAC</strong> (RANdom SAmple Consensus) is the wrapper that makes every one of those estimators usable on real data, and it's arguably the single most-used practical idea in all of multi-view geometry — more code runs RANSAC than runs any individual matrix estimator it protects. This page derives it properly: the loop, the iteration-count formula, and the refinements (MSAC, LO-RANSAC, MAGSAC) that production systems actually use instead of the textbook version.</p>
   </section>
@@ -120,7 +120,7 @@ redirect_from:
   <section class="mvg-step" id="setup">
     <div class="mvg-step-head"><span class="mvg-step-num">0</span><h2>Why one bad correspondence wrecks least squares</h2></div>
     <p class="mvg-eyebrow">Motivation</p>
-    <p>The eight-point algorithm (Part 3), DLT for a homography, and Nist&#233;r's five-point solver for <var>E</var> all end the same way: stack a linear (or least-squares) system from a set of correspondences and solve it in one shot, typically by minimizing a sum of squared residuals <code>&#931;&#8271; r<sub>i</sub>&#178;</code>. That squaring is the problem. A correspondence that's <em>correct</em> contributes a small residual; a correspondence that's <em>wrong</em> &mdash; a mismatched feature, a moving object caught by a matcher expecting a static scene, a repeated texture that fooled the matcher entirely &mdash; can contribute a residual a hundred times larger. Because the cost is squared, one such outlier can dominate the entire sum and drag the fitted <var>F</var>, <var>H</var>, or <var>E</var> arbitrarily far from the truth, even with hundreds of good matches sitting right next to it.</p>
+    <p>The eight-point algorithm (Part 6), DLT for a homography, and Nist&#233;r's five-point solver for <var>E</var> all end the same way: stack a linear (or least-squares) system from a set of correspondences and solve it in one shot, typically by minimizing a sum of squared residuals <code>&#931;&#8271; r<sub>i</sub>&#178;</code>. That squaring is the problem. A correspondence that's <em>correct</em> contributes a small residual; a correspondence that's <em>wrong</em> &mdash; a mismatched feature, a moving object caught by a matcher expecting a static scene, a repeated texture that fooled the matcher entirely &mdash; can contribute a residual a hundred times larger. Because the cost is squared, one such outlier can dominate the entire sum and drag the fitted <var>F</var>, <var>H</var>, or <var>E</var> arbitrarily far from the truth, even with hundreds of good matches sitting right next to it.</p>
     <p>And outliers are not a rare edge case. Real feature matchers (SIFT, ORB, or a learned matcher like SuperGlue &mdash; the front end that <em>produces</em> the correspondences fed to every estimator in this series is its own topic and not this page's job) routinely mismatch 10&ndash;50% of their proposed pairs, especially under repetitive texture, wide baselines, or motion. Every linear estimator built so far in this series needs something wrapped around it that can tolerate that.</p>
     <div class="mvg-warn">&#9888;&#65039; <span><b>Least squares isn't broken, its assumptions are.</b> Ordinary least squares is the maximum-likelihood fit <em>if</em> every residual is Gaussian noise around the true model. Outliers aren't noise around the true model &mdash; they're points that don't belong to it at all. No amount of reweighting a single global least-squares solve fixes that; you need a way to <em>find</em> which points belong before you fit.</span></div>
   </section>
@@ -140,7 +140,7 @@ redirect_from:
     <p>Step 1 needs a <strong>minimal sample size</strong> <var>s</var> &mdash; just enough correspondences to pin the model down exactly, with no slack for a least-squares average. This series has already met every one of these minimal solvers:</p>
     <div class="mvg-math">
       Homography H (8 DOF):  s = 4 point-pairs  &mdash; DLT's 8 linear equations (2 per pair) exactly match 8 unknowns<br>
-      Fundamental matrix F (7 DOF, rank-2):  s = 7  (the 7-point algorithm) or s = 8  (the linear 8-point algorithm, Part 3)<br>
+      Fundamental matrix F (7 DOF, rank-2):  s = 7  (the 7-point algorithm) or s = 8  (the linear 8-point algorithm, Part 6)<br>
       Essential matrix E (5 DOF, calibrated):  s = 5  &mdash; Nist&#233;r's minimal five-point solver
     </div>
     <p>Smaller <var>s</var> is better for RANSAC in one specific way &mdash; it makes an all-inlier draw more likely &mdash; which is exactly why the minimal solvers matter here, not just as a curiosity: RANSAC is the reason anyone bothered inventing a 5-point solver for <var>E</var> instead of always using 8 correspondences with the linear route.</p>
@@ -241,7 +241,7 @@ redirect_from:
   <section class="mvg-step" id="sampson">
     <div class="mvg-step-head"><span class="mvg-step-num">5</span><h2>What "residual" actually means: Sampson vs. algebraic error</h2></div>
     <p class="mvg-eyebrow">The threshold is only as good as the distance it's measured in</p>
-    <p>Everything above assumed a residual <var>r</var> you can threshold against <var>&#964;</var> in pixels. For RANSAC-on-F, the obvious candidate is the same quantity the 8-point algorithm minimizes, the <strong>algebraic error</strong> from Part 3:</p>
+    <p>Everything above assumed a residual <var>r</var> you can threshold against <var>&#964;</var> in pixels. For RANSAC-on-F, the obvious candidate is the same quantity the 8-point algorithm minimizes, the <strong>algebraic error</strong> from Part 6:</p>
     <div class="mvg-math">r<sub>i</sub>&#8330;&#8261;&#8261;<sub>i</sub>&#8309; = x&#771;&#8322;&#7488;Fx&#771;&#8321;</div>
     <p>The problem: this number is not in pixel units, and it doesn't scale like a distance &mdash; a correspondence far from the epipolar line but where <code>Fx&#771;&#8321;</code> happens to be small in magnitude can score a tiny algebraic error despite being a bad match, while another point close to the line but where <code>Fx&#771;&#8321;</code> is large can score a big one. Thresholding on it directly bakes an arbitrary, scene-dependent scale into <var>&#964;</var>, which defeats the whole point of choosing <var>&#964;</var> in interpretable pixel units.</p>
     <p>The fix used by essentially every real RANSAC-for-F implementation is the <strong>Sampson distance</strong>, a first-order (linearized) approximation to the true geometric distance from a point to its epipolar line &mdash; cheap to compute (no iterative reprojection needed) but far closer to actual pixel error than the raw algebraic residual:</p>
@@ -657,7 +657,7 @@ redirect_from:
     var ctx = canvas.getContext('2d');
     var W = canvas.width, H = canvas.height;
 
-    // Build a real F from two fixed synthetic cameras (same machinery as Part 3).
+    // Build a real F from two fixed synthetic cameras (same machinery as Part 6).
     function norml(v){ var n = Math.hypot(v[0],v[1],v[2])||1; return [v[0]/n,v[1]/n,v[2]/n]; }
     function crossv(a,b){ return [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]]; }
     function orbit(az, el, dist){

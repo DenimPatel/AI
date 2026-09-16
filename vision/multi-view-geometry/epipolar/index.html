@@ -120,9 +120,9 @@ redirect_from:
 <main>
 <div class="wrap mvg">
   <section class="page-header">
-    <span class="section-kicker">Interactive guide · Part 3 of 13</span>
+    <span class="section-kicker">Interactive guide · Part 6 of {{ site.data.series.multi_view_geometry.parts | size }}</span>
     <h1>Epipolar Geometry</h1>
-    <p><a href="{{ '/vision/multi-view-geometry/pinhole-camera/' | relative_url }}">Part 1</a> ended on a cliffhanger: one camera can't see depth. Add a second camera, and something remarkable happens — a point's location in image 1 doesn't tell you exactly where it is in image 2, but it tells you it must lie somewhere on <em>one specific line</em>. That's the epipolar constraint, and it turns 2D point-matching into a 1D search.</p>
+    <p><a href="{{ '/vision/multi-view-geometry/pinhole-camera/' | relative_url }}">Part 4</a> ended on a cliffhanger: one camera can't see depth. Add a second camera, and something remarkable happens — a point's location in image 1 doesn't tell you exactly where it is in image 2, but it tells you it must lie somewhere on <em>one specific line</em>. That's the epipolar constraint, and it turns 2D point-matching into a 1D search.</p>
   </section>
   <div class="stats-rule" style="border-top-color: var(--color-divider); margin-bottom: 8px;"></div>
 
@@ -130,7 +130,7 @@ redirect_from:
   <section class="mvg-step" id="setup">
     <div class="mvg-step-head"><span class="mvg-step-num">0</span><h2>Two cameras, one point, one ray each</h2></div>
     <p class="mvg-eyebrow">Setup</p>
-    <p>Say camera 1 sees a point at pixel <var>x&#8321;</var>. That pixel corresponds to an entire ray in 3D — the point could be anywhere along it (exactly the ambiguity from Part 1). Now project that <em>whole ray</em> into camera 2's image. Because a ray is a 3D line, its image under a second pinhole camera is also a straight line — the <strong>epipolar line</strong>. Wherever the true 3D point actually is, its image in camera 2 must fall somewhere on that line. That's the entire idea; the rest of this page is just making it precise and fast to compute.</p>
+    <p>Say camera 1 sees a point at pixel <var>x&#8321;</var>. That pixel corresponds to an entire ray in 3D — the point could be anywhere along it (exactly the ambiguity from Part 4). Now project that <em>whole ray</em> into camera 2's image. Because a ray is a 3D line, its image under a second pinhole camera is also a straight line — the <strong>epipolar line</strong>. Wherever the true 3D point actually is, its image in camera 2 must fall somewhere on that line. That's the entire idea; the rest of this page is just making it precise and fast to compute.</p>
     <div class="mvg-goal">💡 <span><b>Why it matters:</b> when matching features between two photos (for stereo, SfM, or SLAM), you don't have to search the whole second image for a match — only along one line. It turns 2D search into 1D search.</span></div>
   </section>
 
@@ -278,7 +278,7 @@ redirect_from:
   <section class="mvg-step" id="degeneracies">
     <div class="mvg-step-head"><span class="mvg-step-num">7</span><h2>Three ways epipolar estimation breaks</h2></div>
     <p class="mvg-eyebrow">Degeneracies</p>
-    <p><b>Planar scenes.</b> If every 3D point lies on one plane, the correspondences are secretly related by a single homography (Part 3), and there's more than one rank-2 <var>F</var> consistent with them &mdash; the eight-point system becomes ill-posed, with a poorly separated null space instead of one clean answer. In practice, this is exactly why real pipelines don't commit to <var>F</var> blindly: they fit <em>both</em> a homography <var>H</var> and a fundamental matrix <var>F</var> to the same correspondences, then use a model-selection criterion (GRIC is the classic one) that scores each fit while penalizing <var>H</var>'s much smaller degree of freedom count, and keep whichever model actually explains the data &mdash; a near-planar scene should win on <var>H</var>, a general scene on <var>F</var>.</p>
+    <p><b>Planar scenes.</b> If every 3D point lies on one plane, the correspondences are secretly related by a single homography (Part 8), and there's more than one rank-2 <var>F</var> consistent with them &mdash; the eight-point system becomes ill-posed, with a poorly separated null space instead of one clean answer. In practice, this is exactly why real pipelines don't commit to <var>F</var> blindly: they fit <em>both</em> a homography <var>H</var> and a fundamental matrix <var>F</var> to the same correspondences, then use a model-selection criterion (GRIC is the classic one) that scores each fit while penalizing <var>H</var>'s much smaller degree of freedom count, and keep whichever model actually explains the data &mdash; a near-planar scene should win on <var>H</var>, a general scene on <var>F</var>.</p>
     <p><b>Pure rotation.</b> If the camera only rotates in place (<var>t = 0</var>) &mdash; think of standing still and turning your phone &mdash; then <var>E = [t]&#215;R</var> with <var>[0]&#215; = 0</var>, so <var>E</var> is identically the zero matrix, not merely rank-2. There's no baseline, hence no epipolar plane, hence literally zero triangulation information in the geometry: <em>any</em> correspondence satisfies <var>x&#771;&#8322;&#7488;·0·x&#771;&#8321;=0</var> trivially, so the constraint carries no information at all. This is why "just rotate the phone in place" never works for stereo or SfM, no matter how many frames you capture.</p>
     <p><b>Points on the baseline.</b> A 3D point sitting exactly on the line through both camera centers projects to the epipole itself in both images &mdash; its epipolar plane degenerates to a pencil (any plane through the baseline satisfies the coplanarity condition), so its epipolar line is undefined. In practice this shows up as instability for points near the epipole, not just exactly on it: the closer a correspondence is to the epipole, the less its epipolar line constrains anything.</p>
     <div class="mvg-warn">&#9888; <span><b>Simplification here:</b> a degenerate configuration still fits the <em>training</em> correspondences with near-zero residual &mdash; least squares is very good at explaining the points you gave it, even when the underlying geometry is meaningless. The tell isn't residual, it's <em>instability</em>: resample the noise and solve again, and a well-posed <var>F</var> barely moves while a degenerate one jumps around. That's what the demo below checks.</span></div>
@@ -308,7 +308,7 @@ redirect_from:
         <div class="mvg-readout" id="s4e-readout"></div>
       </div>
     </div>
-{% endraw %}    <p>Epipolar geometry constrains <em>where</em> a match can be, but the payoff &mdash; dense, pixel-by-pixel stereo matching &mdash; needs the epipolar lines turned into simple horizontal scanlines first. That rectification-and-disparity pipeline gets its own page: <a href="{{ '/vision/multi-view-geometry/stereo/' | relative_url }}">Part 5</a>.</p>{% raw %}
+{% endraw %}    <p>Epipolar geometry constrains <em>where</em> a match can be, but the payoff &mdash; dense, pixel-by-pixel stereo matching &mdash; needs the epipolar lines turned into simple horizontal scanlines first. That rectification-and-disparity pipeline gets its own page: <a href="{{ '/vision/multi-view-geometry/stereo/' | relative_url }}">Part 9</a>.</p>{% raw %}
   </section>
 
   <section class="mvg-step" id="cheatsheet">
@@ -567,7 +567,7 @@ redirect_from:
   function cameraMarkerTrace(cam, color, symbol){
     return { type:'scatter3d', mode:'markers', x:[cam.C[0]], y:[cam.C[1]], z:[cam.C[2]], marker:{ size:7, color:color, symbol: symbol||'diamond' }, hoverinfo:'skip' };
   }
-  // Wireframe frustum for a camera (same shape as Part 1's): 4 rays + rim rectangle.
+  // Wireframe frustum for a camera (same shape as Part 4's): 4 rays + rim rectangle.
   function cameraFrustumTrace(cam, color, size){
     size = size || 0.55;
     var right = cam.R[0], down = cam.R[1], fwd = cam.R[2];

@@ -120,7 +120,7 @@ redirect_from:
 <main>
 <div class="wrap mvg">
   <section class="page-header">
-    <span class="section-kicker">Interactive guide · Part 1 of 13</span>
+    <span class="section-kicker">Interactive guide · Part 4 of {{ site.data.series.multi_view_geometry.parts | size }}</span>
     <h1>Multi-View Geometry, Interactively</h1>
     <p>Multi-view geometry is the math behind turning flat photographs into 3D structure — how self-driving cars, AR headsets and 3D scanners figure out where things are from pictures alone. This guide builds it up one idea at a time, using one running scene: <strong>a small wireframe cube, watched by one or more pinhole cameras you can drag around</strong>. Every section is a small playground — move the cameras, break the assumptions, watch the geometry respond.</p>
   </section>
@@ -304,7 +304,7 @@ redirect_from:
     <p>A <strong>plane</strong>'s directions all lie in a 2D subspace, so their vanishing points all lie on one image line — the image of that plane's <em>line at infinity</em>. For the ground plane, that's the <strong>horizon line</strong>: the vanishing points of any two non-parallel horizontal directions determine it completely, by exactly the same construction as Part 0's duality demo — <code>l = v&#8321; × v&#8322;</code>.</p>
     <p><strong>The payoff — single-view metrology.</strong> If a scene has three mutually orthogonal directions (the corner of a room, a cube, most buildings), their three vanishing points constrain <var>K</var> itself. Each orthogonal pair <var>(d<sub>i</sub>, d<sub>j</sub>)</var> gives one linear constraint on the <strong>image of the absolute conic</strong> <var>&#969; = K&#8315;&#7488;K&#8315;&#185;</var>: <code>v<sub>i</sub>&#7488; &#969; v<sub>j</sub> = 0</code> — <var>v<sub>i</sub></var> and <var>v<sub>j</sub></var> are said to be <em>conjugate</em> with respect to &#969;. Assuming zero skew and square pixels and a known principal point <var>(c<sub>x</sub>,c<sub>y</sub>)</var> (so <var>K&#8315;&#185;v = ((u−c<sub>x</sub>)/f, (v−c<sub>y</sub>)/f, 1)</var>), that constraint collapses to one clean equation for the focal length:</p>
     <div class="mvg-math">(u<sub>i</sub>−c<sub>x</sub>)(u<sub>j</sub>−c<sub>x</sub>) + (v<sub>i</sub>−c<sub>y</sub>)(v<sub>j</sub>−c<sub>y</sub>) + f&#178; = 0&nbsp;&nbsp;&#8658;&nbsp;&nbsp; f = &#8730;( −[(u<sub>i</sub>−c<sub>x</sub>)(u<sub>j</sub>−c<sub>x</sub>) + (v<sub>i</sub>−c<sub>y</sub>)(v<sub>j</sub>−c<sub>y</sub>)] )</div>
-    <p>Recovering intrinsics (and, with all three pairs, the full <var>K</var>) from vanishing points alone, with no ruler and no checkerboard — one photo of a rectangular room is enough. Part 2 defines &#969; properly (it's the image of the absolute conic, a stand-in for <var>K</var> that ignores camera position) and shows where this constraint actually comes from.</p>
+    <p>Recovering intrinsics (and, with all three pairs, the full <var>K</var>) from vanishing points alone, with no ruler and no checkerboard — one photo of a rectangular room is enough. Part 5 defines &#969; properly (it's the image of the absolute conic, a stand-in for <var>K</var> that ignores camera position) and shows where this constraint actually comes from.</p>
     <div class="mvg-demo">
       <div class="mvg-canvas-wrap">
         <div id="s7-plot3d" class="mvg-plot3d"></div>
