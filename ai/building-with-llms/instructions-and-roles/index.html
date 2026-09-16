@@ -374,6 +374,7 @@ series: "building_with_llms"
   function drawC() {
     if (!setupC) return;
     var ctx = setupC.ctx, H = 380;
+    ctx.clearRect(0, 0, 640, H);
     var segs = assemble();
     var full = segs.map(function (s) { return s.text; }).join('\n');
     var used = AppSim.countTokens(full);
@@ -474,6 +475,7 @@ series: "building_with_llms"
   function drawD() {
     if (!setupD) return;
     var ctx = setupD.ctx, H = 360;
+    ctx.clearRect(0, 0, 640, H);
     var row = INJ_ROWS[INJ.state];
     var sim = AppSim.injectionSim(row.defense, 'indirect-document');
     var isDelim = INJ.state >= 1;
