@@ -497,10 +497,111 @@
     };
   }
 
+  // Horizontal step / trace track: a sequence of connected nodes with labels,
+  // used by a ReAct trace player, a cache-simulator timeline and an agent film
+  // strip. steps: [{id?, label, state?('done'|'active'|'pending'|'error'), color?}].
+  // opts: {active (index), nodeR, padL, padR, padT, padB, labelEvery, labelColor}.
+  // Returns {nodes:[{id, index, x, y, r}], x(i), y} in logical canvas coords, so a
+  // page can hit-test a node with Guide.hitTest and advance `active`.
+  function drawTraceTrack(ctx, W, H, steps, opts) {
+    opts = opts || {};
+    var c = colors();
+    ctx.clearRect(0, 0, W, H);
+    steps = steps || [];
+    if (!steps.length) return { nodes: [], x: function () { return 0; }, y: 0 };
+    var padL = opts.padL != null ? opts.padL : 34, padR = opts.padR != null ? opts.padR : 34;
+    var padT = opts.padT != null ? opts.padT : 28, padB = opts.padB != null ? opts.padB : 44;
+    var plotW = W - padL - padR;
+    var n = steps.length;
+    var gap = n > 1 ? plotW / (n - 1) : 0;
+    var y = padT + (H - padT - padB) / 2;
+    var nodeR = opts.nodeR || 9;
+    var active = opts.active != null ? opts.active : -1;
+    var labelEvery = opts.labelEvery || (n > 14 ? Math.ceil(n / 8) : 1);
+
+    ctx.strokeStyle = c.divider; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(padL + gap * (n - 1), y); ctx.stroke();
+
+    var stateColor = {
+      done: c.accent700 || c.accent, active: c.accent2, pending: c.divider, error: c.accent2
+    };
+    var nodes = steps.map(function (s, i) {
+      var x = padL + i * gap;
+      var isActive = i === active;
+      var col = s.color || stateColor[s.state] || (isActive ? c.accent2 : c.accent400);
+      if (i < active && !s.color && !s.state) col = c.accent700 || c.accent;
+      ctx.beginPath(); ctx.arc(x, y, isActive ? nodeR + 2 : nodeR, 0, 2 * Math.PI);
+      ctx.fillStyle = col; ctx.fill();
+      if (isActive) { ctx.strokeStyle = c.accent2; ctx.lineWidth = 2; ctx.stroke(); }
+      if (i % labelEvery === 0 || isActive) {
+        ctx.fillStyle = opts.labelColor || c.text;
+        ctx.font = (isActive ? '600 ' : '') + '10px ' + c.font;
+        ctx.textAlign = 'center';
+        ctx.fillText(String(s.label == null ? i : s.label).slice(0, 12), x, y + nodeR + 16);
+      }
+      return { id: s.id != null ? s.id : i, index: i, x: x, y: y, r: nodeR + 6 };
+    });
+    if (opts.axisLabel) {
+      ctx.fillStyle = c.text; ctx.font = '11px ' + c.font; ctx.textAlign = 'left';
+      ctx.fillText(opts.axisLabel, padL, H - 4);
+    }
+    return { nodes: nodes, x: function (i) { return padL + i * gap; }, y: y, nodeR: nodeR };
+  }
+
+  // Stacked-column timeline: one vertical stacked bar per step, read left to
+  // right. The counterpart to drawStacked (horizontal rows) for anything with a
+  // time axis — an agent's per-step context composition, a per-request cost
+  // breakdown. columns: [{label, segments:[{value,color,name}], marker?}].
+  // opts: {maxTotal, gap, padL, padR, padT, padB, plotH, labelEvery, palette}.
+  // Returns {px(i), py(v), colW, padT, plotH, maxTotal}.
+  function drawStackedColumns(ctx, W, H, columns, opts) {
+    opts = opts || {};
+    var c = colors();
+    ctx.clearRect(0, 0, W, H);
+    columns = columns || [];
+    if (!columns.length) return { px: function () { return 0; }, py: function () { return 0; }, colW: 0, padT: 0, plotH: 0, maxTotal: 1 };
+    var padL = opts.padL != null ? opts.padL : 34, padR = opts.padR != null ? opts.padR : 12;
+    var padT = opts.padT != null ? opts.padT : 12, padB = opts.padB != null ? opts.padB : 26;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+    var gap = opts.gap == null ? 2 : opts.gap;
+    var totals = columns.map(function (col) {
+      return col.segments.reduce(function (a, s) { return a + Math.max(0, s.value); }, 0);
+    });
+    var maxTotal = opts.maxTotal != null ? opts.maxTotal : (Math.max.apply(null, totals) || 1);
+    var colW = (plotW - gap * (columns.length - 1)) / columns.length;
+    var palette = opts.palette || [c.accent, c.accent2, c.accent400, c.accent700, '#c9a227', '#7a5c9e', '#5f8a3a', '#b0552d'];
+    var labelEvery = opts.labelEvery || (columns.length > 16 ? Math.ceil(columns.length / 8) : 1);
+
+    columns.forEach(function (col, i) {
+      var x = padL + i * (colW + gap);
+      var y = padT + plotH;
+      col.segments.forEach(function (s, j) {
+        var h = plotH * (Math.max(0, s.value) / maxTotal);
+        y -= h;
+        ctx.fillStyle = s.color || palette[j % palette.length];
+        ctx.fillRect(x, y, Math.max(1, colW), Math.max(0, h));
+      });
+      if (col.marker) {
+        ctx.fillStyle = col.marker.color || c.accent2;
+        ctx.fillRect(x, padT - 6, Math.max(1, colW), 4);
+      }
+      ctx.fillStyle = c.text; ctx.font = '9px ' + c.font; ctx.textAlign = 'center';
+      if (i % labelEvery === 0 || i === columns.length - 1) {
+        ctx.fillText(String(col.label == null ? i : col.label), x + colW / 2, H - 8);
+      }
+    });
+    ctx.strokeStyle = c.divider; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(padL, padT + plotH); ctx.lineTo(padL + plotW, padT + plotH); ctx.stroke();
+    function px(i) { return padL + i * (colW + gap) + colW / 2; }
+    function py(v) { return padT + plotH * (1 - v / maxTotal); }
+    return { px: px, py: py, colW: colW, padT: padT, plotH: plotH, maxTotal: maxTotal, padL: padL };
+  }
+
   global.Guide = {
     css: css, colors: colors, setupCanvas: setupCanvas, hitTest: hitTest,
     drawBars: drawBars, drawLines: drawLines, drawColumns: drawColumns, drawStacked: drawStacked, drawHeatmap: drawHeatmap,
     drawArrow: drawArrow, dragHandles: dragHandles, niceTicks: niceTicks,
+    drawTraceTrack: drawTraceTrack, drawStackedColumns: drawStackedColumns,
     softmax: softmax, seededRandom: seededRandom, gaussianFrom: gaussianFrom,
     fmtBytes: fmtBytes, fmtNum: fmtNum, fmtPct: fmtPct, fmtMs: fmtMs,
     loop: loop, bindSliders: bindSliders
