@@ -4,8 +4,10 @@ articles, and the standalone interactive guide HTML files. Pages mark their
 subject with `section: ai|vision|robotics` in front matter.
 
 Rendered as a collapsible left-hand sidebar (fixed on desktop, an off-canvas
-drawer on narrow screens). The collapsed/expanded state is remembered per
-browser via localStorage; the mobile drawer state is not persisted.
+drawer on narrow screens). Collapsing it hides the sidebar down to just its
+hamburger toggle, floating top-left, rather than an icon rail — the
+collapsed/expanded state is remembered per browser via localStorage; the
+mobile drawer state is not persisted.
 {%- endcomment -%}
 <button type="button" class="nav-mobile-toggle" id="nav-mobile-toggle" aria-label="Open navigation" aria-expanded="false" aria-controls="site-nav">
   <span class="nav-mobile-toggle-bar"></span>
@@ -15,16 +17,18 @@ browser via localStorage; the mobile drawer state is not persisted.
 <div class="nav-scrim" id="nav-scrim" hidden></div>
 <nav class="nav" id="site-nav">
   <div class="nav-head">
-    <a class="nav-brand" href="{{ '/' | relative_url }}"><span class="nav-brand-dot" aria-hidden="true"></span><span class="nav-label">AI /</span></a>
+    <a class="nav-brand" href="{{ '/' | relative_url }}"><span class="nav-brand-dot" aria-hidden="true"></span>AI /</a>
     <button type="button" class="nav-collapse-toggle" id="nav-collapse-toggle" aria-label="Collapse navigation" aria-expanded="true" aria-controls="site-nav">
-      <span aria-hidden="true">&laquo;</span>
+      <span class="nav-mobile-toggle-bar" aria-hidden="true"></span>
+      <span class="nav-mobile-toggle-bar" aria-hidden="true"></span>
+      <span class="nav-mobile-toggle-bar" aria-hidden="true"></span>
     </button>
   </div>
-  <a href="{{ '/' | relative_url }}" title="Home"{% if page.layout == 'home' %} aria-current="page"{% endif %}><span class="nav-icon" aria-hidden="true">{{ "Home" | slice: 0, 1 }}</span><span class="nav-label">Home</span></a>
+  <a href="{{ '/' | relative_url }}"{% if page.layout == 'home' %} aria-current="page"{% endif %}>Home</a>
   {%- for s in site.data.sections %}
-  <a href="{{ s.url | relative_url }}" title="{{ s.title }}"{% if page.section == s.id %} aria-current="page"{% endif %}><span class="nav-icon" aria-hidden="true">{{ s.title | slice: 0, 1 }}</span><span class="nav-label">{{ s.title }}</span></a>
+  <a href="{{ s.url | relative_url }}"{% if page.section == s.id %} aria-current="page"{% endif %}>{{ s.title }}</a>
   {%- endfor %}
-  <a href="{{ '/about/' | relative_url }}" title="About"{% if page.url == '/about/' %} aria-current="page"{% endif %}><span class="nav-icon" aria-hidden="true">{{ "About" | slice: 0, 1 }}</span><span class="nav-label">About</span></a>
+  <a href="{{ '/about/' | relative_url }}"{% if page.url == '/about/' %} aria-current="page"{% endif %}>About</a>
 </nav>
 <script>
 (function () {
@@ -40,7 +44,6 @@ browser via localStorage; the mobile drawer state is not persisted.
     if (collapseToggle) {
       collapseToggle.setAttribute('aria-expanded', String(!collapsed));
       collapseToggle.setAttribute('aria-label', collapsed ? 'Expand navigation' : 'Collapse navigation');
-      collapseToggle.innerHTML = '<span aria-hidden="true">' + (collapsed ? '&raquo;' : '&laquo;') + '</span>';
     }
   }
   var stored = null;
