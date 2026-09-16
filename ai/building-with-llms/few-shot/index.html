@@ -247,6 +247,7 @@ series: "building_with_llms"
   function drawA() {
     if (!setupA) return;
     var ctx = setupA.ctx, H = 340;
+    ctx.clearRect(0, 0, 640, H);
     var k = parseInt(A.k.value, 10);
     var acc = builderAcc(k, A.balanced, A.consistent, A.seed);
     var toks = k === 0 ? 0 : AppSim.countTokens(assembleExamples(k, A.balanced, A.consistent));
@@ -326,6 +327,7 @@ series: "building_with_llms"
   function drawB() {
     if (!setupB) return;
     var ctx = setupB.ctx, H = 340;
+    ctx.clearRect(0, 0, 640, H);
     var rec = parseInt(B.recency.value, 10) / 100;
     var padL = 54, padR = 16, padT = 42, padB = 42, plotH = H - padT - padB, plotW = 640 - padL - padR;
     var groupW = plotW / FORMATS.length, barW = groupW / 4;
@@ -423,6 +425,7 @@ series: "building_with_llms"
   function drawC() {
     if (!setupC) return;
     var ctx = setupC.ctx, H = 360;
+    ctx.clearRect(0, 0, 640, H);
     var arts = artifacts();
     ctx.textAlign = 'left';
     ctx.fillStyle = c.text; ctx.font = '600 11px ' + c.font;
