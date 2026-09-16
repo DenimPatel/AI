@@ -1,10 +1,14 @@
 {%- comment -%}
-Series pill nav. Usage:
+Series part picker. Usage:
   {% include series-nav.html series=site.data.series.multi_view_geometry %}
-Replaces the nav block that used to be copy-pasted into every part of a series.
-When the series declares an `acts:` list, the pills are grouped under act labels
-(presentational only: `num` is still the single source of part numbers, and
-series-prevnext.html still walks parts + appendix in flat order).
+Renders the part list, then (via the script below) moves it into the left
+sidebar (#site-nav, from site-nav.html) so it lives in the same collapsible
+pane as the rest of the site nav rather than as a second bar above the
+content. Left in its original DOM position — right after site-nav — it is
+still a fully usable pill row, which is what a no-JS visitor gets.
+When the series declares an `acts:` list, the pills are grouped under act
+labels (presentational only: `num` is still the single source of part
+numbers, and series-prevnext.html still walks parts + appendix in flat order).
 {%- endcomment -%}
 {%- assign current_part = nil -%}
 {%- for part in include.series.parts -%}
@@ -17,7 +21,7 @@ series-prevnext.html still walks parts + appendix in flat order).
 {%- assign current_part = extra -%}
 {%- endif -%}
 {%- endfor -%}
-<nav class="nav nav--series" aria-label="{{ include.series.title }} parts">
+<nav class="nav nav--series" id="series-nav-list" aria-label="{{ include.series.title }} parts">
   <a href="{{ include.series.hub | relative_url }}"{% if page.url == include.series.hub %} aria-current="page"{% endif %}>Contents</a>
   {%- if include.series.acts -%}
   {%- for act in include.series.acts -%}
@@ -42,27 +46,13 @@ series-prevnext.html still walks parts + appendix in flat order).
   {%- endfor %}
   {%- endif %}
 </nav>
-{%- if current_part %}
-<div class="nav-compact" id="series-nav-compact" aria-hidden="true">
-  <span class="nav-compact-series">{{ include.series.title }}</span>
-  <span class="nav-compact-sep">&middot;</span>
-  <span class="nav-compact-part">{{ current_part.short }}</span>
-</div>
-{%- endif %}
 <script>
 (function () {
-  var seriesNav = document.querySelector('.nav--series');
-  var current = seriesNav && seriesNav.querySelector('a[aria-current="page"]');
-  if (current) { current.scrollIntoView({ block: 'nearest', inline: 'center' }); }
-
   var siteNav = document.getElementById('site-nav');
-  var compact = document.getElementById('series-nav-compact');
-  if (!siteNav || !seriesNav || !compact) return;
-  siteNav.classList.add('nav--has-series');
-  var onScroll = function () {
-    compact.classList.toggle('is-visible', seriesNav.getBoundingClientRect().bottom < 0);
-  };
-  onScroll();
-  window.addEventListener('scroll', onScroll, { passive: true });
+  var seriesNav = document.getElementById('series-nav-list');
+  if (!siteNav || !seriesNav) return;
+  siteNav.appendChild(seriesNav);
+  var current = seriesNav.querySelector('a[aria-current="page"]');
+  if (current) current.scrollIntoView({ block: 'nearest' });
 })();
 </script>

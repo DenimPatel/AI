@@ -70,8 +70,11 @@ browser via localStorage; the mobile drawer state is not persisted.
   if (scrim) {
     scrim.addEventListener('click', function () { setOpen(false); });
   }
-  nav.querySelectorAll('a').forEach(function (a) {
-    a.addEventListener('click', function () { setOpen(false); });
+  // Delegated (not per-node): series-nav.html appends its part list into this
+  // nav after this script has already run, so a one-time-bound forEach would
+  // miss those links entirely.
+  nav.addEventListener('click', function (ev) {
+    if (ev.target.closest('a')) setOpen(false);
   });
   document.addEventListener('keydown', function (ev) {
     if (ev.key === 'Escape') setOpen(false);
