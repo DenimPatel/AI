@@ -275,7 +275,10 @@ redirect_from:
     <div class="mvg-step-head"><span class="mvg-step-num">9</span><h2>Scale ambiguity: the metric you never measured</h2></div>
     <p class="mvg-eyebrow">Foundations</p>
     <p>Trace the scale of every quantity on this page back to its source. <var>E</var> is defined only up to an overall scale — it's built from correspondences alone, and <var>E</var> and <var>&#955;E</var> satisfy the identical epipolar constraint for any <var>&#955; &#8800; 0</var>. The SVD recipe above hands back a unit-length <var>t</var> by construction. Every triangulated point inherits that same unknown scale. Nowhere in this entire pipeline — Part 6's essential matrix, this page's pose recovery, this page's triangulation — does an actual physical measurement (meters, millimeters, anything) ever enter. Two uncalibrated-scale images simply cannot tell you whether you're looking at a dollhouse or a house.</p>
-    <p>What you get instead is a reconstruction correct up to a <strong>similarity transform</strong> — a global rotation, a global translation, and a single global scale factor applied to every camera and every point simultaneously, with no way to distinguish the true reconstruction from any rescaled copy of it:</p>
+    <p>The size of that ambiguity depends on exactly one thing: whether the cameras are <strong>calibrated</strong>. A two-view reconstruction from an <strong>uncalibrated</strong> pair — <var>K</var> unknown, so the fundamental matrix is all you have — is defined only up to a general <strong>projective transformation <var>H</var></strong> of 3D space, the full <strong>15-DOF</strong> group of <var>P&#179;</var> (an arbitrary invertible 4&#215;4 matrix, modulo overall scale). Applying any such <var>H</var> to every camera and every 3D point leaves every image measurement bit-for-bit unchanged: send <var>X &#8594; HX</var> and <var>P &#8594; PH&#8315;&#185;</var> and the projection becomes <var>P&#8242;(HX) = PH&#8315;&#185;HX = PX</var> — literally the same number, for any <var>H</var>. An uncalibrated reconstruction is therefore only <em>projectively</em> correct: straight lines stay straight and cross-ratios survive, but angles, length ratios, and parallelism do not.</p>
+    <p>Knowing <var>K</var> removes the projective (and affine) part of that freedom. Calibration is what lets you promote <var>F</var> to the essential matrix <var>E = K&#7488;FK</var>, whose decomposition carries a genuine rotation and a metric translation direction; fold <var>K</var> in and only a <strong>similarity transform</strong> remains — <strong>7 DOF</strong> (3 rotation + 3 translation + 1 uniform scale), i.e. a Euclidean reconstruction up to a single unknown scale. The similarity group is the subgroup of <var>H</var> that additionally preserves angles and length ratios, which is precisely the extra structure calibration buys you. So: <strong>uncalibrated pair &#8594; projective <var>H</var>, 15 DOF; calibrated pair &#8594; similarity <var>(sR, t)</var>, 7 DOF.</strong></p>
+    <p>The intermediate step of that promotion has a name worth keeping. Recovering the <strong>plane at infinity</strong> (equivalently, the <strong>absolute dual quadric</strong>, or the image of the absolute conic) is what upgrades a projective reconstruction to an <em>affine</em> one; imposing the absolute conic&#8217;s constraints on that object is what then upgrades the affine reconstruction to <em>metric</em>. Calling this the &#8220;metric upgrade&#8221; is exact — it is not more triangulation, it is the extra geometric object that calibration pins down.</p>
+    <p>In the calibrated case, what you get instead is a reconstruction correct up to a <strong>similarity transform</strong> — a global rotation, a global translation, and a single global scale factor applied to every camera and every point simultaneously, with no way to distinguish the true reconstruction from any rescaled copy of it:</p>
     <div class="mvg-math">(R, t, {X&#8305;}) &nbsp;and&nbsp; (R, s&#183;t, {s&#183;X&#8305;}) &nbsp;are indistinguishable, for any s &gt; 0</div>
 {% endraw %}    <p>That's <strong>7 degrees of freedom</strong> (3 rotation + 3 translation + 1 scale) that no amount of additional two-view geometry can pin down — a <strong>gauge freedom</strong>, not a solvable unknown. The only way out is an external reference: a known physical size somewhere in the scene, a second sensor with its own metric ground truth (IMU, GPS, LIDAR), or a stereo rig with a physically-measured baseline (which is exactly why Section 7's <var>B</var> has to be a real, known number — that's where the metric scale that monocular two-view geometry can't supply comes from). This same 7-DOF freedom reappears, unchanged, as the gauge freedom that has to be fixed (usually by anchoring one camera and one distance) in bundle adjustment when reconstructing from many views in <a href="{{ '/vision/multi-view-geometry/sfm/' | relative_url }}">Structure from Motion</a>.</p>{% raw %}
     <div class="mvg-goal">&#127919; <b>Learning goal:</b> drag the global scale slider. The reconstruction grows and shrinks like a dollhouse, but the reprojection error &mdash; the only thing the images can actually measure &mdash; stays exactly at zero for <em>every</em> scale. Nothing in the two images moves. That is what "7-DOF gauge freedom" feels like.</div>
@@ -287,6 +290,27 @@ redirect_from:
       <div class="mvg-controls">
         <div class="mvg-field"><label>Global scale s <span class="val" id="s9-scaleval"></span></label><input type="range" id="s9-scale" min="0.3" max="3" step="0.05" value="1"></div>
         <div class="mvg-readout" id="s9-readout"></div>
+      </div>
+    </div>
+    <div class="mvg-goal">&#127919; <b>Learning goal:</b> switch the ambiguity group and roll a random transform. Under the <b>projective H</b> the cube shears and its edge lengths stop being equal; under the <b>similarity (sR, t)</b> it only rotates, translates, and uniformly rescales. In <em>both</em> cases the reprojected pixels are untouched: the readout&#8217;s max reprojection difference stays at float noise while the 3D coordinates visibly move. That gap between &#8220;the images cannot tell&#8221; and &#8220;the 3D scene clearly changed&#8221; <em>is</em> the ambiguity.</div>
+    <div class="mvg-demo">
+      <div class="mvg-canvas-wrap">
+        <canvas id="s9b-canvas" width="480" height="360"></canvas>
+        <p class="mvg-canvas-hint">Orthographic 2D view; the framing fits both the ghost and the transformed scene, so any motion you see is real. Ghost = original reconstruction, solid = transformed (and its cameras).</p>
+        <div class="mvg-legend">
+          <span><i style="background:#9b9797"></i>original</span>
+          <span><i style="background:var(--color-text)"></i>transformed</span>
+          <span><i style="background:var(--color-accent)"></i>camera 1</span>
+          <span><i style="background:var(--color-accent-2)"></i>camera 2</span>
+        </div>
+      </div>
+      <div class="mvg-controls">
+        <div class="mvg-btnrow">
+          <button id="s9b-proj" class="mvg-primary">projective H (15 DOF)</button>
+          <button id="s9b-sim">similarity (sR, t) (7 DOF)</button>
+        </div>
+        <div class="mvg-btnrow"><button id="s9b-random">Apply a random transform</button></div>
+        <div class="mvg-readout" id="s9b-readout"></div>
       </div>
     </div>
   </section>
@@ -306,7 +330,7 @@ redirect_from:
         <tr><td>Midpoint triangulation</td><td>Two back-projected rays</td><td>Midpoint of common perpendicular</td><td>Minimizes 3D ray distance, not pixel error — biased along depth</td></tr>
         <tr><td>Optimal (Hartley&ndash;Sturm) triangulation</td><td><var>F</var> + noisy <var>x&#8321;, x&#8322;</var></td><td>Corrected <var>x&#770;&#8321;, x&#770;&#8322;</var> on the epipolar constraint</td><td>ML-optimal under Gaussian pixel noise; degree-6 polynomial, closed-form</td></tr>
         <tr><td>Depth uncertainty</td><td>Pixel noise &#963;, focal <var>f</var>, baseline <var>B</var>, depth <var>Z</var></td><td><code>&#916;Z &#8776; &#963;&#183;Z&#178;/(fB)</code></td><td>Quadratic in distance, only linear (inverse) in baseline</td></tr>
-        <tr><td>Scale ambiguity</td><td>Two uncalibrated-scale views</td><td>Reconstruction up to a similarity transform</td><td>7-DOF gauge (3 rot + 3 trans + 1 scale) — needs an external metric reference</td></tr>
+        <tr><td>Scale ambiguity</td><td>Two views; uncalibrated vs. calibrated (K known)</td><td>Reconstruction up to <var>H</var>, or up to a similarity once <var>K</var> is known</td><td>Uncalibrated: 15-DOF projective <var>H</var> in <var>P&#179;</var>. Calibrated: 7-DOF similarity gauge (3 rot + 3 trans + 1 scale). Both need an external metric reference</td></tr>
       </tbody>
     </table>
     </div>
@@ -1097,6 +1121,234 @@ redirect_from:
     }
     scaleEl.addEventListener('input', update);
     update();
+  })();
+
+  // ---------- Step 9b: projective vs. similarity ambiguity demo ----------
+  (function(){
+    var canvas = document.getElementById('s9b-canvas');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var W = canvas.width, H = canvas.height;
+    var K = { fx: 480, fy: 480, cx: 0, cy: 0 };
+    var group = 'projective';
+    var Hmat = null;
+
+    // scene: a cube and two cameras (same idea as the scale demo above)
+    var R0 = 0.9;
+    var PTS = [];
+    [-1,1].forEach(function(sx){ [-1,1].forEach(function(sy){ [-1,1].forEach(function(sz){
+      PTS.push([sx*R0, sy*R0, sz*R0 + 1.4]);
+    }); }); });
+    var EDGES = [];
+    for (var pi=0; pi<8; pi++) for (var pj=pi+1; pj<8; pj++){
+      var nd = 0;
+      for (var pk=0; pk<3; pk++) nd += Math.abs(PTS[pi][pk]-PTS[pj][pk]) > 1e-6 ? 1 : 0;
+      if (nd === 1) EDGES.push([pi, pj]);
+    }
+    var CAMS = [
+      { R: [[1,0,0],[0,1,0],[0,0,1]], C: [0,0,-3.2] },
+      MVG.orbitCamera(0.55, 0.2, 4.6, [0,0,1.4])
+    ];
+    var Pbase = CAMS.map(function(c){ return projectionMatrix(K, c); });
+    var view = MVG.orbitCamera(0.9, 0.25, 16, [0,0,0.5]);
+
+    function projP(P, X){
+      var xh = [X[0], X[1], X[2], 1];
+      var u = P[0][0]*xh[0] + P[0][1]*xh[1] + P[0][2]*xh[2] + P[0][3];
+      var v = P[1][0]*xh[0] + P[1][1]*xh[1] + P[1][2]*xh[2] + P[1][3];
+      var w = P[2][0]*xh[0] + P[2][1]*xh[1] + P[2][2]*xh[2] + P[2][3];
+      if (Math.abs(w) < 1e-12) return null;
+      return { u: u/w, v: v/w };
+    }
+    var PIX = PTS.map(function(X){ return Pbase.map(function(P){ return projP(P, X); }); });
+
+    function mul34(P, M){
+      var out = [[0,0,0,0],[0,0,0,0],[0,0,0,0]];
+      for (var i=0;i<3;i++) for (var j=0;j<4;j++){ var s=0; for (var k=0;k<4;k++) s += P[i][k]*M[k][j]; out[i][j]=s; }
+      return out;
+    }
+    function det4(m){
+      var sg = [1,-1,1,-1], s = 0;
+      for (var c=0;c<4;c++){
+        if (!m[0][c]) continue;
+        var sub = [];
+        for (var r=1;r<4;r++){ var row=[]; for (var cc=0;cc<4;cc++){ if (cc!==c) row.push(m[r][cc]); } sub.push(row); }
+        s += sg[c]*m[0][c]*mat3Det(sub);
+      }
+      return s;
+    }
+    function inv4(A){
+      var n=4, M=[[],[],[],[]], I=[[],[],[],[]];
+      for (var r=0;r<n;r++) for (var c=0;c<n;c++){ M[r].push(A[r][c]); I[r].push(r===c?1:0); }
+      for (var col=0; col<n; col++){
+        var piv=col;
+        for (var rr=col+1; rr<n; rr++) if (Math.abs(M[rr][col]) > Math.abs(M[piv][col])) piv=rr;
+        var t1=M[col]; M[col]=M[piv]; M[piv]=t1; var t2=I[col]; I[col]=I[piv]; I[piv]=t2;
+        var pv = M[col][col] || 1e-12;
+        for (var c2=0;c2<n;c2++){ M[col][c2]/=pv; I[col][c2]/=pv; }
+        for (var r2=0;r2<n;r2++){
+          if (r2===col) continue;
+          var f=M[r2][col];
+          if (!f) continue;
+          for (var c3=0;c3<n;c3++){ M[r2][c3]-=f*M[col][c3]; I[r2][c3]-=f*I[col][c3]; }
+        }
+      }
+      return I;
+    }
+    function applyH(M, X){
+      var xh=[X[0],X[1],X[2],1], y=[0,0,0,0];
+      for (var i=0;i<4;i++){ var s=0; for (var j=0;j<4;j++) s += M[i][j]*xh[j]; y[i]=s; }
+      if (Math.abs(y[3]) < 1e-9) return null;
+      return [y[0]/y[3], y[1]/y[3], y[2]/y[3]];
+    }
+    function applyDir(M, d){
+      var y=[0,0,0,0];
+      for (var i=0;i<4;i++){ var s=0; for (var j=0;j<3;j++) s += M[i][j]*d[j]; y[i]=s; }
+      if (Math.abs(y[3]) < 1e-6) return null;
+      return MVG.normalize([y[0]/y[3], y[1]/y[3], y[2]/y[3]]);
+    }
+
+    function makeSimilarity(){
+      var a=(Math.random()*2-1)*Math.PI*0.85, b=(Math.random()*2-1)*Math.PI*0.55, c=(Math.random()*2-1)*Math.PI*0.85;
+      var Rz=[[Math.cos(c),-Math.sin(c),0],[Math.sin(c),Math.cos(c),0],[0,0,1]];
+      var Ry=[[Math.cos(b),0,Math.sin(b)],[0,1,0],[-Math.sin(b),0,Math.cos(b)]];
+      var Rx=[[1,0,0],[0,Math.cos(a),-Math.sin(a)],[0,Math.sin(a),Math.cos(a)]];
+      var R = mat3Mul(mat3Mul(Rz,Ry), Rx);
+      var s = 0.5 + Math.random()*1.3;
+      var t = [(Math.random()*2-1)*1.3, (Math.random()*2-1)*1.0, (Math.random()*2-1)*1.3];
+      var M = [[0,0,0,t[0]],[0,0,0,t[1]],[0,0,0,t[2]],[0,0,0,1]];
+      for (var i=0;i<3;i++) for (var j=0;j<3;j++) M[i][j] = s*R[i][j];
+      return M;
+    }
+    function makeProjective(){
+      var M = [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]];
+      var i, j;
+      for (i=0;i<3;i++) for (j=0;j<3;j++) M[i][j] += gaussianNoise(0.26);
+      for (i=0;i<3;i++) M[i][3] += gaussianNoise(0.7);
+      for (j=0;j<3;j++) M[3][j] += gaussianNoise(0.07);
+      var f = Math.pow(Math.abs(det4(M)), 0.25) || 1;
+      for (i=0;i<4;i++) for (j=0;j<4;j++) M[i][j] /= f;
+      return M;
+    }
+    function tryMake(){
+      var checks = PTS.concat(CAMS.map(function(c){ return c.C; }));
+      for (var attempt=0; attempt<80; attempt++){
+        var M = group === 'similarity' ? makeSimilarity() : makeProjective();
+        var ok = true;
+        for (var i=0;i<checks.length && ok;i++){
+          var Y = applyH(M, checks[i]);
+          if (!Y || !isFinite(Y[0]) || !isFinite(Y[1]) || !isFinite(Y[2]) || MVG.norm(Y) > 45) ok = false;
+        }
+        if (ok) return M;
+      }
+      return [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0.05,0.03,0.04,1]];
+    }
+
+    function toView(p){ var q = MVG.worldToCamera(view, p); return [q[0], q[1]]; }
+
+    function render(){
+      var Hinv = inv4(Hmat);
+      var Ptr = Pbase.map(function(P){ return mul34(P, Hinv); });
+      var pts = PTS.map(function(X){ return applyH(Hmat, X); });
+
+      // the invariance claim: P(H^{-1}) applied to H X must reproduce the original pixels
+      var maxDiff = 0, maxMove = 0;
+      for (var i=0;i<PTS.length;i++){
+        for (var c=0;c<2;c++){
+          var qq = projP(Ptr[c], pts[i]);
+          var pp = PIX[i][c];
+          if (qq && pp) maxDiff = Math.max(maxDiff, Math.hypot(qq.u-pp.u, qq.v-pp.v));
+        }
+        maxMove = Math.max(maxMove, MVG.norm(MVG.sub(pts[i], PTS[i])));
+      }
+      var lens = [];
+      EDGES.forEach(function(e){
+        if (pts[e[0]] && pts[e[1]]) lens.push(MVG.norm(MVG.sub(pts[e[0]], pts[e[1]])));
+      });
+      var lmin = Math.min.apply(null, lens), lmax = Math.max.apply(null, lens);
+      var spread = lmin > 1e-9 ? lmax/lmin : Infinity;
+
+      // ---- draw the reconstruction ----
+      var camSolid = CAMS.map(function(cam){
+        return { C: applyH(Hmat, cam.C), ax: [0,1,2].map(function(k){ return applyDir(Hmat, cam.R[k]); }) };
+      });
+      var ghost = PTS.map(toView);
+      var solid = pts.map(function(p){ return p ? toView(p) : null; });
+
+      var allv = ghost.concat(solid.filter(function(p){ return p; }));
+      var minx=1e9, maxx=-1e9, miny=1e9, maxy=-1e9;
+      allv.forEach(function(p){ minx=Math.min(minx,p[0]); maxx=Math.max(maxx,p[0]); miny=Math.min(miny,p[1]); maxy=Math.max(maxy,p[1]); });
+      var span = Math.max(maxx-minx, maxy-miny, 1e-3);
+      var sc = Math.min(W,H)*0.82/span;
+      var ccx=(minx+maxx)/2, ccy=(miny+maxy)/2;
+      var camSize = span*0.11;
+      function toPx(v){ return [W/2 + (v[0]-ccx)*sc, H/2 + (v[1]-ccy)*sc]; }
+
+      ctx.clearRect(0,0,W,H);
+      ctx.fillStyle = 'rgba(0,0,0,0.04)'; ctx.fillRect(0,0,W,H);
+
+      // ghost cube + camera centers
+      ctx.strokeStyle = '#9b9797'; ctx.lineWidth = 1.2; ctx.setLineDash([4,3]); ctx.globalAlpha = 0.85;
+      EDGES.forEach(function(e){
+        var a=toPx(ghost[e[0]]), b=toPx(ghost[e[1]]);
+        ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); ctx.stroke();
+      });
+      ctx.setLineDash([]); ctx.globalAlpha = 1;
+      ctx.fillStyle = '#9b9797';
+      CAMS.forEach(function(cam){ var s=toPx(toView(cam.C)); ctx.beginPath(); ctx.arc(s[0],s[1],3,0,7); ctx.fill(); });
+
+      // transformed cube
+      ctx.strokeStyle = COLOR_TEXT; ctx.lineWidth = 2;
+      EDGES.forEach(function(e){
+        if (!solid[e[0]] || !solid[e[1]]) return;
+        var a=toPx(solid[e[0]]), b=toPx(solid[e[1]]);
+        ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); ctx.stroke();
+      });
+
+      // transformed cameras + frusta
+      camSolid.forEach(function(cam, idx){
+        if (!cam.C) return;
+        var color = idx===0 ? COLOR_ACCENT : COLOR_ACCENT2;
+        var Cv = MVG.worldToCamera(view, cam.C);
+        var f  = cam.ax[2] ? MVG.matVec(view.R, cam.ax[2]) : [0,0,1];
+        var rr = cam.ax[0] ? MVG.matVec(view.R, cam.ax[0]) : [1,0,0];
+        var dd = cam.ax[1] ? MVG.matVec(view.R, cam.ax[1]) : [0,1,0];
+        var corners = [[-1,-1],[1,-1],[1,1],[-1,1]].map(function(sg){
+          return [Cv[0]+f[0]*camSize + rr[0]*sg[0]*camSize*0.6 + dd[0]*sg[1]*camSize*0.6,
+                  Cv[1]+f[1]*camSize + rr[1]*sg[0]*camSize*0.6 + dd[1]*sg[1]*camSize*0.6];
+        });
+        var cPx = toPx([Cv[0],Cv[1]]);
+        ctx.strokeStyle = color; ctx.lineWidth = 1.4;
+        corners.forEach(function(v){ var p=toPx(v); ctx.beginPath(); ctx.moveTo(cPx[0],cPx[1]); ctx.lineTo(p[0],p[1]); ctx.stroke(); });
+        for (var ci=0; ci<4; ci++){
+          var a=toPx(corners[ci]), b=toPx(corners[(ci+1)%4]);
+          ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); ctx.stroke();
+        }
+        ctx.fillStyle = color;
+        ctx.beginPath(); ctx.arc(cPx[0],cPx[1],4.5,0,7); ctx.fill();
+      });
+
+      var label = group === 'similarity' ? 'similarity (sR, t)' : 'projective H';
+      var dof = group === 'similarity' ? '7' : '15';
+      document.getElementById('s9b-readout').innerHTML =
+        '<div><span class="k">active group</span> = <span class="hi">' + label + '</span> (' + dof + ' DOF)</div>' +
+        '<div><span class="k">max reprojection difference vs. original</span> = <span class="hi">' + maxDiff.toExponential(1) + ' px</span> <span style="opacity:.6">(float noise &#8212; the images are identical)</span></div>' +
+        '<div><span class="k">max 3D point displacement</span> = <span class="hi">' + maxMove.toFixed(2) + ' units</span></div>' +
+        '<div><span class="k">cube edge-length spread (max/min)</span> = <span class="hi">' + (isFinite(spread) ? spread.toFixed(3) : '&#8734;') + '</span> <span style="opacity:.6">' + (group === 'similarity' ? '&#8212; rigid + uniform scale, so exactly 1' : '&#8212; a projective H shears lengths unequally') + '</span></div>' +
+        '<div style="opacity:.65">Identical pixels, different 3D. That is the 15-DOF projective ambiguity of an uncalibrated pair, and the 7-DOF similarity gauge that survives even with K known.</div>';
+    }
+
+    var projBtn = document.getElementById('s9b-proj'), simBtn = document.getElementById('s9b-sim');
+    function setActive(){
+      projBtn.classList.toggle('mvg-primary', group === 'projective');
+      simBtn.classList.toggle('mvg-primary', group === 'similarity');
+    }
+    function randomize(){ Hmat = tryMake(); render(); }
+    projBtn.addEventListener('click', function(){ group='projective'; setActive(); randomize(); });
+    simBtn.addEventListener('click', function(){ group='similarity'; setActive(); randomize(); });
+    document.getElementById('s9b-random').addEventListener('click', randomize);
+    setActive();
+    randomize();
   })();
 
 })();
