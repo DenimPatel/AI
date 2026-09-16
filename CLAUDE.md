@@ -40,6 +40,11 @@ ruby scripts/lint-content.rb
 # asserts known CDF/quantile/test/Kalman values against assets/js/stats-viz.js)
 node scripts/check-stats-viz.js
 
+# numerics self-check for the generative-media / multimodal domain layers
+# (schedules, DDIM round-trip, flow matching, scores, CFG, STFT/mel/RVQ, softmax
+# and contrastive losses, token budgets, the tiny-MLP trainer)
+node scripts/check-genmedia-viz.js
+
 # rendered-page smoke test: loads built guide pages from _site in a real browser,
 # fails on console/page errors and blank canvases. Local dev aid, NOT in CI. Pass a
 # path prefix to scope it, e.g. `node scripts/smoke-guides.js math/statistics`.
@@ -233,6 +238,37 @@ metrics; `scripts/smoke-guides.js` loads built pages from `_site` in Playwright 
 browser from the npx cache or installed Chrome), failing on console/page errors and blank
 canvases. Its glossary appendix is a filterable term index plus the distribution table, the
 test-selection table and the estimator/interval card.
+
+The Multimodal & Generative Media arc (`_data/series/generative_media.yml`,
+`_data/series/multimodal.yml`, `/ai/generative-media/` and `/ai/multimodal/`) is the guide
+kit's **fifth and sixth real consumers** and its second two-volume series, mirroring the
+Probability pair. Both volumes are registered in `_data/sections.yml`; each hub is a
+`series-hub` page and each volume groups its parts under `acts:`. Three domain files sit on
+top of the kit, following the same generic-vs-domain split: `assets/js/genmedia-viz.js`
+(`window.GenMedia`) is loaded **first and shared by both volumes** — seeded RNG/Box–Muller,
+`GenMedia.plot` (modelled directly on `Stats.plot`, same `px/py/wx/wy` mapping and
+`handles(specsOrFn, onChange)` contract), `GenMedia.raster` (an H×W×C float image with a
+nearest-neighbour renderer and patch grid), procedural `GenMedia.img`, the seeded
+`GenMedia.net` MLP with hand-written backprop, `GenMedia.dsp` (FFT, STFT, mel filterbank,
+RVQ, codec rates), `GenMedia.attn` (softmax, cosine, InfoNCE, SigLIP), `GenMedia.cost` and
+`GenMedia.timeline`. `assets/js/diffusion-viz.js` (`window.Diffusion`, Volume I only) holds
+the noise schedules, the forward process, the DDIM/DDPM/Euler solvers, flow matching,
+score functions and SDE coefficients, classifier-free guidance, a toy VAE, the
+distillation/control/video helpers and the U-Net/DiT cost wrappers.
+`assets/js/multimodal-viz.js` (`window.Multimodal`, Volume II only) holds the ViT
+patchifier and position embeddings, the CLIP/SigLIP objectives, retrieval and zero-shot
+helpers, AnyRes/native-resolution tiling arithmetic, the three generation orders and the
+modality table. Kit-side the arc adds exactly two generic things: `Guide.lerpColor(a, b, t)`
+— promoted out of `drawHeatmap`'s inline interpolation, and now used by both new volumes —
+and `.g-imgrow`/`.g-imgcell`/`.g-spec` to `guide.css` for image strips and spectrogram
+captions. Everything else domain-shaped stays in the three files above. Its numerics check
+is `scripts/check-genmedia-viz.js` (mirrors `check-stats-viz.js`, loads the optional domain
+files as they appear so it is green at every commit); `scripts/build-multimodal-embeddings.js`
+regenerates `assets/data/multimodal-embeddings.json` from a hand-authored concept-attribute
+matrix, and the page that fetches it labels it explicitly as illustrative, not real CLIP
+output. `scripts/lint-content.rb` carries disjoint name hints for the two volume titles so
+their "N-part" counters are policed independently, as `probability` and
+`probability_in_action` are.
 
 `assets/js/guide-quiz.js` (`window.GuideQuiz`) adds a "check your understanding" quiz
 section every `/math/` part page ends with, right before `.g-next`. It is generic — the UI,

@@ -124,3 +124,175 @@
   points:
     - "Demonstrated efficient training of powerful open-source language models"
     - "Sparked widespread development of open LLMs"
+- era: "2018-2020"
+  title: "Denoising Diffusion Probabilistic Models"
+  authors: "Ho, Jain & Abbeel"
+  year: 2020
+  url: "https://arxiv.org/pdf/2006.11239"
+  points:
+    - "Cast image generation as learning to reverse a fixed Gaussian noising process"
+    - "Introduced the simplified epsilon-prediction training objective that made diffusion practical"
+- era: "2018-2020"
+  title: "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale"
+  authors: "Dosovitskiy et al."
+  aka: "ViT paper"
+  year: 2020
+  url: "https://arxiv.org/pdf/2010.11929"
+  points:
+    - "Showed a plain transformer over image patches could match convolutional networks at scale"
+    - "Became the vision encoder every multimodal model now uses"
+- era: "2021-2023"
+  title: "Score-Based Generative Modeling through Stochastic Differential Equations"
+  authors: "Song et al."
+  aka: "Score-SDE paper"
+  year: 2021
+  url: "https://arxiv.org/pdf/2011.13456"
+  points:
+    - "Unified score matching and diffusion as discretisations of one SDE"
+    - "Introduced the probability-flow ODE and the variance-exploding/preserving view"
+- era: "2021-2023"
+  title: "Learning Transferable Visual Models From Natural Language Supervision"
+  authors: "Radford et al."
+  aka: "CLIP paper"
+  year: 2021
+  url: "https://arxiv.org/pdf/2103.00020"
+  points:
+    - "Aligned images and captions in one embedding space with a contrastive objective"
+    - "Enabled zero-shot classification and became the default text encoder for image generation"
+- era: "2021-2023"
+  title: "High-Resolution Image Synthesis with Latent Diffusion Models"
+  authors: "Rombach et al."
+  aka: "Latent diffusion / Stable Diffusion paper"
+  year: 2022
+  url: "https://arxiv.org/pdf/2112.10752"
+  points:
+    - "Moved diffusion into a compressed latent space, cutting cost by an order of magnitude"
+    - "Added cross-attention conditioning that made text-to-image controllable"
+- era: "2021-2023"
+  title: "Classifier-Free Diffusion Guidance"
+  authors: "Ho & Salimans"
+  year: 2022
+  url: "https://arxiv.org/pdf/2207.12598"
+  points:
+    - "Showed guidance could be obtained by interpolating conditional and unconditional predictions"
+    - "Removed the need for a separate classifier and became the standard sampling trick"
+- era: "2021-2023"
+  title: "Scalable Diffusion Models with Transformers"
+  authors: "Peebles & Xie"
+  aka: "DiT paper"
+  year: 2022
+  url: "https://arxiv.org/pdf/2212.09748"
+  points:
+    - "Replaced the U-Net with a plain transformer over latent patches"
+    - "Introduced adaLN-Zero conditioning and inherited language-model scaling laws"
+- era: "2021-2023"
+  title: "Flow Matching for Generative Modeling"
+  authors: "Lipman et al."
+  year: 2022
+  url: "https://arxiv.org/pdf/2210.02747"
+  points:
+    - "Trained a velocity field along a chosen probability path with a simple regression loss"
+    - "Generalised diffusion and became the objective behind the 2026 image frontier"
+- era: "2021-2023"
+  title: "Flow Straight and Fast: Learning to Generate and Transfer Data with Rectified Flow"
+  authors: "Liu, Gong & Liu"
+  year: 2022
+  url: "https://arxiv.org/pdf/2209.03003"
+  points:
+    - "Straightened the flow's integral curves so few-step sampling becomes possible"
+    - "Underlies the reflow and shortcut families of fast samplers"
+- era: "2021-2023"
+  title: "Robust Speech Recognition via Large-Scale Weak Supervision"
+  authors: "Radford et al."
+  aka: "Whisper paper"
+  year: 2022
+  url: "https://arxiv.org/pdf/2212.04356"
+  points:
+    - "Trained a single attention encoder-decoder on 680,000 hours of weakly labelled audio"
+    - "Set the robustness standard for speech recognition across accents and noise"
+- era: "2021-2023"
+  title: "High Fidelity Neural Audio Compression"
+  authors: "Défossez et al."
+  aka: "EnCodec paper"
+  year: 2022
+  url: "https://arxiv.org/pdf/2210.13438"
+  points:
+    - "Turned audio into a few hundred discrete tokens per second with a residual vector quantiser"
+    - "Became the tokenizer that makes audio language modelling possible"
+- era: "2021-2023"
+  title: "Sigmoid Loss for Language Image Pre-Training"
+  authors: "Zhai et al."
+  aka: "SigLIP paper"
+  year: 2023
+  url: "https://arxiv.org/pdf/2303.15343"
+  points:
+    - "Replaced the softmax contrastive loss with a pairwise sigmoid over each image-text pair"
+    - "Dropped the global all-gather, making contrastive pretraining cheaper and more stable"
+- era: "2021-2023"
+  title: "Flamingo: a Visual Language Model for Few-Shot Learning"
+  authors: "Alayrac et al."
+  year: 2022
+  url: "https://arxiv.org/pdf/2204.14198"
+  points:
+    - "Fused a frozen vision encoder into a frozen language model with gated cross-attention"
+    - "Handled interleaved images and text without retraining either tower"
+- era: "2021-2023"
+  title: "BLIP-2: Bootstrapping Language-Image Pre-training with Frozen Image Encoders and Large Language Models"
+  authors: "Li et al."
+  year: 2023
+  url: "https://arxiv.org/pdf/2301.12597"
+  points:
+    - "Introduced the Q-Former to query a frozen vision encoder into a fixed set of tokens"
+    - "Showed a small trainable bridge could join two frozen models"
+- era: "2021-2023"
+  title: "Visual Instruction Tuning"
+  authors: "Liu et al."
+  aka: "LLaVA paper"
+  year: 2023
+  url: "https://arxiv.org/pdf/2304.08485"
+  points:
+    - "Used a simple linear projector and instruction data to build an open visual assistant"
+    - "Established the adapter-and-tune recipe most open VLMs still follow"
+- era: "2021-2023"
+  title: "Neural Codec Language Models are Zero-Shot Text to Speech Synthesizers"
+  authors: "Wang et al."
+  aka: "VALL-E paper"
+  year: 2023
+  url: "https://arxiv.org/pdf/2301.02111"
+  points:
+    - "Treated speech as discrete codec tokens and generated them with a language model"
+    - "Achieved zero-shot voice cloning from a three-second prompt"
+- era: "2021-2023"
+  title: "Segment Anything"
+  authors: "Kirillov et al."
+  aka: "SAM paper"
+  year: 2023
+  url: "https://arxiv.org/pdf/2304.02643"
+  points:
+    - "Made segmentation promptable with points, boxes and masks over a 1B-mask dataset"
+    - "Turned a dense prediction task into a promptable, groundable interface"
+- era: "2021-2023"
+  title: "RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control"
+  authors: "Brohan et al."
+  year: 2023
+  url: "https://arxiv.org/pdf/2307.15818"
+  points:
+    - "Discretised robot actions as text tokens on top of a pretrained vision-language model"
+    - "Showed web-scale visual knowledge transfers to manipulation"
+- era: "2024-2026"
+  title: "Scaling Rectified Flow Transformers for High-Resolution Image Synthesis"
+  authors: "Esser et al."
+  aka: "Stable Diffusion 3 paper"
+  year: 2024
+  url: "https://arxiv.org/pdf/2403.03206"
+  points:
+    - "Made rectified flow the training objective of a frontier text-to-image model"
+    - "Introduced the MMDiT architecture with separate text and image streams fused at attention"
+- era: "2024-2026"
+  title: "π₀: A Vision-Language-Action Flow Model for General Robot Control"
+  authors: "Black et al."
+  year: 2024
+  url: "https://arxiv.org/pdf/2410.24164"
+  points:
+    - "Added a flow-matching action expert on top of a pretrained vision-language model"
+    - "Generated action chunks at high frequency across many robot embodiments"

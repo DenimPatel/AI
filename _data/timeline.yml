@@ -42,3 +42,24 @@
 - year: 2022
   era: Generative breakthroughs · 2016–2022
   text: DeepMind's <strong>AlphaFold</strong> predicts the 3D structures of almost all known proteins, solving a 50-year-old challenge in biology.
+- year: 2024
+  era: The generative-media era · 2023–2026
+  text: <strong>Stable Diffusion 3</strong> adopts rectified flow and the MMDiT architecture, moving the image frontier from U-Nets to transformers.
+- year: 2024
+  era: The generative-media era · 2023–2026
+  text: Black Forest Labs releases <strong>FLUX.1</strong>, showing a rectified-flow transformer could lead open text-to-image generation.
+- year: 2024
+  era: The generative-media era · 2023–2026
+  text: Physical Intelligence's <strong>π₀</strong> puts a flow-matching action expert on a pretrained vision-language model, and robot control becomes a generative problem.
+- year: 2025
+  era: The generative-media era · 2023–2026
+  text: Google's <strong>Veo 3</strong> generates synchronized dialogue and sound effects alongside video, in a single pass.
+- year: 2025
+  era: The generative-media era · 2023–2026
+  text: Alibaba's <strong>Qwen-Image</strong> brings strong text rendering to an open text-to-image model.
+- year: 2026
+  era: The generative-media era · 2023–2026
+  text: OpenAI's <strong>Sora 2</strong> ships as a world-model-flavoured video generator with native audio.
+- year: 2026
+  era: The generative-media era · 2023–2026
+  text: The EU AI Act's <strong>Article 50</strong> machine-readable marking obligations take effect on 2 August, making provenance a legal requirement for synthetic media.

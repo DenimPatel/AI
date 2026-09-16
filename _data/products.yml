@@ -267,3 +267,39 @@
 - date: 2026 Aug
   era: Frontier Consolidation (2026)
   text: Independent surveys put Claude Code at 39% adoption among professional developers worldwide (47% in the US), up from 18% in January — the fastest-growing of the major coding agents, ahead of OpenAI's Codex
+- date: '2022'
+  era: Language Model Revolution (2020-2022)
+  weights: closed
+  text: Midjourney opens its Discord beta, putting diffusion image generation in front of a mass audience
+- date: '2022 Aug'
+  era: Language Model Revolution (2020-2022)
+  weights: open
+  text: Stability AI releases Stable Diffusion, the first open text-to-image model good enough to run on a consumer GPU
+- date: '2022 Sep'
+  era: Language Model Revolution (2020-2022)
+  weights: open
+  text: OpenAI releases Whisper, an open speech-recognition model trained on 680,000 hours of weakly labelled audio
+- date: '2023'
+  era: AI Goes Mainstream (2023)
+  weights: closed
+  text: ElevenLabs ships a text-to-speech service whose zero-shot voice cloning sets the commercial bar
+- date: '2023 Dec'
+  era: AI Goes Mainstream (2023)
+  weights: closed
+  text: Suno brings full-song music generation to a browser prompt
+- date: '2024 Aug'
+  era: Open Models Enter the Frontier Race (2024)
+  weights: open
+  text: Black Forest Labs, founded by the original Stable Diffusion authors, releases FLUX.1, a rectified-flow transformer that leads open image generation
+- date: '2025 Apr'
+  era: The Open-Weight Shock & Reasoning Race (2025)
+  weights: closed
+  text: Google's Veo 3 generates native synchronized dialogue and sound effects in the same pass as the video
+- date: '2025 Aug'
+  era: The Open-Weight Shock & Reasoning Race (2025)
+  weights: open
+  text: Alibaba releases Qwen-Image, a large MMDiT text-to-image model with a Qwen2.5-VL text encoder and strong text rendering
+- date: '2026 Feb'
+  era: Frontier Consolidation (2026)
+  weights: closed
+  text: OpenAI ships Sora 2, a video generator with synchronized audio framed as a world model, wrapped in a social app
