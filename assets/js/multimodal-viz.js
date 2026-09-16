@@ -186,6 +186,29 @@
   var gen = { rasterCells: rasterCells, nextScaleCells: nextScaleCells, maskedCells: maskedCells };
 
   // =========================================================================
+  // rl — group-relative advantages (GRPO)
+  // =========================================================================
+  // Score a group of responses sampled for one prompt and use the group itself
+  // as the baseline: advantage = (reward − group mean) / group std. No critic
+  // network is trained, unlike PPO. `rewards` is one group's scores; a
+  // degenerate group (every reward equal) has zero spread and therefore zero
+  // advantage everywhere — there is no signal to reinforce. Population std is
+  // used because the group is the whole population being compared.
+  function groupAdvantage(rewards) {
+    var n = rewards.length, i;
+    var m = 0;
+    for (i = 0; i < n; i++) m += rewards[i];
+    m = n ? m / n : 0;
+    var v = 0;
+    for (i = 0; i < n; i++) { var d = rewards[i] - m; v += d * d; }
+    var std = n ? Math.sqrt(v / n) : 0;
+    var advantages = rewards.map(function (r) { return std > 1e-12 ? (r - m) / std : 0; });
+    return { mean: m, std: std, advantages: advantages };
+  }
+
+  var rl = { groupAdvantage: groupAdvantage };
+
+  // =========================================================================
   // modalities — the zoo the shared space has to cover
   // =========================================================================
   var modalities = [
@@ -206,6 +229,7 @@
     tiles: tilesApi,
     cost: cost,
     gen: gen,
+    rl: rl,
     modalities: modalities
   };
 })(window);

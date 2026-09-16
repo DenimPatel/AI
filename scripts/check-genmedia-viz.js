@@ -336,6 +336,16 @@ if (windowObj.Multimodal) {
   eq(M.cost.imageTokens(224, 16, 2), 49, 'a 2×2 merge quarters the token budget');
   truthy(M.cost.kvBytes(196, 32, 8, 128, 2) > 0, 'image tokens add to the KV cache');
   eq(M.modalities.length, 5, 'the modality zoo lists five modalities');
+
+  // GRPO group-relative advantage: the group is its own baseline.
+  const grp = M.rl.groupAdvantage([0, 1, 2]);
+  close(grp.mean, 1, 1e-12, 'GRPO group mean');
+  close(grp.std, Math.sqrt(2 / 3), 1e-12, 'GRPO group std (population)');
+  close(grp.advantages[0], -1 / Math.sqrt(2 / 3), 1e-12, 'GRPO advantage of the worst sample');
+  close(grp.advantages[2], 1 / Math.sqrt(2 / 3), 1e-12, 'GRPO advantage of the best sample');
+  close(grp.advantages.reduce((a, b) => a + b, 0), 0, 1e-12, 'GRPO advantages sum to zero');
+  const flatGroup = M.rl.groupAdvantage([0.5, 0.5, 0.5]);
+  truthy(flatGroup.std === 0 && flatGroup.advantages.every((a) => a === 0), 'a degenerate GRPO group carries no advantage');
 }
 
 // --- report ------------------------------------------------------------------
