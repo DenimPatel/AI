@@ -109,6 +109,7 @@ series: "multimodal"
     <p class="g-eyebrow">Commitment against smoothness</p>
     <p>Understanding is trained by cross-entropy on the next token. Its gradient &mdash; the direction in which the weights should move to lower the loss &mdash; is largest when the model is wrong about a discrete choice, so it pushes the representation toward tokens that are unambiguous: one right answer, sharply separated from the rest. Generation is trained by a reconstruction or flow objective over a continuous latent, and it is happiest when the latent space is smooth, so that a small perturbation of the noise is a small perturbation of the image rather than a jump to a different object. Those two preferences are not identical. A representation sharp enough to make every next-token prediction confident is often too peaky to sample from without artefacts: a small change in the noise moves the sample across a boundary and the picture changes identity. A representation smooth enough to make sampling stable spreads probability across many nearby possibilities, which is exactly the uncertainty cross-entropy would rather collapse. Take one position's worth of latent: cross-entropy wants it to be unmistakably one thing, while flow matching wants a small nudge to it to produce a slightly different but still coherent picture.</p>
     <p>The plot makes the trade a single axis: how discrete the shared representation is, running from smooth and continuous at one end to sharply committed at the other. Move the marker and read the two objective values. They cross in the middle, and no single setting is best for both. In practice a unified model is a negotiated settlement &mdash; separate heads, separate losses, a tokenizer chosen to be as smooth as the language side tolerates, and sometimes separate parameter subsets for the two directions. Each of those devices gives one objective somewhere to live without forcing the other to accept it everywhere. The point is not that the tension is intolerable; it is that it is structural, and every unified architecture is a position on this line.</p>
+    <p>Those devices are exactly the positions that shipped. Chameleon and Emu3 take the pure-autoregressive route: they quantise images into the same kind of discrete tokens as text, concatenate everything into one token stream, and train it with a single next-token loss, so the understanding objective simply dominates and the generation side has to live with the peaks it would rather smooth. Janus-Pro goes the other way and decouples the encoder: the representation the model reads for understanding and the one it generates from are separate, so each direction gets a representation shaped for it, which is the page's own "sometimes separate parameter subsets" line made architectural rather than a promise to train one shared space harder. Show-o keeps one trunk but fuses the two objectives inside it: text is predicted autoregressively while image tokens are produced by masked discrete diffusion &mdash; filling in masked positions from the visible ones, the generation order the earlier step showed &mdash; so the generation signal is a diffusion objective over discrete codes rather than over a continuous latent, the same one-trunk settlement as Transfusion but reached from the discrete-token side. None of these dissolves the tension: each is a different position on the same discreteness line.</p>
     <div class="g-demo">
       <div class="g-canvas-wrap">
         <canvas id="uni-fight-canvas" width="470" height="260"></canvas>
@@ -132,6 +133,9 @@ series: "multimodal"
       <li>Tianhong Li, Yonglong Tian, He Li and coauthors, <a href="https://arxiv.org/abs/2406.11838">"Autoregressive Image Generation without Vector Quantization"</a>, 2024 &mdash; MAR, masked parallel prediction with a diffusion head and no discrete image vocabulary.</li>
       <li>Chunting Zhou, Lili Yu, Arun Babu and coauthors, <a href="https://arxiv.org/abs/2408.11039">"Transfusion: Predict the Next Token and Diffuse Images with One Multi-Modal Model"</a>, 2024 &mdash; one trunk trained with next-token prediction on text and diffusion on images.</li>
       <li>Chameleon Team, <a href="https://arxiv.org/abs/2405.09818">"Chameleon: Mixed-Modal Early-Fusion Foundation Models"</a>, 2024 &mdash; a token-based trunk over interleaved text and images, and the training instability that discrete image tokens cause.</li>
+      <li>Xinlong Wang, Xiaosong Zhang, Zhengxiong Luo and coauthors, <a href="https://arxiv.org/abs/2409.18869">"Emu3: Next-Token Prediction is All You Need"</a>, 2024 &mdash; one token stream and next-token prediction for text, image and video, with no separate diffusion or understanding path.</li>
+      <li>Xiaokang Chen, Zhiyu Wu, Xingchao Liu and coauthors, <a href="https://arxiv.org/abs/2501.17811">"Janus-Pro: Unified Multimodal Understanding and Generation with Data and Model Scaling"</a>, 2025 &mdash; decoupled encoders for understanding and generation, so each direction reads its own representation.</li>
+      <li>Jinheng Xie, Weijia Mao, Zechen Bai and coauthors, <a href="https://arxiv.org/abs/2408.12528">"Show-o: One Single Transformer to Unify Multimodal Understanding and Generation"</a>, 2024 &mdash; autoregressive text and masked discrete diffusion over image tokens fused in one trunk.</li>
     </ul>
     <h3 style="margin:26px 0 6px;">Cheat sheet</h3>
     <table class="g-cheat">
@@ -155,7 +159,7 @@ series: "multimodal"
 
   <section class="g-step" id="check-yourself">
     <div class="g-step-head"><span class="g-step-num">7</span><h2>Check your understanding</h2></div>
-    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/5 answered</span></div>
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
@@ -486,6 +490,17 @@ series: "multimodal"
         { label: 'The two objectives use different optimisers and cannot be averaged.', correct: false }
       ],
       explanation: 'A representation confident enough for next-token prediction tends to be too peaky to sample from without artefacts, and one smooth enough to sample from spreads probability that cross-entropy would rather collapse. Every unified design is a negotiated point on that axis.'
+    },
+    {
+      id: 'unified-decoupled-encoder',
+      kind: 'choice',
+      prompt: 'Which design choice separates Janus-Pro from Chameleon and Emu3?',
+      options: [
+        { label: 'Janus-Pro uses separate encoders, so understanding and generation each get their own representation, while Chameleon and Emu3 run one shared discrete token stream through a single autoregressive loss.', correct: true },
+        { label: 'Janus-Pro adds a critic network that scores generated images against a learned reward.', correct: false },
+        { label: 'Janus-Pro trains a diffusion model on images alone, with no language loss at all.', correct: false }
+      ],
+      explanation: 'Decoupling the encoder makes the split architectural, so the understanding representation can stay sharp for next-token prediction while generation works in a representation shaped for sampling, whereas Chameleon and Emu3 accept the pure-autoregressive settlement of one next-token loss over a shared stream.'
     }
   ];
   GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);

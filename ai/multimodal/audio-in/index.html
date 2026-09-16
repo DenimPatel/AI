@@ -1,6 +1,6 @@
 ---
 title: "Listening models"
-description: "Speech as an encoder's output or as native audio tokens in the trunk, speech instruction following, paralinguistics, and the contrast with from-scratch speech recognition."
+description: "Speech as an encoder's output or as native audio tokens in the trunk, residual codebooks that trade reconstruction against token count, speech instruction following, paralinguistics, and the contrast with from-scratch speech recognition."
 permalink: "/ai/multimodal/audio-in/"
 section: "ai"
 series: "multimodal"
@@ -87,6 +87,18 @@ series: "multimodal"
         <div class="g-readout" id="au-tok-readout"></div>
       </div>
     </div>
+    <p>Every residual stage is a token, which is what makes the codebook stack unusual among quality dials: it is also a direct multiplier on the context bill. Switch one more codebook on and the reconstruction gets closer to the original, but the sequence the trunk has to carry grows by one token per frame for every second of audio, so the same knob that sharpens the sound lengthens the prompt. The chart below isolates the quantiser on the same synthetic signal the spectrogram demo uses &mdash; a chirp plus a tone at 8 kHz &mdash; so the ladder of bars is the error curve of one component rather than of a whole codec. The first codebook removes most of the error, because it sees the whole signal: it quantises the waveform itself, the largest thing there is to describe, and it takes the biggest single bite out of the residual. Each later stage sees only the leftover from the stages before it, and because each uniform quantiser refits its range to that leftover, the residual shrinks by roughly a constant factor every time &mdash; about sixteen decibels per codebook here &mdash; so the ladder in the chart is a near-straight staircase rather than a curve that levels off. That is what makes the token cost the deciding question: the tenth decibel costs exactly what the first one did, one more token per frame for every second of audio, while the error it removes is already far below what the sound needs. Stopping is therefore a judgement about the codebook count and the frame rate rather than about where a curve flattens: the residual quantiser is worked out in <a href="{{ '/ai/generative-media/audio-codecs/' | relative_url }}">the audio volume's codec part</a>, where the machinery and the reconstruction are the subject, while here the stages matter only for what they cost &mdash; how many tokens per second of speech they add, and how much of the context window they consume before the trunk has read a single word.</p>
+    <div class="g-demo">
+      <div class="g-canvas-wrap">
+        <canvas id="au-rvq-canvas" width="480" height="250"></canvas>
+        <p class="g-canvas-hint">Residual error after each stage of <code>GenMedia.dsp.rvq</code>, measured in dB below the input variance, so a taller bar means more of the error has been removed. The dashed line is 20 dB below input, and the first stage past it is the one the readout names.</p>
+      </div>
+      <div class="g-controls">
+        <div class="g-field"><label>RVQ stages applied <span class="val">4</span></label><input type="range" id="au-rvq-stages" min="1" max="8" step="1" value="4"></div>
+        <div class="g-readout" id="au-rvq-readout"></div>
+        <p class="g-mini">Levels per codebook are fixed at 8, and each stage is one more codebook per frame.</p>
+      </div>
+    </div>
     <div class="g-goal">💡 <span>The two routes are not rivals so much as a dial. A transcript is the cheapest way to get meaning into a language model; native tokens are the only way to get sound. Models that do both often run a transcript for the part of the job that needs reasoning &mdash; deciding what to say &mdash; and audio tokens for delivery, the voice and tone the answer arrives in. That split is close to the thinker-and-talker arrangement of the omni models in the next part.</span></div>
   </section>
 
@@ -154,7 +166,7 @@ series: "multimodal"
 
   <section class="g-step" id="check-yourself">
     <div class="g-step-head"><span class="g-step-num">7</span><h2>Check your understanding</h2></div>
-    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/5 answered</span></div>
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
@@ -181,6 +193,7 @@ series: "multimodal"
   var winIdx = 1, hopIdx = 0;
   var codecHz = 75, codecBooks = 8;
   var express = 2;
+  var rvqStages = 4;
 
   function clamp(v, lo, hi) { return v < lo ? lo : (v > hi ? hi : v); }
 
@@ -296,6 +309,55 @@ series: "multimodal"
     }
   }
 
+  // ---- 3b. residual quantiser error ladder ---------------------------------
+  var RVQ_ERR = GM.dsp.rvq(SIG, { stages: 8, levels: 8 }).errors;
+  var RVQ_TICKS = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+  function rvqDb(i) {
+    var db = 10 * Math.log10(RVQ_ERR[i] / RVQ_ERR[0]);
+    return Math.max(-70, isFinite(db) ? db : -70);
+  }
+  var rvqFirstCross = (function () {
+    for (var i = 1; i < RVQ_ERR.length; i++) { if (rvqDb(i) < -20) return i; }
+    return RVQ_ERR.length - 1;
+  })();
+  var rvqPlot = GM.plot(document.getElementById('au-rvq-canvas'), {
+    W: 480, H: 250, xRange: [0, 9], yRange: [0, 140],
+    xLabel: 'RVQ stages applied', yLabel: 'residual error (dB below input)',
+    xTicks: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+    onResize: function () { drawRvq(); }
+  });
+  function drawRvq() {
+    if (!rvqPlot) return;
+    var p = rvqPlot;
+    p.clear();
+    p.axes({ xLabel: 'RVQ stages applied', yLabel: 'residual error (dB below input)', xTicks: RVQ_TICKS });
+    // Draw the bars by hand: GenMedia.plot.columns silently skips any bin whose
+    // top value is <= 0, and the residual is plotted here as a positive
+    // attenuation (dB below the input), so each bar is -rvqDb(i) tall.
+    p.raw(function (ctx) {
+      for (var i = 0; i < RVQ_TICKS.length; i++) {
+        var x0 = p.px(i + 0.15), x1 = p.px(i + 0.85);
+        var yBase = p.py(0), yTop = p.py(-rvqDb(i));
+        ctx.fillStyle = i <= rvqStages ? c.accent : 'rgba(120,120,120,0.35)';
+        ctx.fillRect(x0, yTop, Math.max(1, x1 - x0), Math.max(1, yBase - yTop));
+      }
+    });
+    p.hline(20, { color: c.accent2, dashed: true, label: '20 dB below input', labelX: 5.2 });
+    p.legend([
+      { label: 'applied codebooks', color: c.accent, fill: true },
+      { label: 'remaining stages', color: 'rgba(120,120,120,0.35)', fill: true }
+    ], { dx: 286, dy: 8 });
+    var el = document.getElementById('au-rvq-readout');
+    if (el) {
+      el.innerHTML =
+        '<div><span class="k">stages applied</span> <span class="hi">' + rvqStages + '</span></div>' +
+        '<div><span class="k">levels per codebook</span> 8</div>' +
+        '<div><span class="k">residual error after</span> ' + (-rvqDb(rvqStages)).toFixed(1) + ' dB below input</div>' +
+        '<div><span class="k">tokens /s</span> <span class="hi">' + (codecHz * rvqStages) + '</span> at ' + codecHz + ' Hz</div>' +
+        '<div class="g-mini">The first stage to push the residual below -20 dB is stage ' + rvqFirstCross + '; past that point the ladder keeps falling at roughly the same number of decibels per stage, while every stage still costs one more token per frame.</div>';
+    }
+  }
+
   // ---- 4. prosody contours -------------------------------------------------
   var paraSetup = Guide.setupCanvas(document.getElementById('au-para-canvas'), 480, 250, function () { drawPara(); });
   function contours() {
@@ -335,7 +397,7 @@ series: "multimodal"
     }
   }
 
-  function redraw() { drawMel(); drawEnc(); drawTok(); drawPara(); }
+  function redraw() { drawMel(); drawEnc(); drawTok(); drawRvq(); drawPara(); }
 
   Guide.bindSliders(document.querySelectorAll('#au-win'), function (el) {
     winIdx = parseInt(el.value, 10);
@@ -355,6 +417,10 @@ series: "multimodal"
   });
   Guide.bindSliders(document.querySelectorAll('#au-exp'), function (el) {
     express = parseInt(el.value, 10);
+    redraw();
+  });
+  Guide.bindSliders(document.querySelectorAll('#au-rvq-stages'), function (el) {
+    rvqStages = parseInt(el.value, 10);
     redraw();
   });
 
@@ -401,6 +467,15 @@ series: "multimodal"
         { label: 'It only works on audio that has no background noise.', correct: false }
       ],
       explanation: 'Asking a model to answer in a tone, say whether a recording sounds happy, or read the emotion in a voice puts the information in the prosody. Recognition deliberately removes that channel, so instruction following needs audio tokens or a separate paralinguistic model.'
+    },
+    {
+      id: 'audio-rvq-stages',
+      kind: 'numeric',
+      prompt: 'With 8 levels per codebook, how many RVQ stages does the synthetic demo signal need before its residual error drops below -20 dB?',
+      answer: 2,
+      tolerance: 0.1,
+      unit: 'stages',
+      explanation: 'errors[0] is the input variance, which is 0 dB by definition; errors[1] is the residual after one stage, about -16 dB, and errors[2] is the residual after two, about -33 dB. One stage is not yet below -20 dB and two stages are, so two stages cross the line. Past that point the ladder keeps descending at roughly the same rate &mdash; each uniform quantiser refits its range to the residual, so the factor is near-constant at about 16 dB per stage &mdash; but every stage costs another token per frame, which is why the count is a budget decision rather than a question of diminishing returns.'
     }
   ];
   GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);

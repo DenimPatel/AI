@@ -1,6 +1,6 @@
 ---
 title: "Training a vision-language model"
-description: "The staged recipe, freezing schedules and data mixtures, what breaks along the way, and preference tuning on multimodal pairs."
+description: "The staged recipe, freezing schedules and data mixtures, what breaks along the way, preference tuning on multimodal pairs, and the reinforcement-learning stage that turns a vision-language model into a reasoner."
 permalink: "/ai/multimodal/training-a-vlm/"
 section: "ai"
 series: "multimodal"
@@ -46,12 +46,13 @@ series: "multimodal"
         <div class="g-readout" id="train-gantt-readout"></div>
       </div>
     </div>
-    <div class="g-goal">💡 <span><b>By the end of this part you'll be able to</b> describe the three stages and what each trains, say which components are frozen in each, read a data mixture, explain catastrophic forgetting of text ability and why the warm-up exists, and say what multimodal DPO adds to the recipe. (DPO is a preference-tuning method that learns from pairs of better and worse answers instead of from one correct answer.) These are also the questions worth asking of any recipe you meet, not only this one.</span></div>
+    <div class="g-goal">💡 <span><b>By the end of this part you'll be able to</b> describe the three stages and what each trains, say which components are frozen in each, read a data mixture, explain catastrophic forgetting of text ability and why the warm-up exists, say what multimodal DPO adds to the recipe, and say how group-relative reinforcement learning sharpens a model on questions whose answers can be checked. (DPO is a preference-tuning method that learns from pairs of better and worse answers instead of from one correct answer.) These are also the questions worth asking of any recipe you meet, not only this one.</span></div>
     <div class="g-toc">
       <a href="#frozen">2 · What is frozen when</a>
       <a href="#mixture">3 · The data mixture</a>
       <a href="#breaks">4 · What breaks</a>
       <a href="#preference">5 · Preference tuning on pairs</a>
+      <a href="#rl">6 · RL and reasoning post-training</a>
     </div>
   </section>
 
@@ -126,14 +127,36 @@ series: "multimodal"
     </div>
   </section>
 
+  <section class="g-step" id="rl">
+    <div class="g-step-head"><span class="g-step-num">6</span><h2>RL and reasoning post-training</h2></div>
+    <p class="g-eyebrow">The group is its own baseline</p>
+    <p>Preference tuning taught the model which of two answers a person would rather have. A newer stage asks a sharper question: among all the answers the model <em>could</em> produce, which ones are actually correct? That is a reinforcement-learning problem, and reinforcement learning here means training by trial and reward rather than by imitation: the model generates its own attempts, something scores them, and the update makes the better attempts more likely and the worse ones less likely. The immediate difficulty is that a reward is only a number, and a number means nothing on its own. A score of 0.6 is good or bad depending on what the model usually gets on that prompt, so every method in this family needs a <em>baseline</em> &mdash; a reference point for what an ordinary attempt scores &mdash; because without one the update cannot tell a genuine improvement from a lucky draw. Proximal policy optimisation, or PPO, the method that dominated reinforcement learning for language models, learns that baseline with a second network called a <em>critic</em>, trained to predict the reward the policy is about to receive. The critic roughly doubles the memory, needs its own tuning, and in a vision-language model it must also learn to read the image, because the reward it predicts depends on what was in the picture. That is a great deal of machinery to bolt onto the last stage of a recipe.</p>
+    <p><em>Group relative policy optimisation</em>, or GRPO, removes the critic by noticing where a baseline can be had for free. For a single prompt, sample not one response but a whole <em>group</em> of them &mdash; typically four to sixteen attempts at the same question &mdash; and score every attempt in the group with the reward function. The group's own average score is then the baseline. Each attempt's <em>advantage</em>, the quantity the update actually consumes, is its reward minus the group mean, divided by the group's spread, so that a response better than its siblings gets a positive advantage and its tokens are made more likely, while a response worse than its siblings gets a negative advantage and is suppressed. No critic network, no value head, no second model to train: the group is the baseline, and the reward scale cancels out of the ratio entirely. That one substitution is why GRPO spread through the open-model releases of 2025, and it was the method behind DeepSeek-R1's reasoning behaviour. The reward has to be computable without a person in the loop, because the group must be scored automatically and repeatedly. For a text model the checkable rewards are mathematics and code, where the final answer can be verified by a parser or a test run; for a vision-language model they are precisely the tasks the earlier parts of this volume set up: a chart question with a known answer, a document question that must quote the right field, a bounding box scored by how much it overlaps the true one, or a visual arithmetic problem whose final number can be read and compared. That recipe &mdash; reinforcement learning against a rule that can be checked, rather than against a human preference &mdash; is what produces the &ldquo;thinking&rdquo; vision-language models, which write out a chain of intermediate reasoning before committing to an answer. On the text side the proof was DeepSeek-R1; among open multimodal models, GLM-4.1V-Thinking and the reasoning-tuned Qwen3-VL variants are the same move applied to images.</p>
+    <p>The plot below is the mechanism, not the reward. It shows one prompt's group of sampled attempts on a reward axis, the group mean as the dashed line they are measured against, and each attempt's deviation from that line as a bar. The slider sets how many attempts the group contains, which is the method's main tuning knob and its main cost. With only two attempts the baseline is the average of two samples, so one lucky draw receives an enormous advantage and the update chases it; as the group grows the mean becomes a stabler estimate of what this prompt is worth to the model, the advantages shrink toward the group's genuine spread, and the signal is cleaner. The price is that every attempt in the group is a full generation, so a group of sixteen costs eight times the sampling compute of a group of two for the same number of prompts. Move the slider and watch the readout's advantages settle: at two attempts they are pinned near plus and minus one, and by sixteen the outliers separate from the pack.</p>
+    <div class="g-demo">
+      <div class="g-canvas-wrap">
+        <canvas id="train-grpo-canvas" width="460" height="280"></canvas>
+        <p class="g-canvas-hint">One prompt's sampled group on a reward axis, the group mean as the baseline, and each attempt's signed distance from that mean. The advantages in the readout come from <code>Multimodal.rl.groupAdvantage</code>.</p>
+      </div>
+      <div class="g-controls">
+        <div class="g-field"><label>Group size G <span class="val">8</span></label><input type="range" id="train-rl-group" min="2" max="16" step="1" value="8"></div>
+        <div class="g-readout" id="train-grpo-readout"></div>
+        <p class="g-mini">Advantage = (reward minus group mean) / group spread. Small groups give a noisy baseline; large groups give a stable one and cost more samples per prompt.</p>
+      </div>
+    </div>
+    <div class="g-goal">💡 <span><b>Where this stage sits.</b> Supervised tuning teaches the format of an answer, preference tuning teaches which of two answers is more careful, and group-relative reinforcement learning teaches correctness on questions that can be checked. They stack rather than replace one another, and the open recipes that produce a reasoning model run the earlier stages first, because a model that cannot follow the answer format will not reliably emit something a verifier can read. The cost of the stage is verbosity: a chain of intermediate reasoning is many more tokens and a longer wait, a deliberate trade of latency for accuracy on the hard cases.</span></div>
+    <div class="g-warn">⚠ <span><b>An uninformative reward is worse than none.</b> Group-relative advantages depend entirely on the reward being able to rank attempts within the group. If every attempt scores the same &mdash; because the verifier is too coarse, or the question too easy, or the answers too similar &mdash; then the group's spread is zero and every advantage is zero, so no gradient flows at all. A reward that is merely noisy is worse still, because it ranks attempts at random and the update reinforces whichever attempt happened to be scored highest. Getting the reward right, not the optimiser, is the hard part of this stage.</span></div>
+  </section>
+
   <section class="g-step">
     <h2>Further reading</h2>
-    <p>The staging recipe, the instruction-tuning data, and the preference methods that followed it. Read them in this order and the arc runs from the three-stage schedule, through the mixture and unfreezing decisions that refine it, to the objectives that teach a trained model to prefer a better answer.</p>
+    <p>The staging recipe, the instruction-tuning data, and the methods that followed it. Read them in this order and the arc runs from the three-stage schedule, through the mixture and unfreezing decisions that refine it, to the objectives that teach a trained model to prefer a better answer, and finally to the reinforcement-learning stage that teaches it to check one.</p>
     <ul class="g-refs">
       <li>Haotian Liu, Chunyuan Li, Qingyang Wu and Yong Jae Lee, <a href="https://arxiv.org/abs/2304.08485">"Visual Instruction Tuning"</a>, 2023 &mdash; LLaVA's two-stage recipe: projector warm-up, then instruction tuning.</li>
       <li>Haotian Liu, Chunyuan Li, Yuheng Li and Yong Jae Lee, <a href="https://arxiv.org/abs/2310.03744">"Improved Baselines with Visual Instruction Tuning"</a>, 2023 &mdash; the stage-two mixture, unfreezing decisions and the 665K instruction set.</li>
       <li>Qinghao Ye, Haiyang Xu, Guohai Xu and coauthors, <a href="https://arxiv.org/abs/2308.12038">"mPLUG-Owl: Modularization Empowers Large Language Models with Multimodality"</a>, 2023 &mdash; staged training with a modular visual interface and an explicit forgetting discussion.</li>
       <li>Rafael Rafailov, Archit Sharma, Eric Mitchell and coauthors, <a href="https://arxiv.org/abs/2305.18290">"Direct Preference Optimization: Your Language Model is Secretly a Reward Model"</a>, 2023 &mdash; the objective that multimodal DPO adapts to image-conditioned pairs.</li>
+      <li>DeepSeek-AI, Daya Guo, Dejian Yang and coauthors, <a href="https://arxiv.org/abs/2501.12948">"DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning"</a>, 2025 &mdash; group-relative policy optimisation and the verifiable-reward recipe behind the reasoning wave.</li>
     </ul>
     <h3 style="margin:26px 0 6px;">Cheat sheet</h3>
     <table class="g-cheat">
@@ -148,13 +171,17 @@ series: "multimodal"
         <tr><td>Grounding lag</td><td>Naming an object is easier than pointing at it, so grounding trains last and lags</td></tr>
         <tr><td>Preference tuning</td><td>Train on chosen/rejected pairs rather than on a single reference answer</td></tr>
         <tr><td>DPO</td><td>Direct preference objective; $\beta$ sets how far the policy may drift from the reference</td></tr>
+        <tr><td>RL post-training</td><td>Sample attempts, score them, and update toward the better ones; no reference answer</td></tr>
+        <tr><td>GRPO</td><td>Group-relative policy optimisation: advantage = (reward minus group mean) / group spread, no critic</td></tr>
+        <tr><td>Verifiable reward</td><td>A score a rule can compute &mdash; a checked answer, a matched box &mdash; instead of a human preference</td></tr>
+        <tr><td>Thinking VLM</td><td>A model that writes intermediate reasoning before answering, bought with RL and paid for in latency</td></tr>
       </tbody>
     </table>
   </section>
 
   <section class="g-step" id="check-yourself">
     <div class="g-step-head"><span class="g-step-num">7</span><h2>Check your understanding</h2></div>
-    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/4 answered</span></div>
+    <div class="g-quiz-head"><span class="g-quiz-badge" data-quiz-badge>0/5 answered</span></div>
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
@@ -372,7 +399,53 @@ series: "multimodal"
     }
   }
 
-  function redraw() { drawGantt(); drawParts(); drawCurve(); drawDpo(); }
+  function redraw() { drawGantt(); drawParts(); drawCurve(); drawDpo(); drawGrpo(); }
+
+  // ---- 6. GRPO group advantages -------------------------------------------
+  var RL_POOL = [0.28, 0.54, 0.61, 0.39, 0.77, 0.49, 0.46, 0.88, 0.34, 0.57, 0.43, 0.65, 0.51, 0.23, 0.70, 0.48];
+  var rlGroupSize = 8;
+
+  var grpoPlot = GM.plot(document.getElementById('train-grpo-canvas'), {
+    W: 460, H: 280, xRange: [-0.5, 15.5], yRange: [0, 1],
+    xLabel: 'sampled response in the group', yLabel: 'reward',
+    onResize: function () { drawGrpo(); }
+  });
+
+  function drawGrpo() {
+    if (!grpoPlot) return;
+    var rewards = RL_POOL.slice(0, rlGroupSize);
+    var g = MM.rl.groupAdvantage(rewards);
+    grpoPlot.clear();
+    var ticks = [];
+    for (var t = 0; t < rewards.length; t++) ticks.push(t);
+    grpoPlot.axes({
+      xLabel: 'sampled response in the group', yLabel: 'reward',
+      xTicks: ticks, xFormat: function (v) { return 'r' + (v + 1); },
+      yFormat: function (v) { return v.toFixed(1); }
+    });
+    grpoPlot.columns(rewards.map(function (r, i) {
+      return { x0: i - 0.26, x1: i + 0.26, h: r, color: r >= g.mean ? c.accent : c.accent2 };
+    }), { base: g.mean, alpha: 0.28 });
+    grpoPlot.hline(g.mean, { color: c.text, dashed: true, label: 'group mean', labelX: 0.1 });
+    grpoPlot.points(rewards.map(function (r, i) { return [i, r]; }), { color: c.accent, r: 4.5, stroke: '#fff', width: 1.4 });
+    grpoPlot.legend([
+      { label: 'sampled reward', color: c.accent },
+      { label: 'above the group mean', color: c.accent, swatch: true },
+      { label: 'below the group mean', color: c.accent2, swatch: true }
+    ], { dy: 6 });
+    var el = document.getElementById('train-grpo-readout');
+    if (el) {
+      var best = Math.max.apply(null, g.advantages);
+      var worst = Math.min.apply(null, g.advantages);
+      el.innerHTML =
+        '<div><span class="k">group size G</span> <span class="hi">' + rlGroupSize + '</span> attempts</div>' +
+        '<div><span class="k">group mean</span> ' + g.mean.toFixed(3) + '</div>' +
+        '<div><span class="k">group spread</span> ' + g.std.toFixed(3) + '</div>' +
+        '<div><span class="k">best advantage</span> <span class="hi">+' + best.toFixed(2) + '</span></div>' +
+        '<div><span class="k">worst advantage</span> <span class="bad">' + worst.toFixed(2) + '</span></div>' +
+        '<div class="g-mini">Advantage is measured in units of the group&rsquo;s own spread, so it says how unusual an attempt was for this prompt rather than how high its raw score was. More attempts make the baseline steadier and cost more sampling.</div>';
+    }
+  }
 
   Guide.bindSliders(document.querySelectorAll('#train-s1'), function (el) {
     stageSteps[0] = parseInt(el.value, 10);
@@ -400,6 +473,12 @@ series: "multimodal"
     betaIdx = parseInt(el.value, 10);
     var valEl = el.parentElement ? el.parentElement.querySelector('.val') : null;
     if (valEl) valEl.textContent = BETAS[betaIdx];
+    redraw();
+  });
+  Guide.bindSliders(document.querySelectorAll('#train-rl-group'), function (el) {
+    rlGroupSize = parseInt(el.value, 10);
+    var valEl = el.parentElement ? el.parentElement.querySelector('.val') : null;
+    if (valEl) valEl.textContent = rlGroupSize;
     redraw();
   });
 
@@ -447,6 +526,17 @@ series: "multimodal"
         { label: 'The fraction of preference pairs that are chosen versus rejected.', correct: false }
       ],
       explanation: 'Beta is the strength of the anchor to the reference policy. Small beta lets the model move far and learn preferences fast, at the risk of drifting into confidently wrong answers; large beta stays close and changes little.'
+    },
+    {
+      id: 'training-grpo',
+      kind: 'choice',
+      prompt: 'How does GRPO obtain the baseline that turns a raw reward into an advantage?',
+      options: [
+        { label: 'It samples a group of responses to the same prompt and uses the group\'s own mean and spread as the baseline, so no critic network is trained.', correct: true },
+        { label: 'It trains a separate value network to predict the expected reward, as PPO does.', correct: false },
+        { label: 'It compares each response against a single human-preferred answer, as DPO does.', correct: false }
+      ],
+      explanation: 'GRPO computes advantage = (reward minus group mean) / group spread from a group of sampled attempts. The group supplies its own baseline, which removes the critic PPO needs; DPO instead learns from a chosen/rejected pair, and PPO trains a value network to estimate the baseline.'
     }
   ];
   GuideQuiz.init(document.getElementById('quiz-root'), QUIZ_QUESTIONS, window.__GUIDE_PAGE_ID__);
