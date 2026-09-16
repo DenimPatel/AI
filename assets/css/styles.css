@@ -319,6 +319,7 @@ main { display: block; }
   white-space: nowrap;
 }
 .nav--series a:hover { background: var(--glass-bg-strong); }
+.nav--series-title { display: none; }
 .nav--series a[aria-current='page'] {
   background: var(--color-accent); color: #fff;
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--glass-blue) 18%, transparent);
@@ -367,10 +368,17 @@ main { display: block; }
   border-bottom: none; border-top: 1px solid var(--glass-border);
 }
 #site-nav .nav--series a {
+  display: flex; flex-direction: column; gap: 1px;
   font-size: 13.5px; padding: 6px 10px; border-radius: var(--radius-md);
   background: none; border: none; backdrop-filter: none; -webkit-backdrop-filter: none;
   white-space: normal;
 }
+#site-nav .nav--series-short { font-weight: 600; }
+#site-nav .nav--series-title {
+  display: block; font-size: 11.5px; font-weight: 400; opacity: 0.65;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+#site-nav .nav--series a[aria-current='page'] .nav--series-title { opacity: 0.85; }
 #site-nav .nav--series a:hover { background: var(--glass-bg); }
 /* Specificity note: this must out-rank #site-nav .nav--series a above (same
    0 classes + 1 attribute vs 1 class, same id/type count — a tie that the
