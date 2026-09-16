@@ -410,13 +410,10 @@ series: "llm_serving"
     </ul>
   </section>
 
-  <div class="g-next reveal">
-    <span>This page is a reference. The series itself starts at the decode loop.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/llm-serving/decode-loop/' | relative_url }}">Start with Part 1 →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.llm_serving %}
+{% capture next_teaser %}This page is a reference. The series itself starts at the decode loop.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.llm_serving teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

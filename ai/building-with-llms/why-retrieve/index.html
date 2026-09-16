@@ -172,13 +172,10 @@ series: "building_with_llms"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>BM25 fails on exactly one thing: meaning without shared words. Next: embeddings, cosine similarity, the query–document asymmetry, and what Matryoshka truncation and MTEB can and cannot tell you.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/building-with-llms/embeddings/' | relative_url }}">Next: Embeddings and vector similarity →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.building_with_llms %}
+{% capture next_teaser %}BM25 fails on exactly one thing: meaning without shared words. Next: embeddings, cosine similarity, the query–document asymmetry, and what Matryoshka truncation and MTEB can and cannot tell you.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.building_with_llms teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

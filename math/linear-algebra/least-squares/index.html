@@ -169,13 +169,10 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>A projection needs a direction, and in three dimensions one operation builds a perpendicular out of nothing.</span>
-    <a class="btn btn-secondary" href="{{ '/math/linear-algebra/cross-product/' | relative_url }}">Next: Cross product and skew-symmetric matrices →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.linear_algebra %}
+{% capture next_teaser %}A projection needs a direction, and in three dimensions one operation builds a perpendicular out of nothing.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.linear_algebra teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

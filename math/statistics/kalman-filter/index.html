@@ -167,13 +167,10 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>A single Gaussian cannot survive a room with two doors. The next part replaces the ellipse with a cloud of particles that can be in two places at once.</span>
-    <a class="btn btn-secondary" href="{{ '/math/statistics/particle-filter/' | relative_url }}">Next: Particle filters and MCL →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.statistics %}
+{% capture next_teaser %}A single Gaussian cannot survive a room with two doors. The next part replaces the ellipse with a cloud of particles that can be in two places at once.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.statistics teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

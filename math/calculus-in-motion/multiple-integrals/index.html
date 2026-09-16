@@ -188,13 +188,10 @@ series: "calculus_in_motion"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>The reachable set was a fixed region. The next part asks where a quantity touches a constraint — and turns tangency into an equation.</span>
-    <a class="btn btn-secondary" href="{{ '/math/calculus-in-motion/lagrange/' | relative_url }}">Next: Lagrange multipliers &amp; KKT →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.calculus_in_motion %}
+{% capture next_teaser %}The reachable set was a fixed region. The next part asks where a quantity touches a constraint — and turns tangency into an equation.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.calculus_in_motion teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

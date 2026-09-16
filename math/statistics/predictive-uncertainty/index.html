@@ -167,13 +167,10 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>A band around one prediction generalises to a distribution over many coupled predictions. The next part makes that joint structure the object of study.</span>
-    <a class="btn btn-secondary" href="{{ '/math/statistics/multivariate-gaussian/' | relative_url }}">Next: The multivariate Gaussian →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.statistics %}
+{% capture next_teaser %}A band around one prediction generalises to a distribution over many coupled predictions. The next part makes that joint structure the object of study.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.statistics teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

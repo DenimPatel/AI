@@ -208,13 +208,10 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Every composition has a single number attached to it that measures how much it stretches area &mdash; and whether it flips the plane over.</span>
-    <a class="btn btn-secondary" href="{{ '/math/linear-algebra/determinant/' | relative_url }}">Next: The determinant: signed area →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.linear_algebra %}
+{% capture next_teaser %}Every composition has a single number attached to it that measures how much it stretches area &mdash; and whether it flips the plane over.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.linear_algebra teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

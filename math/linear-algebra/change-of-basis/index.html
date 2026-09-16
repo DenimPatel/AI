@@ -206,13 +206,10 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Pick the basis well and the matrix turns diagonal &mdash; the directions that refuse to turn are the eigenvectors.</span>
-    <a class="btn btn-secondary" href="{{ '/math/linear-algebra/eigenvectors/' | relative_url }}">Next: The arrows that don't turn →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.linear_algebra %}
+{% capture next_teaser %}Pick the basis well and the matrix turns diagonal &mdash; the directions that refuse to turn are the eigenvectors.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.linear_algebra teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

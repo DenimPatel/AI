@@ -176,13 +176,10 @@ series: "calculus_in_motion"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>The area element is now in hand. The next part sweeps double and triple integrals in polar, cylindrical and spherical coordinates, carrying each volume element with it.</span>
-    <a class="btn btn-secondary" href="{{ '/math/calculus-in-motion/multiple-integrals/' | relative_url }}">Next: Multiple integrals &amp; coordinates →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.calculus_in_motion %}
+{% capture next_teaser %}The area element is now in hand. The next part sweeps double and triple integrals in polar, cylindrical and spherical coordinates, carrying each volume element with it.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.calculus_in_motion teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

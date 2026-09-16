@@ -144,13 +144,10 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>One sample is a cloud of numbers. The next part is about turning that cloud into a picture you can read at a glance &mdash; and about which single number to trust.</span>
-    <a class="btn btn-secondary" href="{{ '/math/statistics/describing-data/' | relative_url }}">Next: Describing one sample →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.statistics %}
+{% capture next_teaser %}One sample is a cloud of numbers. The next part is about turning that cloud into a picture you can read at a glance &mdash; and about which single number to trust.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.statistics teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

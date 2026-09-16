@@ -178,13 +178,10 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Symmetry is a special case. Generic matrices shear as well as scale, and the tool that handles them is the singular value decomposition.</span>
-    <a class="btn btn-secondary" href="{{ '/math/linear-algebra/svd/' | relative_url }}">Next: Every matrix maps a circle to an ellipse →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.linear_algebra %}
+{% capture next_teaser %}Symmetry is a special case. Generic matrices shear as well as scale, and the tool that handles them is the singular value decomposition.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.linear_algebra teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

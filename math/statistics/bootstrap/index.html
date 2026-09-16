@@ -183,13 +183,10 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>The bootstrap gives error bars without a model. The next part writes the model down explicitly: a straight line through the data, its coefficients, and their uncertainty.</span>
-    <a class="btn btn-secondary" href="{{ '/math/statistics/regression/' | relative_url }}">Next: Linear regression as estimation →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.statistics %}
+{% capture next_teaser %}The bootstrap gives error bars without a model. The next part writes the model down explicitly: a straight line through the data, its coefficients, and their uncertainty.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.statistics teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

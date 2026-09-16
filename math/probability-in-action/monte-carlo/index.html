@@ -171,13 +171,10 @@ series: "probability_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Randomness also accumulates over time &mdash; next, walks that drift, jump and diffuse.</span>
-    <a class="btn btn-secondary" href="{{ '/math/probability-in-action/random-walks/' | relative_url }}">Next: Random walks, Poisson processes, Brownian motion →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.probability_in_action %}
+{% capture next_teaser %}Randomness also accumulates over time &mdash; next, walks that drift, jump and diffuse.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.probability_in_action teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

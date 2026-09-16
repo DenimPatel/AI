@@ -201,13 +201,10 @@ series: "calculus_in_motion"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>The theorems gave you exactness; the next part asks how a region's area scales when you deform it, which is the Jacobian determinant.</span>
-    <a class="btn btn-secondary" href="{{ '/math/calculus-in-motion/change-of-variables/' | relative_url }}">Next: The Jacobian determinant →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.calculus_in_motion %}
+{% capture next_teaser %}The theorems gave you exactness; the next part asks how a region's area scales when you deform it, which is the Jacobian determinant.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.calculus_in_motion teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

@@ -192,13 +192,10 @@ series: "probability"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Counting gives you the sizes; conditioning is what lets you use them when information arrives.</span>
-    <a class="btn btn-secondary" href="{{ '/math/probability/conditional/' | relative_url }}">Next: Conditional probability →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.probability %}
+{% capture next_teaser %}Counting gives you the sizes; conditioning is what lets you use them when information arrives.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.probability teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

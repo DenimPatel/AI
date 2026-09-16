@@ -213,13 +213,10 @@ series: "llm_serving"
     </ul>
   </section>
 
-  <div class="g-next reveal">
-    <span>This part built the fleet and priced its failures. The last part turns all of it into a number you can defend.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/llm-serving/economics/' | relative_url }}">Next: Benchmarking, cost and capacity planning →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.llm_serving %}
+{% capture next_teaser %}This part built the fleet and priced its failures. The last part turns all of it into a number you can defend.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.llm_serving teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script>

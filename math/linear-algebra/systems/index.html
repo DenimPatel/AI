@@ -179,13 +179,10 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Elimination hides two subspaces in plain sight: the inputs that land on zero, and the outputs that are reachable at all. Naming them is the next step.</span>
-    <a class="btn btn-secondary" href="{{ '/math/linear-algebra/rank-subspaces/' | relative_url }}">Next: Rank, null space, and the four subspaces →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.linear_algebra %}
+{% capture next_teaser %}Elimination hides two subspaces in plain sight: the inputs that land on zero, and the outputs that are reachable at all. Naming them is the next step.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.linear_algebra teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

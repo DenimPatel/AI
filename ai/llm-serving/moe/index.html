@@ -177,13 +177,10 @@ series: "llm_serving"
     </ul>
   </section>
 
-  <div class="g-next reveal">
-    <span>Experts solved the compute bill; context length is the next bill, and it grows quadratically.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/llm-serving/long-context/' | relative_url }}">Next: Long-context serving →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.llm_serving %}
+{% capture next_teaser %}Experts solved the compute bill; context length is the next bill, and it grows quadratically.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.llm_serving teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

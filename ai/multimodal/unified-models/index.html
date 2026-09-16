@@ -159,13 +159,10 @@ series: "multimodal"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>A unified model can point at a region as easily as it can describe one, if the coordinates are tokens too. Pointing, which the next part calls grounding, means naming where in the image an answer lives, and the coordinates have to enter the model as tokens just as the picture did. A box is a rectangle around an object, a point is a single location, and a mask is a per-pixel outline of a shape. The next part turns boxes, points and masks into sequences the trunk already knows how to read.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/multimodal/grounding/' | relative_url }}">Next: Grounding →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.multimodal %}
+{% capture next_teaser %}A unified model can point at a region as easily as it can describe one, if the coordinates are tokens too. Pointing, which the next part calls grounding, means naming where in the image an answer lives, and the coordinates have to enter the model as tokens just as the picture did. A box is a rectangle around an object, a point is a single location, and a mask is a per-pixel outline of a shape. The next part turns boxes, points and masks into sequences the trunk already knows how to read.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.multimodal teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

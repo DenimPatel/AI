@@ -218,13 +218,10 @@ series: "calculus"
     <p>For the destination, <a href="{{ '/vision/nonlinear-optimization/' | relative_url }}">Nonlinear Optimization</a> is the natural continuation: it treats the second-derivative test and the gradient as the ingredients of an iterative solver, and asks what happens when the landscape is too large to write down. Keep this page open beside it — every step an optimizer takes is one of the rules in the table above.</p>
   </section>
 
-  <div class="g-next reveal">
-    <span>You have reached the end of the volume's reference card. The appendix has no next part; the series contents are one click away.</span>
-    <a class="btn btn-secondary" href="{{ '/math/calculus/' | relative_url }}">Series contents →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.calculus %}
+{% capture next_teaser %}You have reached the end of the volume's reference card. The appendix has no next part; the series contents are one click away.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.calculus teaser=next_teaser %}
 {% include guide-footer.html %}
 
 {% raw %}

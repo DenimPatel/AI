@@ -174,13 +174,10 @@ series: "generative_media"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>A denoiser is only half the story; the other half is what you tell it to draw. The final part is about conditioning and classifier-free guidance: text encoders, cross- against joint attention, and the guidance scale that trades diversity for fidelity.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/generative-media/guidance/' | relative_url }}">Next: Conditioning and classifier-free guidance →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.generative_media %}
+{% capture next_teaser %}A denoiser is only half the story; the other half is what you tell it to draw. The final part is about conditioning and classifier-free guidance: text encoders, cross- against joint attention, and the guidance scale that trades diversity for fidelity.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.generative_media teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

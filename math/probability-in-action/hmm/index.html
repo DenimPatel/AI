@@ -194,13 +194,10 @@ series: "probability_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Everything here assumed a small discrete state that lives in one cell at a time &mdash; the Bayes filter keeps the same loop on a continuous corridor.</span>
-    <a class="btn btn-secondary" href="{{ '/math/probability-in-action/bayes-filter/' | relative_url }}">Next: The Bayes filter →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.probability_in_action %}
+{% capture next_teaser %}Everything here assumed a small discrete state that lives in one cell at a time &mdash; the Bayes filter keeps the same loop on a continuous corridor.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.probability_in_action teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

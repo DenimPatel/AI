@@ -227,13 +227,10 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>One matrix now answers every shape of the question &mdash; but the same answer can be steady or wild depending on how close the columns are to dependent.</span>
-    <a class="btn btn-secondary" href="{{ '/math/linear-algebra/numerics/' | relative_url }}">Next: Conditioning, stability, and cost →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.linear_algebra %}
+{% capture next_teaser %}One matrix now answers every shape of the question &mdash; but the same answer can be steady or wild depending on how close the columns are to dependent.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.linear_algebra teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

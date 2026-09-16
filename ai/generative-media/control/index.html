@@ -147,13 +147,10 @@ series: "generative_media"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Every control in this part acts on a single image. The next part changes the modality and the dimensionality: a video is a three-dimensional signal, and the token and attention budget a clip really costs is where video diffusion stops being image diffusion in a loop.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/generative-media/video-basics/' | relative_url }}">Next: Video as a 3D signal →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.generative_media %}
+{% capture next_teaser %}Every control in this part acts on a single image. The next part changes the modality and the dimensionality: a video is a three-dimensional signal, and the token and attention budget a clip really costs is where video diffusion stops being image diffusion in a loop.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.generative_media teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

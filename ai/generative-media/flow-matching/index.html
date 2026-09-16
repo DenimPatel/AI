@@ -135,13 +135,10 @@ series: "generative_media"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>A velocity field is cheap to train because the target is a single subtraction. The next question is where the field lives: not on pixels, but on a compressed latent that an autoencoder produces. The next part builds that compressor and measures what the compression costs.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/generative-media/latent-diffusion/' | relative_url }}">Next: Latent diffusion →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.generative_media %}
+{% capture next_teaser %}A velocity field is cheap to train because the target is a single subtraction. The next question is where the field lives: not on pixels, but on a compressed latent that an autoencoder produces. The next part builds that compressor and measures what the compression costs.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.generative_media teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

@@ -162,13 +162,10 @@ series: "multimodal"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>A grounded box tells a model where something is. A vision-language-action model has to go further and decide what to do about it, emitting movement instead of a caption. The gap between the two is the difference between perception and control: a box describes the scene, while an action chooses how to change it. The next part is about actions as tokens.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/multimodal/vla/' | relative_url }}">Next: Vision-language-action →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.multimodal %}
+{% capture next_teaser %}A grounded box tells a model where something is. A vision-language-action model has to go further and decide what to do about it, emitting movement instead of a caption. The gap between the two is the difference between perception and control: a box describes the scene, while an action chooses how to change it. The next part is about actions as tokens.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.multimodal teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

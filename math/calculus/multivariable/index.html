@@ -187,13 +187,10 @@ series: "calculus"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>We have a vector of partials. The next part asks which direction it points, and answers: straight uphill.</span>
-    <a class="btn btn-secondary" href="{{ '/math/calculus/gradient/' | relative_url }}">Next: The gradient →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.calculus %}
+{% capture next_teaser %}We have a vector of partials. The next part asks which direction it points, and answers: straight uphill.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.calculus teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

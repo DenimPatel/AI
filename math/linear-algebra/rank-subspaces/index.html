@@ -220,13 +220,10 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Two subspaces on opposite sides of a matrix are secretly the same dimension &mdash; and the operation that detects the overlap is a single number you multiply and add.</span>
-    <a class="btn btn-secondary" href="{{ '/math/linear-algebra/dot-product/' | relative_url }}">Next: Dot product, projection, duality →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.linear_algebra %}
+{% capture next_teaser %}Two subspaces on opposite sides of a matrix are secretly the same dimension &mdash; and the operation that detects the overlap is a single number you multiply and add.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.linear_algebra teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

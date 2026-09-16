@@ -212,13 +212,10 @@ series: "probability"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Every term in the volume, linked to the part that builds it, with the full distribution card.</span>
-    <a class="btn btn-secondary" href="{{ '/math/probability/glossary/' | relative_url }}">Next: Glossary and distribution reference →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.probability %}
+{% capture next_teaser %}Every term in the volume, linked to the part that builds it, with the full distribution card.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.probability teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

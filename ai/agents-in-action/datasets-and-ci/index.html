@@ -149,13 +149,10 @@ series: "agents_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Code checks cover what you can state exactly. The rest needs a grader — and a grader is a model with biases you now have to measure. Next: the LLM judge, its failure modes and how to calibrate one.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/agents-in-action/llm-judge/' | relative_url }}">Next: The LLM judge →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.agents_in_action %}
+{% capture next_teaser %}Code checks cover what you can state exactly. The rest needs a grader — and a grader is a model with biases you now have to measure. Next: the LLM judge, its failure modes and how to calibrate one.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.agents_in_action teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

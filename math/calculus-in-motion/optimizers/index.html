@@ -190,13 +190,10 @@ series: "calculus_in_motion"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>With curvature understood, the next part asks where the numbers come from: what calculus has to say about probability.</span>
-    <a class="btn btn-secondary" href="{{ '/math/calculus-in-motion/probability/' | relative_url }}">Next: Calculus of probability →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.calculus_in_motion %}
+{% capture next_teaser %}With curvature understood, the next part asks where the numbers come from: what calculus has to say about probability.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.calculus_in_motion teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

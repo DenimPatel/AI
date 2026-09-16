@@ -158,13 +158,10 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>The average's shape is now known and its width is $\sigma/\sqrt{n}$. The next part asks which rule for combining a sample into a guess should be trusted at all &mdash; and separates the error that shrinks with data from the error that does not.</span>
-    <a class="btn btn-secondary" href="{{ '/math/statistics/good-estimator/' | relative_url }}">Next: What makes an estimator good →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.statistics %}
+{% capture next_teaser %}The average's shape is now known and its width is $\sigma/\sqrt{n}$. The next part asks which rule for combining a sample into a guess should be trusted at all &mdash; and separates the error that shrinks with data from the error that does not.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.statistics teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

@@ -162,13 +162,10 @@ messages = [system, user]
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>The loop and its tools are in place. Next: the algorithms that tried to plan it all up front — ReAct, Plan-and-Execute, Reflexion, Tree of Thoughts, LATS — and which of their ideas actually survived into production.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/agents-in-action/planning-family/' | relative_url }}">Next: ReAct and the planning family →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.agents_in_action %}
+{% capture next_teaser %}The loop and its tools are in place. Next: the algorithms that tried to plan it all up front — ReAct, Plan-and-Execute, Reflexion, Tree of Thoughts, LATS — and which of their ideas actually survived into production.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.agents_in_action teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

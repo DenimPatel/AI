@@ -218,13 +218,11 @@ series: "llm_serving"
     </ul>
   </section>
 
-  <div class="g-next reveal">
-    <span>That is the end of the series. The <a href="{{ '/ai/llm-serving/glossary/' | relative_url }}">glossary and numbers card</a> collects every constant and definition used across all twenty parts.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/llm-serving/glossary/' | relative_url }}">Glossary &amp; numbers to know →</a>
-  </div>
+
 </main>
 
-{% include series-prevnext.html series=site.data.series.llm_serving %}
+{% capture next_teaser %}That is the end of the series. The glossary and numbers card collects every constant and definition used across all twenty parts.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.llm_serving teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

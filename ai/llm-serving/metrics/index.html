@@ -144,13 +144,10 @@ series: "llm_serving"
     <p class="g-source" id="cost-source"></p>
   </section>
 
-  <div class="g-next reveal">
-    <span>Metrics turn into concurrency the moment you size the KV cache. Next: bytes per token for real model geometries.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/llm-serving/kv-cache/' | relative_url }}">Next: The KV cache →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.llm_serving %}
+{% capture next_teaser %}Metrics turn into concurrency the moment you size the KV cache. Next: bytes per token for real model geometries.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.llm_serving teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

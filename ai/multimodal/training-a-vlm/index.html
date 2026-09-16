@@ -158,13 +158,10 @@ series: "multimodal"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>A trained model still invents objects that are not in the picture. Nothing in this recipe removes that habit &mdash; training shapes which answers are preferred, not whether the model can tell when it does not know. The next part is about why that happens, why some image tokens are ignored, and how the benchmarks are built to catch it.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/multimodal/hallucination-and-evals/' | relative_url }}">Next: Why vision-language models hallucinate →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.multimodal %}
+{% capture next_teaser %}A trained model still invents objects that are not in the picture. Nothing in this recipe removes that habit &mdash; training shapes which answers are preferred, not whether the model can tell when it does not know. The next part is about why that happens, why some image tokens are ignored, and how the benchmarks are built to catch it.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.multimodal teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

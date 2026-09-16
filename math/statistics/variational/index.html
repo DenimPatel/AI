@@ -171,13 +171,10 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Approximate posteriors trade bias for tractability. The next part replaces the posterior altogether with a single number and asks how its error splits into the part that shrinks with data and the part that does not.</span>
-    <a class="btn btn-secondary" href="{{ '/math/statistics/bias-variance/' | relative_url }}">Next: Bias and variance, revisited →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.statistics %}
+{% capture next_teaser %}Approximate posteriors trade bias for tractability. The next part replaces the posterior altogether with a single number and asks how its error splits into the part that shrinks with data and the part that does not.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.statistics teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

@@ -150,13 +150,10 @@ series: "generative_media"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>The U-Net's pyramid and its carefully placed attention are inductive biases borrowed from vision. A transformer makes the opposite bet: cut the image into tokens, drop the pyramid, and let attention do everything. The next part patches the latent and puts adaLN-Zero in charge of conditioning.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/generative-media/dit/' | relative_url }}">Next: The DiT backbone →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.generative_media %}
+{% capture next_teaser %}The U-Net's pyramid and its carefully placed attention are inductive biases borrowed from vision. A transformer makes the opposite bet: cut the image into tokens, drop the pyramid, and let attention do everything. The next part patches the latent and puts adaLN-Zero in charge of conditioning.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.generative_media teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

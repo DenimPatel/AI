@@ -165,13 +165,10 @@ series: "building_with_llms"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>You can now shape the distribution and read its uncertainty. Next: what a call actually costs and how long it takes — the output/input price asymmetry, TTFT versus TPOT, the quadratic cost of an agent loop, and effort as a dial.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/building-with-llms/cost-latency/' | relative_url }}">Next: Cost and latency from first principles →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.building_with_llms %}
+{% capture next_teaser %}You can now shape the distribution and read its uncertainty. Next: what a call actually costs and how long it takes — the output/input price asymmetry, TTFT versus TPOT, the quadratic cost of an agent loop, and effort as a dial.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.building_with_llms teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

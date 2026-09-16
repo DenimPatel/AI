@@ -183,13 +183,10 @@ series: "llm_serving"
     <p class="g-source" id="pm-source"></p>
   </section>
 
-  <div class="g-next reveal">
-    <span>The memory manager now hands a full batch to the scheduler every step. Next: how that batch is assembled and why prefill keeps interrupting it.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/llm-serving/batching/' | relative_url }}">Next: Continuous batching and chunked prefill →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.llm_serving %}
+{% capture next_teaser %}The memory manager now hands a full batch to the scheduler every step. Next: how that batch is assembled and why prefill keeps interrupting it.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.llm_serving teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

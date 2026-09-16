@@ -152,13 +152,10 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>The trade-off needs a dial, and the penalty you add to the fit is that dial. The next part reads the penalty as a prior.</span>
-    <a class="btn btn-secondary" href="{{ '/math/statistics/regularization-prior/' | relative_url }}">Next: Regularization is a prior →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.statistics %}
+{% capture next_teaser %}The trade-off needs a dial, and the penalty you add to the fit is that dial. The next part reads the penalty as a prior.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.statistics teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

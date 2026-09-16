@@ -154,13 +154,10 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>With many tests, the question becomes which test to run at all. The next part is a working reference to the whole zoo.</span>
-    <a class="btn btn-secondary" href="{{ '/math/statistics/test-zoo/' | relative_url }}">Next: t, z, chi-square, F and the likelihood-ratio →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.statistics %}
+{% capture next_teaser %}With many tests, the question becomes which test to run at all. The next part is a working reference to the whole zoo.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.statistics teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

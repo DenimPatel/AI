@@ -181,13 +181,10 @@ series: "building_with_llms"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Tokens are the atoms; sampling is what turns a distribution over them into text. Next: how temperature, top-p and top-k reshape that distribution, why temperature 0 is not deterministic, and what logprobs can and cannot tell you about confidence.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/building-with-llms/sampling/' | relative_url }}">Next: Sampling, nondeterminism and confidence →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.building_with_llms %}
+{% capture next_teaser %}Tokens are the atoms; sampling is what turns a distribution over them into text. Next: how temperature, top-p and top-k reshape that distribution, why temperature 0 is not deterministic, and what logprobs can and cannot tell you about confidence.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.building_with_llms teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

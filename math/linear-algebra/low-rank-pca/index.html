@@ -143,13 +143,10 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Keeping the largest singular values is how you compress; inverting <em>all</em> of them, carefully, is how you solve every version of <var>Ax = b</var>.</span>
-    <a class="btn btn-secondary" href="{{ '/math/linear-algebra/pseudoinverse/' | relative_url }}">Next: The complete picture of Ax = b →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.linear_algebra %}
+{% capture next_teaser %}Keeping the largest singular values is how you compress; inverting <em>all</em> of them, carefully, is how you solve every version of <var>Ax = b</var>.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.linear_algebra teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

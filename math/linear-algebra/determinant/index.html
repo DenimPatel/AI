@@ -204,13 +204,10 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>The determinant tells you whether a system is solvable; elimination tells you how to solve it and what to do when it is not.</span>
-    <a class="btn btn-secondary" href="{{ '/math/linear-algebra/systems/' | relative_url }}">Next: Solving Ax = b, and Gaussian elimination →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.linear_algebra %}
+{% capture next_teaser %}The determinant tells you whether a system is solvable; elimination tells you how to solve it and what to do when it is not.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.linear_algebra teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

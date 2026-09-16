@@ -152,13 +152,10 @@ series: "multimodal"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>That is the whole arc from pixels to a shared space to the modality zoo. The series continues with how those aligned encoders are bolted onto a language model, and how one trunk comes to read every modality at once. If "aligned" now feels like a claim to interrogate rather than a fact to accept, this part has done its job.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/multimodal/' | relative_url }}">Back to the Multimodal hub →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.multimodal %}
+{% capture next_teaser %}That is the whole arc from pixels to a shared space to the modality zoo. The series continues with how those aligned encoders are bolted onto a language model, and how one trunk comes to read every modality at once. If "aligned" now feels like a claim to interrogate rather than a fact to accept, this part has done its job.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.multimodal teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

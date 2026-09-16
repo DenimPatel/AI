@@ -168,13 +168,10 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>An interval quantifies how large an effect might be. The next part turns it into a decision, by asking how surprising the data would be if nothing were going on.</span>
-    <a class="btn btn-secondary" href="{{ '/math/statistics/hypothesis-testing/' | relative_url }}">Next: Null distributions and the p-value →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.statistics %}
+{% capture next_teaser %}An interval quantifies how large an effect might be. The next part turns it into a decision, by asking how surprising the data would be if nothing were going on.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.statistics teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

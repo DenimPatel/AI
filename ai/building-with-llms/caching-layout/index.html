@@ -168,13 +168,10 @@ user question        <span class="s">// volatile: different every call</span></d
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Caching rewards a stable prefix, which raises the question of what belongs in the prefix at all. Next: the real reasons to retrieve — freshness, provenance, access control and cost — and why BM25 is still the brutal baseline to beat.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/building-with-llms/why-retrieve/' | relative_url }}">Next: Why retrieve →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.building_with_llms %}
+{% capture next_teaser %}Caching rewards a stable prefix, which raises the question of what belongs in the prefix at all. Next: the real reasons to retrieve — freshness, provenance, access control and cost — and why BM25 is still the brutal baseline to beat.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.building_with_llms teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

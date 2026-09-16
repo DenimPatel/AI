@@ -221,13 +221,10 @@ series: "multimodal"
     </ul>
   </section>
 
-  <div class="g-next reveal">
-    <span>This page is a reference, meant to be dipped into rather than read start to finish. The series itself starts with a picture becoming a sequence of patches, and every term in the index above links back to the part where it first appeared.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/multimodal/vit/' | relative_url }}">Start with Part 1 →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.multimodal %}
+{% capture next_teaser %}This page is a reference, meant to be dipped into rather than read start to finish. The series itself starts with a picture becoming a sequence of patches, and every term in the index above links back to the part where it first appeared.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.multimodal teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

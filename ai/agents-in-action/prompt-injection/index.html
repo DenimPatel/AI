@@ -164,13 +164,10 @@ series: "agents_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>This part set the problem: an agent with private data, untrusted content and an exfiltration channel is one retrieved document from acting for someone else. The next part is the answer — the architectural defenses that change what the system permits, not what the prompt asks for.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/agents-in-action/defenses/' | relative_url }}">Next: Architectural defenses, guardrails and red-teaming →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.agents_in_action %}
+{% capture next_teaser %}This part set the problem: an agent with private data, untrusted content and an exfiltration channel is one retrieved document from acting for someone else. The next part is the answer — the architectural defenses that change what the system permits, not what the prompt asks for.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.agents_in_action teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

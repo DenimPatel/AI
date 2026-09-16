@@ -161,13 +161,10 @@ series: "multimodal"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>That is the end of the volume's account of models that read every modality at once. The next part turns to unifying the architectures themselves: one recipe, one objective and one trunk shared across images, video, audio and beyond. The question it answers is whether the separate front ends this volume has built &mdash; the patch projector, the audio codec, the video sampler &mdash; can be replaced by a single way of turning any signal into tokens, so that adding a new modality stops meaning designing a new front end.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/multimodal/unified-models/' | relative_url }}">Next: One model to read them all →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.multimodal %}
+{% capture next_teaser %}That is the end of the volume's account of models that read every modality at once. The next part turns to unifying the architectures themselves: one recipe, one objective and one trunk shared across images, video, audio and beyond. The question it answers is whether the separate front ends this volume has built &mdash; the patch projector, the audio codec, the video sampler &mdash; can be replaced by a single way of turning any signal into tokens, so that adding a new modality stops meaning designing a new front end.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.multimodal teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

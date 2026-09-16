@@ -189,13 +189,10 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>One vector is a point; two vectors can be a whole plane &mdash; until they line up and everything collapses.</span>
-    <a class="btn btn-secondary" href="{{ '/math/linear-algebra/span-basis/' | relative_url }}">Next: Span, independence and basis →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.linear_algebra %}
+{% capture next_teaser %}One vector is a point; two vectors can be a whole plane &mdash; until they line up and everything collapses.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.linear_algebra teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

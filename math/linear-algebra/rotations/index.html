@@ -166,13 +166,10 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Coordinates on a manifold let us move without leaving it; the next part takes the derivative of that motion, gradient by gradient.</span>
-    <a class="btn btn-secondary" href="{{ '/math/linear-algebra/optimization/' | relative_url }}">Next: Jacobians, Hessians and Gauss–Newton →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.linear_algebra %}
+{% capture next_teaser %}Coordinates on a manifold let us move without leaving it; the next part takes the derivative of that motion, gradient by gradient.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.linear_algebra teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

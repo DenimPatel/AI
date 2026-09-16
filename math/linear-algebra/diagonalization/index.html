@@ -185,13 +185,10 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Not every matrix has perpendicular eigenvectors &mdash; but symmetric ones always do, and that is what makes their powers predictable.</span>
-    <a class="btn btn-secondary" href="{{ '/math/linear-algebra/symmetric/' | relative_url }}">Next: Symmetric matrices and quadratic forms →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.linear_algebra %}
+{% capture next_teaser %}Not every matrix has perpendicular eigenvectors &mdash; but symmetric ones always do, and that is what makes their powers predictable.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.linear_algebra teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

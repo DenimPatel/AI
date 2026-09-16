@@ -154,13 +154,10 @@ series: "agents_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Once the tree says tune, the work becomes data. Next: curation, synthetic data and its diversity collapse, rejection sampling, LoRA arithmetic, preference methods and the reward-hacking curve.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/agents-in-action/tuning-in-practice/' | relative_url }}">Next: Data, distillation, and tuning in practice →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.agents_in_action %}
+{% capture next_teaser %}Once the tree says tune, the work becomes data. Next: curation, synthetic data and its diversity collapse, rejection sampling, LoRA arithmetic, preference methods and the reward-hacking curve.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.agents_in_action teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

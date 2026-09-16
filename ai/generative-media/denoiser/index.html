@@ -150,13 +150,10 @@ series: "generative_media"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>A denoiser tells you which direction the data lies at one noise level. The next part turns that estimate into a loop that walks all the way from pure noise to a finished sample.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/generative-media/sampling/' | relative_url }}">Next: Sampling - noise to picture →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.generative_media %}
+{% capture next_teaser %}A denoiser tells you which direction the data lies at one noise level. The next part turns that estimate into a loop that walks all the way from pure noise to a finished sample.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.generative_media teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

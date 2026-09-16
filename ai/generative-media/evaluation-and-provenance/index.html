@@ -197,13 +197,10 @@ series: "generative_media"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>That is the guide: from noise to images, through the backbones, samplers, video and sound, and out to the unglamorous work of measuring, marking and serving what was made. The reference page holds every term and every table in one place.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/generative-media/' | relative_url }}">Back to the series contents →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.generative_media %}
+{% capture next_teaser %}That is the guide: from noise to images, through the backbones, samplers, video and sound, and out to the unglamorous work of measuring, marking and serving what was made. The reference page holds every term and every table in one place.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.generative_media teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

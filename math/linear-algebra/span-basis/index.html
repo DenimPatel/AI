@@ -174,13 +174,10 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>A basis is a coordinate system; the next step is to move it, and to send the whole plane somewhere else.</span>
-    <a class="btn btn-secondary" href="{{ '/math/linear-algebra/transformations/' | relative_url }}">Next: Linear transformations are matrices →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.linear_algebra %}
+{% capture next_teaser %}A basis is a coordinate system; the next step is to move it, and to send the whole plane somewhere else.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.linear_algebra teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

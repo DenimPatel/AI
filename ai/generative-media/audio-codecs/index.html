@@ -148,13 +148,10 @@ series: "generative_media"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>With sound reduced to a few hundred tokens per second, the next part is a conditional language model over that vocabulary: text in, speech out, with alignment, cloning and first-chunk latency as the open problems.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/generative-media/tts/' | relative_url }}">Next: Text to speech →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.generative_media %}
+{% capture next_teaser %}With sound reduced to a few hundred tokens per second, the next part is a conditional language model over that vocabulary: text in, speech out, with alignment, cloning and first-chunk latency as the open problems.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.generative_media teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

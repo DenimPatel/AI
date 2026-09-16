@@ -160,13 +160,10 @@ series: "generative_media"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>If the forward process is a known recipe for destroying an image, the reverse process is the only hard part: estimate the noise, remove a little of it, repeat. The next part trains a real denoiser in your browser and watches the loss fall.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/generative-media/denoiser/' | relative_url }}">Next: Learning to undo one step →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.generative_media %}
+{% capture next_teaser %}If the forward process is a known recipe for destroying an image, the reverse process is the only hard part: estimate the noise, remove a little of it, repeat. The next part trains a real denoiser in your browser and watches the loss fall.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.generative_media teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

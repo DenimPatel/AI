@@ -166,13 +166,10 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>One sample is described. The next part describes two at once, and meets the ellipse that ties covariance, correlation and regression together.</span>
-    <a class="btn btn-secondary" href="{{ '/math/statistics/two-variables/' | relative_url }}">Next: Covariance, correlation, and the ellipse →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.statistics %}
+{% capture next_teaser %}One sample is described. The next part describes two at once, and meets the ellipse that ties covariance, correlation and regression together.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.statistics teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

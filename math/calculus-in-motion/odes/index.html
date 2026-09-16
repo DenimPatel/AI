@@ -187,13 +187,10 @@ series: "calculus_in_motion"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Flat state spaces are not the whole story: a rotation, a sphere or a set of poses is curved, and the Euler step has to be replaced by one that respects the surface.</span>
-    <a class="btn btn-secondary" href="{{ '/math/calculus-in-motion/manifolds/' | relative_url }}">Next: Calculus on manifolds →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.calculus_in_motion %}
+{% capture next_teaser %}Flat state spaces are not the whole story: a rotation, a sphere or a set of poses is curved, and the Euler step has to be replaced by one that respects the surface.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.calculus_in_motion teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

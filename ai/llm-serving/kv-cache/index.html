@@ -212,13 +212,10 @@ series: "llm_serving"
     </ul>
   </section>
 
-  <div class="g-next reveal">
-    <span>Bytes per token in hand, the next question is how to allocate them without fragmentation.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/llm-serving/paged-memory/' | relative_url }}">Next: PagedAttention →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.llm_serving %}
+{% capture next_teaser %}Bytes per token in hand, the next question is how to allocate them without fragmentation.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.llm_serving teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script>

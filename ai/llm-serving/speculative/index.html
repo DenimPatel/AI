@@ -194,13 +194,10 @@ series: "llm_serving"
     </ul>
   </section>
 
-  <div class="g-next reveal">
-    <span>A single model now goes faster. Next: what happens when one GPU is not enough.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/llm-serving/parallelism/' | relative_url }}">Next: Parallelism for inference →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.llm_serving %}
+{% capture next_teaser %}A single model now goes faster. Next: what happens when one GPU is not enough.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.llm_serving teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

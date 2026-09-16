@@ -175,13 +175,10 @@ series: "multimodal"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>The bridge is chosen and the token budget is set. The next part is the training recipe: what is frozen, in what order, on what data, and what breaks along the way. Resolution decides how many tokens the vision tower hands over, but it does not settle the deeper question of which weights move while the model learns to use them, and that is where the story goes next.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/multimodal/training-a-vlm/' | relative_url }}">Next: Training a vision-language model →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.multimodal %}
+{% capture next_teaser %}The bridge is chosen and the token budget is set. The next part is the training recipe: what is frozen, in what order, on what data, and what breaks along the way. Resolution decides how many tokens the vision tower hands over, but it does not settle the deeper question of which weights move while the model learns to use them, and that is where the story goes next.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.multimodal teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

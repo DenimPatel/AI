@@ -242,13 +242,10 @@ series: "linear_algebra"
     </div>
   </section>
 
-  <div class="g-next reveal">
-    <span>That is the whole series. Go back to the beginning, or open the contents page to jump to any part.</span>
-    <a class="btn btn-secondary" href="{{ '/math/linear-algebra/' | relative_url }}">Series contents →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.linear_algebra %}
+{% capture next_teaser %}That is the whole series. Go back to the beginning, or open the contents page to jump to any part.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.linear_algebra teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

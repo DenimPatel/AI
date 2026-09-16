@@ -148,13 +148,10 @@ series: "generative_media"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>The sampler is how you spend a budget you already have. The next part asks a different question: how to need almost no budget at all, by training a smaller student to jump the whole trajectory in one or four steps &mdash; and what that costs.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/generative-media/distillation/' | relative_url }}">Next: Few-step generation →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.generative_media %}
+{% capture next_teaser %}The sampler is how you spend a budget you already have. The next part asks a different question: how to need almost no budget at all, by training a smaller student to jump the whole trajectory in one or four steps &mdash; and what that costs.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.generative_media teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

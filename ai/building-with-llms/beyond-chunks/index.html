@@ -190,13 +190,10 @@ rg <span class="s">"AuthTokenValidator"</span> packages/
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>That is the end of the volume's parts. The appendix is a reference: every term linked back to the part that introduces it, a retrieval-architecture selection table, and a RAG failure-mode to metric table you can check a real pipeline against.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/building-with-llms/glossary/' | relative_url }}">Reference: Glossary and selection tables →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.building_with_llms %}
+{% capture next_teaser %}That is the end of the volume's parts. The appendix is a reference: every term linked back to the part that introduces it, a retrieval-architecture selection table, and a RAG failure-mode to metric table you can check a real pipeline against.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.building_with_llms teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

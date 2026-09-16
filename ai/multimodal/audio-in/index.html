@@ -158,13 +158,10 @@ series: "multimodal"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>A model that hears audio tokens and emits audio tokens can hold a conversation in one sequence, if the timing works. The final part assembles the omni model: interleaved streams, where the incoming and outgoing tokens share one sequence instead of living in separate pipelines; a thinker and a talker, the split between deciding what to say and rendering how to say it; listening while speaking, which is what makes interruption and back-channelling possible; and the latency budget &mdash; the few hundred milliseconds the whole loop may spend before the reply begins &mdash; that decides whether it feels alive.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/multimodal/omni/' | relative_url }}">Next: Omni models and the real-time loop →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.multimodal %}
+{% capture next_teaser %}A model that hears audio tokens and emits audio tokens can hold a conversation in one sequence, if the timing works. The final part assembles the omni model: interleaved streams, where the incoming and outgoing tokens share one sequence instead of living in separate pipelines; a thinker and a talker, the split between deciding what to say and rendering how to say it; listening while speaking, which is what makes interruption and back-channelling possible; and the latency budget &mdash; the few hundred milliseconds the whole loop may spend before the reply begins &mdash; that decides whether it feels alive.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.multimodal teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

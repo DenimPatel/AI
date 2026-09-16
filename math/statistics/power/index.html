@@ -152,13 +152,10 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>A single well-powered test is one clean answer. Run many tests over many slices of the same data and the false-positive rate quietly multiplies &mdash; the next part is about that garden of forking paths.</span>
-    <a class="btn btn-secondary" href="{{ '/math/statistics/multiple-comparisons/' | relative_url }}">Next: p-hacking and the garden of forking paths →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.statistics %}
+{% capture next_teaser %}A single well-powered test is one clean answer. Run many tests over many slices of the same data and the false-positive rate quietly multiplies &mdash; the next part is about that garden of forking paths.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.statistics teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

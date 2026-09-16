@@ -169,13 +169,10 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>MCMC gives you samples at the price of a chain that may not have converged. The next part buys speed instead &mdash; fitting a simple Gaussian to the posterior, or optimising a variational bound.</span>
-    <a class="btn btn-secondary" href="{{ '/math/statistics/variational/' | relative_url }}">Next: Laplace and variational approximations →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.statistics %}
+{% capture next_teaser %}MCMC gives you samples at the price of a chain that may not have converged. The next part buys speed instead &mdash; fitting a simple Gaussian to the posterior, or optimising a variational bound.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.statistics teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

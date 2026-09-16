@@ -197,13 +197,10 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Keep only the biggest singular values and the ellipse becomes a good sketch of the data. That is low-rank approximation, and next it becomes PCA.</span>
-    <a class="btn btn-secondary" href="{{ '/math/linear-algebra/low-rank-pca/' | relative_url }}">Next: Low-rank approximation and PCA →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.linear_algebra %}
+{% capture next_teaser %}Keep only the biggest singular values and the ellipse becomes a good sketch of the data. That is low-rank approximation, and next it becomes PCA.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.linear_algebra teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

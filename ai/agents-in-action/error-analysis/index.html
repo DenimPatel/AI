@@ -144,13 +144,10 @@ series: "agents_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>A taxonomy is a list of things to test. Next: build the set you trust, the set you must not tune against, and the gate that stops a prompt change from shipping a regression.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/agents-in-action/datasets-and-ci/' | relative_url }}">Next: Datasets, checks and CI →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.agents_in_action %}
+{% capture next_teaser %}A taxonomy is a list of things to test. Next: build the set you trust, the set you must not tune against, and the gate that stops a prompt change from shipping a regression.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.agents_in_action teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

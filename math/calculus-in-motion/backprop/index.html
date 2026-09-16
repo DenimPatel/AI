@@ -177,13 +177,10 @@ series: "calculus_in_motion"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Backprop gives the gradient. The next part asks how to use it — and why some directions slow a solver to a crawl.</span>
-    <a class="btn btn-secondary" href="{{ '/math/calculus-in-motion/optimizers/' | relative_url }}">Next: Curvature and convergence →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.calculus_in_motion %}
+{% capture next_teaser %}Backprop gives the gradient. The next part asks how to use it — and why some directions slow a solver to a crawl.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.calculus_in_motion teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

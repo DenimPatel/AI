@@ -184,13 +184,10 @@ series: "probability_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Once you have an interval, the next reflex is to ask whether it excludes zero &mdash; and that reflex is where testing begins.</span>
-    <a class="btn btn-secondary" href="{{ '/math/probability-in-action/testing/' | relative_url }}">Next: Hypothesis testing, and how it goes wrong →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.probability_in_action %}
+{% capture next_teaser %}Once you have an interval, the next reflex is to ask whether it excludes zero &mdash; and that reflex is where testing begins.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.probability_in_action teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

@@ -157,13 +157,10 @@ series: "generative_media"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>The stack is now complete: a latent compressor, a backbone, a path to integrate, and a scalar that decides how hard the prompt pulls. Return to the series hub to see how the parts sit together, or jump to the multimodal volume where the same conditioning machinery meets other modalities.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/generative-media/' | relative_url }}">Back to the series →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.generative_media %}
+{% capture next_teaser %}The stack is now complete: a latent compressor, a backbone, a path to integrate, and a scalar that decides how hard the prompt pulls. Return to the series hub to see how the parts sit together, or jump to the multimodal volume where the same conditioning machinery meets other modalities.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.generative_media teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

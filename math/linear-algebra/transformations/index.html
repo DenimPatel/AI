@@ -194,13 +194,10 @@ series: "linear_algebra"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>One matrix moves the plane; two in a row compose into a product &mdash; and the order matters.</span>
-    <a class="btn btn-secondary" href="{{ '/math/linear-algebra/composition/' | relative_url }}">Next: Matrix multiplication is composition →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.linear_algebra %}
+{% capture next_teaser %}One matrix moves the plane; two in a row compose into a product &mdash; and the order matters.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.linear_algebra teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

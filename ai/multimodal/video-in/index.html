@@ -166,13 +166,10 @@ series: "multimodal"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Video gave the trunk a temporal axis and a memory problem, and the two turn out to be the same problem: the longer the sequence, the more positions to encode and the more cache to carry. Audio has neither a frame grid nor a natural boundary: it is a continuous waveform whose tokens are set by a codec, and the model has to decide whether to hear it directly or only through a transcript. There is no frame rate to sample down, so the whole compression question lands on the codec instead &mdash; which is exactly the lever the next part puts under the sliders.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/multimodal/audio-in/' | relative_url }}">Next: Listening models →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.multimodal %}
+{% capture next_teaser %}Video gave the trunk a temporal axis and a memory problem, and the two turn out to be the same problem: the longer the sequence, the more positions to encode and the more cache to carry. Audio has neither a frame grid nor a natural boundary: it is a continuous waveform whose tokens are set by a codec, and the model has to decide whether to hear it directly or only through a transcript. There is no frame rate to sample down, so the whole compression question lands on the codec instead &mdash; which is exactly the lever the next part puts under the sliders.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.multimodal teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

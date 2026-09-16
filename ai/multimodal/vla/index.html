@@ -162,13 +162,10 @@ series: "multimodal"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>An image in the prompt is not just more text: it moves the request from decode-bound to prefill-bound, and it creates a second workload &mdash; the encoder &mdash; that has its own pool and its own cache. Prefill is the pass that ingests the whole prompt at once, decode is the slower pass that emits output one token at a time, and an image shifts the cost toward the first. The last part prices the whole multimodal request and names what is still unsolved.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/multimodal/serving-and-open-problems/' | relative_url }}">Next: Serving and evaluating multimodal systems →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.multimodal %}
+{% capture next_teaser %}An image in the prompt is not just more text: it moves the request from decode-bound to prefill-bound, and it creates a second workload &mdash; the encoder &mdash; that has its own pool and its own cache. Prefill is the pass that ingests the whole prompt at once, decode is the slower pass that emits output one token at a time, and an image shifts the cost toward the first. The last part prices the whole multimodal request and names what is still unsolved.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.multimodal teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

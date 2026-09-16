@@ -196,13 +196,10 @@ series: "probability_in_action"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>With robust fits in hand, the final part turns probability into the engine of a machine-learning model, from softmax to cross-entropy to diffusion.</span>
-    <a class="btn btn-secondary" href="{{ '/math/probability-in-action/probabilistic-ml/' | relative_url }}">Next: Probability in machine learning →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.probability_in_action %}
+{% capture next_teaser %}With robust fits in hand, the final part turns probability into the engine of a machine-learning model, from softmax to cross-entropy to diffusion.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.probability_in_action teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

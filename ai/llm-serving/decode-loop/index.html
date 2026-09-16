@@ -191,13 +191,10 @@ series: "llm_serving"
     </ul>
   </section>
 
-  <div class="g-next reveal">
-    <span>Bandwidth is the headline number. Next: the machines that supply it, the interconnect that bounds them, and the energy each token costs.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/llm-serving/hardware/' | relative_url }}">Next: The machine →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.llm_serving %}
+{% capture next_teaser %}Bandwidth is the headline number. Next: the machines that supply it, the interconnect that bounds them, and the energy each token costs.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.llm_serving teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

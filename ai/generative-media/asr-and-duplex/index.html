@@ -197,13 +197,10 @@ series: "generative_media"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>A recogniser good enough to transcribe anyone, and a synthesiser good enough to speak as anyone, together make voice the easiest modality to forge. The final part is about judging generated media and saying where it came from: evaluation, detection, watermarking and provenance.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/generative-media/evaluation-and-provenance/' | relative_url }}">Next: Judging and provenance →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.generative_media %}
+{% capture next_teaser %}A recogniser good enough to transcribe anyone, and a synthesiser good enough to speak as anyone, together make voice the easiest modality to forge. The final part is about judging generated media and saying where it came from: evaluation, detection, watermarking and provenance.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.generative_media teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

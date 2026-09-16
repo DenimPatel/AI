@@ -161,13 +161,10 @@ series: "generative_media"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Twenty-four thousand tokens a second is not a language-model problem; it is a compression problem. The next part is the codec that turns sound into a few hundred discrete tokens per second.</span>
-    <a class="btn btn-secondary" href="{{ '/ai/generative-media/audio-codecs/' | relative_url }}">Next: Neural audio codecs →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.generative_media %}
+{% capture next_teaser %}Twenty-four thousand tokens a second is not a language-model problem; it is a compression problem. The next part is the codec that turns sound into a few hundred discrete tokens per second.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.generative_media teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

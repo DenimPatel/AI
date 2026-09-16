@@ -168,13 +168,10 @@ series: "statistics"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Cross-validation tells you how well a model generalises; the next part turns a generalising model's scores into decisions &mdash; thresholds, ROC and PR curves, and calibration.</span>
-    <a class="btn btn-secondary" href="{{ '/math/statistics/calibration/' | relative_url }}">Next: Evaluation, ROC/PR, and calibration →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.statistics %}
+{% capture next_teaser %}Cross-validation tells you how well a model generalises; the next part turns a generalising model's scores into decisions &mdash; thresholds, ROC and PR curves, and calibration.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.statistics teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

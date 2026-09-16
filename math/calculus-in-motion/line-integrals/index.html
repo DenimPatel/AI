@@ -194,13 +194,10 @@ series: "calculus_in_motion"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>A curl-free field has a potential, but how do we measure curl at a point? The next part drops a shrinking paddlewheel into the field and reads its spin.</span>
-    <a class="btn btn-secondary" href="{{ '/math/calculus-in-motion/div-curl/' | relative_url }}">Next: Divergence and curl →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.calculus_in_motion %}
+{% capture next_teaser %}A curl-free field has a potential, but how do we measure curl at a point? The next part drops a shrinking paddlewheel into the field and reads its spin.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.calculus_in_motion teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

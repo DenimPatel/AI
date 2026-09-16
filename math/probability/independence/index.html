@@ -181,13 +181,10 @@ series: "probability"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>With independence in hand, a random variable turns outcomes into numbers you can average, and the PMF and CDF into two views of the same object.</span>
-    <a class="btn btn-secondary" href="{{ '/math/probability/random-variables/' | relative_url }}">Next: Random variables, PMFs and CDFs →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.probability %}
+{% capture next_teaser %}With independence in hand, a random variable turns outcomes into numbers you can average, and the PMF and CDF into two views of the same object.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.probability teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>

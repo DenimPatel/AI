@@ -194,13 +194,10 @@ series: "probability"
     <div class="g-quiz" id="quiz-root"></div>
   </section>
 
-  <div class="g-next reveal">
-    <span>Averaging works because the mgf of a long sum is a power &mdash; and the law of large numbers is what that power does at the origin.</span>
-    <a class="btn btn-secondary" href="{{ '/math/probability/lln/' | relative_url }}">Next: The Law of Large Numbers →</a>
-  </div>
 </main>
 
-{% include series-prevnext.html series=site.data.series.probability %}
+{% capture next_teaser %}Averaging works because the mgf of a long sum is a power &mdash; and the law of large numbers is what that power does at the origin.{% endcapture %}
+{% include series-prevnext.html series=site.data.series.probability teaser=next_teaser %}
 {% include guide-footer.html %}
 
 <script src="{{ '/assets/js/guide-core.js' | relative_url }}"></script>
