@@ -209,7 +209,11 @@ SERIES_NAME_HINTS = {
   # on its own is intentionally left unpoliced rather than mis-attributed.
   'calculus' => /calculus,\s*interactively/i,
   'calculus_in_motion' => /calculus\s+in\s+motion/i,
-  'statistics' => /statistics,\s*interactively/i
+  'statistics' => /statistics,\s*interactively/i,
+  # The two LLM-application volumes are named by their full titles so an
+  # "N-part" counter is attributed to the right one.
+  'building_with_llms' => /building\s+with\s+llms/i,
+  'agents_in_action' => /agents\s+in\s+action/i
 }.freeze
 
 Find.find('.') do |path|
