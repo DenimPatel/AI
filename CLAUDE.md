@@ -149,7 +149,7 @@ guides. There are no local images — **all 31 raster images are hotlinked to
 The multi-view-geometry and nonlinear-optimization pages each carry a large inline `<style>`
 block. These look duplicated but are not: pages deliberately override shared selectors with
 per-page values (`.mvg-plot3d` height varies 320/340/380/420px across pages), and only 32
-rules are byte-identical across all 13 MVG files. Extracting them to a shared stylesheet
+rules are byte-identical across all 20 MVG files. Extracting them to a shared stylesheet
 reorders the cascade for a small payoff — this was considered and rejected.
 
 ## Adding new content
@@ -177,7 +177,7 @@ setup, bar/line charts, an animation loop, slider binding, the vector/matrix mat
 Plotly cube scene that the vision guides re-derive per page. `_templates/guide-part.html`
 wires a new page to it.
 
-**This is additive only.** The 19 existing multi-view-geometry and nonlinear-optimization
+**This is additive only.** The 26 existing multi-view-geometry and nonlinear-optimization
 pages keep their own inline `<style>` blocks and per-page scripts exactly as they are —
 don't migrate them to the guide kit opportunistically, even though the classes and
 functions look like an obvious match. Likewise `llm-guide.css`/`llm-guide.js` stay as they

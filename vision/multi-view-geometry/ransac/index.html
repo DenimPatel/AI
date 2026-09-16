@@ -110,7 +110,7 @@ redirect_from:
 <main>
 <div class="wrap mvg">
   <section class="page-header">
-    <span class="section-kicker">Interactive guide &middot; Part 4 of 13</span>
+    <span class="section-kicker">Interactive guide · Part 7 of {{ site.data.series.multi_view_geometry.parts | size }}</span>
     <h1>Robust Estimation: RANSAC &amp; Friends</h1>
     <p>Every estimator this series has built so far — the eight-point algorithm for <var>F</var>, DLT for a homography <var>H</var>, Nist&#233;r's five-point solver for <var>E</var> — quietly assumed the input correspondences were correct. In practice they never all are: SIFT, ORB, and even learned feature matchers produce plenty of wrong matches, and a least-squares fit has no defense against them. <strong>RANSAC</strong> (RANdom SAmple Consensus) is the wrapper that makes every one of those estimators usable on real data, and it's arguably the single most-used practical idea in all of multi-view geometry — more code runs RANSAC than runs any individual matrix estimator it protects. This page derives it properly: the loop, the iteration-count formula, and the refinements (MSAC, LO-RANSAC, MAGSAC) that production systems actually use instead of the textbook version.</p>
   </section>
@@ -120,7 +120,7 @@ redirect_from:
   <section class="mvg-step" id="setup">
     <div class="mvg-step-head"><span class="mvg-step-num">0</span><h2>Why one bad correspondence wrecks least squares</h2></div>
     <p class="mvg-eyebrow">Motivation</p>
-    <p>The eight-point algorithm (Part 3), DLT for a homography, and Nist&#233;r's five-point solver for <var>E</var> all end the same way: stack a linear (or least-squares) system from a set of correspondences and solve it in one shot, typically by minimizing a sum of squared residuals <code>&#931;&#8271; r<sub>i</sub>&#178;</code>. That squaring is the problem. A correspondence that's <em>correct</em> contributes a small residual; a correspondence that's <em>wrong</em> &mdash; a mismatched feature, a moving object caught by a matcher expecting a static scene, a repeated texture that fooled the matcher entirely &mdash; can contribute a residual a hundred times larger. Because the cost is squared, one such outlier can dominate the entire sum and drag the fitted <var>F</var>, <var>H</var>, or <var>E</var> arbitrarily far from the truth, even with hundreds of good matches sitting right next to it.</p>
+    <p>The eight-point algorithm (Part 6), DLT for a homography, and Nist&#233;r's five-point solver for <var>E</var> all end the same way: stack a linear (or least-squares) system from a set of correspondences and solve it in one shot, typically by minimizing a sum of squared residuals <code>&#931;&#8271; r<sub>i</sub>&#178;</code>. That squaring is the problem. A correspondence that's <em>correct</em> contributes a small residual; a correspondence that's <em>wrong</em> &mdash; a mismatched feature, a moving object caught by a matcher expecting a static scene, a repeated texture that fooled the matcher entirely &mdash; can contribute a residual a hundred times larger. Because the cost is squared, one such outlier can dominate the entire sum and drag the fitted <var>F</var>, <var>H</var>, or <var>E</var> arbitrarily far from the truth, even with hundreds of good matches sitting right next to it.</p>
     <p>And outliers are not a rare edge case. Real feature matchers (SIFT, ORB, or a learned matcher like SuperGlue &mdash; the front end that <em>produces</em> the correspondences fed to every estimator in this series is its own topic and not this page's job) routinely mismatch 10&ndash;50% of their proposed pairs, especially under repetitive texture, wide baselines, or motion. Every linear estimator built so far in this series needs something wrapped around it that can tolerate that.</p>
     <div class="mvg-warn">&#9888;&#65039; <span><b>Least squares isn't broken, its assumptions are.</b> Ordinary least squares is the maximum-likelihood fit <em>if</em> every residual is Gaussian noise around the true model. Outliers aren't noise around the true model &mdash; they're points that don't belong to it at all. No amount of reweighting a single global least-squares solve fixes that; you need a way to <em>find</em> which points belong before you fit.</span></div>
   </section>
@@ -140,10 +140,10 @@ redirect_from:
     <p>Step 1 needs a <strong>minimal sample size</strong> <var>s</var> &mdash; just enough correspondences to pin the model down exactly, with no slack for a least-squares average. This series has already met every one of these minimal solvers:</p>
     <div class="mvg-math">
       Homography H (8 DOF):  s = 4 point-pairs  &mdash; DLT's 8 linear equations (2 per pair) exactly match 8 unknowns<br>
-      Fundamental matrix F (7 DOF, rank-2):  s = 7  (the 7-point algorithm) or s = 8  (the linear 8-point algorithm, Part 3)<br>
+      Fundamental matrix F (7 DOF, rank-2):  s = 7  (the 7-point algorithm) or s = 8  (the linear 8-point algorithm, Part 6)<br>
       Essential matrix E (5 DOF, calibrated):  s = 5  &mdash; Nist&#233;r's minimal five-point solver
     </div>
-    <p>Smaller <var>s</var> is better for RANSAC in one specific way &mdash; it makes an all-inlier draw more likely &mdash; which is exactly why the minimal solvers matter here, not just as a curiosity: RANSAC is the reason anyone bothered inventing a 5-point solver for <var>E</var> instead of always using 8 correspondences with the linear route.</p>
+{% endraw %}    <p>Smaller <var>s</var> is better for RANSAC in one specific way &mdash; it makes an all-inlier draw more likely &mdash; which is exactly why the minimal solvers matter here, not just as a curiosity: RANSAC is the reason anyone bothered inventing a 5-point solver for <var>E</var> (the five-point algorithm, treated in <a href="{{ '/vision/multi-view-geometry/five-point/' | relative_url }}">Part 13</a>) instead of always using 8 correspondences with the linear route.</p>{% raw %}
     <p class="mvg-eyebrow" style="margin-top:22px;">How many iterations, exactly?</p>
     <p>The one number RANSAC can't skip is <var>N</var>, the iteration count. Here's where it comes from. Let <var>w</var> be the (unknown, estimated) fraction of correspondences that are inliers. The probability that one randomly drawn minimal sample of size <var>s</var> is <em>entirely</em> inliers is <code>w&#8347;</code> (each of the <var>s</var> draws independently needs to land on an inlier). So the probability a single sample <em>fails</em> to be all-inliers is <code>1 &minus; w&#8347;</code>, and the probability that <em>all N</em> independent samples fail is <code>(1 &minus; w&#8347;)&#7497;</code> &mdash; that's the probability RANSAC never once gets a clean sample in <var>N</var> tries. Demanding that this failure probability be at most <code>1 &minus; p</code>, for a desired confidence <var>p</var> (e.g. 99%) of having drawn at least one all-inlier sample, and solving for <var>N</var>:</p>
     <div class="mvg-math">
@@ -238,10 +238,37 @@ redirect_from:
     </div>
   </section>
 
+  <section class="mvg-step" id="demo-montecarlo">
+    <div class="mvg-step-head"><span class="mvg-step-num">5</span><h2>Play: a Monte-Carlo check of the iteration-count formula</h2></div>
+    <p class="mvg-eyebrow">Interactive</p>
+    <div class="mvg-goal">&#127919; <b>Learning goal:</b> <code>P = 1 &minus; (1 &minus; w&#8347;)&#7497;</code> is not a heuristic &mdash; it is the exact probability that N independent minimal draws contain at least one all-inlier sample. Run the draws for real and watch the measured success rate climb onto that curve, tightening around it as the number of trials M grows.</div>
+    <p>The pink curve is the formula from the previous step, evaluated at every iteration count k up to N. The blue curve is measured: for each of M independent trials, RANSAC draws N minimal samples of s correspondences from a synthetic pool in which a fraction w are inliers, and the trial counts as a success if <em>any one</em> of its N draws lands entirely on inliers. A single draw is all-inlier with probability <code>w&#8347;</code>, the draws are independent, so the fraction of trials succeeded by iteration N should land on <code>1 &minus; (1 &minus; w&#8347;)&#7497;</code> &mdash; and the gap should shrink as M grows.</p>
+    <div class="mvg-demo">
+      <div class="mvg-canvas-wrap">
+        <canvas id="mc-canvas" width="480" height="320"></canvas>
+        <div class="mvg-legend">
+          <span><i style="background:var(--color-accent-2)"></i>theoretical 1 &minus; (1 &minus; w&#8347;)&#7497;</span>
+          <span><i style="background:var(--color-accent)"></i>empirical, M trials</span>
+        </div>
+      </div>
+      <div class="mvg-controls">
+        <div class="mvg-field"><label>Inlier fraction w <span class="val" id="mc-wval"></span></label><input type="range" id="mc-w" min="0.05" max="0.95" step="0.01" value="0.3"></div>
+        <div class="mvg-field"><label>Minimal sample size s <span class="val" id="mc-sval"></span></label><input type="range" id="mc-s" min="2" max="12" step="1" value="4"></div>
+        <div class="mvg-field"><label>Iterations N <span class="val" id="mc-nval"></span></label><input type="range" id="mc-n" min="10" max="1000" step="10" value="300"></div>
+        <div class="mvg-field"><label>Trials M <span class="val" id="mc-mval"></span></label><input type="range" id="mc-m" min="50" max="500" step="50" value="200"></div>
+        <div class="mvg-btnrow">
+          <button id="mc-resample" class="mvg-primary">Resample</button>
+        </div>
+        <div class="mvg-readout" id="mc-readout"></div>
+      </div>
+    </div>
+    <p>Every trial is generated by a seeded <code>mulberry32</code> RNG, so a given slider setting and seed always reproduces the same curve; <b>Resample</b> advances the seed by one so you can eyeball how much of the remaining gap is pure sampling noise. With <code>M = 200</code> the empirical curve wobbles around the theory; push M to 500 and the wobble visibly narrows.</p>
+  </section>
+
   <section class="mvg-step" id="sampson">
-    <div class="mvg-step-head"><span class="mvg-step-num">5</span><h2>What "residual" actually means: Sampson vs. algebraic error</h2></div>
+    <div class="mvg-step-head"><span class="mvg-step-num">6</span><h2>What "residual" actually means: Sampson vs. algebraic error</h2></div>
     <p class="mvg-eyebrow">The threshold is only as good as the distance it's measured in</p>
-    <p>Everything above assumed a residual <var>r</var> you can threshold against <var>&#964;</var> in pixels. For RANSAC-on-F, the obvious candidate is the same quantity the 8-point algorithm minimizes, the <strong>algebraic error</strong> from Part 3:</p>
+    <p>Everything above assumed a residual <var>r</var> you can threshold against <var>&#964;</var> in pixels. For RANSAC-on-F, the obvious candidate is the same quantity the 8-point algorithm minimizes, the <strong>algebraic error</strong> from Part 6:</p>
     <div class="mvg-math">r<sub>i</sub>&#8330;&#8261;&#8261;<sub>i</sub>&#8309; = x&#771;&#8322;&#7488;Fx&#771;&#8321;</div>
     <p>The problem: this number is not in pixel units, and it doesn't scale like a distance &mdash; a correspondence far from the epipolar line but where <code>Fx&#771;&#8321;</code> happens to be small in magnitude can score a tiny algebraic error despite being a bad match, while another point close to the line but where <code>Fx&#771;&#8321;</code> is large can score a big one. Thresholding on it directly bakes an arbitrary, scene-dependent scale into <var>&#964;</var>, which defeats the whole point of choosing <var>&#964;</var> in interpretable pixel units.</p>
     <p>The fix used by essentially every real RANSAC-for-F implementation is the <strong>Sampson distance</strong>, a first-order (linearized) approximation to the true geometric distance from a point to its epipolar line &mdash; cheap to compute (no iterative reprojection needed) but far closer to actual pixel error than the raw algebraic residual:</p>
@@ -553,6 +580,144 @@ redirect_from:
     update();
   })();
 
+  // ---------- Step 5: Monte-Carlo check of the iteration-count formula ----------
+  (function(){
+    var canvas = document.getElementById('mc-canvas');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var W = canvas.width, H = canvas.height;
+    var padL = 46, padB = 30, padT = 12, padR = 14;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+
+    var wEl = document.getElementById('mc-w'), sEl = document.getElementById('mc-s');
+    var nEl = document.getElementById('mc-n'), mEl = document.getElementById('mc-m');
+    var resampleBtn = document.getElementById('mc-resample');
+
+    var POOL = 20000;     // synthetic correspondences per trial; large so the
+                          // hypergeometric draw ratio matches w^s to ~0.3%
+    var seed = 20240916;  // deterministic base seed; Resample advances it by one
+
+    function mulberry32(a){
+      return function(){
+        a |= 0; a = (a + 0x6D2B79F5) | 0;
+        var t = Math.imul(a ^ (a >>> 15), 1 | a);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+
+    // exact theoretical success by iteration k: -expm1(k*log1p(-ws)) = 1-(1-ws)^k
+    function theoP(ws, k){
+      if (ws <= 0) return 0;
+      if (ws >= 1) return 1;
+      return -Math.expm1(k * Math.log1p(-ws));
+    }
+
+    var sampleBuf = new Int32Array(16);
+    // draw s distinct indices uniformly from [0, nPool); a draw is all-inlier
+    // iff every index lands in the first nInlier slots of the pool.
+    function firstSuccess(rng, nIter, sSize, nInlier, nPool){
+      for (var k=1;k<=nIter;k++){
+        var allIn = true, cnt = 0;
+        while (cnt < sSize){
+          var idx = Math.floor(rng()*nPool);
+          var dup = false;
+          for (var q=0;q<cnt;q++){ if (sampleBuf[q] === idx){ dup = true; break; } }
+          if (dup) continue;
+          sampleBuf[cnt++] = idx;
+          if (idx >= nInlier) allIn = false;
+        }
+        if (allIn) return k;
+      }
+      return nIter + 1;
+    }
+
+    function kToX(k, N){
+      var t = Math.log(Math.max(k, 1)) / Math.log(N);
+      return padL + t * plotW;
+    }
+    function pToY(pv){ return padT + (1 - pv) * plotH; }
+
+    function render(){
+      var w = parseFloat(wEl.value), s = parseInt(sEl.value, 10);
+      var N = parseInt(nEl.value, 10), M = parseInt(mEl.value, 10);
+      var nInlier = Math.round(w * POOL);
+      var rng = mulberry32(seed);
+
+      var succ = new Float64Array(N + 1);
+      for (var t=0;t<M;t++){
+        var first = firstSuccess(rng, N, s, nInlier, POOL);
+        if (first <= N) succ[first]++;
+      }
+      for (var k=1;k<=N;k++) succ[k] += succ[k-1]; // success fraction by iteration k
+
+      var ws = Math.pow(w, s);
+      var pTheo = theoP(ws, N);
+      var empFinal = succ[N] / M;
+
+      ctx.clearRect(0,0,W,H);
+      ctx.fillStyle = 'rgba(0,0,0,0.04)'; ctx.fillRect(0,0,W,H);
+
+      ctx.strokeStyle = COLOR_DIVIDER; ctx.lineWidth = 1;
+      ctx.fillStyle = COLOR_TEXT; ctx.font = '10px monospace';
+      [0, 0.25, 0.5, 0.75, 1].forEach(function(pv){
+        var y = pToY(pv);
+        ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(W-padR, y); ctx.stroke();
+        ctx.globalAlpha = 0.7; ctx.fillText(pv.toFixed(2), 2, y+3); ctx.globalAlpha = 1;
+      });
+      for (var p=0; Math.pow(10,p) <= N; p++){
+        var kv = Math.pow(10,p), x = kToX(kv, N);
+        ctx.beginPath(); ctx.moveTo(x, padT); ctx.lineTo(x, H-padB); ctx.stroke();
+        ctx.globalAlpha = 0.7; ctx.fillText(kv === 1 ? '1' : ('1e'+p), x-6, H-padB+14); ctx.globalAlpha = 1;
+      }
+      ctx.beginPath(); ctx.moveTo(padL, padT); ctx.lineTo(padL, H-padB); ctx.lineTo(W-padR, H-padB); ctx.stroke();
+
+      // theoretical 1 - (1 - w^s)^k
+      ctx.strokeStyle = COLOR_ACCENT2; ctx.lineWidth = 2; ctx.beginPath();
+      for (var kt=1;kt<=N;kt++){
+        var yt = pToY(theoP(ws, kt)), xt = kToX(kt, N);
+        if (kt === 1) ctx.moveTo(xt, yt); else ctx.lineTo(xt, yt);
+      }
+      ctx.stroke();
+
+      // empirical stepped curve: fraction of the M trials succeeded by iteration k
+      ctx.strokeStyle = COLOR_ACCENT; ctx.lineWidth = 2; ctx.beginPath();
+      ctx.moveTo(kToX(1, N), pToY(succ[1]/M));
+      for (var ke=2;ke<=N;ke++){
+        var xe = kToX(ke, N);
+        ctx.lineTo(xe, pToY(succ[ke-1]/M));
+        ctx.lineTo(xe, pToY(succ[ke]/M));
+      }
+      ctx.stroke();
+
+      // endpoint markers at k = N
+      var xN = kToX(N, N);
+      ctx.fillStyle = COLOR_ACCENT;
+      ctx.beginPath(); ctx.arc(xN, pToY(empFinal), 5, 0, 7); ctx.fill();
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
+      ctx.strokeStyle = COLOR_ACCENT2; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(xN, pToY(pTheo), 5, 0, 7); ctx.stroke();
+
+      document.getElementById('mc-wval').textContent = w.toFixed(2);
+      document.getElementById('mc-sval').textContent = s;
+      document.getElementById('mc-nval').textContent = N;
+      document.getElementById('mc-mval').textContent = M;
+      document.getElementById('mc-readout').innerHTML =
+        '<div><span class="k">w&#8347;</span> = ' + ws.toExponential(3) + '</div>' +
+        '<div><span class="k">trials M / seed</span> = ' + M + ' / ' + seed + '</div>' +
+        '<div><span class="k">theoretical P(N)</span> = ' + (pTheo*100).toFixed(2) + '% &nbsp;<span class="k">(expected</span> ' + (M*pTheo).toFixed(1) + ' <span class="k">successes)</span></div>' +
+        '<div><span class="k">empirical by N</span> = <span class="hi">' + (empFinal*100).toFixed(2) + '%</span> &nbsp;<span class="k">(' + succ[N] + ' / ' + M + ' trials)</span></div>' +
+        '<div><span class="k">gap</span> = ' + (Math.abs(empFinal - pTheo)*100).toFixed(2) + ' pts &mdash; sampling noise, narrower as M grows</div>';
+    }
+
+    wEl.addEventListener('input', render);
+    sEl.addEventListener('input', render);
+    nEl.addEventListener('input', render);
+    mEl.addEventListener('input', render);
+    resampleBtn.addEventListener('click', function(){ seed = (seed + 1) | 0; render(); });
+    render();
+  })();
+
   // ---------- Step 3: RANSAC vs MSAC on the same 400 samples ----------
   (function(){
     var canvas = document.getElementById('s3-canvas');
@@ -657,7 +822,7 @@ redirect_from:
     var ctx = canvas.getContext('2d');
     var W = canvas.width, H = canvas.height;
 
-    // Build a real F from two fixed synthetic cameras (same machinery as Part 3).
+    // Build a real F from two fixed synthetic cameras (same machinery as Part 6).
     function norml(v){ var n = Math.hypot(v[0],v[1],v[2])||1; return [v[0]/n,v[1]/n,v[2]/n]; }
     function crossv(a,b){ return [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]]; }
     function orbit(az, el, dist){

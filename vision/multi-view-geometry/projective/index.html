@@ -107,7 +107,7 @@ redirect_from:
 <main>
 <div class="wrap mvg">
   <section class="page-header">
-    <span class="section-kicker">Interactive guide · Part 0 of 13</span>
+    <span class="section-kicker">Interactive guide · Part 0 of {{ site.data.series.multi_view_geometry.parts | size }}</span>
     <h1>Projective Geometry &amp; Homogeneous Coordinates</h1>
     <p>Every later part of this series writes things like <code>x&#771; = K[R|t]X&#771;</code>, says two vectors are "equal up to scale" (<code>≅</code>), and pulls lines and intersections out of cross products as if that were obvious. It isn't obvious — it's <strong>projective geometry</strong>, a different (and, once it clicks, simpler) way of doing geometry where points at infinity are just points, lines and points are interchangeable, and "scale doesn't matter" is a first-class rule rather than an asterisk. This page builds that language from scratch, with nothing assumed from later parts.</p>
   </section>
@@ -171,7 +171,7 @@ redirect_from:
       Line through two points x&#771;&#8321;, x&#771;&#8322;:  l = x&#771;&#8321; × x&#771;&#8322;<br>
       Point where lines l&#8321;, l&#8322; meet:  x&#771; = l&#8321; × l&#8322;
     </div>
-    <p>Why the cross product works: <code>l = x&#771;&#8321; × x&#771;&#8322;</code> is by construction orthogonal to both <code>x&#771;&#8321;</code> and <code>x&#771;&#8322;</code>, i.e. <code>l · x&#771;&#8321; = l · x&#771;&#8322; = 0</code> — exactly the incidence condition, satisfied for both points at once. This one identity is the entire computational engine behind vanishing points, epipolar lines as <code>l = Fx&#8321;</code> in Part 2, and much of what looks like magic later in this series.</p>
+    <p>Why the cross product works: <code>l = x&#771;&#8321; × x&#771;&#8322;</code> is by construction orthogonal to both <code>x&#771;&#8321;</code> and <code>x&#771;&#8322;</code>, i.e. <code>l · x&#771;&#8321; = l · x&#771;&#8322; = 0</code> — exactly the incidence condition, satisfied for both points at once. This one identity is the entire computational engine behind vanishing points, epipolar lines as <code>l = Fx&#8321;</code> in Part 6, and much of what looks like magic later in this series.</p>
     <p>And it explains ideal points cleanly: two parallel lines <code>l&#8321;, l&#8322;</code> (same <code>(a, b)</code> direction, different <code>c</code>) cross to give a point with <code>w = 0</code> — an ideal point, in the direction perpendicular to <code>(a, b)</code>, i.e. along the lines themselves. All ideal points together form one line, the <strong>line at infinity</strong> <code>l&#8734; = (0, 0, 1)</code>, which every ordinary line meets at its own vanishing direction and no other.</p>
   </section>
 
@@ -192,40 +192,16 @@ redirect_from:
     </div>
     <p>Drag the two orange handles anywhere — the blue line through them updates live. Click <b>"Snap parallel"</b> to make the fixed line exactly parallel to the draggable one and watch the intersection's <code>w</code> hit (numerically) zero: same direction, no finite meeting point, an ideal point on the line at infinity.</p>
   </section>
+{% endraw %}
 
   <section class="mvg-step" id="beyond">
     <div class="mvg-step-head"><span class="mvg-step-num">5</span><h2>What else lives in P² and P³</h2></div>
     <p class="mvg-eyebrow">Just enough to recognize it later</p>
-    <p><strong>Cross-ratio.</strong> Four collinear points <code>A, B, C, D</code> have a ratio <code>(A,B;C,D)</code> that survives <em>any</em> projective transformation — it's the one metric quantity projective geometry doesn't destroy. It's what lets Part 6's stratified reconstruction recover affine and metric structure from a purely projective reconstruction.</p>
-    <p><strong>Conics.</strong> A conic (ellipse, parabola, circle, pair of lines, ...) is a symmetric 3×3 matrix <code>C</code> with <code>x&#771;ᵀCx&#771; = 0</code>. The <strong>image of the absolute conic</strong> — a specific conic that exists only at infinity and is invisible in any one photo — is exactly what camera calibration (Part 2 of this series) recovers: it's a stand-in for the intrinsic matrix <code>K</code> that doesn't care about camera position at all.</p>
-    <p><strong>P³ and camera projection.</strong> Everything above generalizes one dimension up: 3D points are <code>X&#771; = (X, Y, Z, W)</code>, planes are 4-vectors with the same dot-product incidence rule, and the point at infinity in a 3D direction has <code>W = 0</code>. A camera is then literally a linear map <code>P³ → P²</code> — a 3×4 matrix <code>P</code> — and <code>x&#771; = PX&#771;</code> is projective geometry's version of "take a picture." That's the object Part 1 builds concretely as <code>P = K[R|t]</code>.</p>
-    <p><strong>The transformation hierarchy.</strong> Not every transform of P² is equally destructive. Euclidean transforms (3 DOF: rotation + translation) preserve lengths and angles; similarity (4 DOF) adds uniform scale; affine (6 DOF) preserves parallelism and ratios along a line but not angles; the full projective group (8 DOF) preserves only incidence and cross-ratio — it can turn a square into any convex quadrilateral. Homography estimation in Part 3 is estimating a general element of this last, most permissive group.</p>
-
-    <div class="mvg-goal">🎯 <b>Learning goal (cross-ratio):</b> a projective map can shrink, stretch, and relocate four collinear points arbitrarily — but the cross-ratio <code>(A,B;C,D)</code> comes out identical on both lines. Drag any point and watch both values track each other exactly.</div>
-    <div class="mvg-demo">
-      <div class="mvg-canvas-wrap mvg-imgplane">
-        <canvas id="s5-canvas" width="480" height="360"></canvas>
-        <p class="mvg-canvas-hint">Top: four draggable collinear points. Bottom: the same four points after the projective remap t&#8242; = 6t/(t+4). Labels travel with the points.</p>
-      </div>
-      <div class="mvg-controls">
-        <div class="mvg-readout" id="s5-readout"></div>
-        <div class="mvg-btnrow"><button id="s5-reset">Reset points</button></div>
-        <p class="mvg-canvas-hint">Directed distances along each line; (A,B;C,D) = (AC/BC)/(AD/BD). Under an affine remap ratios along the line would also survive — under this genuinely projective remap they don&#8217;t, but the cross-ratio still does.</p>
-      </div>
-    </div>
-
-    <div class="mvg-goal">🎯 <b>Learning goal (transformation hierarchy):</b> drag the corners of the dashed unit square into any convex quadrilateral. The demo checks the shape&#8217;s properties and reports the <em>least</em> destructive transform group that can produce it — with the DOF each group has.</div>
-    <div class="mvg-demo">
-      <div class="mvg-canvas-wrap mvg-imgplane">
-        <canvas id="s5b-canvas" width="480" height="360"></canvas>
-        <p class="mvg-canvas-hint">Drag the four orange handles. Classification: square/rotated square = Euclidean (3 DOF), uniformly scaled = similarity (4), parallelogram = affine (6), anything else = projective (8).</p>
-      </div>
-      <div class="mvg-controls">
-        <div class="mvg-readout" id="s5b-readout"></div>
-        <div class="mvg-btnrow"><button id="s5b-reset">Reset to square</button></div>
-      </div>
-    </div>
+    <p><strong>Conics.</strong> A conic (ellipse, parabola, circle, pair of lines, ...) is a symmetric 3×3 matrix <code>C</code> with <code>x&#771;ᵀCx&#771; = 0</code>; the absolute conic is the special one that camera calibration recovers. <a href="{{ '/vision/multi-view-geometry/conics/' | relative_url }}">Conics &amp; the absolute conic</a> works it out in full.</p>
+    <p><strong>P³ and camera projection.</strong> The same language generalizes to 3D points, 4-vector planes, and a camera as a 3×4 matrix <code>P</code> with <code>x&#771; = PX&#771;</code>. <a href="{{ '/vision/multi-view-geometry/projective-3d/' | relative_url }}">3D projective space &amp; Plücker lines</a> takes that up.</p>
+    <p><strong>The transformation hierarchy.</strong> Not every transform of P² is equally destructive — Euclidean, similarity, affine, and projective maps each add degrees of freedom and give up an invariant. <a href="{{ '/vision/multi-view-geometry/transformation-hierarchy/' | relative_url }}">The projective transformation hierarchy</a> is the full stratification, including cross-ratio.</p>
   </section>
+{% raw %}
 
   <section class="mvg-step" id="cheatsheet">
     <div class="mvg-step-head"><span class="mvg-step-num">✓</span><h2>Cheat sheet</h2></div>
@@ -236,12 +212,12 @@ redirect_from:
       <tbody>
         <tr><td>Homogeneous point</td><td><code>x&#771; = (x, y, w)</code></td><td>Euclidean point is <code>(x/w, y/w)</code>; defined up to scale</td><td>Every <code>x&#771;</code> in this series</td></tr>
         <tr><td>Scale equivalence</td><td><code>a ≅ b</code></td><td><code>a = λb</code> for some <code>λ ≠ 0</code></td><td>"Equal up to scale" everywhere: <code>E</code>, <code>F</code>, <code>H</code>, <code>P</code></td></tr>
-        <tr><td>Point at infinity</td><td><code>(x, y, 0)</code></td><td>No Euclidean counterpart; one per direction</td><td>Vanishing points (Part 1), pure rotation (Part 2)</td></tr>
-        <tr><td>Line</td><td><code>l = (a, b, c)</code></td><td>Incidence: <code>l · x&#771; = 0</code></td><td>Epipolar lines <code>l = Fx&#8321;</code> (Part 2)</td></tr>
-        <tr><td>Line through 2 points</td><td><code>l = x&#771;&#8321; × x&#771;&#8322;</code></td><td>Cross product</td><td>Vanishing-point construction (Part 1)</td></tr>
+        <tr><td>Point at infinity</td><td><code>(x, y, 0)</code></td><td>No Euclidean counterpart; one per direction</td><td>Vanishing points (Part 4), pure rotation (Part 8)</td></tr>
+        <tr><td>Line</td><td><code>l = (a, b, c)</code></td><td>Incidence: <code>l · x&#771; = 0</code></td><td>Epipolar lines <code>l = Fx&#8321;</code> (Part 6)</td></tr>
+        <tr><td>Line through 2 points</td><td><code>l = x&#771;&#8321; × x&#771;&#8322;</code></td><td>Cross product</td><td>Vanishing-point construction (Part 4)</td></tr>
         <tr><td>Intersection of 2 lines</td><td><code>x&#771; = l&#8321; × l&#8322;</code></td><td>Cross product (dual of the above)</td><td>Epipole = null space, computed similarly</td></tr>
-        <tr><td>Line at infinity</td><td><code>l&#8734; = (0, 0, 1)</code></td><td>Contains every ideal point</td><td>Affine/metric upgrade (Part 6)</td></tr>
-        <tr><td>Transformation hierarchy</td><td>Euclidean ⊂ similarity ⊂ affine ⊂ projective</td><td>3 / 4 / 6 / 8 DOF</td><td>Homography (Part 3), calibration</td></tr>
+        <tr><td>Line at infinity</td><td><code>l&#8734; = (0, 0, 1)</code></td><td>Contains every ideal point</td><td>Affine/metric upgrade (Part 16)</td></tr>
+        <tr><td>Transformation hierarchy</td><td>Euclidean ⊂ similarity ⊂ affine ⊂ projective</td><td>3 / 4 / 6 / 8 DOF</td><td>Homography (Part 8), calibration</td></tr>
       </tbody>
     </table>
     </div>
@@ -249,8 +225,8 @@ redirect_from:
 {% endraw %}
 
   <div class="mvg-next">
-    <span>With homogeneous coordinates and duality in hand, the pinhole camera equation <code>x&#771; = K[R|t]X&#771;</code> stops being a magic formula — it's just a linear map on P³, followed by one division.</span>
-    <a class="btn btn-secondary" href="{{ '/vision/multi-view-geometry/pinhole-camera/' | relative_url }}">Continue: the pinhole camera →</a>
+    <span>Homogeneous coordinates and duality are the alphabet; the next pages are words. First up: conics, and the absolute conic that camera calibration later pins down.</span>
+    <a class="btn btn-secondary" href="{{ '/vision/multi-view-geometry/conics/' | relative_url }}">Continue: conics &amp; the absolute conic →</a>
   </div>
 </div>
 
@@ -503,225 +479,6 @@ redirect_from:
       if (ang < 0) ang += 180;
       angEl.value = ang.toFixed(0);
       update();
-    });
-    update();
-  })();
-
-  // ---------- Step 5a: cross-ratio demo ----------
-  (function(){
-    var canvas = document.getElementById('s5-canvas');
-    if (!canvas) return;
-    var ctx = canvas.getContext('2d');
-    var W = canvas.width, H = canvas.height;
-    var cx = W/2, cy = H/2, scale = 55;
-
-    function toPx(t, yWorld){ return [cx + t*scale, cy - yWorld*scale]; }
-    function crossRatio(ts){
-      var a = ts[0], b = ts[1], c = ts[2], d = ts[3];
-      var num = (c - a) * (d - b), den = (c - b) * (d - a);
-      return den !== 0 ? num/den : Infinity;
-    }
-    // projective remap of the line parameter (non-affine: denominator depends on t)
-    function remap(t){ return 6*t/(t + 4); }
-
-    var tInit = [-2.2, -0.6, 0.9, 2.4];
-    var ts = tInit.slice();
-    var yTop = 1.4, yBot = -1.4;
-    var labels = ['A','B','C','D'];
-    var colors = [COLOR_ACCENT, '#e08a1e', COLOR_ACCENT2, '#8a5cff'];
-    var dragIdx = -1;
-
-    function drawLine(yWorld, color, lw){
-      var p1 = toPx(-4.3, yWorld), p2 = toPx(4.3, yWorld);
-      ctx.strokeStyle = color; ctx.lineWidth = lw;
-      ctx.beginPath(); ctx.moveTo(p1[0], p1[1]); ctx.lineTo(p2[0], p2[1]); ctx.stroke();
-    }
-
-    function update(){
-      ctx.clearRect(0,0,W,H);
-      ctx.fillStyle = 'rgba(0,0,0,0.04)'; ctx.fillRect(0,0,W,H);
-      ctx.strokeStyle = COLOR_DIVIDER; ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(0,cy); ctx.lineTo(W,cy); ctx.stroke();
-
-      drawLine(yTop, COLOR_TEXT, 1.5);
-      drawLine(yBot, COLOR_TEXT, 1.5);
-
-      // tick marks at integer t on the top line
-      ctx.fillStyle = COLOR_TEXT; ctx.globalAlpha = 0.35; ctx.font = '10px monospace';
-      for (var g = -4; g <= 4; g++){
-        var tp = toPx(g, yTop);
-        ctx.fillRect(tp[0]-0.5, tp[1]-4, 1, 8);
-        if (g !== 0) ctx.fillText(String(g), tp[0]-3, tp[1]+14);
-      }
-      ctx.globalAlpha = 1;
-
-      var ts2 = ts.map(remap);
-
-      // correspondence ticks between the two lines
-      ctx.strokeStyle = COLOR_ACCENT; ctx.globalAlpha = 0.4; ctx.lineWidth = 1;
-      for (var i = 0; i < 4; i++){
-        var p1 = toPx(ts[i], yTop), p2 = toPx(ts2[i], yBot);
-        ctx.setLineDash([3,3]);
-        ctx.beginPath(); ctx.moveTo(p1[0], p1[1]); ctx.lineTo(p2[0], p2[1]); ctx.stroke();
-      }
-      ctx.setLineDash([]); ctx.globalAlpha = 1;
-
-      function drawPts(arr, yWorld, r){
-        for (var i = 0; i < 4; i++){
-          var p = toPx(arr[i], yWorld);
-          ctx.fillStyle = colors[i];
-          ctx.beginPath(); ctx.arc(p[0], p[1], r, 0, 7); ctx.fill();
-          ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
-          ctx.fillStyle = colors[i]; ctx.font = 'bold 12px sans-serif';
-          ctx.fillText(labels[i], p[0]+8, p[1]-8);
-        }
-      }
-      drawPts(ts, yTop, 7);
-      drawPts(ts2, yBot, 6);
-
-      ctx.fillStyle = COLOR_TEXT; ctx.globalAlpha = 0.6; ctx.font = '11px sans-serif';
-      ctx.fillText('original line — drag A, B, C, D', 10, toPx(0, yTop)[1] - 60);
-      ctx.fillText('after projective remap', 10, toPx(0, yBot)[1] + 66);
-      ctx.globalAlpha = 1;
-
-      var cr1 = crossRatio(ts), cr2 = crossRatio(ts2);
-      function fmt(v){ return isFinite(v) ? v.toFixed(4) : '∞'; }
-      document.getElementById('s5-readout').innerHTML =
-        '<div><span class="k">cross-ratio on top line</span> (A,B;C,D) = <span class="hi">' + fmt(cr1) + '</span></div>' +
-        '<div><span class="k">cross-ratio after remap</span> (A′,B′;C′,D′) = <span class="hi">' + fmt(cr2) + '</span></div>' +
-        '<div><span class="k">difference</span> = ' + (isFinite(cr1) && isFinite(cr2) ? Math.abs(cr1-cr2).toExponential(2) : '—') + ' <span class="hi">— invariant</span></div>' +
-        '<div><span class="k">simple ratio AC/BC</span> = ' + (isFinite((ts[2]-ts[0])/(ts[2]-ts[1])) ? ((ts[2]-ts[0])/(ts[2]-ts[1])).toFixed(4) : '∞') +
-        ' &nbsp;→&nbsp; after remap = ' + (isFinite((ts2[2]-ts2[0])/(ts2[2]-ts2[1])) ? ((ts2[2]-ts2[0])/(ts2[2]-ts2[1])).toFixed(4) : '∞') + ' <span style="opacity:.6">(NOT preserved)</span></div>';
-    }
-
-    function nearestT(mx, my){
-      // project pointer onto the top line, return t (clamped to visible range)
-      var t = (mx - cx)/scale;
-      var dy = Math.abs(my - toPx(0, yTop)[1]);
-      return { t: Math.max(-4.2, Math.min(4.2, t)), dy: dy };
-    }
-    canvas.addEventListener('pointerdown', function(e){
-      var rect = canvas.getBoundingClientRect();
-      var mx = (e.clientX-rect.left)*(W/rect.width), my = (e.clientY-rect.top)*(H/rect.height);
-      var hit = nearestT(mx, my);
-      if (hit.dy > 40){
-        var best = -1, bestD = 0.4;
-        for (var i = 0; i < 4; i++){ var d = Math.abs(ts[i]-hit.t); if (d < bestD){ bestD = d; best = i; } }
-        if (best >= 0){ dragIdx = best; canvas.setPointerCapture(e.pointerId); }
-      }
-    });
-    canvas.addEventListener('pointermove', function(e){
-      if (dragIdx < 0) return;
-      var rect = canvas.getBoundingClientRect();
-      var mx = (e.clientX-rect.left)*(W/rect.width), my = (e.clientY-rect.top)*(H/rect.height);
-      ts[dragIdx] = nearestT(mx, my).t;
-      update();
-    });
-    canvas.addEventListener('pointerup', function(){ dragIdx = -1; });
-    canvas.addEventListener('pointercancel', function(){ dragIdx = -1; });
-    document.getElementById('s5-reset').addEventListener('click', function(){ ts = tInit.slice(); update(); });
-    update();
-  })();
-
-  // ---------- Step 5b: transformation hierarchy demo ----------
-  (function(){
-    var canvas = document.getElementById('s5b-canvas');
-    if (!canvas) return;
-    var ctx = canvas.getContext('2d');
-    var W = canvas.width, H = canvas.height;
-    var cx = W/2, cy = H/2, scale = 62; // unit = 62px
-
-    function toPx(p){ return [cx + p[0]*scale, cy - p[1]*scale]; }
-    // quad corners corresponding to square corners (-1,-1),(1,-1),(1,1),(-1,1)
-    var quad = [ [-1,-1], [1,-1], [1,1], [-1,1] ];
-    var quadInit = quad.map(function(p){ return p.slice(); });
-    var dragIdx = -1;
-    var SQ = 1.4; // source square half-size for display
-
-    function classify(){
-      // side vectors of the quad in correspondence order
-      var e1 = [ (quad[1][0]-quad[0][0])/2, (quad[1][1]-quad[0][1])/2 ]; // image of x-axis
-      var e2 = [ (quad[3][0]-quad[0][0])/2, (quad[3][1]-quad[0][1])/2 ]; // image of y-axis
-      var n1 = Math.hypot(e1[0], e1[1]), n2 = Math.hypot(e2[0], e2[1]);
-      var dot = e1[0]*e2[0] + e1[1]*e2[1];
-      // parallelogram test: P0 + (P2-P0) should equal P1 + P3 - ... check both diagonals share midpoint
-      var m1 = [(quad[0][0]+quad[2][0])/2, (quad[0][1]+quad[2][1])/2];
-      var m2 = [(quad[1][0]+quad[3][0])/2, (quad[1][1]+quad[3][1])/2];
-      var diag = Math.max(Math.hypot(quad[2][0]-quad[0][0], quad[2][1]-quad[0][1]), 1e-9);
-      var isPara = Math.hypot(m1[0]-m2[0], m1[1]-m2[1]) < 0.02*diag;
-      var isSim = isPara && n1 > 1e-9 && n2 > 1e-9 &&
-        Math.abs(dot)/(n1*n2) < 0.03 && Math.abs(n1-n2)/Math.max(n1,n2) < 0.03;
-      var s = (n1+n2)/2;
-      var isEuclid = isSim && Math.abs(s-1)/1 < 0.05;
-      var result, color;
-      if (isEuclid){ result = 'Euclidean transform (rotation + translation)'; color = '#2a9d5c'; }
-      else if (isSim){ result = 'Similarity transform (Euclidean + uniform scale)'; color = COLOR_ACCENT; }
-      else if (isPara){ result = 'Affine transform (parallelogram — parallelism kept)'; color = '#e08a1e'; }
-      else { result = 'General projective transform (homography)'; color = COLOR_ACCENT2; }
-      var dof = isEuclid ? 3 : isSim ? 4 : isPara ? 6 : 8;
-      return { result: result, color: color, dof: dof, s: s,
-        shear: n1*n2 > 1e-9 ? dot/(n1*n2) : 0, aniso: Math.abs(n1-n2)/Math.max(n1,n2) };
-    }
-
-    function update(){
-      var cls = classify();
-      ctx.clearRect(0,0,W,H);
-      ctx.fillStyle = 'rgba(0,0,0,0.04)'; ctx.fillRect(0,0,W,H);
-      // dashed unit square
-      ctx.strokeStyle = COLOR_TEXT; ctx.globalAlpha = 0.5; ctx.lineWidth = 1.5; ctx.setLineDash([5,4]);
-      var sq = [toPx([-SQ,-SQ]), toPx([SQ,-SQ]), toPx([SQ,SQ]), toPx([-SQ,SQ])];
-      ctx.beginPath();
-      sq.forEach(function(p,i){ i ? ctx.lineTo(p[0],p[1]) : ctx.moveTo(p[0],p[1]); });
-      ctx.closePath(); ctx.stroke();
-      ctx.setLineDash([]); ctx.globalAlpha = 1;
-      // right-angle + axis markers inside the square
-      ctx.fillStyle = COLOR_TEXT; ctx.globalAlpha = 0.55; ctx.font = '11px sans-serif';
-      ctx.fillText('unit square', sq[0][0]+4, sq[0][1]-6);
-      ctx.globalAlpha = 1;
-
-      // quad
-      var qp = quad.map(toPx);
-      ctx.strokeStyle = cls.color; ctx.lineWidth = 2.5;
-      ctx.beginPath();
-      qp.forEach(function(p,i){ i ? ctx.lineTo(p[0],p[1]) : ctx.moveTo(p[0],p[1]); });
-      ctx.closePath(); ctx.stroke();
-      ctx.fillStyle = cls.color; ctx.globalAlpha = 0.08; ctx.fill(); ctx.globalAlpha = 1;
-      // handles
-      qp.forEach(function(p){
-        ctx.fillStyle = '#e08a1e';
-        ctx.beginPath(); ctx.arc(p[0], p[1], 7, 0, 7); ctx.fill();
-        ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
-      });
-
-      document.getElementById('s5b-readout').innerHTML =
-        '<div><span class="k">classification</span> = <span class="hi" style="color:' + cls.color + '">' + cls.result + '</span></div>' +
-        '<div><span class="k">DOF of that group</span> = <span class="hi">' + cls.dof + '</span> &nbsp;<span class="k">(Euclidean 3 · similarity 4 · affine 6 · projective 8)</span></div>' +
-        '<div><span class="k">sides parallel?</span> ' + (cls.dof <= 6 ? '<span class="hi">yes</span>' : 'no — parallelism destroyed') + '</div>' +
-        '<div><span class="k">axis images orthogonal?</span> ' + (cls.dof <= 4 ? '<span class="hi">yes</span>' : 'no (shear sin ≈ ' + Math.abs(cls.shear).toFixed(3) + ')') + '</div>' +
-        '<div><span class="k">axis scale anisotropy</span> = ' + cls.aniso.toFixed(3) + (cls.dof <= 4 ? ' <span class="hi">— uniform</span>' : ' <span style="opacity:.6">— per-axis, angles not kept</span>') + '</div>';
-    }
-
-    canvas.addEventListener('pointerdown', function(e){
-      var rect = canvas.getBoundingClientRect();
-      var mx = (e.clientX-rect.left)*(W/rect.width), my = (e.clientY-rect.top)*(H/rect.height);
-      var best = -1, bestD = 22;
-      quad.forEach(function(p,i){
-        var q = toPx(p); var d = Math.hypot(q[0]-mx, q[1]-my);
-        if (d < bestD){ bestD = d; best = i; }
-      });
-      if (best >= 0){ dragIdx = best; canvas.setPointerCapture(e.pointerId); }
-    });
-    canvas.addEventListener('pointermove', function(e){
-      if (dragIdx < 0) return;
-      var rect = canvas.getBoundingClientRect();
-      var mx = (e.clientX-rect.left)*(W/rect.width), my = (e.clientY-rect.top)*(H/rect.height);
-      quad[dragIdx] = [(mx-cx)/scale, (cy-my)/scale];
-      update();
-    });
-    canvas.addEventListener('pointerup', function(){ dragIdx = -1; });
-    canvas.addEventListener('pointercancel', function(){ dragIdx = -1; });
-    document.getElementById('s5b-reset').addEventListener('click', function(){
-      quad = quadInit.map(function(p){ return p.slice(); }); update();
     });
     update();
   })();

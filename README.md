@@ -61,7 +61,7 @@ New interactive guide pages should build on the "guide kit" — `_includes/guide
 `_includes/guide-footer.html`, `assets/css/guide.css`, `assets/js/guide-core.js`,
 `assets/js/guide-math.js`, `assets/js/guide-plot3d.js` — rather than pasting a new
 `<style>`/`<script>` block. See `CLAUDE.md` for the full architecture and the guide kit's
-scope (it is for *new* pages only — the 19 existing multi-view-geometry and
+scope (it is for *new* pages only — the 26 existing multi-view-geometry and
 nonlinear-optimization pages keep their inline styles and are never migrated).
 
 See `CLAUDE.md` for everything else: the three page shapes, the `{% raw %}` gotchas,

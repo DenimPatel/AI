@@ -102,6 +102,17 @@ redirect_from:
   .mvg-cheat th, .mvg-cheat td { padding: 10px 12px; border-bottom: 1px solid var(--color-divider); vertical-align: top; text-align: left; }
   .mvg-cheat th { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.6; }
   .mvg-cheat code { white-space: nowrap; }
+  .mvg-toggle { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 13px; cursor: pointer; }
+  .mvg-toggle input { width: 16px; height: 16px; flex: 0 0 auto; accent-color: var(--color-accent); }
+  .mvg-dofbar { display: flex; gap: 6px; margin: 0 0 12px; }
+  .mvg-dofcell {
+    flex: 1 1 0; height: 40px; min-width: 0; display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 11.5px; white-space: nowrap; overflow: hidden;
+    background: var(--color-accent-100); color: var(--color-accent-800);
+    border: 1px solid var(--color-divider); border-radius: var(--radius-sm);
+    transition: flex-grow .35s ease, opacity .35s ease, border-width .35s ease;
+  }
+  .mvg-dofcell.off { flex-grow: 0; opacity: 0; border-width: 0; }
   .mvg-next {
     display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;
     margin-top: 24px; padding: 18px; background: var(--color-surface); border-radius: var(--radius-md);
@@ -120,9 +131,9 @@ redirect_from:
 <main>
 <div class="wrap mvg">
   <section class="page-header">
-    <span class="section-kicker">Interactive guide · Part 3 of 13</span>
+    <span class="section-kicker">Interactive guide · Part 6 of {{ site.data.series.multi_view_geometry.parts | size }}</span>
     <h1>Epipolar Geometry</h1>
-    <p><a href="{{ '/vision/multi-view-geometry/pinhole-camera/' | relative_url }}">Part 1</a> ended on a cliffhanger: one camera can't see depth. Add a second camera, and something remarkable happens — a point's location in image 1 doesn't tell you exactly where it is in image 2, but it tells you it must lie somewhere on <em>one specific line</em>. That's the epipolar constraint, and it turns 2D point-matching into a 1D search.</p>
+    <p><a href="{{ '/vision/multi-view-geometry/pinhole-camera/' | relative_url }}">Part 4</a> ended on a cliffhanger: one camera can't see depth. Add a second camera, and something remarkable happens — a point's location in image 1 doesn't tell you exactly where it is in image 2, but it tells you it must lie somewhere on <em>one specific line</em>. That's the epipolar constraint, and it turns 2D point-matching into a 1D search.</p>
   </section>
   <div class="stats-rule" style="border-top-color: var(--color-divider); margin-bottom: 8px;"></div>
 
@@ -130,7 +141,7 @@ redirect_from:
   <section class="mvg-step" id="setup">
     <div class="mvg-step-head"><span class="mvg-step-num">0</span><h2>Two cameras, one point, one ray each</h2></div>
     <p class="mvg-eyebrow">Setup</p>
-    <p>Say camera 1 sees a point at pixel <var>x&#8321;</var>. That pixel corresponds to an entire ray in 3D — the point could be anywhere along it (exactly the ambiguity from Part 1). Now project that <em>whole ray</em> into camera 2's image. Because a ray is a 3D line, its image under a second pinhole camera is also a straight line — the <strong>epipolar line</strong>. Wherever the true 3D point actually is, its image in camera 2 must fall somewhere on that line. That's the entire idea; the rest of this page is just making it precise and fast to compute.</p>
+    <p>Say camera 1 sees a point at pixel <var>x&#8321;</var>. That pixel corresponds to an entire ray in 3D — the point could be anywhere along it (exactly the ambiguity from Part 4). Now project that <em>whole ray</em> into camera 2's image. Because a ray is a 3D line, its image under a second pinhole camera is also a straight line — the <strong>epipolar line</strong>. Wherever the true 3D point actually is, its image in camera 2 must fall somewhere on that line. That's the entire idea; the rest of this page is just making it precise and fast to compute.</p>
     <div class="mvg-goal">💡 <span><b>Why it matters:</b> when matching features between two photos (for stereo, SfM, or SLAM), you don't have to search the whole second image for a match — only along one line. It turns 2D search into 1D search.</span></div>
   </section>
 
@@ -229,8 +240,29 @@ redirect_from:
     <p><b>Order matters, transposed.</b> <var>F&#8321;&#8322;</var> (image 1 &#8594; image 2 convention, <var>x&#771;&#8322;&#7488;F&#8321;&#8322;x&#771;&#8321;=0</var>) and <var>F&#8322;&#8321;</var> (the same pair, roles swapped, <var>x&#771;&#8321;&#7488;F&#8322;&#8321;x&#771;&#8322;=0</var>) are related by a plain transpose: <var>F&#8322;&#8321; = F&#8321;&#8322;&#7488;</var>. Transposing the scalar equation <var>x&#771;&#8322;&#7488;F&#8321;&#8322;x&#771;&#8321;=0</var> (a 1×1 matrix, equal to its own transpose) gives <var>x&#771;&#8321;&#7488;F&#8321;&#8322;&#7488;x&#771;&#8322;=0</var>, which is exactly the swapped-order constraint with <var>F&#8322;&#8321;=F&#8321;&#8322;&#7488;</var>.</p>
   </section>
 
+  <section class="mvg-step" id="dofpeel">
+    <div class="mvg-step-head"><span class="mvg-step-num">5</span><h2>Peeling the degrees of freedom</h2></div>
+    <p class="mvg-eyebrow">Properties, continued</p>
+    <p>The two structural facts from the previous step — <var>F</var> is only defined up to scale, and <var>det(F)=0</var> — together explain why a fundamental matrix is not an arbitrary 3×3 matrix. Nine numbers, but only <strong>seven degrees of freedom</strong>. It is worth watching each of the two extra dimensions come off in turn.</p>
+    <p><b>(a) Overall scale is meaningless &mdash; 9 &rarr; 8.</b> The constraint <var>x&#771;&#8322;&#7488;Fx&#771;&#8321;=0</var> still holds if every entry of <var>F</var> is multiplied by the same nonzero number, so <var>F</var> and <var>&lambda;F</var> describe exactly the same epipolar geometry. Fixing that arbitrary gauge — say by requiring a unit-norm <var>f</var> — spends one of the nine numbers. Eight remain.</p>
+    <p><b>(b) det(F)=0 &mdash; 8 &rarr; 7.</b> A real fundamental matrix has rank 2, so its smallest singular value is zero. Unlike the scale choice, this is a genuine nonlinear constraint, not a gauge. The plain linear eight-point solve enforces only (a): it returns the unit-norm <var>f</var> minimizing <var>&#8214;Af&#8214;</var>, which for noisy correspondences reshapes to a full-rank 3×3 matrix with <var>det(F)&ne;0</var> — near the rank-2 surface but not on it. Snapping it back is the same SVD trick used for homographies: factor <var>F=U&#183;diag(&sigma;&#8321;,&sigma;&#8322;,&sigma;&#8323;)&#183;V&#7488;</var>, set <var>&sigma;&#8323;=0</var>, and reassemble. By Eckart&ndash;Young that is the closest rank-2 matrix in Frobenius norm, and it is exactly what a constrained or nonlinear fit converges to.</p>
+    <div class="mvg-goal">🎯 <b>Learning goal:</b> toggle the two constraints and watch the 9-cell matrix collapse to 8 then 7 entries' worth of freedom. With neither constraint, the unconstrained fit's epipolar lines wander; enforcing <var>det(F)=0</var> zeroes the smallest singular value and settles them onto a genuine rank-2 fundamental matrix.</div>
+    <div class="mvg-demo">
+      <div class="mvg-canvas-wrap" style="flex-basis:100%;">
+        <div class="mvg-dofbar" id="dof-bar"></div>
+        <canvas id="dof-canvas" width="960" height="540"></canvas>
+        <p class="mvg-canvas-hint">Image 2: the fitted epipolar lines (live) for several image-1 points, using the same synthetic scene as the next step.</p>
+      </div>
+      <div class="mvg-controls">
+        <label class="mvg-toggle"><input type="checkbox" id="dof-scale"> fix overall scale (homogeneous)</label>
+        <label class="mvg-toggle"><input type="checkbox" id="dof-rank"> enforce det(F)=0 (rank 2)</label>
+        <div class="mvg-readout" id="dof-readout"></div>
+      </div>
+    </div>
+  </section>
+
   <section class="mvg-step" id="eightpoint">
-    <div class="mvg-step-head"><span class="mvg-step-num">5</span><h2>The eight-point algorithm, one row at a time</h2></div>
+    <div class="mvg-step-head"><span class="mvg-step-num">6</span><h2>The eight-point algorithm, one row at a time</h2></div>
     <p class="mvg-eyebrow">Interactive derivation</p>
     <p>Every correspondence <var>(x&#771;&#8321;, x&#771;&#8322;)</var> gives one <em>linear</em> equation in the 9 unknown entries of <var>F</var>. Writing <var>x&#771;&#8321;=(x&#8321;,y&#8321;,1)</var>, <var>x&#771;&#8322;=(x&#8322;,y&#8322;,1)</var> and expanding <var>x&#771;&#8322;&#7488;Fx&#771;&#8321;=0</var> term by term:</p>
     <div class="mvg-math">x&#8321;x&#8322;f&#8321;&#8321; + y&#8321;x&#8322;f&#8321;&#8322; + x&#8322;f&#8321;&#8323; + x&#8321;y&#8322;f&#8322;&#8321; + y&#8321;y&#8322;f&#8322;&#8322; + y&#8322;f&#8322;&#8323; + x&#8321;f&#8323;&#8321; + y&#8321;f&#8323;&#8322; + f&#8323;&#8323; = 0</div>
@@ -269,16 +301,16 @@ redirect_from:
   </section>
 
   <section class="mvg-step" id="beyond8">
-    <div class="mvg-step-head"><span class="mvg-step-num">6</span><h2>Beyond eight points</h2></div>
+    <div class="mvg-step-head"><span class="mvg-step-num">7</span><h2>Beyond eight points</h2></div>
     <p class="mvg-eyebrow">Minimal solvers</p>
     <p><b>Seven-point algorithm.</b> With only 7 correspondences, <var>A</var> is 7×9 and its null space is generically <em>two</em>-dimensional, spanned by matrices <var>F&#8320;</var> and <var>F&#8321;</var> (found the same way &mdash; the two smallest-eigenvalue eigenvectors of <var>A&#7488;A</var>). Every rank-2 <var>F</var> consistent with the 7 points has the form <var>F = F&#8320; + &lambda;F&#8321;</var> for some scalar <var>&lambda;</var>, so the rank-2 constraint <var>det(F&#8320;+&lambda;F&#8321;) = 0</var> becomes a <em>cubic</em> polynomial in <var>&lambda;</var>. A cubic has 1 or 3 real roots, so seven-point produces 1 to 3 candidate matrices; an 8th correspondence (or a cheirality/reprojection check) picks the right one. It exists purely because 7 points aren't enough to pin down the 2 DOF a 9-entry, scale-free, rank-2 matrix has left over &mdash; you get a 1-parameter family instead of a point.</p>
     <p><b>Five-point algorithm (calibrated).</b> If the cameras <em>are</em> calibrated, you're solving for <var>E</var>, not <var>F</var>, and <var>E</var> carries one more constraint than "rank 2": its two nonzero singular values must be <em>equal</em>. That's 2 extra constraints beyond what <var>F</var> has, dropping the minimal correspondence count from 7 to 5. Nist&eacute;r's five-point algorithm (2004) solves this minimal, more constrained problem directly &mdash; it's algebraically more involved (a polynomial system solved via Gr&ouml;bner bases or resultants) and this page won't derive it, but it's worth knowing it exists: it's what nearly every modern visual-odometry and structure-from-motion pipeline actually calls, because the extra constraint makes it far less prone to the planar-scene degeneracy that eight-point suffers from below, and using fewer points means fewer that need to be outlier-free inside a RANSAC loop.</p>
   </section>
 
   <section class="mvg-step" id="degeneracies">
-    <div class="mvg-step-head"><span class="mvg-step-num">7</span><h2>Three ways epipolar estimation breaks</h2></div>
+    <div class="mvg-step-head"><span class="mvg-step-num">8</span><h2>Three ways epipolar estimation breaks</h2></div>
     <p class="mvg-eyebrow">Degeneracies</p>
-    <p><b>Planar scenes.</b> If every 3D point lies on one plane, the correspondences are secretly related by a single homography (Part 3), and there's more than one rank-2 <var>F</var> consistent with them &mdash; the eight-point system becomes ill-posed, with a poorly separated null space instead of one clean answer. In practice, this is exactly why real pipelines don't commit to <var>F</var> blindly: they fit <em>both</em> a homography <var>H</var> and a fundamental matrix <var>F</var> to the same correspondences, then use a model-selection criterion (GRIC is the classic one) that scores each fit while penalizing <var>H</var>'s much smaller degree of freedom count, and keep whichever model actually explains the data &mdash; a near-planar scene should win on <var>H</var>, a general scene on <var>F</var>.</p>
+    <p><b>Planar scenes.</b> If every 3D point lies on one plane, the correspondences are secretly related by a single homography (Part 8), and there's more than one rank-2 <var>F</var> consistent with them &mdash; the eight-point system becomes ill-posed, with a poorly separated null space instead of one clean answer. In practice, this is exactly why real pipelines don't commit to <var>F</var> blindly: they fit <em>both</em> a homography <var>H</var> and a fundamental matrix <var>F</var> to the same correspondences, then use a model-selection criterion (GRIC is the classic one) that scores each fit while penalizing <var>H</var>'s much smaller degree of freedom count, and keep whichever model actually explains the data &mdash; a near-planar scene should win on <var>H</var>, a general scene on <var>F</var>.</p>
     <p><b>Pure rotation.</b> If the camera only rotates in place (<var>t = 0</var>) &mdash; think of standing still and turning your phone &mdash; then <var>E = [t]&#215;R</var> with <var>[0]&#215; = 0</var>, so <var>E</var> is identically the zero matrix, not merely rank-2. There's no baseline, hence no epipolar plane, hence literally zero triangulation information in the geometry: <em>any</em> correspondence satisfies <var>x&#771;&#8322;&#7488;·0·x&#771;&#8321;=0</var> trivially, so the constraint carries no information at all. This is why "just rotate the phone in place" never works for stereo or SfM, no matter how many frames you capture.</p>
     <p><b>Points on the baseline.</b> A 3D point sitting exactly on the line through both camera centers projects to the epipole itself in both images &mdash; its epipolar plane degenerates to a pencil (any plane through the baseline satisfies the coplanarity condition), so its epipolar line is undefined. In practice this shows up as instability for points near the epipole, not just exactly on it: the closer a correspondence is to the epipole, the less its epipolar line constrains anything.</p>
     <div class="mvg-warn">&#9888; <span><b>Simplification here:</b> a degenerate configuration still fits the <em>training</em> correspondences with near-zero residual &mdash; least squares is very good at explaining the points you gave it, even when the underlying geometry is meaningless. The tell isn't residual, it's <em>instability</em>: resample the noise and solve again, and a well-posed <var>F</var> barely moves while a degenerate one jumps around. That's what the demo below checks.</span></div>
@@ -308,7 +340,28 @@ redirect_from:
         <div class="mvg-readout" id="s4e-readout"></div>
       </div>
     </div>
-{% endraw %}    <p>Epipolar geometry constrains <em>where</em> a match can be, but the payoff &mdash; dense, pixel-by-pixel stereo matching &mdash; needs the epipolar lines turned into simple horizontal scanlines first. That rectification-and-disparity pipeline gets its own page: <a href="{{ '/vision/multi-view-geometry/stereo/' | relative_url }}">Part 5</a>.</p>{% raw %}
+{% endraw %}    <p>Calibration changes how badly the planar case bites. The 5-point algorithm gets a full worked treatment later in this series, in <a href="{{ '/vision/multi-view-geometry/five-point/' | relative_url }}">Part 13</a>; for now, the side-by-side demo below fits both models to the <em>same</em> near-planar scene. Drag the planarity slider from a general 3D cloud toward a coplanar one and watch the uncalibrated eight-point system lose its well-separated null space, while the calibrated essential matrix stays pinned to the equal-singular-value manifold, where rank 2 and det(E)=0 hold by construction.</p>{% raw %}
+    <div class="mvg-demo">
+      <div class="mvg-canvas-wrap" style="flex-basis:100%;">
+        <div class="mvg-imgrow">
+          <div class="mvg-imgcol">
+            <h4>Uncalibrated F (8-point)</h4>
+            <canvas id="d5ec-fcanvas" width="960" height="540"></canvas>
+          </div>
+          <div class="mvg-imgcol">
+            <h4>Calibrated E (essential)</h4>
+            <canvas id="d5ec-ecanvas" width="960" height="540"></canvas>
+          </div>
+        </div>
+        <p class="mvg-canvas-hint">Same correspondences in both panes. Dots = image-2 points; lines = fitted epipolar lines for several image-1 points.</p>
+      </div>
+      <div class="mvg-controls">
+        <div class="mvg-field"><label>Scene planarity <span class="val" id="d5ec-planarval"></span></label><input type="range" id="d5ec-planar" min="0" max="1" step="0.01" value="0"></div>
+        <div class="mvg-readout" id="d5ec-readout"></div>
+      </div>
+    </div>
+{% endraw %}    <p>The configurations that break these estimators — planar scenes, pure rotation, critical surfaces, near-degenerate baselines — are gathered and demonstrated in <a href="{{ '/vision/multi-view-geometry/degeneracies/' | relative_url }}">Part 18</a>.</p>{% raw %}
+{% endraw %}    <p>Epipolar geometry constrains <em>where</em> a match can be, but the payoff &mdash; dense, pixel-by-pixel stereo matching &mdash; needs the epipolar lines turned into simple horizontal scanlines first. That rectification-and-disparity pipeline gets its own page: <a href="{{ '/vision/multi-view-geometry/stereo/' | relative_url }}">Part 9</a>.</p>{% raw %}
   </section>
 
   <section class="mvg-step" id="cheatsheet">
@@ -567,7 +620,7 @@ redirect_from:
   function cameraMarkerTrace(cam, color, symbol){
     return { type:'scatter3d', mode:'markers', x:[cam.C[0]], y:[cam.C[1]], z:[cam.C[2]], marker:{ size:7, color:color, symbol: symbol||'diamond' }, hoverinfo:'skip' };
   }
-  // Wireframe frustum for a camera (same shape as Part 1's): 4 rays + rim rectangle.
+  // Wireframe frustum for a camera (same shape as Part 4's): 4 rays + rim rectangle.
   function cameraFrustumTrace(cam, color, size){
     size = size || 0.55;
     var right = cam.R[0], down = cam.R[1], fwd = cam.R[2];
@@ -1041,7 +1094,182 @@ redirect_from:
     update();
   })();
 
-  // ---------- Step 7: degeneracy demo ----------
+  // ---------- Step 5: DOF peeling (rank-2 projection) demo ----------
+  (function(){
+    var canvas = document.getElementById('dof-canvas'), ctx = canvas.getContext('2d');
+    var W = canvas.width, H = canvas.height;
+    var barEl = document.getElementById('dof-bar');
+    var scaleEl = document.getElementById('dof-scale'), rankEl = document.getElementById('dof-rank');
+    var readoutEl = document.getElementById('dof-readout');
+
+    var cam1 = MVG.orbitCamera(0.7, 0.25, 7, [0,0,0]);
+    var cam2 = MVG.orbitCamera(-1.0, 0.3, 7, [0,0,0]);
+    var K1 = { fx: 800, fy: 800, cx: W/2, cy: H/2 };
+    var K2 = { fx: 800, fy: 800, cx: W/2, cy: H/2 };
+
+    // The same synthetic correspondences used by the eight-point step below.
+    var SCENE = randomCloud(20, makeRNG(1234));
+    var rng = makeRNG(77);
+    var NOISE = SCENE.map(function(){ return [gaussianFrom(rng), gaussianFrom(rng), gaussianFrom(rng), gaussianFrom(rng)]; });
+    var SIGMA = 1.2;
+    var pts1 = [], pts2 = [];
+    SCENE.forEach(function(X, i){
+      var q1 = MVG.project(K1, cam1, X), q2 = MVG.project(K2, cam2, X);
+      if (!q1 || !q2) return;
+      pts1.push([q1.u + NOISE[i][0]*SIGMA, q1.v + NOISE[i][1]*SIGMA]);
+      pts2.push([q2.u + NOISE[i][2]*SIGMA, q2.v + NOISE[i][3]*SIGMA]);
+    });
+
+    var LABELS = ['f11','f12','f13','f21','f22','f23','f31','f32','f33'];
+    LABELS.forEach(function(l){
+      var cell = document.createElement('span');
+      cell.className = 'mvg-dofcell'; cell.textContent = l; cell.title = l;
+      barEl.appendChild(cell);
+    });
+    var cells = barEl.querySelectorAll('.mvg-dofcell');
+
+    // Unconstrained eight-point least squares on Hartley-normalized correspondences, then (optionally) the rank-2 SVD projection.
+    function solve(){
+      var n1 = MVG.hartleyNormalize(pts1), n2 = MVG.hartleyNormalize(pts2);
+      var corrsN = n1.pts.map(function(p,i){ return [p[0],p[1],n2.pts[i][0],n2.pts[i][1]]; });
+      var nv = MVG.nullVector9(MVG.buildAMatrix(corrsN));
+      var F0 = MVG.matMul(MVG.matMul(MVG.transpose(n2.T), MVG.reshape9to3x3(nv.f)), n1.T);
+      var rankOn = rankEl.checked, scaleOn = scaleEl.checked;
+      var Fc = rankOn ? MVG.enforceRank2(F0) : F0;
+      var Fn = MVG.scaleMat3(Fc, 1/(MVG.frobNorm3(Fc) || 1));
+      var svd = MVG.svd3x3(Fn);
+      var det = svd.S[0]*svd.S[1]*svd.S[2];
+      var Fd = Fn;
+      if (scaleOn){
+        var g = Math.abs(Fn[2][2]) > 1e-9 ? Fn[2][2] : 1;
+        Fd = MVG.scaleMat3(Fn, 1/g);
+      }
+      return { F: Fd, S: svd.S, det: det, scaleOn: scaleOn, rankOn: rankOn,
+               dof: 9 - (scaleOn ? 1 : 0) - (rankOn ? 1 : 0) };
+    }
+
+    function draw(res){
+      ctx.clearRect(0,0,W,H);
+      ctx.fillStyle = 'rgba(0,0,0,0.06)'; ctx.fillRect(0,0,W,H);
+      [0,4,8,12,16].forEach(function(i){
+        if (i >= pts1.length) return;
+        drawClippedLine(ctx, W, H, MVG.matVecGeneric(res.F, [pts1[i][0], pts1[i][1], 1]), COLOR_ACCENT2, false);
+      });
+      pts2.forEach(function(p){ ctx.fillStyle = COLOR_ACCENT; ctx.beginPath(); ctx.arc(p[0],p[1],4,0,7); ctx.fill(); });
+      ctx.fillStyle = COLOR_TEXT; ctx.beginPath(); ctx.arc(pts2[0][0], pts2[0][1], 6, 0, 7); ctx.fill();
+    }
+
+    function update(){
+      var res = solve();
+      draw(res);
+      Array.prototype.forEach.call(cells, function(c, i){ c.classList.toggle('off', i >= res.dof); });
+      var cellsTxt = [];
+      for (var i=0;i<9;i++) cellsTxt.push(res.F[Math.floor(i/3)][i%3].toFixed(3));
+      readoutEl.innerHTML =
+        '<div><span class="k">degrees of freedom</span> = <span class="hi">' + res.dof + '</span> / 9 &nbsp;(9 &minus; ' + (res.scaleOn?1:0) + ' scale &minus; ' + (res.rankOn?1:0) + ' rank)</div>' +
+        '<div><span class="k">F (gauge-fixed)</span> = [' + cellsTxt.join(', ') + ']</div>' +
+        '<div><span class="k">singular values</span> = ' + res.S.map(function(v){ return v.toExponential(3); }).join(', ') + '</div>' +
+        '<div><span class="k">det(F)</span> = <span class="hi"' + (res.rankOn ? ' style="color:#2a9d5c"' : '') + '>' + res.det.toExponential(3) + '</span> ' +
+        (res.rankOn ? '<span style="opacity:.6">(rank 2 &mdash; snapped onto the constraint surface)</span>' : '<span style="opacity:.6">(rank 3 &mdash; not yet a valid fundamental matrix)</span>') + '</div>';
+    }
+
+    scaleEl.addEventListener('change', update);
+    rankEl.addEventListener('change', update);
+    update();
+  })();
+
+  // ---------- Step 8 (extra): E vs F on a near-planar scene ----------
+  (function(){
+    var cF = document.getElementById('d5ec-fcanvas'), ctxF = cF.getContext('2d');
+    var cE = document.getElementById('d5ec-ecanvas'), ctxE = cE.getContext('2d');
+    var WF = cF.width, HF = cF.height, WE = cE.width, HE = cE.height;
+
+    var cam1 = MVG.orbitCamera(0.7, 0.25, 7, [0,0,0]);
+    var cam2 = MVG.orbitCamera(-1.0, 0.3, 7, [0,0,0]);
+    var K1 = { fx: 800, fy: 800, cx: WF/2, cy: HF/2 };
+    var K2 = { fx: 800, fy: 800, cx: WE/2, cy: HE/2 };
+    var K1m = MVG.K3(K1), K2m = MVG.K3(K2);
+    var K1inv = MVG.inverse3(K1m), K2invT = MVG.transpose(MVG.inverse3(K2m));
+
+    var BASE = randomCloud(20, makeRNG(1234));
+    var rng0 = makeRNG(4343);
+    var NOISE = BASE.map(function(){ return [gaussianFrom(rng0), gaussianFrom(rng0), gaussianFrom(rng0), gaussianFrom(rng0)]; });
+    var SIGMA = 1.2;
+
+    var planarEl = document.getElementById('d5ec-planar'), planarVal = document.getElementById('d5ec-planarval');
+    var readoutEl = document.getElementById('d5ec-readout');
+
+    function essentialProject(E0){
+      var svd = MVG.svd3x3(E0);
+      var s = 0.5*(svd.S[0] + svd.S[1]);
+      var E = [[0,0,0],[0,0,0],[0,0,0]];
+      for (var k=0;k<2;k++) for (var i=0;i<3;i++) for (var j=0;j<3;j++) E[i][j] += s*svd.U[k][i]*svd.V[k][j];
+      return E;
+    }
+    function fitF(p1, p2){
+      var n1 = MVG.hartleyNormalize(p1), n2 = MVG.hartleyNormalize(p2);
+      var c = n1.pts.map(function(p,i){ return [p[0],p[1],n2.pts[i][0],n2.pts[i][1]]; });
+      var nv = MVG.nullVector9(MVG.buildAMatrix(c));
+      var Fh = MVG.enforceRank2(MVG.reshape9to3x3(nv.f));
+      var F = MVG.matMul(MVG.matMul(MVG.transpose(n2.T), Fh), n1.T);
+      return { F: F, gap: nv.sortedValues[0]/(nv.sortedValues[1] || 1e-12) };
+    }
+    function drawPanel(ctx, W, H, pts, lines, color){
+      ctx.clearRect(0,0,W,H);
+      ctx.fillStyle = 'rgba(0,0,0,0.06)'; ctx.fillRect(0,0,W,H);
+      lines.forEach(function(l){ drawClippedLine(ctx, W, H, l, color, false); });
+      pts.forEach(function(p){ ctx.fillStyle = COLOR_ACCENT; ctx.beginPath(); ctx.arc(p[0],p[1],4,0,7); ctx.fill(); });
+      ctx.fillStyle = COLOR_TEXT; ctx.beginPath(); ctx.arc(pts[0][0], pts[0][1], 6, 0, 7); ctx.fill();
+    }
+
+    function update(){
+      var t = parseFloat(planarEl.value);
+      var P = BASE.map(function(p){ return [p[0], p[1]*(1 - t), p[2]]; });
+      var p1 = [], p2 = [], p1c = [], p2c = [];
+      P.forEach(function(X, i){
+        var q1 = MVG.project(K1, cam1, X), q2 = MVG.project(K2, cam2, X);
+        if (!q1 || !q2) return;
+        p1c.push([q1.u, q1.v]); p2c.push([q2.u, q2.v]);
+        p1.push([q1.u + NOISE[i][0]*SIGMA, q1.v + NOISE[i][1]*SIGMA]);
+        p2.push([q2.u + NOISE[i][2]*SIGMA, q2.v + NOISE[i][3]*SIGMA]);
+      });
+      if (p1.length < 8) return;
+
+      var sol = fitF(p1, p2);
+      var F = sol.F;
+      // Calibrated essential matrix from the same fit, then snapped onto the equal-singular-value manifold.
+      var E = essentialProject(MVG.matMul(MVG.matMul(MVG.transpose(K2m), F), K1m));
+      var SE = MVG.svd3x3(E).S;
+      var FE = MVG.matMul(MVG.matMul(K2invT, E), K1inv);
+
+      var cclean = p1c.map(function(p,i){ return [p[0],p[1],p2c[i][0],p2c[i][1]]; });
+      var resF = MVG.meanEpipolarResidual(F, cclean);
+      var detE = SE[0]*SE[1]*SE[2];
+
+      var linesF = [], linesE = [];
+      [0,4,8,12,16].forEach(function(i){
+        if (i >= p1.length) return;
+        linesF.push(MVG.matVecGeneric(F, [p1[i][0], p1[i][1], 1]));
+        linesE.push(MVG.matVecGeneric(FE, [p1[i][0], p1[i][1], 1]));
+      });
+      drawPanel(ctxF, WF, HF, p2c, linesF, COLOR_ACCENT2);
+      drawPanel(ctxE, WE, HE, p2c, linesE, '#2a9d5c');
+
+      planarVal.textContent = t.toFixed(2);
+      var degenerate = sol.gap > 0.15;
+      readoutEl.innerHTML =
+        '<div><span class="k">F: smallest / 2nd-smallest singular value of A (normalized)</span> = ' + sol.gap.toExponential(2) + ' &mdash; ' +
+        (degenerate ? '<span class="hi" style="color:' + COLOR_ACCENT2 + '">degenerate &mdash; null space poorly separated</span>' : '<span class="hi" style="color:#2a9d5c">well-posed</span>') + '</div>' +
+        '<div><span class="k">F: mean epipolar residual (clean pts)</span> = ' + resF.toFixed(2) + ' px</div>' +
+        '<div><span class="k">E: essential constraint &sigma;&#8322;/&sigma;&#8321;</span> = <span class="hi" style="color:#2a9d5c">' + (SE[1]/SE[0]).toFixed(3) + '</span> <span style="opacity:.6">(equal singular values)</span></div>' +
+        '<div><span class="k">E: det(E)</span> = <span class="hi" style="color:#2a9d5c">' + detE.toExponential(2) + '</span> <span style="opacity:.6">(rank 2 enforced &mdash; stays a valid essential matrix)</span></div>';
+    }
+
+    planarEl.addEventListener('input', update);
+    update();
+  })();
+
+  // ---------- Step 8: degeneracy demo ----------
   (function(){
     var canvas1 = document.getElementById('s4e-canvas1'), ctx1 = canvas1.getContext('2d');
     var canvas2 = document.getElementById('s4e-canvas2'), ctx2 = canvas2.getContext('2d');
