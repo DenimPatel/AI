@@ -83,10 +83,12 @@
 *, *::before, *::after { box-sizing: border-box; }
 html {
   -webkit-text-size-adjust: 100%;
-  /* The global nav is a sticky floating pill (see .nav below); without this,
-     jumping to an in-page anchor (e.g. a guide's table of contents) lands the
-     target heading right under the nav, which then covers it. */
-  scroll-padding-top: 90px;
+  /* The series pill nav (see .nav--series below) is sticky at the top of the
+     content column; without this, jumping to an in-page anchor (e.g. a
+     guide's table of contents) lands the target heading right under it. */
+  scroll-padding-top: 64px;
+  --nav-w: 220px;
+  --nav-w-collapsed: 64px;
 }
 body {
   margin: 0;
@@ -97,6 +99,15 @@ body {
   line-height: 1.55;
   font-weight: 400;
   text-wrap: pretty;
+  margin-left: var(--nav-w);
+  transition: margin-left .2s ease;
+}
+html.nav-collapsed body { margin-left: var(--nav-w-collapsed); }
+@media (max-width: 900px) {
+  body { margin-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body { transition: none; }
 }
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading); font-weight: var(--font-heading-weight);
@@ -174,6 +185,11 @@ tbody tr:hover { background: color-mix(in srgb, var(--color-text) 4%, transparen
 main { display: block; }
 .section { padding: var(--space-8) 0; }
 .section:first-of-type { padding-top: clamp(32px, 6vw, 56px); }
+@media (max-width: 900px) {
+  /* Same hamburger clearance as .page-header, for layouts (home) whose first
+     block is a .section rather than a .page-header. */
+  .section:first-of-type { padding-top: 64px; }
+}
 .section-kicker {
   display: block; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase;
   color: color-mix(in srgb, var(--color-text) 70%, transparent); margin-bottom: 10px;
@@ -187,47 +203,111 @@ main { display: block; }
 }
 .era-heading:first-of-type { margin-top: var(--space-4); }
 
-/* — navigation: floating liquid-glass pill, sticky above all content — */
-.nav {
-  position: sticky; top: 14px; z-index: 100;
-  display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap;
-  margin: 14px clamp(14px, 4vw, 56px) 0;
-  padding: 10px 22px;
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  border-radius: 999px;
-  backdrop-filter: blur(20px) saturate(160%);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
-  box-shadow: var(--glass-shadow);
-  transition: padding .25s ease, box-shadow .25s ease, background .25s ease;
-}
-.nav--condensed {
-  padding-block: 7px;
-  box-shadow: var(--glass-shadow-hover);
-  background: var(--glass-bg-strong);
-}
+/* — navigation: collapsible left sidebar, fixed for the life of the page — */
+.nav a { color: inherit; text-decoration: none; }
 .nav-brand {
-  display: inline-flex; align-items: center; gap: 7px;
+  display: inline-flex; align-items: center; gap: 9px;
   font-family: var(--font-heading); font-weight: var(--font-heading-weight);
-  font-size: 18px; margin-right: auto; color: var(--color-text); text-decoration: none;
+  font-size: 18px; color: var(--color-text); text-decoration: none;
 }
 .nav-brand-dot {
-  width: 8px; height: 8px; border-radius: 50%;
+  width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto;
   background: var(--glass-blue);
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--glass-blue) 18%, transparent);
 }
-.nav a { color: inherit; text-decoration: none; font-size: 14px; padding: 5px 4px; border-radius: 999px; transition: color .2s ease, background .2s ease; }
-.nav a:hover { color: var(--glass-blue-dark); }
-.nav a[aria-current='page'] {
-  background: var(--glass-blue); color: #fff; padding: 5px 13px;
+
+#site-nav {
+  position: fixed; inset: 0 auto 0 0; z-index: 300;
+  width: var(--nav-w);
+  display: flex; flex-direction: column; gap: 2px;
+  padding: 18px 14px 20px;
+  overflow-y: auto;
+  background: var(--glass-bg-strong);
+  border-right: 1px solid var(--glass-border);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  transition: width .2s ease, transform .2s ease;
+}
+.nav-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 10px; padding-bottom: 4px;
+}
+.nav-collapse-toggle {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; padding: 0; margin: 0;
+  font-size: 14px; line-height: 1; color: var(--color-text);
+  background: transparent; border: 1px solid var(--glass-border); border-radius: var(--radius-md);
+  cursor: pointer;
+}
+.nav-collapse-toggle:hover { background: var(--glass-bg); }
+#site-nav a {
+  font-size: 14.5px; padding: 8px 10px; border-radius: var(--radius-md);
+  transition: color .15s ease, background .15s ease;
+}
+#site-nav a:hover { background: var(--glass-bg); color: var(--glass-blue-dark); }
+#site-nav a[aria-current='page'] { background: var(--glass-blue); color: #fff; }
+
+/* — collapsed state: icon-rail only, labels hidden, native title tooltip — */
+.nav-icon {
+  display: none; width: 26px; height: 26px; border-radius: 50%;
+  align-items: center; justify-content: center;
+  font-family: var(--font-heading); font-weight: 600; font-size: 12px;
+  background: var(--glass-bg); border: 1px solid var(--glass-border);
+}
+[aria-current='page'] .nav-icon { background: rgba(255,255,255,0.25); border-color: transparent; }
+html.nav-collapsed #site-nav { width: var(--nav-w-collapsed); }
+html.nav-collapsed #site-nav .nav-label { display: none; }
+html.nav-collapsed #site-nav .nav-icon { display: flex; }
+html.nav-collapsed #site-nav a {
+  display: flex; align-items: center; justify-content: center; padding: 8px 0;
+}
+html.nav-collapsed #site-nav .nav-brand { justify-content: center; }
+html.nav-collapsed .nav-head { justify-content: center; flex-direction: column; gap: 8px; }
+
+/* — mobile: sidebar becomes an off-canvas drawer; a fixed hamburger opens it — */
+.nav-mobile-toggle { display: none; }
+.nav-scrim { display: none; }
+@media (max-width: 900px) {
+  #site-nav {
+    width: min(78vw, 280px);
+    transform: translateX(-100%);
+    box-shadow: var(--glass-shadow-hover);
+  }
+  html.nav-open #site-nav { transform: translateX(0); }
+  html.nav-collapsed #site-nav .nav-label { display: inline; }
+  html.nav-collapsed #site-nav .nav-icon { display: none; }
+  html.nav-collapsed #site-nav a { display: block; padding: 8px 10px; }
+  html.nav-collapsed .nav-head { flex-direction: row; justify-content: space-between; }
+  .nav-collapse-toggle { display: none; }
+  .nav-mobile-toggle {
+    display: flex; flex-direction: column; justify-content: center; gap: 4px;
+    position: fixed; top: 14px; left: 14px; z-index: 350;
+    width: 40px; height: 40px; padding: 0;
+    background: var(--glass-bg-strong); border: 1px solid var(--glass-border); border-radius: var(--radius-md);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    box-shadow: var(--glass-shadow);
+    cursor: pointer;
+  }
+  .nav-mobile-toggle-bar {
+    display: block; width: 18px; height: 2px; margin: 0 auto;
+    background: var(--color-text); border-radius: 1px;
+  }
+  html.nav-open .nav-scrim {
+    display: block; position: fixed; inset: 0; z-index: 320;
+    background: color-mix(in srgb, var(--glass-ink) 35%, transparent);
+  }
 }
 @media (prefers-reduced-motion: reduce) {
-  .nav { transition: none; }
+  #site-nav, body { transition: none; }
 }
 
-/* — series pill nav: the per-part row under the global nav — */
+/* — series pill nav: the per-part row, sticky at the top of the content column — */
 .nav--series {
-  gap: var(--space-2); padding-top: 0; padding-bottom: var(--space-3);
+  position: sticky; top: 14px; z-index: 100;
+  display: flex; align-items: center; flex-wrap: wrap;
+  gap: var(--space-2); margin: 14px clamp(14px, 4vw, 56px) 0 0;
+  padding: 10px 0 var(--space-3);
   border-bottom: 1px solid var(--color-divider); font-size: 13px;
 }
 .nav--series a {
@@ -263,15 +343,15 @@ main { display: block; }
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scroll-snap-type: x proximity;
-    margin: 10px 14px 0;
+    margin: 10px 14px 0 0;
   }
   .nav--series a,
   .nav--series-act { scroll-snap-align: start; }
-  /* The full link row and the part ribbon are both useful once, to get your
-     bearings or jump to a part, but neither is worth pinning to the screen
-     while reading — series-nav.html marks the site nav with this class once
-     a series ribbon follows it. */
-  .nav--has-series { position: static; }
+}
+/* Clear the fixed mobile hamburger (top-left) so the first pill, or a
+   page's own heading, never sits underneath it. */
+@media (max-width: 900px) {
+  .nav--series { padding-left: 62px; }
 }
 
 /* — compact mobile-only bar: current series + part, replaces the full site
@@ -453,6 +533,12 @@ main { display: block; }
   font-size: clamp(32px, 5vw, 52px); line-height: 1.1; margin: 0;
 }
 .page-header p { font-size: 16px; line-height: 1.6; max-width: 60ch; margin: 16px 0 0; opacity: 0.85; }
+@media (max-width: 900px) {
+  /* Clear the fixed mobile hamburger (top-left, ~54px tall) so a page's own
+     heading — which has no series ribbon above it to push it down — never
+     starts underneath the button. */
+  .page-header { padding-top: 64px; }
+}
 
 /* — robotics listing rows — */
 .note-row {
