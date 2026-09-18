@@ -3,14 +3,10 @@ name: Build and deploy to GitHub Pages
 # Builds the Jekyll site in Actions and publishes it as this repo's project page
 # (https://denimpatel.github.io/AI/). This requires
 # Settings → Pages → Build and deployment → Source = "GitHub Actions".
-#
-# `split-courses` is the branch that moved the interactive guides out to
-# denimpatel/interactive-courses; it is listed here so that branch deploys a
-# preview while the split is verified. Drop it once the split is merged to main.
 
 on:
   push:
-    branches: [main, split-courses]
+    branches: [main]
   workflow_dispatch: {}
 
 permissions:
