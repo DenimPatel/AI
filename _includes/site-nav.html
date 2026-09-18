@@ -28,6 +28,7 @@ mobile drawer state is not persisted.
   {%- for s in site.data.sections %}
   <a href="{{ s.url | relative_url }}"{% if page.section == s.id %} aria-current="page"{% endif %}>{{ s.title }}</a>
   {%- endfor %}
+  <a href="https://denimpatel.github.io/interactive-courses/">Interactive guides &rarr;</a>
   <a href="{{ '/about/' | relative_url }}"{% if page.url == '/about/' %} aria-current="page"{% endif %}>About</a>
 </nav>
 <script>

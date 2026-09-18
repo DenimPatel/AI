@@ -1,4 +1,5 @@
-# Ordering and headings for the field-note listings on the section hubs.
+# Ordering and headings for the field-note listings on the section hubs and
+# the /blog/ index.
 # Notes carry `section` and `group` in their front matter; this file decides
 # which groups appear, in what order, under what heading.
 robotics:
@@ -13,3 +14,9 @@ vision:
     title: "Computer vision basics"
   - id: math
     title: "Math for geometry"
+# Pure-opinion posts that fit neither subject. New posts are scaffolded with
+# `scripts/new-note.sh blog perspective <slug>`; they render under the
+# "Perspectives" heading on /blog/ and nowhere else.
+blog:
+  - id: perspective
+    title: "Perspectives"

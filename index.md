@@ -7,24 +7,15 @@ description: A running record of artificial intelligence — milestones, product
 ---
 
 {%- assign notes = site.pages | where_exp: "p", "p.date_label" -%}
-{%- assign llm = site.data.series.llm_training.parts | size -%}
-{%- assign serving = site.data.series.llm_serving.parts | size -%}
-{%- assign mvg = site.data.series.multi_view_geometry.parts | size -%}
-{%- assign nlo = site.data.series.nonlinear_optimization.parts | size -%}
-{%- assign linalg = site.data.series.linear_algebra.parts | size -%}
-{%- assign calc = site.data.series.calculus.parts | size -%}
-{%- assign calc_motion = site.data.series.calculus_in_motion.parts | size -%}
-{%- assign prob = site.data.series.probability.parts | size -%}
-{%- assign prob_action = site.data.series.probability_in_action.parts | size -%}
-{%- assign stats = site.data.series.statistics.parts | size -%}
-{%- assign guideparts = llm | plus: serving | plus: mvg | plus: nlo | plus: linalg | plus: calc | plus: calc_motion | plus: prob | plus: prob_action | plus: stats -%}
+{%- assign guideparts = site.data.guide_index.total_parts -%}
+{%- assign guidecount = site.data.guide_index.total_guides -%}
 
 <section class="hero">
   <h1>A running record<br>of artificial intelligence.</h1>
   <p>From the Turing Test to today's agents: the milestones, the products, and the people who said so at the time — plus {{ guideparts }} parts of interactive guides that build the underlying machinery from scratch.</p>
   <div class="hero-actions">
     <a href="{{ '/ai/' | relative_url }}" class="btn btn-primary">Read the record</a>
-    <a href="{{ '/vision/' | relative_url }}" class="btn btn-ghost">Try the interactive guides</a>
+    <a href="https://denimpatel.github.io/interactive-courses/" class="btn btn-ghost">Try the interactive guides</a>
   </div>
 </section>
 
@@ -76,18 +67,17 @@ description: A running record of artificial intelligence — milestones, product
 <section class="section">
   <span class="section-kicker">Interactive guides</span>
   <h2 class="section-title">Built from scratch, step by step</h2>
-  <p class="section-lede">Ten long-form guides. Every part is interactive — you drag the point along the curve, run the training loop, and watch the solver converge.</p>
+  <p class="section-lede">{{ guidecount }} long-form guides, {{ guideparts }} parts, now on their own site. Every part is interactive — you drag the point along the curve, run the training loop, and watch the solver converge.</p>
   <div class="card-grid card-grid--tight" style="margin-bottom: 24px;">
-    {%- assign guide_ids = "llm_training,llm_serving,multi_view_geometry,nonlinear_optimization,linear_algebra,calculus,calculus_in_motion,probability,probability_in_action,statistics" | split: "," %}
-    {%- for sid in guide_ids %}
-    {%- assign s = site.data.series[sid] %}
-    <a class="card reveal" style="text-decoration:none; color:inherit; transition-delay: {{ forloop.index0 | times: 0.05 }}s;" href="{{ s.hub | relative_url }}">
-      <div class="card-kicker">Interactive &middot; {{ s.parts | size }} parts</div>
-      <div class="card-title">{{ s.title }}</div>
-      <p class="card-body">{{ s.parts[0].blurb }}</p>
+    {%- for g in site.data.guide_index.guides %}
+    <a class="card reveal" style="text-decoration:none; color:inherit; transition-delay: {{ forloop.index0 | times: 0.05 }}s;" href="{{ g.url }}">
+      <div class="card-kicker">Interactive &middot; {{ g.parts }} parts</div>
+      <div class="card-title">{{ g.title }}</div>
+      <p class="card-body">{{ g.blurb }}</p>
     </a>
     {%- endfor %}
   </div>
+  <p><a href="https://denimpatel.github.io/interactive-courses/" class="btn btn-secondary">Open the interactive guides &rarr;</a></p>
 </section>
 
 <section class="section" style="padding-bottom: 40px;">

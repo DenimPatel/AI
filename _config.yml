@@ -35,3 +35,8 @@ defaults:
       type: pages
     values:
       layout: robotics-article
+  - scope:
+      path: "blog"
+      type: pages
+    values:
+      layout: robotics-article

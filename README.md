@@ -1,13 +1,17 @@
 # AI
 
-A Jekyll site published by GitHub Pages at https://denimpatel.github.io/AI/. It's a running
-record of the AI field (timeline, product releases, benchmarks, labs, quotes, key papers),
-interactive guides on multi-view geometry and nonlinear optimization, a 15-part guide on
-how a language model is trained, a 20-part guide on serving it at scale, and the math
-volumes: 22 parts of linear algebra, two 14-part volumes of calculus, two interactive
-probability volumes (`/math/probability/` and `/math/probability-in-action/`), and a
-32-part guide to statistics that runs from a single sample to Kalman filters and causal
-inference — plus a set of field notes on ROS and robot navigation.
+A Jekyll site published by GitHub Pages at https://denimpatel.github.io/AI/. It is the
+"everything else" half of a two-repo split:
+
+- **This repo** — the running record of the AI field (timeline, product releases,
+  benchmarks, labs, quotes, key papers), the field notes on ROS, robot navigation and
+  computer vision, and the blog at `/blog/` that gathers those notes plus new perspective
+  pieces.
+- **[interactive-courses](https://github.com/DenimPatel/interactive-courses)** — all the
+  interactive guides (LLM training and serving, building with LLMs, agents, generative
+  media, multimodal, multi-view geometry, nonlinear optimization, linear algebra,
+  calculus, probability, statistics), published at
+  https://denimpatel.github.io/interactive-courses/.
 
 No JavaScript framework, no npm, no build step beyond Jekyll.
 
@@ -36,9 +40,10 @@ already existed before your change, fails only on new/changed files):
 ruby scripts/lint-content.rb
 ```
 
-CI (`.github/workflows/ci.yml`) runs all three of the above on every push and PR. A
-separate monthly job (`.github/workflows/link-check.yml`) checks external links too,
-since the site hotlinks all 31 raster images to an external blog with no local fallback.
+CI (`.github/workflows/ci.yml`) runs all three of the above on every push and PR.
+`.github/workflows/pages.yml` builds and deploys the site. A separate monthly job
+(`.github/workflows/link-check.yml`) checks external links too, since the site hotlinks
+all 31 raster images to an external blog with no local fallback.
 
 ## Adding content
 
@@ -48,21 +53,24 @@ an existing page:
 
 | To add... | Run |
 |---|---|
-| A part to an existing interactive guide series | `scripts/new-part.sh <series_id> <slug>` |
-| A field note | `scripts/new-note.sh <section> <group> <slug>` |
-| A brand-new guide series | `scripts/new-series.sh <section> <series_id>` |
+| A field note or blog post | `scripts/new-note.sh <section> <group> <slug>` |
 
-Each writes from a template in `_templates/` and leaves `REPLACE_*` placeholders for you
-to fill in; none of them touch an existing file (`new-series.sh` does rewrite
-`_data/sections.yml` through a YAML round-trip to register the series — diff it before
-committing).
+For a pure-opinion blog post that fits neither subject, use section `blog` and group
+`perspective`: `scripts/new-note.sh blog perspective <slug>`. It renders under
+"Perspectives" on `/blog/`.
 
-New interactive guide pages should build on the "guide kit" — `_includes/guide-head.html`,
-`_includes/guide-footer.html`, `assets/css/guide.css`, `assets/js/guide-core.js`,
-`assets/js/guide-math.js`, `assets/js/guide-plot3d.js` — rather than pasting a new
-`<style>`/`<script>` block. See `CLAUDE.md` for the full architecture and the guide kit's
-scope (it is for *new* pages only — the 26 existing multi-view-geometry and
-nonlinear-optimization pages keep their inline styles and are never migrated).
+New interactive guide pages do **not** belong here any more — they go in the
+[interactive-courses](https://github.com/DenimPatel/interactive-courses) repo, where
+`scripts/new-part.sh` and `scripts/new-series.sh` live. After adding, removing or
+renaming a guide part there, run this repo's sync script so the homepage counters and the
+old-URL redirect stubs pick up the change:
 
-See `CLAUDE.md` for everything else: the three page shapes, the `{% raw %}` gotchas,
-`baseurl`/`relative_url` rules, and front-matter conventions.
+```bash
+ruby scripts/sync-guides.rb /path/to/interactive-courses
+```
+
+That regenerates `_data/guide_index.yml` (the homepage part counts) and the ~300 static
+redirect stubs under the old `/AI/...` guide paths. Commit the result.
+
+See `CLAUDE.md` for everything else: the page shapes, `baseurl`/`relative_url` rules,
+the cross-repo link rules, and front-matter conventions.

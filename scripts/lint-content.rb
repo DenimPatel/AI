@@ -66,7 +66,7 @@ end
 def front_matter_pages
   pages = []
   Find.find('.') do |path|
-    Find.prune if path.start_with?('./.git', './_site', './vendor', './.claude', './.jekyll-cache')
+    Find.prune if path.start_with?('./.git', './_site', './vendor', './.claude', './.jekyll-cache', './.worktrees')
     next unless File.file?(path)
     next unless path =~ /\.(md|markdown|html)$/
     rel = path.sub(%r{\A\./}, '')
@@ -222,7 +222,7 @@ SERIES_NAME_HINTS = {
 }.freeze
 
 Find.find('.') do |path|
-  Find.prune if path.start_with?('./.git', './_site', './vendor', './.claude', './.jekyll-cache', './assets')
+  Find.prune if path.start_with?('./.git', './_site', './vendor', './.claude', './.jekyll-cache', './.worktrees', './assets')
   next unless File.file?(path)
   next unless path =~ /\.(md|markdown|html|yml|yaml)$/
   rel = path.sub(%r{\A\./}, '')

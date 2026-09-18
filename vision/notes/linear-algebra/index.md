@@ -18,7 +18,7 @@ In this blog post I am sharing you the best resources available on the internet 
 
 My goal here is not to scare you by providing the massive resource list from picking everything from the internet but delivering what is best. You can use any of the mentioned reference material as per your convenience.
 
-**Update:** there is now a full interactive series built on this list — <a href="{{ '/math/linear-algebra/' | relative_url }}">Linear Algebra, Interactively</a> — which works through the checklist below one draggable picture at a time, starting from <a href="{{ '/math/linear-algebra/vectors/' | relative_url }}">what a vector is</a>. Use this page for the source links; use the series to actually learn the material.
+**Update:** there is now a full interactive series built on this list — <a href="https://denimpatel.github.io/interactive-courses/math/linear-algebra/">Linear Algebra, Interactively</a> — which works through the checklist below one draggable picture at a time, starting from <a href="https://denimpatel.github.io/interactive-courses/math/linear-algebra/vectors/">what a vector is</a>. Use this page for the source links; use the series to actually learn the material.
 
 Here's the list you are looking for:
 

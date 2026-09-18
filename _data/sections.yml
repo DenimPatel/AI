@@ -1,5 +1,12 @@
-# The four top-level subjects. Drives the global nav (_includes/site-nav.html),
+# The top-level subjects. Drives the global nav (_includes/site-nav.html),
 # the homepage doors, and each section hub page (_layouts/section-hub.html).
+#
+# The interactive guides moved to their own repo in Aug 2026:
+#   https://denimpatel.github.io/interactive-courses/
+# This repo keeps the record (timeline/products/benchmarks/labs/voices/papers),
+# the field notes, and the blog. There are no `series:` keys here any more —
+# `_layouts/section-hub.html` no longer renders series grids, and the homepage
+# counters read the generated `_data/guide_index.yml` instead.
 #
 # Contract - one entry per section, keys:
 #   id        (required) matches page front-matter `section:` values for this subject.
@@ -10,9 +17,6 @@
 #   pages     (optional) a list of {title, url, blurb} hand-authored pages to card-grid
 #             at the top of the hub (e.g. the /ai/ record pages). Omit if the section has
 #             none.
-#   series    (optional) a list of series ids (matching _data/series/<id>.yml filenames)
-#             to render as card grids, each followed by an "Open the N-part guide" button.
-#             Omit if the section has no interactive guides.
 #   notes_path / notes_blurb (optional, must be given together) - when set, the hub
 #             renders a "Background notes" heading with this blurb, followed by
 #             {% include note-list.html section=<id> %} (the field-note listing for
@@ -22,7 +26,7 @@
   title: "AI"
   url: /ai/
   kicker: "The record"
-  blurb: "A running record of the field - milestones, product releases, benchmark scores, the labs building it, and what people said at the time - plus interactive guides to how a language model is actually trained, how one is served at scale, how to build with LLMs, how agents act in the world, and how models are made to see, hear and generate media."
+  blurb: "A running record of the field - milestones, product releases, benchmark scores, the labs building it, and what people said at the time. The interactive guides to how language models are trained, served, built with and made to see now live on the companion guides site."
   pages:
     - title: "History timeline"
       url: /ai/timeline/
@@ -42,23 +46,12 @@
     - title: "Key papers"
       url: /ai/papers/
       blurb: "An annotated bibliography of the landmark papers, 1943 to today, each with a link to the original."
-  series:
-    - llm_training
-    - llm_serving
-    - building_with_llms
-    - agents_in_action
-    - generative_media
-    - multimodal
 
 - id: vision
   title: "Vision & Geometry"
   url: /vision/
-  kicker: "Interactive guides"
-  blurb: "Two long interactive guides built around running examples you can drag: the geometry that turns images into 3D structure, and the nonlinear least-squares machinery that makes it converge. Plus the background notes that lead into them."
-  series:
-    - multi_view_geometry
-    - nonlinear_optimization
-    - guide_kit_demo
+  kicker: "Field notes"
+  blurb: "Background notes on OpenCV basics, linear algebra and quaternions - the on-ramp to the multi-view geometry and nonlinear optimization guides, which now live on the companion guides site."
   notes_path: /vision/notes/
   notes_blurb: "Background notes on OpenCV basics, linear algebra and quaternions - the on-ramp to both guides."
 
@@ -70,15 +63,8 @@
   notes_path: /robotics/
   notes_blurb: "Notes and tutorials on ROS and robot navigation, migrated from the Robotics At Once blog."
 
-- id: math
-  title: "Math"
-  url: /math/
-  kicker: "Foundations"
-  blurb: "The machinery every other subject assumes, built from pictures first: a 22-part interactive guide to linear algebra, two interactive calculus volumes that build single- and multivariable calculus from local linearity up to the gradients, Jacobians, backprop and Lie-group updates the AI, vision and robotics guides consume, two interactive probability volumes that go from what a probability means to the filters, samplers and estimators those guides run on, and an interactive guide to statistics that starts at a sample you can redraw and ends at Kalman filters and causal inference."
-  series:
-    - linear_algebra
-    - calculus
-    - calculus_in_motion
-    - probability
-    - probability_in_action
-    - statistics
+- id: blog
+  title: "Blog"
+  url: /blog/
+  kicker: "Views & perspectives"
+  blurb: "Personal perspective pieces, gathered with the field notes from both subjects - the informal, from-the-workbench writing that does not fit a timeline or an interactive guide."
