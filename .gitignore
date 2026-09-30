@@ -7,3 +7,8 @@ vendor/
 
 # macOS
 .DS_Store
+
+# A git worktree directory, never content. Committing one would nest a
+# second .git inside the index; it shows as untracked and is easy to sweep up
+# with `git add -A`. See `git worktree list`.
+.worktrees/

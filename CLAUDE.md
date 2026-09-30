@@ -126,12 +126,63 @@ invalid YAML and silently broke their meta descriptions. Quote every string valu
 
 ## Assets
 
-`assets/css/styles.css` is the whole design system. `assets/js/reveal.js` is the only JS
-this repo ships: `_includes/site-nav.html` loads it for the homepage card animations, so
-it is kept here even though it is also part of the guide kit. `assets/favicon.svg` and the
-`_includes/{site-nav,favicon,guide-footer}.html` chrome are duplicated in the
-interactive-courses repo rather than extracted to a submodule — keep the two copies in
-sync when you change shared chrome.
+`assets/css/theme.css` is the design system. It declares the token layer — colour,
+type, spacing, radii, elevation, motion — and `assets/css/styles.css` declares no
+values of its own: every colour, space, radius, shadow, duration and type size it
+uses is a `var()` into `theme.css`. `assets/css/chrome.css` is the third sheet and
+draws the nav, the settings dialog and the mobile drawer. It is linked last so it
+beats the general `.nav-*` rules in `styles.css` on equal specificity, which is
+what lets neither file need `!important`.
+
+Every real page renders through `_layouts/default.html`, the only file here with a
+`<head>`; the other four layouts compose into it. The other 341 files in `_site`
+are generated redirect stubs — no front matter, copied verbatim, linking no
+stylesheet at all.
+
+The theme layer, the preferences module and the two includes that carry the boot
+script and the settings panel were brought across from `interactive-courses` at
+the split, along with `assets/fonts/inter-var-latin.woff2`. They are synced copies,
+not forks. `assets/css/theme.css`, `assets/css/chrome.css`,
+`assets/css/styles.css`, `assets/js/preferences.js`, `assets/js/theme-tokens.js`,
+`_includes/theme-boot.html` and `_includes/prefs-panel.html` are the same files in
+both repos and are kept in step **by hand**, by the same arrangement as the older
+chrome described below. Nothing will tell you they have drifted, and the comments
+in them were written against the guides site's scale — its page count, its
+standalone pages, its guide stylesheets — none of which exist here. Each file now
+says in its own header that it is a synced copy. Edit both.
+
+`assets/js/reveal.js` is the pre-existing script: `_includes/site-nav.html` loads
+it for the homepage card animations, and it was kept here when the guide kit moved
+out. `assets/js/theme-tokens.js` is the canvas colour bridge; it is loaded on every
+page and defines `THEME`, but this site has no canvas pages, so nothing calls it
+here. `assets/favicon.svg` and the `_includes/{site-nav,favicon,guide-footer}.html`
+chrome are likewise duplicated in the interactive-courses repo rather than
+extracted to a submodule — keep the two copies in sync when you change shared
+chrome.
+
+Three guards check the theme layer against a built `_site`. They need `node`, which
+CI does not install, so run them by hand after a build:
+
+```bash
+node scripts/check-theme-coverage.js   # every real page carries the whole layer
+node scripts/check-stylesheet-order.js # theme.css first, chrome.css last
+node scripts/check-inline-scripts.js   # every inline <script> compiles
+```
+
+- `check-theme-coverage.js` splits the two page populations before counting,
+  because the 341 stubs would otherwise dilute a coverage check into a number that
+  looks complete and is not. Each real page must carry all nine pieces: the three
+  stylesheets, `theme-tokens.js`, `preferences.js`, `window.__icThemeBoot` (Liquid
+  expands the include, so the marker has to be what the include installs),
+  `id="main"` for the skip link, the panel markup, and the skip link itself.
+- `check-stylesheet-order.js` enforces the one canonical order and reports a page
+  that has wedged an unmanaged local sheet between the managed links. `--fix`
+  rewrites order in place.
+- `check-inline-scripts.js` compiles every inline `<script>` in `_site` with
+  `vm.Script`, which uses browser semantics rather than CJS. It exists because a
+  top-level `return` is legal in a module and fatal in a browser: the script is
+  discarded whole, at parse time, on every page, and the rendered page says nothing
+  about it. A broken boot script looks exactly like a page that is simply unthemed.
 
 There are no local images — **all 31 raster images are hotlinked to
 `roboticswithdenim.wordpress.com`** and will disappear if that blog goes down.

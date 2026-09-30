@@ -5,14 +5,42 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{% if page.title %}{{ page.title }} · {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
 {% if page.description %}<meta name="description" content="{{ page.description }}">{% else %}<meta name="description" content="{{ site.description }}">{% endif %}
+
+{%- comment -%}
+No-flash boot. This runs before any stylesheet, because a stylesheet is what
+decides what the first frame looks like, and a reader who chose Dark must never
+be shown a light one. It is inlined on every page and wrapped in try/catch
+throughout, so blocked storage degrades to the defaults rather than throwing.
+It reads the same `ic-prefs` key and writes the same attributes and custom
+properties as assets/js/preferences.js; the two must agree or a reader gets a
+different page depending on whether the module loaded.
+{%- endcomment -%}
+{% include theme-boot.html %}
+<meta name="theme-color" content="#f2f5fa" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#090c11" media="(prefers-color-scheme: dark)">
+<script src="{{ '/assets/js/theme-tokens.js' | relative_url }}"></script>
+
+{%- comment -%}
+Order is load-bearing, and both ends of it are enforced by
+scripts/check-stylesheet-order.js:
+
+  theme.css   the token layer. First, so that anything linked after it can
+              still override a value.
+  styles.css  site chrome, cards, prose, footer, home page.
+  chrome.css  nav, settings dialog, mobile drawer. Last, so it beats the
+              general .nav-* rules in styles.css on equal specificity, which is
+              what lets either file stay free of !important.
+{%- endcomment -%}
+<link rel="stylesheet" href="{{ '/assets/css/theme.css' | relative_url }}">
 <link rel="stylesheet" href="{{ '/assets/css/styles.css' | relative_url }}">
+<link rel="stylesheet" href="{{ '/assets/css/chrome.css' | relative_url }}">
 {% include favicon.html %}
 </head>
 <body class="layout-{{ page.layout | default: 'page' }}">
 
 {% include site-nav.html %}
 
-<main>
+<main id="main">
 {{ content }}
 </main>
 
